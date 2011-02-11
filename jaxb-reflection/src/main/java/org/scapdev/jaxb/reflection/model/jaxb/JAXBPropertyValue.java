@@ -30,7 +30,7 @@ import java.util.Collection;
 
 import javax.xml.bind.JAXBElement;
 
-import org.scapdev.jaxb.reflection.instance.visitor.InstanceVisitor;
+import org.scapdev.jaxb.reflection.instance.InstanceVisitor;
 import org.scapdev.jaxb.reflection.model.DelegatingPropertyValue;
 import org.scapdev.jaxb.reflection.model.ExtendedModel;
 import org.scapdev.jaxb.reflection.model.PropertyInfo;

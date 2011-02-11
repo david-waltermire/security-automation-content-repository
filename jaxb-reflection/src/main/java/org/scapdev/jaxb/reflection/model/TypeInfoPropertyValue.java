@@ -26,7 +26,7 @@ package org.scapdev.jaxb.reflection.model;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-import org.scapdev.jaxb.reflection.instance.visitor.InstanceVisitor;
+import org.scapdev.jaxb.reflection.instance.InstanceVisitor;
 import org.scapdev.jaxb.reflection.model.visitor.ModelVisitor;
 
 public class TypeInfoPropertyValue implements PropertyValue {

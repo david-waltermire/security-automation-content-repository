@@ -31,13 +31,27 @@ import java.lang.reflect.Method;
 
 
 /**
- * This interface represents a property contained within a bound XML class.
+ * This interface represents an XML element or attribute property contained
+ * within a bound XML class.
+
  * @author David Waltermire
  *
  */
 public interface PropertyInfo {
+	/**
+	 * Retrieves the Java Method getter associated with the property
+	 * @return the Java Method associated with the property
+	 */
 	Method getGetter();
+	/**
+	 * Retrieves the Java Field associated with the property
+	 * @return the Java Field associated with the property
+	 */
 	Field getField();
+	/**
+	 * Retrieves the PropertyValue object directly associated with the property
+	 * @return the PropertyValue associated with the property
+	 */
 	PropertyValue getValue();
 	/**
 	 * Retrieves the TypeInfo records of the bound XML class for which this property is a member
@@ -49,8 +63,34 @@ public interface PropertyInfo {
 	 * @return the property name
 	 */
 	String getName();
+	/**
+	 * @return <code>true</code> if the property represents a bound XML
+	 * 		attribute, <code>false</code> otherwise
+	 */
 	boolean isAttribute();
+	/**
+	 * @return <code>true</code> if the property represents a bound XML
+	 * 		element, <code>false</code> otherwise
+	 */
 	boolean isElement();
+	/**
+	 * Retrieves the instance associated with the property
+	 * @param classInstance the Java object to retrieve the property value from 
+	 * @return the instance associated with the property
+	 * @throws IllegalArgumentException (from Java) when invoking a Java method
+	 * 		that is an instance method and the specified object argument is not
+	 * 		an instance of the class or interface declaring the underlying
+	 * 		method (or of a subclass or implementor thereof); if the number of
+	 * 		actual and formal parameters differ; if an unwrapping conversion for
+	 * 		primitive arguments fails; or if, after possible unwrapping, a
+	 * 		parameter value cannot be converted to the corresponding formal
+	 * 		parameter type by a method invocation conversion.
+	 * @throws IllegalAccessException (from Java) when invoking a Java method
+	 * 		object that enforces Java language access control and the underlying
+	 * 		method is inaccessible.
+	 * @throws InvocationTargetException (from Java) when invoking a Java method
+	 * 		where the underlying method throws an exception.
+ 	 */
 	Object getInstance(Object classInstance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
 	<T extends Annotation> T getAnnotation(Class<T> annotation);
 }
