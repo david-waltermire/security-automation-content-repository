@@ -28,9 +28,7 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Relationship;
-import org.scapdev.content.model.RelationshipInfo;
+import org.apache.commons.lang.time.StopWatch;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
 import org.scapdev.content.model.processor.jaxb.ImportData;
@@ -44,15 +42,38 @@ public class App
 {
     public static void main( String[] args ) throws IOException, JAXBException, ImportException
     {
+    	StopWatch watch = new StopWatch();
+    	watch.start();
     	ContentRepository repository = new ContentRepository(App.class.getClassLoader());
+    	watch.stop();
+    	System.out.println("Repository startup: "+watch.toString());
+
+    	
     	Importer importer = repository.getProcessor().newImporter();
-    	ImportData data = importer.read(new File("content/fdcc/FDCC-Major-Version-1.2.0.0/winxp/fdcc-winxp-oval.xml"));
-    	for (Entity<Object> entity : data.getEntities()) {
-    		System.out.println("Entity: "+entity.getEntityInfo().getId());
-    		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
-        		System.out.println("  Relationship: "+relationship.getRelationshipInfo().getId());
-    		}
-    	}
+    	watch.reset();
+    	watch.start();
+    	ImportData data = importer.read(new File("target/content/com.redhat.rhsa-all.xml"));
+    	watch.stop();
+    	System.out.println("Redhat import: "+watch.toString());
+
+//    	for (Entity<Object> entity : data.getEntities()) {
+//    		System.out.println("Entity: "+entity.getEntityInfo().getId());
+//    		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
+//        		System.out.println("  Relationship: "+relationship.getRelationshipInfo().getId());
+//    		}
+//    	}
+    	watch.reset();
+    	watch.start();
+    	ImportData data2 = importer.read(new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml"));
+    	watch.stop();
+    	System.out.println("USGCB Win7 import: "+watch.toString());
+
+//    	for (Entity<Object> entity : data2.getEntities()) {
+//    		System.out.println("Entity: "+entity.getEntityInfo().getId());
+//    		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
+//        		System.out.println("  Relationship: "+relationship.getRelationshipInfo().getId());
+//    		}
+//    	}
     	repository.shutdown();
     }
 }
