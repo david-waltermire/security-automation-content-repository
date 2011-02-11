@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.instance.visitor;
+package org.scapdev.jaxb.reflection.instance;
 
 import java.lang.reflect.InvocationTargetException;
 

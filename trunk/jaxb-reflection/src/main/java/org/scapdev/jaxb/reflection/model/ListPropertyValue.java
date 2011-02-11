@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.instance.visitor.InstanceVisitor;
+import org.scapdev.jaxb.reflection.instance.InstanceVisitor;
 import org.scapdev.jaxb.reflection.model.visitor.ModelVisitor;
 
 public class ListPropertyValue implements DelegatingPropertyValue {

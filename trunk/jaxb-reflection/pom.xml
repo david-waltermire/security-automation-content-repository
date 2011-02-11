@@ -12,7 +12,11 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>jaxb-reflection</name>
-  <url>http://maven.apache.org</url>
+
+  <scm>
+  	<url>scm:svn:https://security-automation-content-repository.googlecode.com/svn/trunk/jaxb-reflection</url>
+  </scm>
+
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
@@ -44,4 +48,26 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

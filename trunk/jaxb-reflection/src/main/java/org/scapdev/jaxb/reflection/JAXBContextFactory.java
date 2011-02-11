@@ -37,7 +37,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
+import org.scapdev.jaxb.reflection.model.JAXBModelException;
 
+/**
+ * This factory class produces a JAXBContext and manages Java packages related
+ * to bound classes within the /META-INF/jaxb-manifest.  The contents of these
+ * files are one package name per line.
+ * 
+ * @author David Waltermire
+ *
+ */
 public class JAXBContextFactory {
 	private static Logger log = Logger.getLogger(JAXBContextFactory.class);
 	private static final ConcurrentMap<JAXBContext, ContextInfo> contextMap = new ConcurrentHashMap<JAXBContext, ContextInfo>();
@@ -49,9 +58,16 @@ public class JAXBContextFactory {
 	}
 
 	public static Set<String> getPackagesForContext(JAXBContext context) {
-		return contextMap.get(context).getPackages();
+		ContextInfo info = contextMap.get(context);
+		if (info == null) {
+			throw new JAXBModelException("the JAXBContext was not initialized by this factory");
+		}
+		return info.getPackages();
 	}
 
+	// TODO: this method will only find the manifest in a single jar associated
+	// with the class loader.  It might be better to allow multiple classloaders
+	// to be provided allowing multiple jars to be used.
 	private static Set<String> getContextPackages(ClassLoader classLoader) throws IOException {
 		log.info("Retrieving packages from jaxb-manifest");
 		InputStream is = classLoader.getResourceAsStream("/META-INF/jaxb-manifest");

@@ -28,30 +28,52 @@ import java.lang.reflect.Method;
 
 import org.scapdev.jaxb.reflection.model.JAXBModelException;
 
+/**
+ * Utility class that enables retrieval of a method on a JAXB bound class, or
+ * one of its super classes recursively, that represents an XML element or
+ * attribute.
+ * @author David Waltermire
+ *
+ */
 public class BeanUtil {
-	public static Method getPropertyGetter(Field field, Class<?> clazz, boolean recurse) throws NoSuchMethodException {
+	/**
+	 * 
+	 * @param field the Field associated with the getter using bean naming conventions
+	 * @param clazz the class to retrieve the Method from
+	 * @param recurse if <code>true</code> search super classes for methods
+	 * @return the Method associated with the field or <code>null</code> if a
+	 * 		matching Method was not found
+	 */
+	public static Method getPropertyGetter(Field field, Class<?> clazz, boolean recurse) {
 		return getPropertyGetter(field.getName(), field.getType(), clazz, recurse);
 	}
-	public static Method getPropertyGetter(String property, Class<?> fieldType, Class<?> clazz, boolean recurse) throws NoSuchMethodException {
+
+	private static Method getPropertyGetter(String property, Class<?> fieldType, Class<?> clazz, boolean recurse) {
+
+		// Build the method name
 		StringBuilder builder = new StringBuilder();
+		// if the field is a Boolean typed field, use "is" as the prefix
 		if (Boolean.class.isAssignableFrom(fieldType)) {
 			builder.append("is");
 		} else {
 			builder.append("get");
 		}
+
 		builder.append(property.substring(0, 1)
 				.toUpperCase())
 				.append(property.substring(1));
+
 		String methodName = builder.toString();
+		Method result = null;
 		do {
-			Method result;
 			try {
 				result = clazz.getDeclaredMethod(methodName);
 			} catch (SecurityException e) {
 				throw new JAXBModelException(e);
+			} catch (NoSuchMethodException e) {
+				result = null;
 			}
-			if (result != null) return result;
-		} while (recurse && (clazz = clazz.getSuperclass()) != null);
-		return null;
+		} while (result == null && recurse && (clazz = clazz.getSuperclass()) != null);
+		return result;
 	}
 }

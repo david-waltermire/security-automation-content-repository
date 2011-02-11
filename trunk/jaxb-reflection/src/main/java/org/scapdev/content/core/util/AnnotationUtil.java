@@ -25,8 +25,22 @@ package org.scapdev.content.core.util;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * Utility methods that support identifying annotations on a class or a super class recursively.
+ * 
+ * @author David Waltermire
+ *
+ */
 public class AnnotationUtil {
 
+	/**
+	 * Retrieves an annotation from a class or one of its super classes.
+	 * @param <A> the annotation type to retrieve
+	 * @param clazz the class to search for an annotation
+	 * @param annotationClass the annotation type to search for
+	 * @return the annotation if it exists on the class or a super class or
+	 * 		<code>null</code> if the annotation is not present
+	 */
 	public static <A extends Annotation> A getAnnotationRecursive(Class<?> clazz, Class<A> annotationClass) {
 		do {
 			A result = clazz.getAnnotation(annotationClass);
@@ -37,6 +51,15 @@ public class AnnotationUtil {
 		return null;
 	}
 
+	/**
+	 * Identifies if an annotation is present on a class or one of its super classes.
+	 * @param <A> the annotation type to identify
+	 * @param clazz the class to search for an annotation
+	 * @param annotationClass the annotation type to search for
+	 * @return <code>true</code> if the annotation exists on the class or a super class or
+	 * 		<code>false</code> if the annotation is not present
+	 * @return
+	 */
 	public static <A extends Annotation> boolean isAnnotationPresentRecursive(Class<?> clazz, Class<A> annotationClass) {
 		do {
 			if (clazz.isAnnotationPresent(annotationClass)) {

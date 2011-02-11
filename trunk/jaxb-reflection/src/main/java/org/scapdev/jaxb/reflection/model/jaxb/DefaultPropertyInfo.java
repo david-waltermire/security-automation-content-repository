@@ -79,23 +79,25 @@ public class DefaultPropertyInfo implements PropertyInfo {
 
 	public Method getGetter() {
 		
-		try {
-			return BeanUtil.getPropertyGetter(field, typeInfo.getType(), true);
-		} catch (NoSuchMethodException e) {
+		Method result = BeanUtil.getPropertyGetter(field, typeInfo.getType(), true);
+		if (result == null) {
 			String name;
+			// TODO: It doesn't appear that the annotations have any impact on
+			// the name of the getter. Evaluate if this logic is doing anything.
 			if (field.isAnnotationPresent(XmlAttribute.class)) {
 				name = field.getAnnotation(XmlAttribute.class).name();
 			} else if (field.isAnnotationPresent(XmlElement.class)) {
 				name = field.getAnnotation(XmlElement.class).name();
 			} else {
-				throw(new JAXBModelException(e));
+				throw(new JAXBModelException("Unable to guess the field name"));
 			}
 			try {
-				return typeInfo.getType().getDeclaredMethod("get"+name);
+				result = typeInfo.getType().getDeclaredMethod("get"+name);
 			} catch (NoSuchMethodException e2) {
 				throw new JAXBModelException(e2);
 			}
 		}
+		return result;
 	}
 
 	public boolean isAttribute() {

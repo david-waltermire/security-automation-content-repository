@@ -27,15 +27,33 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.scapdev.jaxb.reflection.model.PropertyInfo;
-
+/**
+ * @author David Waltermire
+ */
 public class PropertyPathEvaluator {
 	private PropertyPathEvaluator() {}
 
+	/**
+	 * Evaluates a property path against an instance returning the value at the
+	 * end of the path.
+	 * @param <T> the type of the PropertyInfo
+	 * @param instance the JAXB instance to evaluate
+	 * @param path the property path to follow
+	 * @return the value at the end of the property path
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 */
 	public static <T extends PropertyInfo> String evaluate(Object instance, List<T> path) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		for (T propertyInfo : path) {
+			if (instance == null) break;
 			instance = propertyInfo.getInstance(instance);
 			instance = propertyInfo.getValue().getInstance(instance);
 		}
-		return instance.toString();
+		String retval = null;
+		if (instance != null) {
+			retval = instance.toString();
+		}
+		return retval;
 	}
 }

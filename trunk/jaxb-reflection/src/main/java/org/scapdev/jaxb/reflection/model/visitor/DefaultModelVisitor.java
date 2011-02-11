@@ -24,7 +24,7 @@
 package org.scapdev.jaxb.reflection.model.visitor;
 
 import org.apache.log4j.Logger;
-import org.scapdev.jaxb.reflection.instance.visitor.DefaultInstanceVisitor;
+import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
 import org.scapdev.jaxb.reflection.model.ExtendedModel;
 import org.scapdev.jaxb.reflection.model.PropertyInfo;
 import org.scapdev.jaxb.reflection.model.TypeInfo;
