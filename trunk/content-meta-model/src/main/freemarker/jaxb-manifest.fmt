@@ -1,0 +1,7 @@
+<@file name="META-INF/jaxb-manifest">
+  <@forAllPackages var="package">
+    <@ifHasAnnotation declaration=package annotation="javax.xml.bind.annotation.XmlSchema">
+${package.qualifiedName}
+    </@ifHasAnnotation>
+  </@forAllPackages>
+</@file>

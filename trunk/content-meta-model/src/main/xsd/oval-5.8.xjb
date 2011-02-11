@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+    jaxb:version="2.1">
+  
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/oval-definitions-schema.xsd" node="/xs:schema">
+    
+
+  	<!-- ********************************************************************** -->
+  	<!-- * Other bindings                                                     * -->
+  	<!-- ********************************************************************** -->
+<!--
+    <jaxb:bindings node="//xs:complexType[@name='RestrictionType']">
+      <jaxb:property>
+        <jaxb:baseType name="java.lang.String"/>
+      </jaxb:property>
+    </jaxb:bindings>
+-->
+    <jaxb:bindings node="//xs:complexType[@name='PossibleValueType']">
+      <jaxb:property>
+        <jaxb:baseType name="java.lang.String"/>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:complexType[@name='ValueType']">
+      <jaxb:property>
+        <jaxb:baseType name="java.lang.String"/>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:complexType[@name='LiteralComponentType']">
+      <jaxb:property>
+        <jaxb:baseType name="java.lang.String"/>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:complexType[@name='EntityBaseType']">
+      <jaxb:property>
+        <jaxb:baseType name="java.lang.String"/>
+      </jaxb:property>
+    </jaxb:bindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/aix-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.aix"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/apache-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.apache"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/catos-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.catos"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/debian-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.debian"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/esx-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.esx"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/freebsd-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.freebsd"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/hpux-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.hpux"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/independent-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.independent"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/ios-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.ios"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/linux-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.linux"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/macos-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.macos"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/oval-common-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.common"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/oval-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/pixos-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.pixos"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/redhat-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.redhat"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/sharepoint-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.sharepoint"/>
+    </jaxb:schemaBindings>
+    <jaxb:bindings node="//xs:element[@name='infopolicycoll_object']">
+      <jaxb:bindings node=".//xs:element[@name='id']">
+        <jaxb:property name="identifier"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/solaris-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.solaris"/>
+    </jaxb:schemaBindings>
+    <jaxb:bindings node="//xs:element[@name='patch54_object']">
+      <jaxb:bindings node=".//xs:element[@name='version']">
+        <jaxb:property name="patchVersion"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/unix-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.unix"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/windows-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.mitre.oval.v5_8.definitions.windows"/>
+    </jaxb:schemaBindings>
+    <jaxb:bindings node="//xs:element[@name='metabase_object']">
+      <jaxb:bindings node=".//xs:element[@name='id']">
+        <jaxb:property name="identifier"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/independent-definitions-schema.xsd" node="/xs:schema">
+    <jaxb:bindings node="//xs:element[@name='sql_object']">
+      <jaxb:bindings node=".//xs:element[@name='version']">
+        <jaxb:property name="engineVersion"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:element[@name='sql_state']">
+      <jaxb:bindings node=".//xs:element[@name='version']">
+        <jaxb:property name="engineVersion"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:element[@name='sql57_object']">
+      <jaxb:bindings node=".//xs:element[@name='version']">
+        <jaxb:property name="engineVersion"/>
+      </jaxb:bindings>
+    </jaxb:bindings>
+  </jaxb:bindings>
+</jaxb:bindings>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The MIT License
+  
+  Copyright (c) 2011 David Waltermire
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+-->
+<meta-model xmlns="http://scapdev.org/schema/meta-model/0.1"
+  xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://scapdev.org/schema/meta-model/0.1 ../xsd/MetaModel.xsd">
+  <schemas>
+    <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5"
+        namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        schemaLocation="../../../src/main/xsd/oval-5.8/oval-definitions-schema.xsd"
+        prefix="oval-def">
+      <schema-node node="/xs:schema"/>
+      
+      <entities>
+        <entity id="urn:scap-content:entity:org.mitre.oval:definition">
+          <schema-node node="//xs:complexType[@name='DefinitionType']"/>
+          <key id="urn:scap-content:key:org.mitre.oval:definition">
+            <field id="urn:scap-content:field:org.mitre.oval:definition">
+              <schema-node node="xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+        <entity id="urn:scap-content:entity:org.mitre.oval:test">
+          <schema-node node="//xs:complexType[@name='TestType']"/>
+          <key id="urn:scap-content:key:org.mitre.oval:test">
+            <field id="urn:scap-content:field:org.mitre.oval:test">
+              <schema-node node="xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+        <entity id="urn:scap-content:entity:org.mitre.oval:object">
+          <schema-node node="//xs:complexType[@name='ObjectType']"/>
+          <key id="urn:scap-content:key:org.mitre.oval:object">
+            <field id="urn:scap-content:field:org.mitre.oval:object">
+              <schema-node node="xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+        <entity id="urn:scap-content:entity:org.mitre.oval:state">
+          <schema-node node="//xs:complexType[@name='StateType']"/>
+          <key id="urn:scap-content:key:org.mitre.oval:state">
+            <field id="urn:scap-content:field:org.mitre.oval:state">
+              <schema-node node="xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+        <entity id="urn:scap-content:entity:org.mitre.oval:variable">
+          <schema-node node="//xs:complexType[@name='VariableType']"/>
+          <key id="urn:scap-content:key:org.mitre.oval:variable">
+            <field id="urn:scap-content:field:org.mitre.oval:variable">
+              <schema-node node="xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+      </entities>
+
+      <relationships>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:extended-definition">
+          <schema-node node="//xs:complexType[@name='ExtendDefinitionType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:extended-definition"
+              id-ref="urn:scap-content:key:org.mitre.oval:definition">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:extended-definition-id"
+                id-ref="urn:scap-content:field:org.mitre.oval:definition">
+              <schema-node node="xs:attribute[@name='definition_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:criterion">
+          <schema-node node="//xs:complexType[@name='CriterionType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:criterion"
+              id-ref="urn:scap-content:key:org.mitre.oval:test">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:criterion-test-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:test">
+              <schema-node node="xs:attribute[@name='test_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:object-ref">
+          <schema-node node="//xs:complexType[@name='ObjectRefType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:object-ref"
+              id-ref="urn:scap-content:key:org.mitre.oval:object">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:object-ref-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:object">
+              <schema-node node="xs:attribute[@name='object_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:object-component">
+          <schema-node node="//xs:complexType[@name='ObjectComponentType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:object-component"
+            id-ref="urn:scap-content:key:org.mitre.oval:object">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:object-component-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:object">
+              <schema-node node="xs:attribute[@name='object_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:state-ref">
+          <schema-node node="//xs:complexType[@name='StateRefType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:state-ref"
+            id-ref="urn:scap-content:key:org.mitre.oval:state">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:state-ref-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:state">
+              <schema-node node="xs:attribute[@name='state_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:variable-component">
+          <schema-node node="//xs:complexType[@name='VariableComponentType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:variable-component"
+            id-ref="urn:scap-content:key:org.mitre.oval:variable">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:variable-component-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:variable">
+              <schema-node node="xs:attribute[@name='var_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:entity-base-variable">
+          <schema-node node="//xs:complexType[@name='EntityBaseType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:entity-base-variable"
+            id-ref="urn:scap-content:key:org.mitre.oval:variable">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:entity-base-variable-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:variable">
+              <schema-node node=".//xs:attribute[@name='var_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:entity-state-field-variable">
+          <schema-node node="//xs:complexType[@name='EntityStateFieldType']"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:entity-state-field-variable"
+            id-ref="urn:scap-content:key:org.mitre.oval:variable">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:entity-state-field-variable-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:variable">
+              <schema-node node=".//xs:attribute[@name='var_ref']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+        <local-relationship id="urn:scap-content:relationship:org.mitre.oval:set-state-filter">
+          <schema-node node="//xs:element[@name='set']/xs:complexType"/>
+          <key-ref id="urn:scap-content:key-ref:org.mitre.oval:set-state-filter"
+            id-ref="urn:scap-content:key:org.mitre.oval:state">
+            <field-ref id="urn:scap-content:field-ref:org.mitre.oval:set-state-filter-id"
+              id-ref="urn:scap-content:field:org.mitre.oval:state">
+              <schema-node node=".//xs:element[@ref='oval-def:filter']"/>
+            </field-ref>
+          </key-ref>
+        </local-relationship>
+      </relationships>
+
+      <documents>
+        <document id="urn:scap-content:document:org.mitre.oval:oval-document">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType"/>
+          <generated-document-model>
+            <entity-container id="urn:scap-content:container:org.mitre.oval:definitions">
+              <schema-node node="//xs:complexType[@name='DefinitionsType']"/>
+              <entity-schema-node node="xs:sequence/xs:element[@name='definition']">
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:definition"/>
+              </entity-schema-node>
+            </entity-container>
+            <entity-container id="urn:scap-content:container:org.mitre.oval:tests">
+              <schema-node node="//xs:complexType[@name='TestsType']"/>
+              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:test']">
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:test"/>
+              </entity-schema-node>
+            </entity-container>
+            <entity-container id="urn:scap-content:container:org.mitre.oval:objects">
+              <schema-node node="//xs:complexType[@name='ObjectsType']"/>
+              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:object']">
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:object"/>
+              </entity-schema-node>
+            </entity-container>
+            <entity-container id="urn:scap-content:container:org.mitre.oval:states">
+              <schema-node node="//xs:complexType[@name='StatesType']"/>
+              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:state']">
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:state"/>
+              </entity-schema-node>
+            </entity-container>
+            <entity-container id="urn:scap-content:container:org.mitre.oval:variables">
+              <schema-node node="//xs:complexType[@name='VariablesType']"/>
+              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:variable']">
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:variable"/>
+              </entity-schema-node>
+            </entity-container>
+          </generated-document-model>
+        </document>
+      </documents>
+    </schema>
+  </schemas>
+</meta-model>
