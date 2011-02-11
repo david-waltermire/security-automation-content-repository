@@ -1,0 +1,91 @@
+/*******************************************************************************
+ * The MIT License
+ * 
+ * Copyright (c) 2011 David Waltermire
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ ******************************************************************************/
+package org.scapdev.content.model.processor.jaxb;
+
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.jaxb.JAXBMetadataModel;
+import org.scapdev.content.model.processor.EntityProcessor;
+import org.scapdev.content.model.processor.Importer;
+
+public class JAXBEntityProcessor implements EntityProcessor {
+	private final ContentRepository repository;
+	private final JAXBMetadataModel model;
+	private final ExecutorService service;
+
+	public JAXBEntityProcessor(ContentRepository repository, JAXBMetadataModel model) {
+		// Replace with persistence class
+		this.repository = repository;
+		this.model = model;
+		this.service = Executors.newFixedThreadPool(2);
+	}
+
+	public void shutdown() {
+		service.shutdown();
+	}
+
+	public Importer newImporter() {
+		return new JAXBImporter(this);
+	}
+
+	/**
+	 * @return the model
+	 */
+	public JAXBMetadataModel getMetadataModel() {
+		return model;
+	}
+
+
+	private static class RelationshipExtractingTask implements Callable<List<Relationship<Object, ?>>> {
+		private final EntityImpl entity;
+		private final JAXBRelationshipIdentifyingImportVisitor visitor;
+
+		RelationshipExtractingTask(EntityImpl entity, Object node, JAXBMetadataModel model) {
+			this.entity = entity;
+			this.visitor = new JAXBRelationshipIdentifyingImportVisitor(entity, node, model);
+		}
+
+		@Override
+		public List<Relationship<Object, ?>> call() throws Exception {
+			visitor.visit();
+			List<Relationship<Object, ?>> relationships = visitor.getRelationships();
+			entity.setRelationships(relationships);
+			return relationships;
+		}
+		
+	}
+
+
+	public Future<List<Relationship<Object, ?>>> processEntity(EntityImpl entity, Object obj) {
+		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, model);
+		Future<List<Relationship<Object, ?>>> future = service.submit(task);
+		return future;
+	}
+}
