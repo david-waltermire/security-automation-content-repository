@@ -34,7 +34,7 @@ class EntityImpl extends AbstractEntity<Object> {
 	private List<Relationship<Object, ?>> relationships;
 
 	public EntityImpl(EntityInfo entityInfo, Object object) {
-		super(entityInfo, object);
+		super(entityInfo.getKeyInfo().getKey(object), entityInfo, object);
 		relationships = Collections.emptyList();
 	}
 

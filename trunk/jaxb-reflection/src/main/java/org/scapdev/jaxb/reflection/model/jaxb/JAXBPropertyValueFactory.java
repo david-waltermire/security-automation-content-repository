@@ -84,7 +84,7 @@ public class JAXBPropertyValueFactory implements PropertyValueFactory {
 	}
 
 	private PropertyValue createDelegateObject(Type type, Field field) {
-//		System.out.println("Field: "+field+" Type: "+type);
+//		log.fine("creating delegate for field: "+field+" Type: "+type);
 		Class<?> clazz = (Class<?>)type;
 		TypeInfo typeInfo = model.getTypeInfo(clazz);
 		if (typeInfo != null) {

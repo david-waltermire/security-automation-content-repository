@@ -21,34 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import org.scapdev.content.core.ContentException;
+import java.util.List;
 
-public class ContentImportException extends ContentException {
+import org.scapdev.content.model.EntityInfo;
+import org.scapdev.content.model.Key;
+import org.scapdev.content.model.Relationship;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public interface EntityDescriptor<DATA> {
+	Key getKey();
+	String getContentId();
+	List<Relationship<DATA, ?>> getRelationships();
 
-	public ContentImportException() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public ContentImportException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ContentImportException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ContentImportException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
+	EntityInfo getEntityInfo();
 }

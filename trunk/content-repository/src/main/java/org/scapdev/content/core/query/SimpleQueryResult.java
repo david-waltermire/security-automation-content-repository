@@ -26,17 +26,17 @@ package org.scapdev.content.core.query;
 import java.util.Collections;
 import java.util.Map;
 
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public class SimpleQueryResult implements QueryResult {
-	private final Map<Key, EntityHandle> fragments;
+	private final Map<Key, Entity<Object>> fragments;
 
-	public SimpleQueryResult(Map<Key, EntityHandle> fragments) {
+	public SimpleQueryResult(Map<Key, Entity<Object>> fragments) {
 		this.fragments = Collections.unmodifiableMap(fragments);
 	}
 
-	public Map<Key, EntityHandle> getFragmentHandles() {
+	public Map<Key, Entity<Object>> getEntities() {
 		return fragments;
 	}
 }

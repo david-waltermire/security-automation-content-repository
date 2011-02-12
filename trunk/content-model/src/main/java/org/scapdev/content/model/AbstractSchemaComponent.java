@@ -24,7 +24,7 @@
 package org.scapdev.content.model;
 
 
-public class AbstractSchemaComponent implements SchemaComponent {
+public abstract class AbstractSchemaComponent implements SchemaComponent {
 	private final String id;
 	private final SchemaInfo schemaInfo;
 	private final String schemaNode;
@@ -49,4 +49,7 @@ public class AbstractSchemaComponent implements SchemaComponent {
 	public String getSchemaNode() {
 		return schemaNode;
 	}
+
+	public abstract boolean equals(Object obj);
+	public abstract int hashCode();
 }

@@ -24,12 +24,19 @@
 package org.scapdev.content.model;
 
 public abstract class AbstractEntity<DATA> implements Entity<DATA> {
+	private final Key key;
 	private final EntityInfo entityInfo;
 	private final DATA object;
 
-	public AbstractEntity(EntityInfo entityInfo, DATA object) {
+	public AbstractEntity(Key key, EntityInfo entityInfo, DATA object) {
+		this.key = key;
 		this.entityInfo = entityInfo;
 		this.object = object;
+	}
+
+	@Override
+	public Key getKey() {
+		return key;
 	}
 
 	/**

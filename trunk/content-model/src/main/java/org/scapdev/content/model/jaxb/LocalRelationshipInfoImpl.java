@@ -33,30 +33,52 @@ import org.scapdev.content.model.SchemaInfo;
 
 class LocalRelationshipInfoImpl extends AbstractRelationshipInfo<Object, LocalRelationshipInfo<Object>> implements LocalRelationshipInfo<Object> {
 
-	private final KeyRefInfoImpl keyRef;
+	private final KeyRefInfoImpl keyRefInfo;
 
 	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, JAXBMetadataModel loader, InitializingTypeInfoVisitor init) {
 		super(type, schemaInfo);
-		keyRef = new KeyRefInfoImpl(type.getKeyRef(), this, loader, init);
+		keyRefInfo = new KeyRefInfoImpl(type.getKeyRef(), this, loader, init);
 	}
 
 	@Override
 	public KeyRefInfoImpl getKeyRefInfo() {
-		return keyRef;
+		return keyRefInfo;
 	}
 
 	@Override
 	public KeyInfo getKeyInfo() {
-		return keyRef.getKeyInfo();
+		return keyRefInfo.getKeyInfo();
 	}
 
 	@Override
 	public Key getKey(Object instance) throws ModelInstanceException {
-		return keyRef.getKey(instance);
+		return keyRefInfo.getKey(instance);
 	}
 
 	@Override
 	public LocalRelationship<Object> newRelationship(Object instance, Entity<Object> owningEntity) {
 		return new LocalRelationshipImpl<Object>(this, owningEntity, getKey(instance));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof LocalRelationshipInfoImpl))
+			return false;
+		LocalRelationshipInfoImpl other = (LocalRelationshipInfoImpl) obj;
+		if (!getId().equals(other.getId())) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 13;
+		result = 37 * result +  getId().hashCode();
+		return result;
 	}
 }

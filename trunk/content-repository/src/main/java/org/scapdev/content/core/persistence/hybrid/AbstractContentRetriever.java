@@ -21,11 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.io.File;
+public abstract class AbstractContentRetriever<DATA> implements ContentRetriever<DATA> {
+	public String contentId;
 
-public interface DataStreamProcessor {
-	void addComponent(File file);
-	void process();
+	public AbstractContentRetriever(String contentId) {
+		this.contentId = contentId;
+	}
+
+	@Override
+	public DATA getContent() {
+		return getContentInternal(contentId);
+	}
+
+	protected abstract DATA getContentInternal(String contentId);
 }

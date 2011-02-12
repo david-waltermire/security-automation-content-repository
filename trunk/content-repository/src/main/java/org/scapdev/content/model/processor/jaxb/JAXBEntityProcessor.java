@@ -29,21 +29,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
 import org.scapdev.content.model.processor.EntityProcessor;
 import org.scapdev.content.model.processor.Importer;
 
 public class JAXBEntityProcessor implements EntityProcessor {
-	private final ContentRepository repository;
 	private final JAXBMetadataModel model;
 	private final ExecutorService service;
+	private final ContentPersistenceManager persistenceManager;
 
-	public JAXBEntityProcessor(ContentRepository repository, JAXBMetadataModel model) {
-		// Replace with persistence class
-		this.repository = repository;
+	public JAXBEntityProcessor(JAXBMetadataModel model, ContentPersistenceManager persistenceManager) {
 		this.model = model;
+		this.persistenceManager = persistenceManager;
 		this.service = Executors.newFixedThreadPool(2);
 	}
 
@@ -53,6 +52,13 @@ public class JAXBEntityProcessor implements EntityProcessor {
 
 	public Importer newImporter() {
 		return new JAXBImporter(this);
+	}
+
+	/**
+	 * @return the persistenceManager
+	 */
+	public ContentPersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 
 	/**

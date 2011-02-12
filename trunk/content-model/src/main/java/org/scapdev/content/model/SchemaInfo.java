@@ -23,9 +23,12 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Collection;
+
 public interface SchemaInfo extends SchemaComponent {
 	String getId();
 	String getNamespace();
 	String getPrefix();
 	String getSchemaLocation();
+	Collection<DocumentInfo> getDocumentInfos();
 }

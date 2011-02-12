@@ -35,5 +35,7 @@ public interface Entity<DATA> {
 	 * @return the object
 	 */
 	DATA getObject();
-	List<Relationship<Object, ?>> getRelationships();
+	List<Relationship<DATA, ?>> getRelationships();
+
+	Key getKey();
 }

@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.database;
+package org.scapdev.content.core.persistence;
 
 import org.scapdev.content.core.ContentException;
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 
-public interface ContentDatabase {
-	EntityHandle getFragmentHandleByKey(Key key);
-	void storeFragmentHandle(EntityHandle handle) throws ContentException;
+public interface ContentPersistenceManager {
+	Entity<Object> getEntityByKey(Key key);
+	void storeEntity(Entity<Object> entity) throws ContentException;
 }

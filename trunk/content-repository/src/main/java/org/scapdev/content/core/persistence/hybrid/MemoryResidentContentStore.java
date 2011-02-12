@@ -21,10 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface ComponentProcessor {
-	void process(File file);
+public class MemoryResidentContentStore implements ContentStore {
+	private int index = 0;
+	private Map<Integer, Object> contentMap;
+
+	public MemoryResidentContentStore() {
+		contentMap = new HashMap<Integer, Object>();
+	}
+
+	@Override
+	public Object getContent(String contentId) {
+		return contentMap.get(Integer.valueOf(contentId));
+	}
+
+	@Override
+	public String persist(Object content) {
+		Integer key = Integer.valueOf(++index);
+		contentMap.put(key, content);
+		return key.toString();
+	}
+
+	@Override
+	public ContentRetriever<Object> getContentRetriever(String contentId) {
+		return new InternalContentRetriever(contentId);
+	}
+
+	private class InternalContentRetriever extends AbstractContentRetriever<Object> {
+
+		public InternalContentRetriever(String contentId) {
+			super(contentId);
+		}
+
+		@Override
+		protected Object getContentInternal(String contentId) {
+			return MemoryResidentContentStore.this.getContent(contentId);
+		}
+	}
 }

@@ -25,28 +25,30 @@ package org.scapdev.content.core.resolver;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.scapdev.content.core.database.ContentDatabase;
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.Relationship;
 
 public class LocalResolver implements Resolver {
-	private final ContentDatabase database;
+	private final ContentPersistenceManager database;
 	private final Resolver delegate;
 
-	public LocalResolver(ContentDatabase database) {
+	public LocalResolver(ContentPersistenceManager database) {
 		this(database, null);
 	}
 
-	public LocalResolver(ContentDatabase database, Resolver delegate) {
+	public LocalResolver(ContentPersistenceManager database, Resolver delegate) {
 		this.database = database;
 		this.delegate = delegate;
 	}
 
 	@Override
-	public Map<Key, EntityHandle> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
+	public Map<Key, Entity<Object>> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
 		ResolutionState state = new ResolutionState(keys);
 		do {
 			resolveResolvable(state, parameters);
@@ -70,12 +72,12 @@ public class LocalResolver implements Resolver {
 	}
 
 	private void resolveInternal(ResolutionState state, ResolutionParameters parameters) {
-		Map<Key, EntityHandle> retrievedFragments = state.getRetrievedFragments();
+		Map<Key, Entity<Object>> retrievedFragments = state.getRetrievedFragments();
 		Set<Key> unresolvableKeys = state.getUnresolvableKeys();
 		Set<Key> unresolvedKeys = new HashSet<Key>();
 
 		for (Key key : state.getUnresolvedKeys()) {
-			EntityHandle handle = database.getFragmentHandleByKey(key);
+			Entity<Object> handle = database.getEntityByKey(key);
 			if (handle == null) {
 				unresolvableKeys.add(key);
 			} else {
@@ -88,8 +90,12 @@ public class LocalResolver implements Resolver {
 		state.setUnresolvedKeys(unresolvedKeys);
 	}
 
-	private Set<Key> generateRelatedKeys(EntityHandle handle, ResolutionParameters parameters) {
-		throw new UnsupportedOperationException();
-//		return new HashSet<Key>(handle.getKeyReferences().keySet());
+	private Set<Key> generateRelatedKeys(Entity<Object> entity, ResolutionParameters parameters) {
+		Set<Key> keys = new LinkedHashSet<Key>();
+		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
+			Key key = relationship.getKey();
+			keys.add(key);
+		}
+		return keys;
 	}
 }

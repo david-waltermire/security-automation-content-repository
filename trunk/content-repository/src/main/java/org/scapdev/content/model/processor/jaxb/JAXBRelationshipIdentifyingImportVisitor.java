@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.scapdev.content.annotation.KeyRef;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.NullFieldValueException;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.RelationshipInfo;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
@@ -63,12 +64,19 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 	public boolean beforeNode(Object instance, DefaultTypeInfo typeInfo) {
 		boolean processContent = true;
 
-		KeyRef annotation = typeInfo.getAnnotation(KeyRef.class, true);
-		if (annotation != null) {
-			RelationshipInfo<Object> relationshipInfo = metadataModel.getRelationshipByKeyRefId(annotation.id());
-			Relationship<Object, ?> relationship = relationshipInfo.newRelationship(instance, owningEntity);
-			relationships.add(relationship);
-			processContent = false;
+		if (instance != null) {
+			KeyRef annotation = typeInfo.getAnnotation(KeyRef.class, true);
+			if (annotation != null) {
+				RelationshipInfo<Object> relationshipInfo = metadataModel.getRelationshipByKeyRefId(annotation.id());
+				try {
+					Relationship<Object, ?> relationship = relationshipInfo.newRelationship(instance, owningEntity);
+					relationships.add(relationship);
+				} catch (NullFieldValueException e) {
+					// This indicates that the relationship is not properly formed
+					// do nothing, ignoring the relationship
+				}
+				processContent = false;
+			}
 		}
 		return processContent;
 	}

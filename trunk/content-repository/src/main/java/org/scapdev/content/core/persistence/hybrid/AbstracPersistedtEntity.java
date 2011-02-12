@@ -21,28 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.io.File;
+import java.util.List;
 
-import org.scapdev.content.core.ProcessingFactory;
-import org.scapdev.content.core.database.AbstractContentDatabase;
+import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.EntityInfo;
+import org.scapdev.content.model.Key;
+import org.scapdev.content.model.Relationship;
 
-public abstract class AbstractProcessingFactory implements ProcessingFactory {
-	private final AbstractContentDatabase contentDatabase;
+public class AbstracPersistedtEntity<DATA> implements Entity<DATA> {
+	private final Key key;
+	private final EntityInfo entityInfo;
+	private final List<Relationship<DATA, ?>> relationships;
+	private final ContentRetriever<DATA> retriever;
 
-	public AbstractProcessingFactory(AbstractContentDatabase contentDatabase) {
-		this.contentDatabase = contentDatabase;
+	// TODO: enable the object to be retrieved using lazy fetch
+	public AbstracPersistedtEntity(EntityDescriptor<DATA> desc, ContentRetriever<DATA> retriever) {
+		this.key = desc.getKey();
+		this.relationships = desc.getRelationships();
+		this.entityInfo = desc.getEntityInfo();
+		this.retriever = retriever;
 	}
-
-	protected abstract ComponentProcessor newComponentProcessor();
 
 	@Override
-	public void importFile(File file) {
-		newComponentProcessor().process(file);
+	public Key getKey() {
+		return key;
 	}
 
-	public AbstractContentDatabase getContentDatabase() {
-		return contentDatabase;
+	/**
+	 * @return the entityInfo
+	 */
+	public EntityInfo getEntityInfo() {
+		return entityInfo;
 	}
+
+	@Override
+	public List<Relationship<DATA, ?>> getRelationships() {
+		return relationships;
+	}
+
+	@Override
+	public DATA getObject() {
+		return retriever.getContent();
+	}
+
 }

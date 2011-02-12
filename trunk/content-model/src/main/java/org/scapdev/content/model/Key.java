@@ -26,6 +26,7 @@ package org.scapdev.content.model;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Key implements Comparable<Key> {
@@ -40,6 +41,11 @@ public class Key implements Comparable<Key> {
 		this.id = id;
 		idToValueMap = new LinkedHashMap<String, String>();
 		for (int i = 0;i<typeIds.length;i++) {
+			if (typeIds[i] == null) {
+				throw new KeyException(id);
+			} else if (values[i] == null) {
+				throw new NullFieldValueException("null value for key '"+id+"' field: "+typeIds[i]);
+			}
 			idToValueMap.put(typeIds[i], values[i]);
 		}
 	}
@@ -47,6 +53,13 @@ public class Key implements Comparable<Key> {
 	public Key(String id, LinkedHashMap<String, String> idToValueMap) {
 		this.id = id;
 		this.idToValueMap = idToValueMap;
+		for (Map.Entry<String, String> entry : idToValueMap.entrySet()) {
+			if (entry.getKey() == null) {
+				throw new KeyException(id);
+			} else if (entry.getValue() == null) {
+				throw new NullFieldValueException("null value for key '"+id+"' field: "+entry.getKey());
+			}
+		}
 	}
 
 	public String getId() {

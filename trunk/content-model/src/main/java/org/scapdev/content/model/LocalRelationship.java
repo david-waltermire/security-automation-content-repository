@@ -24,5 +24,4 @@
 package org.scapdev.content.model;
 
 public interface LocalRelationship<DATA> extends Relationship<DATA, LocalRelationshipInfo<DATA>> {
-	Key getKey();
 }

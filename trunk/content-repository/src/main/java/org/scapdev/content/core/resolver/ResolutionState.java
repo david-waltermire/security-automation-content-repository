@@ -28,18 +28,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public class ResolutionState {
 	private Set<Key> unresolvedKeys;
 	private final Set<Key> unresolvableKeys;
-	private final Map<Key, EntityHandle> retrievedFragments;
+	private final Map<Key, Entity<Object>> retrievedFragments;
 
 	public ResolutionState(Set<Key> initalKeys) {
 		unresolvedKeys = new HashSet<Key>(initalKeys);
 		unresolvableKeys = new HashSet<Key>();
-		retrievedFragments = new TreeMap<Key, EntityHandle>();
+		retrievedFragments = new TreeMap<Key, Entity<Object>>();
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ResolutionState {
 	/**
 	 * @return the retrievedFragments
 	 */
-	public Map<Key, EntityHandle> getRetrievedFragments() {
+	public Map<Key, Entity<Object>> getRetrievedFragments() {
 		return retrievedFragments;
 	}
 
