@@ -21,31 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.io.File;
+public interface ContentStore {
 
-import org.scapdev.content.core.database.AbstractContentDatabase;
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+	Object getContent(String contentId);
+	String persist(Object object);
+	ContentRetriever<Object> getContentRetriever(String contentId);
 
-public abstract class AbstractComponentProcessor implements ComponentProcessor {
-	private final AbstractContentDatabase contentDatabase;
-
-	public AbstractComponentProcessor(AbstractContentDatabase contentDatabase) {
-		this.contentDatabase = contentDatabase;
-	}
-
-	protected AbstractContentDatabase getContentDatabase() {
-		return contentDatabase;
-	}
-
-	@Override
-	public void process(File file) {
-		ComponentIndex index = processFile(file);
-		for (EntityHandle handle : index.getFragmentHandles()) {
-			contentDatabase.storeFragmentHandle(handle);
-		}
-	}
-
-	protected abstract ComponentIndex processFile(File file);
 }

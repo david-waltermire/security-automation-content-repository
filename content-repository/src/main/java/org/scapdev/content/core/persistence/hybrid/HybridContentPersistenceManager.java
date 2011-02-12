@@ -21,18 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.net.URL;
-import java.util.List;
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.Key;
 
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+public interface HybridContentPersistenceManager extends ContentPersistenceManager {
 
-
-public interface ComponentIndex {
-
-	URL getComponentURL();
-	Object getRootDocumentNode();
-	void setRootDocumentNode(Object node);
-	List<EntityHandle> getFragmentHandles();
+	public EntityDescriptor<Object> getEntityDescriptorByKey(Key key);
 }

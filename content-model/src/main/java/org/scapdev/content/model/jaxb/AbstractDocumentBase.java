@@ -36,4 +36,26 @@ abstract class AbstractDocumentBase extends AbstractDocument {
 	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
 		return binding;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractDocumentBase))
+			return false;
+		AbstractDocumentBase other = (AbstractDocumentBase) obj;
+		if (!getId().equals(other.getId())) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 13;
+		result = 37 * result +  getId().hashCode();
+		return result;
+	}
 }

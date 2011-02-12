@@ -23,12 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.model.jaxb;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 
-import org.scapdev.content.model.AbstractDocument;
+import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.RelationshipInfo;
 import org.scapdev.content.model.SchemaInfo;
 import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
@@ -41,7 +42,7 @@ class SchemaInfoImpl implements SchemaInfo {
 	private String prefix;
 	private String schemaNode;
 	private Map<DefaultTypeInfo, EntityInfoImpl> entityMap;
-	private Map<DefaultTypeInfo, AbstractDocument> documentMap;
+	private Map<DefaultTypeInfo, DocumentInfo> documentMap;
 	private Map<DefaultTypeInfo, RelationshipInfo<Object>> relationshipMap;
 
 	SchemaInfoImpl(SchemaType type, JAXBMetadataModel metadataModel, InitializingTypeInfoVisitor init) {
@@ -51,7 +52,7 @@ class SchemaInfoImpl implements SchemaInfo {
 		this.prefix = type.getPrefix();
 		this.schemaNode = type.getSchemaNode().getNode();
 
-		documentMap = new HashMap<DefaultTypeInfo, AbstractDocument>();
+		documentMap = new HashMap<DefaultTypeInfo, DocumentInfo>();
 		for (DocumentEntityType node : type.getDocuments().getDocument()) {
 			BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
 			org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
@@ -122,5 +123,10 @@ class SchemaInfoImpl implements SchemaInfo {
 	@Override
 	public SchemaInfo getSchemaInfo() {
 		return this;
+	}
+
+	@Override
+	public Collection<DocumentInfo> getDocumentInfos() {
+		return documentMap.values();
 	}
 }

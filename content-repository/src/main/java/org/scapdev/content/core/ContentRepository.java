@@ -27,30 +27,39 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.scapdev.content.core.database.AbstractContentDatabase;
-import org.scapdev.content.core.database.memory.MemoryResidentContentDatabase;
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager;
+import org.scapdev.content.core.query.DefaultQueryProcessor;
+import org.scapdev.content.core.query.Query;
+import org.scapdev.content.core.query.QueryProcessor;
+import org.scapdev.content.core.query.QueryResult;
+import org.scapdev.content.core.query.SimpleQuery;
+import org.scapdev.content.core.resolver.LocalResolver;
+import org.scapdev.content.core.resolver.Resolver;
+import org.scapdev.content.model.Key;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
 import org.scapdev.content.model.jaxb.MetadataModelFactory;
 import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
 
 public class ContentRepository {
-	private final AbstractContentDatabase contentDatabase;
+	private final ContentPersistenceManager persistenceManager;
 	private final JAXBMetadataModel model;
 	private final JAXBEntityProcessor processor;
 //	private final ProcessingFactory processingFactory;
 //	private final InstanceWriterFactory instanceWriterFactory;
-//	private final Resolver resolver;
-//	private final QueryProcessor queryProcessor;
+	private final Resolver resolver;
+	private final QueryProcessor queryProcessor;
 
 
 	public ContentRepository(ClassLoader classLoader) throws IOException, JAXBException {
-		contentDatabase = new MemoryResidentContentDatabase();
+//		persistenceManager = new MemoryResidentPersistenceManager();
+		persistenceManager = new DefaultHybridContentPersistenceManager();
 		model = MetadataModelFactory.newInstance();
-		processor = new JAXBEntityProcessor(this, model);
+		processor = new JAXBEntityProcessor(model, persistenceManager);
 //		processingFactory = new JAXBProcessingFactory(contentDatabase, model);
 //		instanceWriterFactory = new JAXBInstanceWriterFactory(model);
-//		resolver = new LocalResolver(contentDatabase);
-//		queryProcessor = new DefaultQueryProcessor(resolver);
+		resolver = new LocalResolver(persistenceManager);
+		queryProcessor = new DefaultQueryProcessor(resolver);
 	}
 
 	public JAXBMetadataModel getMetadataModel() {
@@ -62,6 +71,21 @@ public class ContentRepository {
 //		InstanceWriter writer = instanceWriterFactory.newInstanceWriter(os);
 //		writer.write(queryResult);
 //	}
+
+	public QueryResult query(Key key) throws IOException {
+		return query(key, false);
+	}
+
+	public QueryResult query(Key key, boolean resolveReferences) throws IOException {
+		SimpleQuery query = new SimpleQuery(key);
+		query.setResolveReferences(resolveReferences);
+		return query(query);
+	}
+
+	public <RESULT extends QueryResult> RESULT query(Query<RESULT> query) {
+		RESULT queryResult = queryProcessor.query(query);
+		return queryResult;
+	}
 
 	public JAXBEntityProcessor getProcessor() {
 		return processor;

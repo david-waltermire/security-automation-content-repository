@@ -46,4 +46,29 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 	BindingInfo<org.scapdev.content.annotation.Entity> getBinding() {
 		return binding;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EntityInfoImpl))
+			return false;
+		EntityInfoImpl other = (EntityInfoImpl) obj;
+		if (!getId().equals(other.getId())) {
+			return false;
+		} else if (!key.equals(other.key)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 13;
+		result = 37 * result +  getId().hashCode();
+		result = 37 * result +  key.hashCode();
+		return result;
+	}
 }

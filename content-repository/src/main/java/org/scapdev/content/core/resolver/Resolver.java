@@ -26,10 +26,10 @@ package org.scapdev.content.core.resolver;
 import java.util.Map;
 import java.util.Set;
 
-import org.scapdev.content.core.model.context.instance.EntityHandle;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public interface Resolver {
-	Map<Key, EntityHandle> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
+	Map<Key, Entity<Object>> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
 	void resolveResolvable(ResolutionState state, ResolutionParameters parameters);
 }

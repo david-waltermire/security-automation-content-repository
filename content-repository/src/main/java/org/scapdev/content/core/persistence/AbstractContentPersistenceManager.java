@@ -21,37 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.reader.jaxb;
-//
-//import javax.xml.bind.JAXBException;
-//import javax.xml.bind.Unmarshaller;
-//
-//import org.scapdev.content.core.database.AbstractContentDatabase;
-//import org.scapdev.content.core.model.MutableSCAPModel;
-//import org.scapdev.content.core.reader.AbstractProcessingFactory;
-//import org.scapdev.content.core.reader.ComponentProcessor;
-//import org.scapdev.content.model.MetadataModel;
-//
-//
-//public class JAXBProcessingFactory extends AbstractProcessingFactory {
-//
-//	private final MetadataModel model;
-//
-//	public JAXBProcessingFactory(AbstractContentDatabase contentDatabase, MetadataModel model) {
-//		super(contentDatabase);
-//		this.model = model;
-//	}
-//
-//	public MetadataModel getModel() {
-//		return model;
-//	}
-//
-//	protected Unmarshaller getUnmarshaller() throws JAXBException {
-//		return model.getJAXBContext().createUnmarshaller();
-//	}
-//
-//	@Override
-//	protected ComponentProcessor newComponentProcessor() {
-//		return new JAXBComponentProcessor(getContentDatabase(), this);
-//	}
-//}
+package org.scapdev.content.core.persistence;
+
+
+public abstract class AbstractContentPersistenceManager implements ContentPersistenceManager {
+}

@@ -25,7 +25,7 @@ package org.scapdev.content.core.query;
 
 import org.scapdev.content.core.resolver.Resolver;
 
-public interface Query<X extends QueryResult> {
+public interface Query<RESULT extends QueryResult> {
 
-	X resolve(Resolver resolver);
+	RESULT resolve(Resolver resolver);
 }

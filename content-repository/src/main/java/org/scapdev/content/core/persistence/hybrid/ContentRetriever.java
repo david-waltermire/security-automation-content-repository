@@ -21,13 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.database;
+package org.scapdev.content.core.persistence.hybrid;
 
-import org.scapdev.content.core.ContentException;
-import org.scapdev.content.core.model.context.instance.EntityHandle;
-import org.scapdev.content.model.Key;
-
-public abstract class AbstractContentDatabase implements ContentDatabase {
-	public abstract EntityHandle getFragmentHandleByKey(Key key);
-	public abstract void storeFragmentHandle(EntityHandle handle) throws ContentException;
+public interface ContentRetriever<DATA> {
+	DATA getContent();
 }

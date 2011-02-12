@@ -35,6 +35,8 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
@@ -76,7 +78,15 @@ public class JAXBImporter implements Importer {
 		ImportVisitor visitor = new ImportVisitor(obj, jaxbEntityProcessor, jaxbEntityProcessor.getMetadataModel());
 		ImportData data = visitor.importContent();
 		data.validateRelationships();
+		importData(data);
 		return data;
+	}
+
+	private void importData(ImportData data) {
+		ContentPersistenceManager manager = getEntityProcessor().getPersistenceManager();
+		for (Entity<Object> entity : data.getEntities()) {
+			manager.storeEntity(entity);
+		}
 	}
 
 	@Override

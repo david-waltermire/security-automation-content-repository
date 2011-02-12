@@ -21,13 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.query;
+package org.scapdev.content.core.persistence;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.scapdev.content.core.ContentException;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
-public interface QueryResult {
-	Map<Key, Entity<Object>> getEntities();
+public class MemoryResidentContentPersistenceManager extends AbstractContentPersistenceManager {
+	private static Logger log = Logger.getLogger(MemoryResidentContentPersistenceManager.class);
+
+	private Map<String, Map<Key, Entity<Object>>> fragmentIndex;
+
+	public MemoryResidentContentPersistenceManager() {
+		log.info("Initializing database");
+		fragmentIndex = new HashMap<String, Map<Key, Entity<Object>>>();
+		log.info("Database initialized");
+	}
+
+	@Override
+	public Entity<Object> getEntityByKey(Key key) {
+		Map<Key, Entity<Object>> idMap = fragmentIndex.get(key.getId());
+		if (idMap != null) {
+			return idMap.get(key);
+		}
+		return null;
+	}
+
+	@Override
+	public void storeEntity(Entity<Object> entity) throws ContentException {
+		Key key = entity.getKey();
+		String keyTypeId = key.getId();
+		log.log(Level.TRACE, "Storing entity: "+key);
+		Map<Key, Entity<Object>> idMap = fragmentIndex.get(keyTypeId);
+		if (idMap == null) {
+			idMap = new HashMap<Key, Entity<Object>>();
+			fragmentIndex.put(keyTypeId, idMap);
+		} else if (idMap.containsKey(key)) {
+			throw new ContentException("Record already exists in the database identified by key: "+key);
+		}
+		idMap.put(key, entity);
+	}
 }

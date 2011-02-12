@@ -34,6 +34,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.FieldInfo;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.KeyException;
 import org.scapdev.content.model.KeyInfo;
 import org.scapdev.content.model.SchemaInfo;
 
@@ -72,15 +73,24 @@ class KeyInfoImpl implements KeyInfo {
 	}
 
 	@Override
-	public Key getKey(Object instance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	public Key getKey(Object instance) throws KeyException {
 		Key key = new Key(getId(), getFieldMap(instance));
 		return key;
 	}
 
-	private LinkedHashMap<String, String> getFieldMap(Object instance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	private LinkedHashMap<String, String> getFieldMap(Object instance) throws KeyException {
 		LinkedHashMap<String, String> fieldIdToValueMap = new LinkedHashMap<String, String>();
 		for (FieldInfo fieldInfo : getFieldInfos()) {
-			String value = fieldInfo.getValue(instance);
+			String value;
+			try {
+				value = fieldInfo.getValue(instance);
+			} catch (IllegalArgumentException e) {
+				throw new KeyException(getId(),e);
+			} catch (IllegalAccessException e) {
+				throw new KeyException(getId(),e);
+			} catch (InvocationTargetException e) {
+				throw new KeyException(getId(),e);
+			}
 			fieldIdToValueMap.put(fieldInfo.getId(), value);
 		}
 		return fieldIdToValueMap;

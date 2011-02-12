@@ -23,12 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 public interface KeyInfo extends Component {
 	EntityInfo getEntity();
 	Collection<FieldInfo> getFieldInfos();
 	FieldInfo getFieldInfo(String id);
-	Key getKey(Object instance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
+	Key getKey(Object instance) throws KeyException;
 }

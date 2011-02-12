@@ -21,17 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.model.context.instance;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.util.Collection;
-
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
-import org.scapdev.content.model.Relationship;
 
+public interface MetadataStore<DATA> {
 
+	EntityDescriptor<DATA> getEntityDescriptor(Key key);
 
-
-public interface EntityHandle {
-	Key getKey();
-	Collection<Relationship> getRelationships();
-} 
+	void persist(Entity<Object> entity, String contentId);
+}

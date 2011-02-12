@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.ImportException;
 
 public class ImportData {
+	private static final Logger log = Logger.getLogger(ImportData.class);
+
 	private final List<Future<List<Relationship<Object, ?>>>> futures;
 	private final List<Entity<Object>> entities;
 
@@ -27,7 +31,7 @@ public class ImportData {
 	}
 
 	void newEntity(EntityInfo entityInfo, Object obj, JAXBEntityProcessor processor) {
-		System.err.println("Entity: "+entityInfo.getId());
+		log.log(Level.TRACE,"Creating entity type: "+entityInfo.getId());
 		EntityImpl entity = new EntityImpl(entityInfo, obj);
 		Future<List<Relationship<Object, ?>>> future = processor.processEntity(entity, obj);
 		registerRelationshipData(future);
