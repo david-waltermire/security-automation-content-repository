@@ -34,7 +34,7 @@
       <schema-node node="/xs:schema"/>
       
       <entities>
-        <entity id="urn:scap-content:entity:org.mitre.oval:definition">
+        <entity id="urn:scap-content:entity:org.mitre.oval:definition" local-part="definition">
           <schema-node node="//xs:complexType[@name='DefinitionType']"/>
           <key id="urn:scap-content:key:org.mitre.oval:definition">
             <field id="urn:scap-content:field:org.mitre.oval:definition">
@@ -175,7 +175,7 @@
           <generated-document-model>
             <entity-container id="urn:scap-content:container:org.mitre.oval:definitions">
               <schema-node node="//xs:complexType[@name='DefinitionsType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@name='definition']">
+              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:definition']">
                 <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:definition"/>
               </entity-schema-node>
             </entity-container>

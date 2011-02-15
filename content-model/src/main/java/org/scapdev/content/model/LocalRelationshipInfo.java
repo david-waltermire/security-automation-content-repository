@@ -23,7 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface LocalRelationshipInfo<DATA> extends RelationshipInfo<DATA> {
+
+public interface LocalRelationshipInfo extends RelationshipInfo {
 	KeyRefInfo getKeyRefInfo();
 	KeyInfo getKeyInfo();
 	Key getKey(Object instance) throws ModelInstanceException;

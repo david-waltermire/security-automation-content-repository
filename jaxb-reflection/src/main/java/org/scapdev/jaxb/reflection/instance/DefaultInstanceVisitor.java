@@ -24,12 +24,16 @@
 package org.scapdev.jaxb.reflection.instance;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.apache.log4j.Logger;
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModelException;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
 /**
  * 
@@ -37,88 +41,123 @@ import org.scapdev.jaxb.reflection.model.TypeInfo;
  *
  * @param <STATE> Visitor state type
  */
-public class DefaultInstanceVisitor<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> implements InstanceVisitor<MODEL, TYPE, PROPERTY> {
+public class DefaultInstanceVisitor implements InstanceVisitor {
 	private static final Logger log = Logger.getLogger(DefaultInstanceVisitor.class);
 
 	private final Object document;
-	private final MODEL model;
+	private final JAXBModel model;
 
-	public DefaultInstanceVisitor(Object document, MODEL model) {
+	public DefaultInstanceVisitor(Object document, JAXBModel model) {
 		this.document = document;
 		this.model = model;
 	}
 
-	protected MODEL getModel() {
+	protected JAXBModel getModel() {
 		return model;
 	}
 
-	public TYPE getTypeInfo(Class<?> clazz) {
-		return getModel().getTypeInfo(clazz);
+	public JAXBClass getJAXBClass(Class<?> clazz) {
+		return getModel().getClass(clazz);
 	}
 
 	public void visit() {
 		log.debug("visiting document: "+document);
-		TYPE typeInfo = model.getTypeInfo(document.getClass());
-		if (beforeDocument(document, typeInfo)) {
-			processNode(document, typeInfo);
+
+		Class<?> clazz;
+		Object effectiveInstance;
+		if (JAXBElement.class.isAssignableFrom(document.getClass())) {
+			JAXBElement<?> element = (JAXBElement<?>) document;
+			clazz = element.getDeclaredType();
+			effectiveInstance = element.getValue();
+		} else {
+			clazz = document.getClass();
+			effectiveInstance = document;
 		}
-		afterDocument(document, typeInfo);
+		
+		JAXBClass jaxbClass = model.getClass(clazz);
+		if (beforeDocument(document, jaxbClass)) {
+			processNode(effectiveInstance);
+		}
+		afterDocument(document, jaxbClass);
 	}
 
-	public boolean beforeDocument(Object document, TYPE typeInfo) { return true; }
-	public void afterDocument(Object document, TYPE typeInfo) {}
+	public boolean beforeDocument(Object document, JAXBClass jaxbClass) { return true; }
+	public void afterDocument(Object document, JAXBClass jaxbClass) {}
 
-	public boolean beforeNode(Object instance, TYPE typeInfo) { return true; }
-	public void afterNode(Object instance, TYPE typeInfo) {}
+	public boolean beforeNode(Object instance, JAXBClass jaxbClass) { return true; }
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) { return true; }
+	
+	public void afterNode(Object instance, JAXBClass jaxbClass) {}
+	public void afterNode(JAXBElement<?> instance, JAXBClass jaxbClass) {}
 
-	public void beforeTypeInfo(Object instance, TYPE typeInfo) {}
-	public void afterTypeInfo(Object instance, TYPE typeInfo) {}
+	public void beforeJAXBClass(Object instance, JAXBClass jaxbClass) {}
+	public void afterJAXBClass(Object instance, JAXBClass jaxbClass) {}
 
-	public void beforePropertyInfo(Object instance, TYPE typeInfo, PROPERTY property) {}
-	public void afterPropertyInfo(Object instance, TYPE typeInfo, PROPERTY property) {}
+	public void beforeJAXBProperty(Object instance, JAXBProperty property) {}
+	public void afterJAXBProperty(Object instance, JAXBProperty property) {}
 
-	public void handleObject(Object instance, PROPERTY propertyInfo) {}
+	public void handleObject(Object instance, JAXBProperty property) {}
 
-	public final void processNode(Object instance, TYPE typeInfo) {
+	private void processNode(Object instance) {
 		log.trace("Walking node: "+(instance != null ? instance.getClass() : "(not set)"));
-		if (beforeNode(instance, typeInfo)) {
-			if (instance != null) processTypeInfo(instance, typeInfo);
+		if (instance != null) {
+//			Object effectiveInstance = instance;
+//			if (JAXBElement.class.isAssignableFrom(instance.getClass())) {
+//				JAXBElement<?> element = (JAXBElement<?>)instance;
+//				effectiveInstance = element.getValue();
+//			}
+//			JAXBClass jaxbClass = model.getClass(effectiveInstance.getClass());
+//			if (beforeNode(instance, jaxbClass)) {
+//				processJAXBClass(effectiveInstance, jaxbClass);
+//			}
+//			afterNode(instance, jaxbClass);
+			if (JAXBElement.class.isAssignableFrom(instance.getClass())) {
+				JAXBElement<?> element = (JAXBElement<?>)instance;
+				JAXBClass jaxbClass = model.getClass(element.getDeclaredType());
+				if (beforeNode(element, jaxbClass)) {
+					instance = element.getValue();
+					if (instance != null) {
+						processJAXBClass(instance, jaxbClass);
+					}
+				}
+				afterNode(element, jaxbClass);
+			} else {
+				JAXBClass jaxbClass = model.getClass(instance.getClass());
+				if (beforeNode(instance, jaxbClass)) {
+					processJAXBClass(instance, jaxbClass);
+				}
+				afterNode(instance, jaxbClass);
+			}
 		}
-		afterNode(instance, typeInfo);
+
 	}
 
-	protected void processTypeInfo(Object instance, TYPE typeInfo) {
-		log.trace("Walking typeInfo: "+typeInfo.getType());
-		beforeTypeInfo(instance, typeInfo);
+	protected void processJAXBClass(Object instance, JAXBClass jaxbClass) {
+		log.trace("Walking JAXB class: "+jaxbClass.getType().getName());
+		beforeJAXBClass(instance, jaxbClass);
 
-		@SuppressWarnings("unchecked")
-		TYPE parent = (TYPE)typeInfo.getParent();
+		JAXBClass parent = jaxbClass.getSuperclass();
 
 		// Handle parent first
-		if (parent != null) processTypeInfo(instance, parent);
+		if (parent != null) processJAXBClass(instance, parent);
 
 		// Iterate over each property, starting with attributes
-		for (PropertyInfo property : typeInfo.getAttributePropertyInfos().values()) {
+		for (JAXBProperty property : jaxbClass.getAttributeProperties().values()) {
 			log.trace("Walking attribute property: "+property.getName());
-			@SuppressWarnings("unchecked")
-			PROPERTY p = (PROPERTY)property;
-			processPropertyInfo(instance, typeInfo, p);
+			processJAXBProperty(instance, property);
 		}
-		for (PropertyInfo property : typeInfo.getElementPropertyInfos().values()) {
+		for (JAXBProperty property : jaxbClass.getElementProperties().values()) {
 			log.trace("Walking element property: "+property.getName());
-			@SuppressWarnings("unchecked")
-			PROPERTY p = (PROPERTY)property;
-			processPropertyInfo(instance, typeInfo, p);
+			processJAXBProperty(instance, property);
 		}
-
-		afterTypeInfo(instance, typeInfo);
+		afterJAXBClass(instance, jaxbClass);
 	}
 
-	protected void processPropertyInfo(Object instance, TYPE typeInfo, PROPERTY propertyInfo) {
-		beforePropertyInfo(instance, typeInfo, propertyInfo);
+	protected void processJAXBProperty(Object instance, JAXBProperty property) {
+		beforeJAXBProperty(instance, property);
 		Object obj;
 		try {
-			obj = propertyInfo.getInstance(instance);
+			obj = property.getInstance(instance);
 		} catch (IllegalArgumentException e) {
 			throw new JAXBModelException(e);
 		} catch (IllegalAccessException e) {
@@ -126,8 +165,31 @@ public class DefaultInstanceVisitor<MODEL extends ExtendedModel<TYPE>, TYPE exte
 		} catch (InvocationTargetException e) {
 			throw new JAXBModelException(e);
 		}
-		InstanceVisitable visitable = propertyInfo.getValue();
-		visitable.visit(obj, propertyInfo, this);
-		afterPropertyInfo(instance, typeInfo, propertyInfo);
+		processPropertyValue(obj, property);
+		afterJAXBProperty(instance, property);
+	}
+
+	private void processPropertyValue(Object instance, JAXBProperty property) {
+		if (instance == null) {
+			handleObject(null, property);
+		} else {
+			Class<?> clazz = instance.getClass();
+			if (List.class.isAssignableFrom(clazz)) {
+				List<?> list = (List<?>)instance;
+				processList(list, property);
+			} else if (JAXBElement.class.isAssignableFrom(clazz)) {
+				processNode(instance);
+			} else if (instance.getClass().isAnnotationPresent(XmlType.class)) {
+				processNode(instance);
+			} else {
+				handleObject(instance, property);
+			}
+		}
+	}
+
+	private void processList(List<?> list, JAXBProperty property) {
+		for (Object instance : list) {
+			processPropertyValue(instance, property);
+		}
 	}
 }

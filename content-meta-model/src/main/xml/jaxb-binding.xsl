@@ -113,7 +113,11 @@
       <annox:annotate>
         <annox:annotate annox:class="org.scapdev.content.annotation.Entity"
           id="{@id}"
-          keyId="{meta:key/@id}"/>
+          keyId="{meta:key/@id}">
+          <xsl:if test="@local-part">
+	        <annox:annotate annox:field="localPart"><xsl:value-of select="@local-part"/></annox:annotate>
+	      </xsl:if>
+        </annox:annotate>
       </annox:annotate>
       <xsl:apply-templates mode="#current"/>
     </jaxb:bindings>

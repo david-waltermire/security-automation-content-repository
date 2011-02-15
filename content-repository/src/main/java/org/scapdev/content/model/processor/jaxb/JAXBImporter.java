@@ -45,12 +45,10 @@ import org.xml.sax.InputSource;
 
 public class JAXBImporter implements Importer {
 	private final JAXBEntityProcessor jaxbEntityProcessor;
-//	private final ImportWalker walker;
 	
 
 	JAXBImporter(JAXBEntityProcessor jaxbEntityProcessor) {
 		this.jaxbEntityProcessor = jaxbEntityProcessor;
-//		this.walker = new ImportWalker(repository);
 	}
 
 	public JAXBMetadataModel getMetadataModel() {
@@ -84,7 +82,7 @@ public class JAXBImporter implements Importer {
 
 	private void importData(ImportData data) {
 		ContentPersistenceManager manager = getEntityProcessor().getPersistenceManager();
-		for (Entity<Object> entity : data.getEntities()) {
+		for (Entity entity : data.getEntities()) {
 			manager.storeEntity(entity);
 		}
 	}

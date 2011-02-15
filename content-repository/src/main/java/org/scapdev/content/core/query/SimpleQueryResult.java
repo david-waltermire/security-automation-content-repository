@@ -30,13 +30,13 @@ import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public class SimpleQueryResult implements QueryResult {
-	private final Map<Key, Entity<Object>> fragments;
+	private final Map<Key, Entity> fragments;
 
-	public SimpleQueryResult(Map<Key, Entity<Object>> fragments) {
+	public SimpleQueryResult(Map<Key, Entity> fragments) {
 		this.fragments = Collections.unmodifiableMap(fragments);
 	}
 
-	public Map<Key, Entity<Object>> getEntities() {
+	public Map<Key, Entity> getEntities() {
 		return fragments;
 	}
 }

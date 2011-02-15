@@ -21,37 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.jaxb;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.annotation.KeyRef;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.NullFieldValueException;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.RelationshipInfo;
-import org.scapdev.content.model.jaxb.JAXBMetadataModel;
 import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVisitor<DefaultModel, DefaultTypeInfo, DefaultPropertyInfo> {
-	private final Entity<Object> owningEntity;
+public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVisitor {
+	private final Entity owningEntity;
 	private final JAXBMetadataModel metadataModel;
-	private final List<Relationship<Object, ?>> relationships;
+	private final List<Relationship> relationships;
 
-	public JAXBRelationshipIdentifyingImportVisitor(Entity<Object> owningEntity, Object node, JAXBMetadataModel metadataModel) {
+	public JAXBRelationshipIdentifyingImportVisitor(Entity owningEntity, JAXBElement<Object> node, JAXBMetadataModel metadataModel) {
 		super(node, metadataModel.getModel());
 		this.owningEntity = owningEntity;
 		this.metadataModel = metadataModel;
-		relationships = new LinkedList<Relationship<Object, ?>>();
+		relationships = new LinkedList<Relationship>();
 	}
 
-	public List<Relationship<Object, ?>> getRelationships() {
-		List<Relationship<Object, ?>> retval;
+	public List<Relationship> getRelationships() {
+		List<Relationship> retval;
 		if (relationships.isEmpty()) {
 			retval = Collections.emptyList();
 		} else {
@@ -61,15 +60,20 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 	}
 
 	@Override
-	public boolean beforeNode(Object instance, DefaultTypeInfo typeInfo) {
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) {
+		return beforeNode(instance.getValue(), jaxbClass);
+	}
+
+	@Override
+	public boolean beforeNode(Object instance, JAXBClass typeInfo) {
 		boolean processContent = true;
 
 		if (instance != null) {
 			KeyRef annotation = typeInfo.getAnnotation(KeyRef.class, true);
 			if (annotation != null) {
-				RelationshipInfo<Object> relationshipInfo = metadataModel.getRelationshipByKeyRefId(annotation.id());
+				RelationshipInfo relationshipInfo = metadataModel.getRelationshipByKeyRefId(annotation.id());
 				try {
-					Relationship<Object, ?> relationship = relationshipInfo.newRelationship(instance, owningEntity);
+					Relationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
 					relationships.add(relationship);
 				} catch (NullFieldValueException e) {
 					// This indicates that the relationship is not properly formed

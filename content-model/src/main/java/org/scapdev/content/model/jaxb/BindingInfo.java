@@ -25,10 +25,10 @@ package org.scapdev.content.model.jaxb;
 
 import java.lang.annotation.Annotation;
 
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
 interface BindingInfo<X extends Annotation> {
 	String getId();
 	X getAnnotation();
-	DefaultTypeInfo getTypeInfo();
+	JAXBClass getJaxbClass();
 }

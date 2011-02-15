@@ -21,12 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.jaxb.reflection.model;
 
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
-public interface ModelVisitable {
-	<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> void visit(PROPERTY propertyInfo, ModelVisitor<MODEL, TYPE, PROPERTY> visitor);
+class PublicMethodIterator extends MethodIterator {
+
+	public PublicMethodIterator(JAXBClass jaxbClass) {
+		super(jaxbClass);
+	}
+
+	@Override
+	protected boolean isJaxbProperty(Method type) {
+		// Checks for get/set
+		boolean result = super.isJaxbProperty(type);
+		if (result) {
+			// Only allow public methods
+			if (!Modifier.isPublic(type.getModifiers())) {
+				result = false;
+			}
+		}
+		return result;
+	}
 }

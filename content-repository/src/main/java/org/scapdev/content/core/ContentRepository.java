@@ -51,7 +51,7 @@ public class ContentRepository {
 	private final QueryProcessor queryProcessor;
 
 
-	public ContentRepository(ClassLoader classLoader) throws IOException, JAXBException {
+	public ContentRepository(ClassLoader classLoader) throws IOException, JAXBException, ClassNotFoundException {
 //		persistenceManager = new MemoryResidentPersistenceManager();
 		persistenceManager = new DefaultHybridContentPersistenceManager();
 		model = MetadataModelFactory.newInstance();

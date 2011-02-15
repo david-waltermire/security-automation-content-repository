@@ -32,8 +32,10 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.scapdev.content.core.query.QueryResult;
+import org.scapdev.content.core.writer.DefaultInstanceWriter;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
 import org.scapdev.content.model.processor.jaxb.ImportData;
@@ -46,53 +48,69 @@ import org.scapdev.content.model.processor.jaxb.ImportData;
 public class App {
 	private static final Logger log = Logger.getLogger(App.class);
 
-    public static void main( String[] args ) throws IOException, JAXBException, ImportException {
-    	StopWatch watch = new StopWatch();
-    	watch.start();
-    	ContentRepository repository = new ContentRepository(App.class.getClassLoader());
-    	watch.stop();
-    	
-    	log.info("Repository startup: "+watch.toString());
-
-    	
-    	Importer importer = repository.getProcessor().newImporter();
-    	watch.reset();
-    	watch.start();
-    	ImportData data = importer.read(new File("target/content/com.redhat.rhsa-all.xml"));
-    	watch.stop();
-    	log.info("Redhat import: "+watch.toString());
-
-//    	for (Entity<Object> entity : data.getEntities()) {
-//    		log.fine("Entity: "+entity.getEntityInfo().getId());
-//    		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
-//        		log.fine("  Relationship: "+relationship.getRelationshipInfo().getId());
-//    		}
-//    	}
-    	watch.reset();
-    	watch.start();
-    	ImportData data2 = importer.read(new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml"));
-    	watch.stop();
-    	log.info("USGCB Win7 import: "+watch.toString());
-
-//    	for (Entity<Object> entity : data2.getEntities()) {
-//    		log.fine("Entity: "+entity.getEntityInfo().getId());
-//    		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
-//        		log.fine("  Relationship: "+relationship.getRelationshipInfo().getId());
-//    		}
-//    	}
-
-    	watch.reset();
-    	watch.start();
-    	LinkedHashMap<String, String> fields = new LinkedHashMap<String, String>();
-    	fields.put("urn:scap-content:field:org.mitre.oval:definition", "oval:gov.nist.usgcb.windowsseven:def:2");
-    	Key key = new Key("urn:scap-content:key:org.mitre.oval:definition", fields);
-    	QueryResult result = repository.query(key, true);
-    	for (Entity<Object> entity : result.getEntities().values()) {
-    		log.info("Retrieved entity: "+entity.getKey());
+    public static void main( String[] args ) throws IOException, JAXBException, ImportException, ClassNotFoundException {
+    	ContentRepository repository = null;
+    	{
+	    	StopWatch watch = new StopWatch();
+	    	watch.start();
+	    	repository = new ContentRepository(App.class.getClassLoader());
+	    	watch.stop();
+	    	
+	    	log.info("Repository startup: "+watch.toString());
     	}
-    	watch.stop();
-    	log.info("Definition query: "+watch.toString());
 
+    	Importer importer = repository.getProcessor().newImporter();
+    	{
+    		File file = new File("target/content/com.redhat.rhsa-all.xml");
+    		log.info("importing: "+file);
+	    	StopWatch watch = new StopWatch();
+	    	watch.start();
+	    	ImportData data = importer.read(file);
+	    	watch.stop();
+	    	log.info("Entities processed: "+data.getEntities().size());
+	    	int relationships = 0;
+	    	for (Entity entity : data.getEntities()) {
+	    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
+	    			++relationships;
+	    		}
+	    	}
+	    	log.info("Relationships processed: "+relationships);
+	    	log.info("Import timing: "+watch.toString());
+    	}
+
+    	{
+    		File file = new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
+    		log.info("importing: "+file);
+    		StopWatch watch = new StopWatch();
+	    	watch.start();
+	    	ImportData data = importer.read(file);
+	    	watch.stop();
+	    	log.info("Entities processed: "+data.getEntities().size());
+	    	int relationships = 0;
+	    	for (Entity entity : data.getEntities()) {
+	    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
+	    			++relationships;
+	    		}
+	    	}
+	    	log.info("Relationships processed: "+relationships);
+	    	log.info("Import timing: "+watch.toString());
+    	}
+
+    	{
+	    	StopWatch watch = new StopWatch();
+	    	watch.start();
+	    	LinkedHashMap<String, String> fields = new LinkedHashMap<String, String>();
+	    	fields.put("urn:scap-content:field:org.mitre.oval:definition", "oval:gov.nist.usgcb.windowsseven:def:2");
+	    	Key key = new Key("urn:scap-content:key:org.mitre.oval:definition", fields);
+	    	QueryResult result = repository.query(key, true);
+	    	for (Entity entity : result.getEntities().values()) {
+	    		log.info("Retrieved entity: "+entity.getKey());
+	    	}
+	    	watch.stop();
+	    	log.info("Definition query: "+watch.toString());
+	
+	    	new DefaultInstanceWriter().write(result);
+    	}
     	repository.shutdown();
     }
 }

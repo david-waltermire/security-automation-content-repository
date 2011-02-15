@@ -23,20 +23,27 @@
  ******************************************************************************/
 package org.scapdev.content.model.processor.jaxb;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import org.scapdev.content.annotation.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
 import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-class ImportVisitor extends DefaultInstanceVisitor<DefaultModel, DefaultTypeInfo, DefaultPropertyInfo> {
+class ImportVisitor extends DefaultInstanceVisitor {
 	private final JAXBEntityProcessor processor;
 	private final JAXBMetadataModel metadataModel;
 	private ImportData state;
 
 	public ImportVisitor(Object document, JAXBEntityProcessor processor, JAXBMetadataModel metadataModel) {
+		super(document, metadataModel.getModel());
+		this.processor = processor;
+		this.metadataModel = metadataModel;
+	}
+
+	public ImportVisitor(JAXBElement<Object> document, JAXBEntityProcessor processor, JAXBMetadataModel metadataModel) {
 		super(document, metadataModel.getModel());
 		this.processor = processor;
 		this.metadataModel = metadataModel;
@@ -49,13 +56,40 @@ class ImportVisitor extends DefaultInstanceVisitor<DefaultModel, DefaultTypeInfo
 	}
 
 	@Override
-	public boolean beforeNode(Object instance, DefaultTypeInfo typeInfo) {
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) {
 		boolean processContent = true;
 		
-		Entity entity = typeInfo.getAnnotation(Entity.class, true);
+		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
 		if (entity != null) {
 			EntityInfo entityInfo = metadataModel.getEntityById(entity.id());
-			state.newEntity(entityInfo, instance, processor);
+
+			@SuppressWarnings("unchecked")
+			JAXBElement<Object> element = (JAXBElement<Object>)instance;
+			state.newEntity(entityInfo, element, processor);
+			processContent = false;
+		}
+		return processContent;
+	}
+
+	@Override
+	public boolean beforeNode(Object instance, JAXBClass jaxbClass) {
+		boolean processContent = true;
+		
+		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
+		if (entity != null) {
+			EntityInfo entityInfo = metadataModel.getEntityById(entity.id());
+
+			String localPart = entityInfo.getLocalPart();
+			if (localPart == null) {
+				throw new UnsupportedOperationException("Class is not a global element: "+instance.getClass().getName());
+			}
+			@SuppressWarnings("unchecked")
+			JAXBElement<Object> element = new JAXBElement<Object>(
+					new QName(entityInfo.getSchemaInfo().getNamespace(), localPart),
+					(Class<Object>) jaxbClass.getType(),
+					null,
+					instance);
+			state.newEntity(entityInfo, element, processor);
 			processContent = false;
 		}
 		return processContent;

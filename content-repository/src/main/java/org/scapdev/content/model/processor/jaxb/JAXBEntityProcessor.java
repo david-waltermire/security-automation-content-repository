@@ -29,9 +29,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.JAXBElement;
+
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.jaxb.JAXBMetadataModel;
+import org.scapdev.content.model.jaxb.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.processor.EntityProcessor;
 import org.scapdev.content.model.processor.Importer;
 
@@ -69,19 +72,19 @@ public class JAXBEntityProcessor implements EntityProcessor {
 	}
 
 
-	private static class RelationshipExtractingTask implements Callable<List<Relationship<Object, ?>>> {
+	private static class RelationshipExtractingTask implements Callable<List<Relationship>> {
 		private final EntityImpl entity;
 		private final JAXBRelationshipIdentifyingImportVisitor visitor;
 
-		RelationshipExtractingTask(EntityImpl entity, Object node, JAXBMetadataModel model) {
+		RelationshipExtractingTask(EntityImpl entity, JAXBElement<Object> node, JAXBMetadataModel model) {
 			this.entity = entity;
 			this.visitor = new JAXBRelationshipIdentifyingImportVisitor(entity, node, model);
 		}
 
 		@Override
-		public List<Relationship<Object, ?>> call() throws Exception {
+		public List<Relationship> call() throws Exception {
 			visitor.visit();
-			List<Relationship<Object, ?>> relationships = visitor.getRelationships();
+			List<Relationship> relationships = visitor.getRelationships();
 			entity.setRelationships(relationships);
 			return relationships;
 		}
@@ -89,9 +92,9 @@ public class JAXBEntityProcessor implements EntityProcessor {
 	}
 
 
-	public Future<List<Relationship<Object, ?>>> processEntity(EntityImpl entity, Object obj) {
+	public Future<List<Relationship>> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
 		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, model);
-		Future<List<Relationship<Object, ?>>> future = service.submit(task);
+		Future<List<Relationship>> future = service.submit(task);
 		return future;
 	}
 }

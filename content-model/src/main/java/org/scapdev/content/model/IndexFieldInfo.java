@@ -26,14 +26,14 @@ package org.scapdev.content.model;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 public interface IndexFieldInfo extends SchemaComponent {
 
 	/**
 	 * @return the propertyPath
 	 */
-	List<DefaultPropertyInfo> getPropertyPath();
+	List<JAXBProperty> getPropertyPath();
 
 	String getValue(Object instance) throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException;

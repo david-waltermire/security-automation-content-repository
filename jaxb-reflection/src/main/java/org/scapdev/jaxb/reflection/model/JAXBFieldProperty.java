@@ -24,9 +24,11 @@
 package org.scapdev.jaxb.reflection.model;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 
-public interface PropertyValueFactory {
-	PropertyValue createPropertyValue(Field field);
-	PropertyValue createDelegate(Type type, Field field);
+public interface JAXBFieldProperty extends JAXBProperty {
+	/**
+	 * Retrieves the Java Field associated with the property
+	 * @return the Java Field associated with the property
+	 */
+	Field getField();
 }

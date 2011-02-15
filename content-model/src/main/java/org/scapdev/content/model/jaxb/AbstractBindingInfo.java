@@ -25,17 +25,17 @@ package org.scapdev.content.model.jaxb;
 
 import java.lang.annotation.Annotation;
 
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
 abstract class AbstractBindingInfo<X extends Annotation> implements BindingInfo<X> {
 	private final String id;
 	private final X annotation;
-	private final DefaultTypeInfo typeInfo;
+	private final JAXBClass jaxbClass;
 
-	AbstractBindingInfo(String id, X annotation, DefaultTypeInfo typeInfo) {
+	AbstractBindingInfo(String id, X annotation, JAXBClass jaxbClass) {
 		this.id = id;
 		this.annotation = annotation;
-		this.typeInfo = typeInfo;
+		this.jaxbClass = jaxbClass;
 	}
 
 	@Override
@@ -49,8 +49,8 @@ abstract class AbstractBindingInfo<X extends Annotation> implements BindingInfo<
 	}
 
 	@Override
-	public DefaultTypeInfo getTypeInfo() {
-		return typeInfo;
+	public JAXBClass getJaxbClass() {
+		return jaxbClass;
 	}
 
 }

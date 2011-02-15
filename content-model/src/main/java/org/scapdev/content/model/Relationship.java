@@ -23,8 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface Relationship<DATA, INFO extends RelationshipInfo<DATA>> {
+public interface Relationship {
 	Key getKey();
-	Entity<DATA> getOwningEntity();
-	INFO getRelationshipInfo();
+	Entity getOwningEntity();
+	RelationshipInfo getRelationshipInfo();
 }

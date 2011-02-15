@@ -31,11 +31,11 @@ import org.scapdev.content.model.LocalRelationshipInfo;
 import org.scapdev.content.model.ModelInstanceException;
 import org.scapdev.content.model.SchemaInfo;
 
-class LocalRelationshipInfoImpl extends AbstractRelationshipInfo<Object, LocalRelationshipInfo<Object>> implements LocalRelationshipInfo<Object> {
+class LocalRelationshipInfoImpl extends AbstractRelationshipInfo implements LocalRelationshipInfo {
 
 	private final KeyRefInfoImpl keyRefInfo;
 
-	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, JAXBMetadataModel loader, InitializingTypeInfoVisitor init) {
+	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
 		super(type, schemaInfo);
 		keyRefInfo = new KeyRefInfoImpl(type.getKeyRef(), this, loader, init);
 	}
@@ -56,7 +56,7 @@ class LocalRelationshipInfoImpl extends AbstractRelationshipInfo<Object, LocalRe
 	}
 
 	@Override
-	public LocalRelationship<Object> newRelationship(Object instance, Entity<Object> owningEntity) {
+	public LocalRelationship newRelationship(Object instance, Entity owningEntity) {
 		return new LocalRelationshipImpl<Object>(this, owningEntity, getKey(instance));
 	}
 

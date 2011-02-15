@@ -194,6 +194,7 @@
         <xs:sequence>
           <xs:element ref="key"/>
         </xs:sequence>
+        <xs:attribute name="local-part" type="xs:NCName"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

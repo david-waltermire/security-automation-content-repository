@@ -32,16 +32,16 @@ import org.scapdev.content.model.Component;
 import org.scapdev.content.model.IndexFieldInfo;
 import org.scapdev.content.model.SchemaInfo;
 import org.scapdev.jaxb.reflection.instance.PropertyPathEvaluator;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT extends Component> implements IndexFieldInfo {
 
 	private final PARENT parent;
 	private final String id;
 	private final String schemaNode;
-	private final List<DefaultPropertyInfo> propertyPath;
+	private final List<JAXBProperty> propertyPath;
 	
-	AbstractFieldInfo(JAXB_TYPE field, PARENT parent, List<DefaultPropertyInfo> propertyPath, JAXBMetadataModel loader) {
+	AbstractFieldInfo(JAXB_TYPE field, PARENT parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
 		this.parent = parent;
 		id = field.getId();
 		schemaNode = field.getSchemaNode().getNode();
@@ -68,7 +68,7 @@ abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT e
 		return getParent().getSchemaInfo();
 	}
 
-	public List<DefaultPropertyInfo> getPropertyPath() {
+	public List<JAXBProperty> getPropertyPath() {
 		return propertyPath;
 	}
 

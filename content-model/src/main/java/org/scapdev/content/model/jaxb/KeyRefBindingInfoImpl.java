@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.scapdev.content.annotation.KeyRef;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 class KeyRefBindingInfoImpl extends AbstractIndexedBindingInfo<KeyRef> implements KeyRefBindingInfo {
-	KeyRefBindingInfoImpl(String id, KeyRef annotation, Map<String, List<DefaultPropertyInfo>> propertyMap, DefaultTypeInfo typeInfo) {
+	KeyRefBindingInfoImpl(String id, KeyRef annotation, Map<String, List<JAXBProperty>> propertyMap, JAXBClass typeInfo) {
 		super(id, annotation, propertyMap, typeInfo);
 	}
 }

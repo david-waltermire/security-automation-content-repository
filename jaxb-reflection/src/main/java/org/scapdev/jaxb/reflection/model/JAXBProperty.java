@@ -24,40 +24,31 @@
 package org.scapdev.jaxb.reflection.model;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
-
-
-/**
- * This interface represents an XML element or attribute property contained
- * within a bound XML class.
-
- * @author David Waltermire
- *
- */
-public interface PropertyInfo {
+public interface JAXBProperty {
+	public enum Type {
+		ELEMENT,
+		ATTRIBUTE;
+	}
+//	/**
+//	 * Retrieves the Java Method getter associated with the property
+//	 * @return the Java Method associated with the property
+//	 */
+//	Method getGetter();
+//	/**
+//	 * Retrieves the PropertyValue object directly associated with the property
+//	 * @return the PropertyValue associated with the property
+//	 */
+//	PropertyValue getValue();
+	Type getType();
+	boolean isRequired();
+	boolean isNillable();
 	/**
-	 * Retrieves the Java Method getter associated with the property
-	 * @return the Java Method associated with the property
+	 * Retrieves the JAXBClass records of the bound XML class for which this property is a member
+	 * @return the JAXBClass record of the associated XML bound class
 	 */
-	Method getGetter();
-	/**
-	 * Retrieves the Java Field associated with the property
-	 * @return the Java Field associated with the property
-	 */
-	Field getField();
-	/**
-	 * Retrieves the PropertyValue object directly associated with the property
-	 * @return the PropertyValue associated with the property
-	 */
-	PropertyValue getValue();
-	/**
-	 * Retrieves the TypeInfo records of the bound XML class for which this property is a member
-	 * @return the TypeInfo record of the associated XML bound class
-	 */
-	TypeInfo getTypeInfo();
+	JAXBClass getJAXBClass();
 	/**
 	 * Retrieves the properties' name
 	 * @return the property name

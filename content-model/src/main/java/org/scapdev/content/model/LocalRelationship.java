@@ -23,5 +23,5 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface LocalRelationship<DATA> extends Relationship<DATA, LocalRelationshipInfo<DATA>> {
+public interface LocalRelationship extends Relationship {
 }

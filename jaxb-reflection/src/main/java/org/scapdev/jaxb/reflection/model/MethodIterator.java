@@ -23,7 +23,36 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 
-public interface DelegatingPropertyValue extends PropertyValue {
-	PropertyValue getDelegate();
+import org.scapdev.jaxb.reflection.model.JAXBProperty.Type;
+
+class MethodIterator extends JAXBPropertyIterator<Method> {
+	public MethodIterator(JAXBClass jaxbClass) {
+		super(jaxbClass);
+	}
+
+	@Override
+	protected Collection<Method> getProperties() {
+		return Arrays.asList(getJaxbClass().getType().getDeclaredMethods());
+	}
+
+	@Override
+	protected boolean isJaxbProperty(Method type) {
+		// TODO: check for getters and setters
+		return true;
+	}
+
+	@Override
+	protected JAXBProperty newInstance(Method type, Type propertyType) {
+		throw new UnsupportedOperationException();
+//		return new JAXBMethodPropertyImpl(type, propertyType, getJaxbClass());
+	}
+
+	@Override
+	protected Type getType(Method type) {
+		throw new UnsupportedOperationException();
+	}
 }

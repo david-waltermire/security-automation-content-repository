@@ -26,7 +26,9 @@ package org.scapdev.jaxb.reflection.instance;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
+import javax.xml.bind.JAXBElement;
+
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 /**
  * @author David Waltermire
  */
@@ -36,7 +38,7 @@ public class PropertyPathEvaluator {
 	/**
 	 * Evaluates a property path against an instance returning the value at the
 	 * end of the path.
-	 * @param <T> the type of the PropertyInfo
+	 * @param <T> the type of the JAXBProperty
 	 * @param instance the JAXB instance to evaluate
 	 * @param path the property path to follow
 	 * @return the value at the end of the property path
@@ -44,16 +46,33 @@ public class PropertyPathEvaluator {
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 */
-	public static <T extends PropertyInfo> String evaluate(Object instance, List<T> path) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		for (T propertyInfo : path) {
+	public static String evaluate(Object instance, List<JAXBProperty> path) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		for (JAXBProperty propertyInfo : path) {
 			if (instance == null) break;
 			instance = propertyInfo.getInstance(instance);
-			instance = propertyInfo.getValue().getInstance(instance);
+			instance = getValue(instance);
 		}
 		String retval = null;
 		if (instance != null) {
 			retval = instance.toString();
 		}
 		return retval;
+	}
+
+	private static Object getValue(Object instance) {
+		if (instance != null) {
+			Class<?> clazz = instance.getClass();
+			if (List.class.isAssignableFrom(clazz)) {
+				throw new UnsupportedOperationException(clazz.getName());
+			} else if (JAXBElement.class.isAssignableFrom(clazz)) {
+				@SuppressWarnings("unchecked")
+				JAXBElement<Object> element = (JAXBElement<Object>) instance;
+				return getValue(element.getValue());
+			} else {
+				// Leaf or XML type
+				return instance;
+			}
+		}
+		return null;
 	}
 }

@@ -34,12 +34,12 @@ import org.scapdev.content.model.Key;
 public class ResolutionState {
 	private Set<Key> unresolvedKeys;
 	private final Set<Key> unresolvableKeys;
-	private final Map<Key, Entity<Object>> retrievedFragments;
+	private final Map<Key, Entity> retrievedFragments;
 
 	public ResolutionState(Set<Key> initalKeys) {
 		unresolvedKeys = new HashSet<Key>(initalKeys);
 		unresolvableKeys = new HashSet<Key>();
-		retrievedFragments = new TreeMap<Key, Entity<Object>>();
+		retrievedFragments = new TreeMap<Key, Entity>();
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ResolutionState {
 	/**
 	 * @return the retrievedFragments
 	 */
-	public Map<Key, Entity<Object>> getRetrievedFragments() {
+	public Map<Key, Entity> getRetrievedFragments() {
 		return retrievedFragments;
 	}
 

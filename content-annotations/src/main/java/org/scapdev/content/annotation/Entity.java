@@ -33,5 +33,6 @@ import java.lang.annotation.Target;
 @Target({TYPE})
 public @interface Entity {
 	String id();
+	String localPart() default "";
 	String keyId();
 }

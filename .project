@@ -3,6 +3,11 @@
 	<name>content</name>
 	<comment></comment>
 	<projects>
+		<project>content-annotations</project>
+		<project>content-meta-model</project>
+		<project>content-model</project>
+		<project>content-repository</project>
+		<project>jaxb-reflection</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

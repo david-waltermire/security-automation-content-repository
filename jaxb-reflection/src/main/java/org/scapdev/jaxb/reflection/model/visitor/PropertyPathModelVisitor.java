@@ -27,43 +27,42 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
-public class PropertyPathModelVisitor<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> extends DefaultModelVisitor<MODEL, TYPE, PROPERTY> {
-	private final LinkedList<PROPERTY> propertyPath = new LinkedList<PROPERTY>();
+public class PropertyPathModelVisitor extends DefaultModelVisitor {
+	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
 
-	public PropertyPathModelVisitor(TYPE typeInfo, MODEL model) {
-		super(typeInfo, model);
+	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
+		super(jaxbClass, model);
 	}
 
-	public List<PROPERTY> getPropertyPath() {
-		return new ArrayList<PROPERTY>(propertyPath);
+	public List<JAXBProperty> getPropertyPath() {
+		return new ArrayList<JAXBProperty>(propertyPath);
 	}
 
-	public final PROPERTY getCurrentPropertyInfo() {
+	public final JAXBProperty getCurrentJAXBProperty() {
 		return propertyPath.peekLast();
 	}
 
-	@SuppressWarnings("unchecked")
-	public TYPE getCurrentTypeInfo() {
-		return (TYPE)getCurrentPropertyInfo().getTypeInfo();
+	public JAXBClass getCurrentTypeInfo() {
+		return getCurrentJAXBProperty().getJAXBClass();
 	}
 
 	@Override
-	protected void processPropertyInfo(TYPE typeInfo, PROPERTY propertyInfo) {
-		pushPropertyInfo(propertyInfo);
-		super.processPropertyInfo(typeInfo, propertyInfo);
-		popPropertyInfo(propertyInfo);
+	protected void processJaxbProperty(JAXBProperty property) {
+		pushPropertyInfo(property);
+		super.processJaxbProperty(property);
+		popPropertyInfo(property);
 	}
 
-	private void popPropertyInfo(PROPERTY info) {
-		PROPERTY poppedInfo = propertyPath.pollLast();
+	private void popPropertyInfo(JAXBProperty info) {
+		JAXBProperty poppedInfo = propertyPath.pollLast();
 		assert(poppedInfo == info);
 	}
 
-	private void pushPropertyInfo(PROPERTY info) {
+	private void pushPropertyInfo(JAXBProperty info) {
 		propertyPath.addLast(info);
 	}
 }

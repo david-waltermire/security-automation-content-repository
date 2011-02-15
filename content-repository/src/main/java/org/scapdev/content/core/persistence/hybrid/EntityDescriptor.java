@@ -29,10 +29,10 @@ import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
 
-public interface EntityDescriptor<DATA> {
+public interface EntityDescriptor {
 	Key getKey();
 	String getContentId();
-	List<Relationship<DATA, ?>> getRelationships();
+	List<Relationship> getRelationships();
 
 	EntityInfo getEntityInfo();
 }

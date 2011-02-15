@@ -21,38 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.jaxb;
+package org.scapdev.jaxb.reflection.model;
 
-import java.net.URI;
+public class InvalidJAXBClassException extends JAXBModelException {
+	/** the serial version UID */
+	private static final long serialVersionUID = 1L;
 
-import org.scapdev.jaxb.reflection.model.MutableTypeInfo;
-import org.scapdev.jaxb.reflection.model.SchemaInfo;
-
-/**
- * This abstract implementation provides basic information about an XML schema specific meta model.
- * @author David Waltermire
- *
- */
-public abstract class AbstractSchemaModel<X extends MutableTypeInfo<?>> implements InternalSchemaModel<X> {
-
-	private final SchemaInfo schema;
-
-	/**
-	 * Constructs a new XML schema meta model
-	 * @param schema the associated schema descriptor
-	 * @param model the XML schema meta model that this schema model is a member of
-	 */
-	public AbstractSchemaModel(SchemaInfo schema) {
-		this.schema = schema;
+	public InvalidJAXBClassException() {
 	}
 
-	/** {@inheritDoc} */
-	public SchemaInfo getSchemaInfo() {
-		return schema;
+	public InvalidJAXBClassException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	/** {@inheritDoc} */
-	public URI getNamespace() {
-		return schema.getSystemId();
+	public InvalidJAXBClassException(String message) {
+		super(message);
 	}
+
+	public InvalidJAXBClassException(Throwable cause) {
+		super(cause);
+	}
+
 }

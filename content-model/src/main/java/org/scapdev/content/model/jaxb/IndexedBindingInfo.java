@@ -27,11 +27,11 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 interface IndexedBindingInfo<ANNOTATION extends Annotation> extends BindingInfo<ANNOTATION> {
 	/**
 	 * @return the propertyMap
 	 */
-	Map<String, List<DefaultPropertyInfo>> getPropertyMap();
+	Map<String, List<JAXBProperty>> getPropertyMap();
 }

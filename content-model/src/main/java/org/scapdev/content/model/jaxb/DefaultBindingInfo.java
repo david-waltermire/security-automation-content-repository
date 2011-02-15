@@ -25,11 +25,11 @@ package org.scapdev.content.model.jaxb;
 
 import java.lang.annotation.Annotation;
 
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
 class DefaultBindingInfo<ANNOTATION extends Annotation> extends AbstractBindingInfo<ANNOTATION> {
 
-	DefaultBindingInfo(String id, ANNOTATION annotation, DefaultTypeInfo typeInfo) {
-		super(id, annotation, typeInfo);
+	DefaultBindingInfo(String id, ANNOTATION annotation, JAXBClass jaxbClass) {
+		super(id, annotation, jaxbClass);
 	}
 }

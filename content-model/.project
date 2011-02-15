@@ -3,6 +3,8 @@
 	<name>content-model</name>
 	<comment></comment>
 	<projects>
+		<project>content-annotations</project>
+		<project>content-meta-model</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

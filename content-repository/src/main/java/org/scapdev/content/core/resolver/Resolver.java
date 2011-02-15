@@ -30,6 +30,6 @@ import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public interface Resolver {
-	Map<Key, Entity<Object>> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
+	Map<Key, Entity> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
 	void resolveResolvable(ResolutionState state, ResolutionParameters parameters);
 }

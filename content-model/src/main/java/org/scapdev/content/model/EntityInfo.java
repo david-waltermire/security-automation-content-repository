@@ -24,4 +24,5 @@
 package org.scapdev.content.model;
 
 public interface EntityInfo extends SchemaComponent, Indexed {
+	String getLocalPart();
 }

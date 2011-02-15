@@ -32,11 +32,16 @@
       <url>http://download.java.net/maven/1</url>
       <layout>legacy</layout>
     </repository>
-    <repository>      <id>goldin.org-releases</id>
+    <repository>
+      <id>goldin.org-releases</id>
       <name>goldin.org Maven 2 Repository</name>
       <url>http://evgeny-goldin.org/artifactory/libs-releases</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <pluginRepositories>

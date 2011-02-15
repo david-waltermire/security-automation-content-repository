@@ -29,5 +29,5 @@ import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
 public interface QueryResult {
-	Map<Key, Entity<Object>> getEntities();
+	Map<Key, Entity> getEntities();
 }

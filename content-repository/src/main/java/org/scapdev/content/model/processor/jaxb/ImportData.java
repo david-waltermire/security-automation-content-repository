@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.JAXBElement;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
@@ -18,30 +20,30 @@ import org.scapdev.content.model.processor.ImportException;
 public class ImportData {
 	private static final Logger log = Logger.getLogger(ImportData.class);
 
-	private final List<Future<List<Relationship<Object, ?>>>> futures;
-	private final List<Entity<Object>> entities;
+	private final List<Future<List<Relationship>>> futures;
+	private final List<Entity> entities;
 
 	ImportData() {
-		this.entities = new LinkedList<Entity<Object>>();
-		this.futures = new LinkedList<Future<List<Relationship<Object, ?>>>>();
+		this.entities = new LinkedList<Entity>();
+		this.futures = new LinkedList<Future<List<Relationship>>>();
 	}
 
-	void registerRelationshipData(Future<List<Relationship<Object, ?>>> future) {
+	void registerRelationshipData(Future<List<Relationship>> future) {
 		futures.add(future);
 	}
 
-	void newEntity(EntityInfo entityInfo, Object obj, JAXBEntityProcessor processor) {
+	void newEntity(EntityInfo entityInfo, JAXBElement<Object> obj, JAXBEntityProcessor processor) {
 		log.log(Level.TRACE,"Creating entity type: "+entityInfo.getId());
 		EntityImpl entity = new EntityImpl(entityInfo, obj);
-		Future<List<Relationship<Object, ?>>> future = processor.processEntity(entity, obj);
+		Future<List<Relationship>> future = processor.processEntity(entity, obj);
 		registerRelationshipData(future);
 		entities.add(entity);
 	}
 
 	void validateRelationships() {
-		for (Future<List<Relationship<Object, ?>>> future : futures) {
+		for (Future<List<Relationship>> future : futures) {
 			try {
-				for (Relationship<Object, ?> relationship : future.get()) {
+				for (Relationship relationship : future.get()) {
 					validateRelationship(relationship);
 				}
 			} catch (InterruptedException e) {
@@ -52,11 +54,11 @@ public class ImportData {
 		}
 	}
 
-	private void validateRelationship(Relationship<Object, ?> relationship) {
+	private void validateRelationship(Relationship relationship) {
 		// TODO: implement
 	}
 
-	public List<Entity<Object>> getEntities() {
+	public List<Entity> getEntities() {
 		return entities;
 	}
 

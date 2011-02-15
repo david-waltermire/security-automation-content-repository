@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface RelationshipInfo<DATA> extends SchemaComponent {
+public interface RelationshipInfo extends SchemaComponent {
 	KeyRefInfo getKeyRefInfo();
-	Relationship<DATA, ?> newRelationship(Object instance, Entity<DATA> owningEntity);
+	Relationship newRelationship(Object instance, Entity owningEntity);
 }

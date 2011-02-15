@@ -27,7 +27,7 @@ import org.scapdev.content.model.AbstractSchemaComponent;
 import org.scapdev.content.model.RelationshipInfo;
 import org.scapdev.content.model.SchemaInfo;
 
-abstract class AbstractRelationshipInfo<DATA, INFO extends RelationshipInfo<DATA>> extends AbstractSchemaComponent implements RelationshipInfo<DATA> {
+abstract class AbstractRelationshipInfo extends AbstractSchemaComponent implements RelationshipInfo {
 
 	protected AbstractRelationshipInfo(RelationshipType type, SchemaInfo schemaInfo) {
 		super(type.getId(), schemaInfo, type.getSchemaNode().getNode());

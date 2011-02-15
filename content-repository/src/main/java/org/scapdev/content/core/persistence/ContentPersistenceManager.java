@@ -29,6 +29,6 @@ import org.scapdev.content.model.Key;
 
 
 public interface ContentPersistenceManager {
-	Entity<Object> getEntityByKey(Key key);
-	void storeEntity(Entity<Object> entity) throws ContentException;
+	Entity getEntityByKey(Key key);
+	void storeEntity(Entity entity) throws ContentException;
 }

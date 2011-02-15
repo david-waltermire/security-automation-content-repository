@@ -25,75 +25,67 @@ package org.scapdev.jaxb.reflection.model.visitor;
 
 import org.apache.log4j.Logger;
 import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
-public class DefaultModelVisitor<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> implements ModelVisitor<MODEL, TYPE, PROPERTY> {
-
+public class DefaultModelVisitor implements ModelVisitor {
 
 	private static final Logger log = Logger.getLogger(DefaultInstanceVisitor.class);
 
-	private final TYPE typeInfo;
-	private final MODEL model;
+	private final JAXBClass jaxbClass;
+	private final JAXBModel model;
 
-	public DefaultModelVisitor(TYPE typeInfo, MODEL model) {
-		this.typeInfo = typeInfo;
+	public DefaultModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
+		this.jaxbClass = jaxbClass;
 		this.model = model;
 	}
 
-	protected MODEL getModel() {
+	protected JAXBModel getModel() {
 		return model;
 	}
 
-	public TYPE getTypeInfo(Class<?> clazz) {
-		return getModel().getTypeInfo(clazz);
-	}
-
 	public void visit() {
-		log.debug("visiting type: "+typeInfo.getType().getName());
-		processTypeInfo(typeInfo);
+		log.debug("visiting type: "+jaxbClass.getType().getName());
+		processJaxbClass(jaxbClass);
 	}
 
-	public boolean beforeTypeInfo(TYPE typeInfo) { return true; }
-	public void afterTypeInfo(TYPE typeInfo) { }
+	public boolean beforeJAXBClass(JAXBClass typeInfo) { return true; }
+	public void afterJAXBClass(JAXBClass typeInfo) { }
 
-	public boolean beforePropertyInfo(TYPE typeInfo, PROPERTY property) { return true; }
-	public void afterPropertyInfo(TYPE typeInfo, PROPERTY property) {}
+	public boolean beforeJAXBProperty(JAXBProperty property) { return true; }
+	public void afterJAXBProperty(JAXBProperty property) {}
 
-	protected void processTypeInfo(TYPE typeInfo) {
-		log.trace("visiting typeInfo: "+typeInfo.getType());
-		if (beforeTypeInfo(typeInfo)) {
+	protected void processJaxbClass(JAXBClass jaxbClass) {
+		log.trace("visiting JAXBClass: "+jaxbClass.getType().getName());
+		if (beforeJAXBClass(jaxbClass)) {
 	
-			@SuppressWarnings("unchecked")
-			TYPE parent = (TYPE)typeInfo.getParent();
+			JAXBClass parent = jaxbClass.getSuperclass();
 	
 			// Handle parent first
-			if (parent != null) processTypeInfo(parent);
+			if (parent != null) processJaxbClass(parent);
 	
 			// Iterate over each property, starting with attributes
-			for (PropertyInfo property : typeInfo.getAttributePropertyInfos().values()) {
+			for (JAXBProperty property : jaxbClass.getAttributeProperties().values()) {
 				log.trace("Walking attribute property: "+property.getName());
-				@SuppressWarnings("unchecked")
-				PROPERTY p = (PROPERTY)property;
-				processPropertyInfo(typeInfo, p);
+				processJaxbProperty(property);
 			}
-			for (PropertyInfo property : typeInfo.getElementPropertyInfos().values()) {
+			for (JAXBProperty property : jaxbClass.getElementProperties().values()) {
 				log.trace("Walking element property: "+property.getName());
-				@SuppressWarnings("unchecked")
-				PROPERTY p = (PROPERTY)property;
-				processPropertyInfo(typeInfo, p);
+				processJaxbProperty(property);
 			}
 		}
-		afterTypeInfo(typeInfo);
+		afterJAXBClass(jaxbClass);
 	}
 
-	protected void processPropertyInfo(TYPE typeInfo, PROPERTY propertyInfo) {
-		if (beforePropertyInfo(typeInfo, propertyInfo)) {
-			ModelVisitable visitable = propertyInfo.getValue();
-			visitable.visit(propertyInfo, this);
+	protected void processJaxbProperty(JAXBProperty property) {
+		if (beforeJAXBProperty(property)) {
+			processPropertyValue(property);
 		}
-		afterPropertyInfo(typeInfo, propertyInfo);
+		afterJAXBProperty(property);
 	}
 
+	private void processPropertyValue(JAXBProperty property) {
+		throw new UnsupportedOperationException();
+	}
 }

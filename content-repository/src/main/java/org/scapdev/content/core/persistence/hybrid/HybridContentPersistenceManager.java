@@ -28,5 +28,5 @@ import org.scapdev.content.model.Key;
 
 public interface HybridContentPersistenceManager extends ContentPersistenceManager {
 
-	public EntityDescriptor<Object> getEntityDescriptorByKey(Key key);
+	public EntityDescriptor getEntityDescriptorByKey(Key key);
 }

@@ -32,29 +32,29 @@ import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
 
-public class MemoryResidentMetadataStore implements MetadataStore<Object> {
-	private final Map<Key, EntityDescriptor<Object>> descriptorMap;
+public class MemoryResidentMetadataStore implements MetadataStore {
+	private final Map<Key, EntityDescriptor> descriptorMap;
 
 	public MemoryResidentMetadataStore() {
-		this.descriptorMap = new HashMap<Key, EntityDescriptor<Object>>();
+		this.descriptorMap = new HashMap<Key, EntityDescriptor>();
 	}
 
 	@Override
-	public EntityDescriptor<Object> getEntityDescriptor(Key key) {
+	public EntityDescriptor getEntityDescriptor(Key key) {
 		return descriptorMap.get(key);
 	}
 
 	@Override
-	public void persist(Entity<Object> entity, String contentId) {
-		EntityDescriptor<Object> desc = new InternalEntityDescriptor(entity, contentId);
+	public void persist(Entity entity, String contentId) {
+		EntityDescriptor desc = new InternalEntityDescriptor(entity, contentId);
 		descriptorMap.put(entity.getKey(), desc);
 	}
 
-	private static class InternalEntityDescriptor implements EntityDescriptor<Object> {
-		private final Entity<Object> entity;
+	private static class InternalEntityDescriptor implements EntityDescriptor {
+		private final Entity entity;
 		private final String contentId;
 		
-		InternalEntityDescriptor(Entity<Object> entity, String contentId) {
+		InternalEntityDescriptor(Entity entity, String contentId) {
 			this.entity = entity;
 			this.contentId = contentId;
 		}
@@ -75,7 +75,7 @@ public class MemoryResidentMetadataStore implements MetadataStore<Object> {
 		}
 
 		@Override
-		public List<Relationship<Object, ?>> getRelationships() {
+		public List<Relationship> getRelationships() {
 			return entity.getRelationships();
 		}
 		

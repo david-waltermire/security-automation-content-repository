@@ -167,9 +167,10 @@
             <xsd:documentation>The DefinitionsType complex type is a container for one or more definition elements. Each definition element describes a single OVAL Definition. Please refer to the description of the DefinitionType for more information about an individual definition.</xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
-            <xsd:element name="definition" type="oval-def:DefinitionType" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="oval-def:definition" minOccurs="1" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
+    <xsd:element name="definition" type="oval-def:DefinitionType"/>
     <xsd:complexType name="DefinitionType">
         <xsd:annotation>
             <xsd:documentation>The DefinitionType defines a single OVAL Definition. A definition is the key structure in OVAL. It is analogous to the logical sentence or proposition: if a computer's state matches the configuration parameters laid out in the criteria, then that computer exhibits the state described. The DefinitionType contains a section for various metadata related elements that describe the definition. This includes a description, version, affected system types, and reference information. The notes section of a definition should be used to hold information that might be helpful to someone examining the technical aspects of the definition. For example, why certain tests have been included in the criteria, or maybe a link to where further information can be found. The DefinitionType also (unless the definition is deprecated) contains a criteria child element that joins individual tests together with a logical operator to specify the specific computer state being described.</xsd:documentation>

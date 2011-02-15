@@ -25,53 +25,37 @@ package org.scapdev.jaxb.reflection.model;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlRootElement;
-
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * This interface describes the general properties of a bound XML class
  * @author David Waltermire
  *
  */
-public interface TypeInfo {
+public interface JAXBClass {
 	/**
 	 * Retrieves the type of the underlying bound class
 	 * @return the bound class
 	 */
 	Class<?> getType();
-	SchemaModel getSchemaModel();
+	XmlType getXmlType();
+	JAXBPackage getJAXBPackage();
+	XmlAccessType getXmlAccessType();
 	/**
-	 * Get the parent TypeInfo that this type extends
-	 * @return the TypeInfo of the parent class or <code>null</code> if the type does not extend an other type
+	 * Get the parent JAXBClass that this type extends
+	 * @return the JAXBClass of the parent class or <code>null</code> if the type does not extend an other type
 	 */
-	TypeInfo getParent();
-	/**
-	 * Retrieves the property descriptors for each property defined on this type
-	 * @return a map of property names to property descriptors
-	 */
-	Map<String, ? extends PropertyInfo> getPropertyInfos();
-	/**
-	 * Retrieves the property descriptors for properties that correspond to XML attribute properties defined on this type
-	 * @return a map of property names to property descriptors
-	 */
-	Map<String, ? extends PropertyInfo> getAttributePropertyInfos();
-	/**
-	 * Retrieves the property descriptors for properties that correspond to XML element properties defined on this type
-	 * @return a map of property names to property descriptors
-	 */
-	Map<String, ? extends PropertyInfo> getElementPropertyInfos();
-	/**
-	 * Retrieves the property descriptor for a specific property defined on this type
-	 * @param property the property name
-	 * @return a property descriptor for the specified property or <code>null</code> if no such property exists 
-	 */
-	PropertyInfo getPropertyInfo(String property);
+	JAXBClass getSuperclass();
+
 	/**
 	 * Identifies if this type is an XML root element
 	 * @return <code>true</code> if this type is an XML root element or <code>false</code> otherwise
 	 */
-	boolean isRootElement();
+	boolean isGlobalElement();
 	XmlRootElement getRootElement();
 	/**
 	 * Identifies if the bound class associated with this type is abstract
@@ -80,4 +64,27 @@ public interface TypeInfo {
 	boolean isAbstract();
 
 	<T extends Annotation> T getAnnotation(Class<T> annotationClass, boolean checkParent);
+
+	Set<String> getElementPropertyNames();
+	/**
+	 * Retrieves the property descriptors for each property defined on this type
+	 * @return a map of property names to property descriptors
+	 */
+	Map<String, JAXBProperty> getProperties();
+	/**
+	 * Retrieves the property descriptors for properties that correspond to XML attribute properties defined on this type
+	 * @return a map of property names to property descriptors
+	 */
+	Map<String, JAXBProperty> getAttributeProperties();
+	/**
+	 * Retrieves the property descriptors for properties that correspond to XML element properties defined on this type
+	 * @return a map of property names to property descriptors
+	 */
+	Map<String, JAXBProperty> getElementProperties();
+	/**
+	 * Retrieves the property descriptor for a specific property defined on this type
+	 * @param property the property name
+	 * @return a property descriptor for the specified property or <code>null</code> if no such property exists 
+	 */
+	JAXBProperty getProperty(String property);
 }

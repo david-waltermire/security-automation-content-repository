@@ -23,14 +23,13 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model.visitor;
 
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public interface ModelVisitor<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> {
-	boolean beforeTypeInfo(TYPE typeInfo);
-	void afterTypeInfo(TYPE typeInfo);
+public interface ModelVisitor {
+	boolean beforeJAXBClass(JAXBClass jaxbClass);
+	void afterJAXBClass(JAXBClass jaxbClass);
 
-	boolean beforePropertyInfo(TYPE typeInfo, PROPERTY property);
-	void afterPropertyInfo(TYPE typeInfo, PROPERTY property);
+	boolean beforeJAXBProperty(JAXBProperty property);
+	void afterJAXBProperty(JAXBProperty property);
 }

@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,8 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.crypto.Data;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

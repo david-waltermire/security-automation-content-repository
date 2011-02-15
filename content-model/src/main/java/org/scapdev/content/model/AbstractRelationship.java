@@ -23,11 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public abstract class AbstractRelationship<DATA, INFO extends RelationshipInfo<DATA>> implements Relationship<DATA, INFO> {
+public abstract class AbstractRelationship<INFO extends RelationshipInfo> implements Relationship {
 	private final INFO relationshipInfo;
-	private final Entity<DATA> owningEntity;
+	private final Entity owningEntity;
 
-	protected AbstractRelationship(INFO relationshipInfo, Entity<DATA> owningEntity) {
+	protected AbstractRelationship(INFO relationshipInfo, Entity owningEntity) {
 		this.relationshipInfo = relationshipInfo;
 		this.owningEntity = owningEntity;
 	}
@@ -38,7 +38,7 @@ public abstract class AbstractRelationship<DATA, INFO extends RelationshipInfo<D
 	}
 
 	@Override
-	public Entity<DATA> getOwningEntity() {
+	public Entity getOwningEntity() {
 		return owningEntity;
 	}
 }
