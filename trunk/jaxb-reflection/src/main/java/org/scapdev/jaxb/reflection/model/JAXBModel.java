@@ -24,23 +24,55 @@
 package org.scapdev.jaxb.reflection.model;
 
 import java.io.IOException;
-
-import javax.xml.bind.annotation.XmlAccessType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.scapdev.jaxb.reflection.model.visitor.JAXBClassVisitor;
 
-public interface JAXBPackage {
+public class JAXBModel {
+	private final ClassLoader classLoader;
+	private Map<String, JAXBPackage> packageToSchemaMap;
 
-	String getNamespace();
+	public JAXBModel(Collection<Package> jaxbPackages, ClassLoader classLoader) {
+		this.classLoader = classLoader;
+		packageToSchemaMap = new HashMap<String, JAXBPackage>();
+		for (Package jaxbPackage : jaxbPackages) {
+			packageToSchemaMap.put(jaxbPackage.getName(), new JAXBPackageImpl(jaxbPackage, this));
+		}
+	}
 
-	String getSchemaLocation();
+	public static JAXBModel newInstanceFromPackageNames(Collection<String> packageNames, ClassLoader classLoader) {
+		List<Package> packages = new ArrayList<Package>(packageNames.size());
+		for (String p : packageNames) {
+			packages.add(Package.getPackage(p));
+		}
+		return new JAXBModel(packages, classLoader);
+	}
 
-	JAXBModel getJAXBModel();
+	/**
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public JAXBClass getClass(Class<?> clazz) {
+		String name = clazz.getPackage().getName();
+		JAXBPackage jaxbPackage = packageToSchemaMap.get(name);
+		if (jaxbPackage == null) {
+			return null;
+		}
+		return jaxbPackage.getClass(clazz);
+	}
 
-	JAXBClass getClass(Class<?> clazz);
+	public void visit(JAXBClassVisitor visitor) throws ClassNotFoundException, IOException {
+		for (JAXBPackage jaxbPackage : packageToSchemaMap.values()) {
+			jaxbPackage.visit(visitor);
+		}
+	}
 
-	XmlAccessType getXmlAccessType();
-
-	void visit(JAXBClassVisitor visitor) throws ClassNotFoundException, IOException;
-
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
 }

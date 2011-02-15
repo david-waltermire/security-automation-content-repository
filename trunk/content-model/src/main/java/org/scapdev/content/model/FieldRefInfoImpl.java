@@ -21,48 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
+import org.scapdev.content.model.jaxb.FieldRefType;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
-
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
-
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
+class FieldRefInfoImpl extends AbstractFieldInfo<FieldRefType, KeyRefInfo> implements FieldRefInfo {
+	private final FieldInfo referencedFieldInfo;
+	
+	FieldRefInfoImpl(FieldRefType field, KeyRefInfo parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
+		super(field, parent, propertyPath, loader);
+		KeyInfo keyInfo = parent.getKeyInfo();
+		String fieldRef = field.getIdRef();
+		referencedFieldInfo = keyInfo.getFieldInfo(fieldRef);
 	}
 
 	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
+	public KeyRefInfo getKeyRefInfo() {
+		return getParent();
 	}
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	@Override
+	public FieldInfo getReferencedFieldInfo() {
+		return referencedFieldInfo;
 	}
 }

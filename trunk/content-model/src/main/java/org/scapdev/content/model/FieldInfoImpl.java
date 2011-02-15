@@ -21,48 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.scapdev.content.model.jaxb.FieldType;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
-
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
-
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
+class FieldInfoImpl extends AbstractFieldInfo<FieldType, KeyInfo> implements FieldInfo {
+	
+	FieldInfoImpl(FieldType field, KeyInfo parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
+		super(field, parent, propertyPath, loader);
 	}
 
 	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
+	public KeyInfo getKeyInfo() {
+		return getParent();
 	}
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+			.appendSuper(super.toString())
+			.toString();
 	}
 }

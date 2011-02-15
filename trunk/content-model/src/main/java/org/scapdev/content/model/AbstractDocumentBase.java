@@ -21,48 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import org.scapdev.content.model.jaxb.DocumentEntityType;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
-import org.scapdev.jaxb.reflection.model.JAXBProperty;
+abstract class AbstractDocumentBase extends AbstractDocument {
+	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
-
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
+	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
+		super(entity, schema);
+		binding = init.getDocumentBindingInfo(entity.getId());
 	}
 
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
+	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
+		return binding;
 	}
 
 	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractDocumentBase))
+			return false;
+		AbstractDocumentBase other = (AbstractDocumentBase) obj;
+		if (!getId().equals(other.getId())) {
+			return false;
+		}
+		return true;
 	}
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	@Override
+	public int hashCode() {
+		int result = 13;
+		result = 37 * result +  getId().hashCode();
+		return result;
 	}
 }

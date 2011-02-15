@@ -24,10 +24,10 @@
 package org.scapdev.jaxb.reflection.model.visitor;
 
 import org.apache.log4j.Logger;
-import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
-import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
+import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 public class DefaultModelVisitor implements ModelVisitor {
 

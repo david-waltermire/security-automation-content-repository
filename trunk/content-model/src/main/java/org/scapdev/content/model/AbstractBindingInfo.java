@@ -21,48 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.annotation.Annotation;
 
 import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
-import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
+abstract class AbstractBindingInfo<X extends Annotation> implements BindingInfo<X> {
+	private final String id;
+	private final X annotation;
+	private final JAXBClass jaxbClass;
 
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
-
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
+	AbstractBindingInfo(String id, X annotation, JAXBClass jaxbClass) {
+		this.id = id;
+		this.annotation = annotation;
+		this.jaxbClass = jaxbClass;
 	}
 
 	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
+	public String getId() {
+		return id;
 	}
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
+	@Override
+	public X getAnnotation() {
+		return annotation;
 	}
 
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	@Override
+	public JAXBClass getJaxbClass() {
+		return jaxbClass;
 	}
+
 }

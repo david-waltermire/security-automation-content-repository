@@ -36,9 +36,9 @@ import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.core.query.SimpleQuery;
 import org.scapdev.content.core.resolver.LocalResolver;
 import org.scapdev.content.core.resolver.Resolver;
+import org.scapdev.content.model.JAXBMetadataModel;
 import org.scapdev.content.model.Key;
-import org.scapdev.content.model.jaxb.JAXBMetadataModel;
-import org.scapdev.content.model.jaxb.MetadataModelFactory;
+import org.scapdev.content.model.MetadataModelFactory;
 import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
 
 public class ContentRepository {
