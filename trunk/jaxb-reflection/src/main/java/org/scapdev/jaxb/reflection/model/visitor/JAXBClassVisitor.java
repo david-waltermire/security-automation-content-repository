@@ -21,24 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model;
+package org.scapdev.jaxb.reflection.model.visitor;
 
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-
-
-
-/**
- * This interface represents an XML schema meta model that can be used to interrogate bound XML classes and class instances.
- * @author David Waltermire
- * 
- */
-public interface Model {
-	
-	/**
-	 * Retrieves a TypeInfo record for the provided bound XML class
-	 * 
-	 * @param clazz the bound XML class
-	 * @return a TypeInfo record
-	 */
-	TypeInfo getTypeInfo(Class<?> clazz);
+public interface JAXBClassVisitor {
+	public void visit(JAXBClass jaxbClass);
 }

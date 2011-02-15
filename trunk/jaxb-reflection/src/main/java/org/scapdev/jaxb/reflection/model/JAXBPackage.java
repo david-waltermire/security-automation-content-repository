@@ -23,23 +23,25 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
-import java.net.URI;
+import java.io.IOException;
 
+import javax.xml.bind.annotation.XmlAccessType;
 
-/**
- * This interface represents a meta model for a specific XML schema
- * @author David Waltermire
- *
- */
-public interface SchemaModel {
-	/**
-	 * Retrieves the XML namespace of the XML schema
-	 * @return
-	 */
-	URI getNamespace();
-	/**
-	 * Retrieves information about the XML schema this model is based on
-	 * @return a schema descriptor
-	 */
-	SchemaInfo getSchemaInfo();
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
+import org.scapdev.jaxb.reflection.model.visitor.JAXBClassVisitor;
+
+public interface JAXBPackage {
+
+	String getNamespace();
+
+	String getSchemaLocation();
+
+	JAXBModel getJAXBModel();
+
+	JAXBClass getClass(Class<?> clazz);
+
+	XmlAccessType getXmlAccessType();
+
+	void visit(JAXBClassVisitor visitor) throws ClassNotFoundException, IOException;
+
 }

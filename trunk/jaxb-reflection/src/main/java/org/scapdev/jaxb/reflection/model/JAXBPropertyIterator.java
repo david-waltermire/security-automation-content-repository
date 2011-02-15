@@ -23,55 +23,57 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Iterator;
 
-import org.scapdev.jaxb.reflection.instance.InstanceVisitor;
-import org.scapdev.jaxb.reflection.model.visitor.ModelVisitor;
+abstract class JAXBPropertyIterator<PROPERTY_TYPE> implements Iterator<JAXBProperty> {
+	protected final JAXBClass jaxbClass;
+	private final Iterator<PROPERTY_TYPE> propertyIterator;
 
-public class TypeInfoPropertyValue implements PropertyValue {
-	private final TypeInfo typeInfo;
-
-	public TypeInfoPropertyValue(TypeInfo typeInfo) {
-		this.typeInfo = typeInfo;
+	public JAXBPropertyIterator(JAXBClass jaxbClass) {
+		this.jaxbClass = jaxbClass;
+		this.propertyIterator = getProperties().iterator();
 	}
 
-	/** {@inheritDoc} */
-	public Type getActualType() {
-		return getTypeInfo().getType();
+	
+	/**
+	 * @return the jaxbClass
+	 */
+	public JAXBClass getJaxbClass() {
+		return jaxbClass;
 	}
 
-	/** {@inheritDoc} */
-	public Class<?> getType() {
-		return getTypeInfo().getType();
-	}
+	protected abstract Collection<PROPERTY_TYPE> getProperties();
+	protected abstract boolean isJaxbProperty(PROPERTY_TYPE type);
+	protected abstract JAXBProperty newInstance(PROPERTY_TYPE type, JAXBProperty.Type propertyType);
+	protected abstract JAXBProperty.Type getType(PROPERTY_TYPE type);
 
-	/** {@inheritDoc} */
-	public Collection<Class<?>> getSuperTypes() {
-		throw new UnsupportedOperationException(); // TODO: return super types of this JAXB class via XmlElementRefs
-	}
-
-	public TypeInfo getTypeInfo() {
-		return typeInfo;
+	@Override
+	public boolean hasNext() {
+		return propertyIterator.hasNext();
 	}
 
 	@Override
-	public <MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> void visit(
-			Object instance, PROPERTY propertyInfo,
-			InstanceVisitor<MODEL, TYPE, PROPERTY> visitor) {
-		@SuppressWarnings("unchecked")
-		TYPE valueTypeInfo = (TYPE)typeInfo;
-		visitor.processNode(instance, valueTypeInfo);
+	public JAXBProperty next() {
+		PROPERTY_TYPE nextProperty = propertyIterator.next();
+		JAXBProperty.Type type = getType(nextProperty);
+		while (nextProperty != null && type == null && !isJaxbProperty(nextProperty)) {
+			nextProperty = propertyIterator.next();
+			type = getType(nextProperty);
+		}
+
+		JAXBProperty result;
+		if (nextProperty == null) {
+			result = null;
+		} else {
+			result = newInstance(nextProperty, type);
+		}
+		return result;
 	}
 
 	@Override
-	public <MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> void visit(
-			PROPERTY propertyInfo, ModelVisitor<MODEL, TYPE, PROPERTY> visitor) {
+	public void remove() {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public Object getInstance(Object instance) {
-		return instance;
-	}
+	
 }

@@ -25,19 +25,21 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
+
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
 
-public class AbstracPersistedtEntity<DATA> implements Entity<DATA> {
+public class AbstracPersistedtEntity implements Entity {
 	private final Key key;
 	private final EntityInfo entityInfo;
-	private final List<Relationship<DATA, ?>> relationships;
-	private final ContentRetriever<DATA> retriever;
+	private final List<Relationship> relationships;
+	private final ContentRetriever retriever;
 
 	// TODO: enable the object to be retrieved using lazy fetch
-	public AbstracPersistedtEntity(EntityDescriptor<DATA> desc, ContentRetriever<DATA> retriever) {
+	public AbstracPersistedtEntity(EntityDescriptor desc, ContentRetriever retriever) {
 		this.key = desc.getKey();
 		this.relationships = desc.getRelationships();
 		this.entityInfo = desc.getEntityInfo();
@@ -57,12 +59,12 @@ public class AbstracPersistedtEntity<DATA> implements Entity<DATA> {
 	}
 
 	@Override
-	public List<Relationship<DATA, ?>> getRelationships() {
+	public List<Relationship> getRelationships() {
 		return relationships;
 	}
 
 	@Override
-	public DATA getObject() {
+	public JAXBElement<Object> getObject() {
 		return retriever.getContent();
 	}
 

@@ -23,7 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-public abstract class AbstractContentRetriever<DATA> implements ContentRetriever<DATA> {
+import javax.xml.bind.JAXBElement;
+
+public abstract class AbstractContentRetriever<DATA> implements ContentRetriever {
 	public String contentId;
 
 	public AbstractContentRetriever(String contentId) {
@@ -31,9 +33,9 @@ public abstract class AbstractContentRetriever<DATA> implements ContentRetriever
 	}
 
 	@Override
-	public DATA getContent() {
+	public JAXBElement<Object> getContent() {
 		return getContentInternal(contentId);
 	}
 
-	protected abstract DATA getContentInternal(String contentId);
+	protected abstract JAXBElement<Object> getContentInternal(String contentId);
 }

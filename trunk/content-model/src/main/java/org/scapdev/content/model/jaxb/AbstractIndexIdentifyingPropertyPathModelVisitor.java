@@ -31,23 +31,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.model.ModelException;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 import org.scapdev.jaxb.reflection.model.visitor.PropertyPathModelVisitor;
 
 abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION extends Annotation, FIELD extends Annotation> extends
-		PropertyPathModelVisitor<DefaultModel, DefaultTypeInfo, DefaultPropertyInfo> {
+		PropertyPathModelVisitor {
 	private final ANNOTATION indexedAnnotation;
-	private final Map<String, List<DefaultPropertyInfo>> propertyMap;
+	private final Map<String, List<JAXBProperty>> propertyMap;
 	private final Class<FIELD> fieldClass;
 
-	public AbstractIndexIdentifyingPropertyPathModelVisitor(ANNOTATION indexedAnnotation, DefaultTypeInfo typeInfo, DefaultModel model, Class<ANNOTATION> annotationClass, Class<FIELD> fieldClass) {
+	public AbstractIndexIdentifyingPropertyPathModelVisitor(ANNOTATION indexedAnnotation, JAXBClass typeInfo, JAXBModel model, Class<ANNOTATION> annotationClass, Class<FIELD> fieldClass) {
 		super(typeInfo, model);
 		if (typeInfo.getAnnotation(annotationClass, false) == null) {
 			throw new ModelException("Type '"+typeInfo.getType().getName()+"' does not contain a "+indexedAnnotation.getClass());
 		}
-		propertyMap = new LinkedHashMap<String, List<DefaultPropertyInfo>>();
+		propertyMap = new LinkedHashMap<String, List<JAXBProperty>>();
 		this.indexedAnnotation = indexedAnnotation;
 		this.fieldClass = fieldClass;
 	}
@@ -59,7 +59,7 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 	/**
 	 * @return the propertyMap
 	 */
-	public Map<String, List<DefaultPropertyInfo>> getPropertyMap() {
+	public Map<String, List<JAXBProperty>> getPropertyMap() {
 		return propertyMap;
 	}
 
@@ -82,8 +82,7 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 	}
 
 	@Override
-	public boolean beforePropertyInfo(DefaultTypeInfo typeInfo,
-			DefaultPropertyInfo property) {
+	public boolean beforeJAXBProperty(JAXBProperty property) {
 		// TODO: support elements
 //		if (property.isAttribute()) {
 			FIELD field = property.getAnnotation(fieldClass);

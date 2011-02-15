@@ -35,17 +35,17 @@ import org.scapdev.content.model.Key;
 public class MemoryResidentContentPersistenceManager extends AbstractContentPersistenceManager {
 	private static Logger log = Logger.getLogger(MemoryResidentContentPersistenceManager.class);
 
-	private Map<String, Map<Key, Entity<Object>>> fragmentIndex;
+	private Map<String, Map<Key, Entity>> fragmentIndex;
 
 	public MemoryResidentContentPersistenceManager() {
 		log.info("Initializing database");
-		fragmentIndex = new HashMap<String, Map<Key, Entity<Object>>>();
+		fragmentIndex = new HashMap<String, Map<Key, Entity>>();
 		log.info("Database initialized");
 	}
 
 	@Override
-	public Entity<Object> getEntityByKey(Key key) {
-		Map<Key, Entity<Object>> idMap = fragmentIndex.get(key.getId());
+	public Entity getEntityByKey(Key key) {
+		Map<Key, Entity> idMap = fragmentIndex.get(key.getId());
 		if (idMap != null) {
 			return idMap.get(key);
 		}
@@ -53,13 +53,13 @@ public class MemoryResidentContentPersistenceManager extends AbstractContentPers
 	}
 
 	@Override
-	public void storeEntity(Entity<Object> entity) throws ContentException {
+	public void storeEntity(Entity entity) throws ContentException {
 		Key key = entity.getKey();
 		String keyTypeId = key.getId();
 		log.log(Level.TRACE, "Storing entity: "+key);
-		Map<Key, Entity<Object>> idMap = fragmentIndex.get(keyTypeId);
+		Map<Key, Entity> idMap = fragmentIndex.get(keyTypeId);
 		if (idMap == null) {
-			idMap = new HashMap<Key, Entity<Object>>();
+			idMap = new HashMap<Key, Entity>();
 			fragmentIndex.put(keyTypeId, idMap);
 		} else if (idMap.containsKey(key)) {
 			throw new ContentException("Record already exists in the database identified by key: "+key);

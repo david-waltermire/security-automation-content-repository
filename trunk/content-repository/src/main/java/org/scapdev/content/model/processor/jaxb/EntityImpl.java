@@ -26,22 +26,24 @@ package org.scapdev.content.model.processor.jaxb;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
+
 import org.scapdev.content.model.AbstractEntity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Relationship;
 
-class EntityImpl extends AbstractEntity<Object> {
-	private List<Relationship<Object, ?>> relationships;
+class EntityImpl extends AbstractEntity {
+	private List<Relationship> relationships;
 
-	public EntityImpl(EntityInfo entityInfo, Object object) {
-		super(entityInfo.getKeyInfo().getKey(object), entityInfo, object);
+	public EntityImpl(EntityInfo entityInfo, JAXBElement<Object> object) {
+		super(entityInfo.getKeyInfo().getKey(object.getValue()), entityInfo, object);
 		relationships = Collections.emptyList();
 	}
 
 	/**
 	 * @return the relationships
 	 */
-	public List<Relationship<Object, ?>> getRelationships() {
+	public List<Relationship> getRelationships() {
 		synchronized (this) {
 			return relationships;
 		}
@@ -50,7 +52,7 @@ class EntityImpl extends AbstractEntity<Object> {
 	/**
 	 * @param relationships the relationships to set
 	 */
-	public void setRelationships(List<Relationship<Object, ?>> relationships) {
+	public void setRelationships(List<Relationship> relationships) {
 		synchronized (this) {
 			this.relationships = Collections.unmodifiableList(relationships);
 		}

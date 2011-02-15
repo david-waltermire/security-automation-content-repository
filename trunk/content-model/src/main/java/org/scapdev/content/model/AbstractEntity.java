@@ -23,12 +23,14 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public abstract class AbstractEntity<DATA> implements Entity<DATA> {
+import javax.xml.bind.JAXBElement;
+
+public abstract class AbstractEntity implements Entity {
 	private final Key key;
 	private final EntityInfo entityInfo;
-	private final DATA object;
+	private final JAXBElement<Object> object;
 
-	public AbstractEntity(Key key, EntityInfo entityInfo, DATA object) {
+	public AbstractEntity(Key key, EntityInfo entityInfo, JAXBElement<Object> object) {
 		this.key = key;
 		this.entityInfo = entityInfo;
 		this.object = object;
@@ -49,7 +51,7 @@ public abstract class AbstractEntity<DATA> implements Entity<DATA> {
 	/**
 	 * @return the object
 	 */
-	public DATA getObject() {
+	public JAXBElement<Object> getObject() {
 		return object;
 	}
 }

@@ -28,7 +28,7 @@ import org.scapdev.content.model.AbstractDocument;
 abstract class AbstractDocumentBase extends AbstractDocument {
 	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
 
-	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingTypeInfoVisitor init) {
+	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
 		super(entity, schema);
 		binding = init.getDocumentBindingInfo(entity.getId());
 	}

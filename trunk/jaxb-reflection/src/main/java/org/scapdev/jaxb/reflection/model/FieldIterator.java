@@ -21,14 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.jaxb;
+package org.scapdev.jaxb.reflection.model;
 
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
-import org.scapdev.jaxb.reflection.model.MutableTypeInfo;
-import org.scapdev.jaxb.reflection.model.SchemaModel;
+import javax.xml.bind.annotation.XmlAttribute;
 
-interface InternalSchemaModel<X extends MutableTypeInfo<?>> extends SchemaModel {
-	Map<Class<?>, X> getTypeInfos();
-	String getJaxbPackage();
+import org.scapdev.jaxb.reflection.model.JAXBProperty.Type;
+
+class FieldIterator extends JAXBPropertyIterator<Field> {
+	private final Set<String> elements;
+
+	public FieldIterator(JAXBClass jaxbClass) {
+		super(jaxbClass);
+		elements = jaxbClass.getElementPropertyNames();
+	}
+
+	@Override
+	protected Collection<Field> getProperties() {
+		return Arrays.asList(jaxbClass.getType().getDeclaredFields());
+	}
+
+	@Override
+	protected boolean isJaxbProperty(Field type) {
+		return true;
+	}
+
+	@Override
+	protected JAXBProperty newInstance(Field type, JAXBProperty.Type propertyType) {
+		return new JAXBFieldPropertyImpl(type, propertyType, getJaxbClass());
+	}
+
+	@Override
+	protected Type getType(Field type) {
+		Type result = null;
+		if (elements.contains(type.getName())) {
+			result = Type.ELEMENT;
+		} else if (type.isAnnotationPresent(XmlAttribute.class)) {
+			result = Type.ATTRIBUTE;
+		}
+		return result;
+	}
 }

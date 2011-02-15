@@ -24,98 +24,57 @@
 package org.scapdev.jaxb.reflection.model.jaxb;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBPackage;
+import org.scapdev.jaxb.reflection.model.visitor.JAXBClassVisitor;
 
-import org.apache.log4j.Logger;
-import org.scapdev.jaxb.reflection.JAXBContextFactory;
-import org.scapdev.jaxb.reflection.model.JAXBModelException;
-import org.scapdev.jaxb.reflection.model.ModelFactory;
-import org.scapdev.jaxb.reflection.model.MutableModel;
-import org.scapdev.jaxb.reflection.model.MutableTypeInfo;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
+public class JAXBModel {
+	private final ClassLoader classLoader;
+	private Map<String, JAXBPackage> packageToSchemaMap;
 
-public class JAXBModel<X extends MutableTypeInfo<Y>, Y extends PropertyInfo> implements MutableModel<Y> {
-	private static Logger log = Logger.getLogger(JAXBModel.class);
+	public JAXBModel(Collection<Package> jaxbPackages, ClassLoader classLoader) {
+		this.classLoader = classLoader;
+		packageToSchemaMap = new HashMap<String, JAXBPackage>();
+		for (Package jaxbPackage : jaxbPackages) {
+			packageToSchemaMap.put(jaxbPackage.getName(), new JAXBPackageImpl(jaxbPackage, this));
+		}
+	}
 
-	private final JAXBContext context;
+	public static JAXBModel newInstanceFromPackageNames(Collection<String> packageNames, ClassLoader classLoader) {
+		List<Package> packages = new ArrayList<Package>(packageNames.size());
+		for (String p : packageNames) {
+			packages.add(Package.getPackage(p));
+		}
+		return new JAXBModel(packages, classLoader);
+	}
+
 	/**
-	 * a mapping of XML schema namespace keys to JAXBSchemaModel values
+	 * 
+	 * @param clazz
+	 * @return
 	 */
-	private final Map<URI, InternalSchemaModel<X>> schemaModels = new TreeMap<URI, InternalSchemaModel<X>>();
-	private final Map<Class<?>, X> dataTypes;
-
-	protected InternalSchemaModel<X> newSchemaModel(ClassLoader contextClassLoader, String packageName, ModelFactory<X, Y> factory) {
-		return new DefaultSchemaModel<X>(contextClassLoader, packageName, factory);
-	}
-
-	public JAXBModel(ClassLoader classLoader, ModelFactory<X, Y> factory) {
-	
-		try {
-			context = JAXBContextFactory.getJAXBContext(classLoader);
-		} catch (IOException e) {
-			throw new JAXBModelException(e);
-		} catch (JAXBException e) {
-			throw new JAXBModelException(e);
+	public JAXBClass getClass(Class<?> clazz) {
+		String name = clazz.getPackage().getName();
+		JAXBPackage jaxbPackage = packageToSchemaMap.get(name);
+		if (jaxbPackage == null) {
+			return null;
 		}
-
-		log.info("Creating JAXBModel");
-		for (String p : JAXBContextFactory.getPackagesForContext(context)) {
-			log.info("Analyzing package: "+p);
-
-			InternalSchemaModel<X> model = newSchemaModel(JAXBContextFactory.class.getClassLoader(), p, factory);
-			schemaModels.put(model.getNamespace(), model);
-		}
-		this.dataTypes = new HashMap<Class<?>, X>();
-		for (InternalSchemaModel<X> model : schemaModels.values()) {
-			// Index data types
-			dataTypes.putAll(model.getTypeInfos());
-			log.info("Processed schema: "+model.getNamespace()+" package: "+model.getJaxbPackage());
-		}
-		processTypeHierarchies();
-		validateModel();
+		return jaxbPackage.getClass(clazz);
 	}
 
-	/** {@inheritDoc} */
-	public JAXBContext getJAXBContext() {
-		return context;
-	}
-
-	/** {@inheritDoc} */
-	public X getTypeInfo(Class<?> clazz) {
-		return dataTypes.get(clazz);
-	}
-
-	public Collection<X> getTypeInfos() {
-		return dataTypes.values();
-	}
-
-	private void processTypeHierarchies() {
-		log.info("Processing parent types");
-		for (X typeInfo : dataTypes.values()) {
-			Class<?> clazz = typeInfo.getType();
-
-			// Process parent
-			Class<?> parentClazz = clazz.getSuperclass();
-			if (parentClazz != null) {
-				typeInfo.setParent(dataTypes.get(parentClazz));
-			}
+	public void visit(JAXBClassVisitor visitor) throws ClassNotFoundException, IOException {
+		for (JAXBPackage jaxbPackage : packageToSchemaMap.values()) {
+			jaxbPackage.visit(visitor);
 		}
 	}
 
-	public void processTypeProperties(ModelFactory<X, Y> factory) {
-		log.info("Processing type properties");
-		for (X typeInfo : dataTypes.values()) {
-			typeInfo.generateProperties(factory);
-		}
-	}
-
-	protected void validateModel() {
+	public ClassLoader getClassLoader() {
+		return classLoader;
 	}
 }

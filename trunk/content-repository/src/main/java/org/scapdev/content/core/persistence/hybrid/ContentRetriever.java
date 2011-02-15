@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-public interface ContentRetriever<DATA> {
-	DATA getContent();
+import javax.xml.bind.JAXBElement;
+
+public interface ContentRetriever {
+	JAXBElement<Object> getContent();
 }

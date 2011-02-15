@@ -32,7 +32,7 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 	private final KeyInfo key;
 	private final BindingInfo<org.scapdev.content.annotation.Entity> binding;
 
-	EntityInfoImpl(EntityType entity, SchemaInfoImpl schema, JAXBMetadataModel loader, InitializingTypeInfoVisitor init) {
+	EntityInfoImpl(EntityType entity, SchemaInfoImpl schema, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
 		super(entity.getId(), schema, entity.getSchemaNode().getNode());
 		binding = init.getEntityBindingInfo(getId());
 		key = new KeyInfoImpl(entity.getKey(), this, loader, init);
@@ -69,6 +69,15 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 		int result = 13;
 		result = 37 * result +  getId().hashCode();
 		result = 37 * result +  key.hashCode();
+		return result;
+	}
+
+	@Override
+	public String getLocalPart() {
+		String result = binding.getAnnotation().localPart();
+		if (result.isEmpty()) {
+			result = null;
+		}
 		return result;
 	}
 }

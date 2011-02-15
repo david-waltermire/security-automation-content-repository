@@ -26,28 +26,30 @@ package org.scapdev.content.core.persistence.hybrid;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBElement;
+
 public class MemoryResidentContentStore implements ContentStore {
 	private int index = 0;
-	private Map<Integer, Object> contentMap;
+	private Map<Integer, JAXBElement<Object>> contentMap;
 
 	public MemoryResidentContentStore() {
-		contentMap = new HashMap<Integer, Object>();
+		contentMap = new HashMap<Integer, JAXBElement<Object>>();
 	}
 
 	@Override
-	public Object getContent(String contentId) {
+	public JAXBElement<Object> getContent(String contentId) {
 		return contentMap.get(Integer.valueOf(contentId));
 	}
 
 	@Override
-	public String persist(Object content) {
+	public String persist(JAXBElement<Object> content) {
 		Integer key = Integer.valueOf(++index);
 		contentMap.put(key, content);
 		return key.toString();
 	}
 
 	@Override
-	public ContentRetriever<Object> getContentRetriever(String contentId) {
+	public ContentRetriever getContentRetriever(String contentId) {
 		return new InternalContentRetriever(contentId);
 	}
 
@@ -58,7 +60,7 @@ public class MemoryResidentContentStore implements ContentStore {
 		}
 
 		@Override
-		protected Object getContentInternal(String contentId) {
+		protected JAXBElement<Object> getContentInternal(String contentId) {
 			return MemoryResidentContentStore.this.getContent(contentId);
 		}
 	}

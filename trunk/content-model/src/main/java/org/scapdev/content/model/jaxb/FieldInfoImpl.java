@@ -29,11 +29,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.scapdev.content.model.FieldInfo;
 import org.scapdev.content.model.KeyInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 class FieldInfoImpl extends AbstractFieldInfo<FieldType, KeyInfo> implements FieldInfo {
 	
-	FieldInfoImpl(FieldType field, KeyInfo parent, List<DefaultPropertyInfo> propertyPath, JAXBMetadataModel loader) {
+	FieldInfoImpl(FieldType field, KeyInfo parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
 		super(field, parent, propertyPath, loader);
 	}
 

@@ -23,28 +23,24 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.instance;
 
-import org.scapdev.jaxb.reflection.model.ExtendedModel;
-import org.scapdev.jaxb.reflection.model.PropertyInfo;
-import org.scapdev.jaxb.reflection.model.TypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public interface InstanceVisitor<MODEL extends ExtendedModel<TYPE>, TYPE extends TypeInfo, PROPERTY extends PropertyInfo> {
+public interface InstanceVisitor {
 
-	TYPE getTypeInfo(Class<?> clazz);
+	JAXBClass getJAXBClass(Class<?> clazz);
 
-	boolean beforeDocument(Object document, TYPE typeInfo);
-	void afterDocument(Object document, TYPE typeInfo);
+	boolean beforeDocument(Object document, JAXBClass jaxbClass);
+	void afterDocument(Object document, JAXBClass jaxbClass);
 
-	boolean beforeNode(Object instance, TYPE typeInfo);
-	void afterNode(Object instance, TYPE typeInfo);
+	boolean beforeNode(Object instance, JAXBClass jaxbClass);
+	void afterNode(Object instance, JAXBClass jaxbClass);
 
-	void beforeTypeInfo(Object instance, TYPE typeInfo);
-	void afterTypeInfo(Object instance, TYPE typeInfo);
+	void beforeJAXBClass(Object instance, JAXBClass jaxbClass);
+	void afterJAXBClass(Object instance, JAXBClass jaxbClass);
 
-	void beforePropertyInfo(Object instance, TYPE typeInfo, PROPERTY property);
-	void afterPropertyInfo(Object instance, TYPE typeInfo, PROPERTY property);
+	void beforeJAXBProperty(Object instance, JAXBProperty property);
+	void afterJAXBProperty(Object instance, JAXBProperty property);
 
-	void handleObject(Object instance, PROPERTY propertyInfo);
-
-	void processNode(Object instance, TYPE typeInfo);
-
+	void handleObject(Object instance, JAXBProperty property);
 }

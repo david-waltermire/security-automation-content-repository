@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.scapdev.content.annotation.Field;
 import org.scapdev.content.annotation.Key;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
 class KeyIdentifyingPropertyPathModelVisitor extends
 		AbstractIndexIdentifyingPropertyPathModelVisitor<Key, Field> {
 
-	protected KeyIdentifyingPropertyPathModelVisitor(Key indexedAnnotation, DefaultTypeInfo typeInfo, DefaultModel model) {
+	protected KeyIdentifyingPropertyPathModelVisitor(Key indexedAnnotation, JAXBClass typeInfo, JAXBModel model) {
 		super(indexedAnnotation, typeInfo, model, Key.class, Field.class);
 	}
 

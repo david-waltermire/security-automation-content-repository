@@ -29,10 +29,10 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.LocalRelationship;
 import org.scapdev.content.model.LocalRelationshipInfo;
 
-public class LocalRelationshipImpl<DATA> extends AbstractRelationship<DATA, LocalRelationshipInfo<DATA>> implements LocalRelationship<DATA> {
+public class LocalRelationshipImpl<DATA> extends AbstractRelationship<LocalRelationshipInfo> implements LocalRelationship {
 	private final Key key;
 	
-	LocalRelationshipImpl(LocalRelationshipInfo<DATA> relationshipInfo, Entity<DATA> owningEntity, Key key) {
+	LocalRelationshipImpl(LocalRelationshipInfo relationshipInfo, Entity owningEntity, Key key) {
 		super(relationshipInfo, owningEntity);
 		this.key = key;
 	}

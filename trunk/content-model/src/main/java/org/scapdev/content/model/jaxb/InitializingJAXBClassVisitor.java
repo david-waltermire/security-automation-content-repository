@@ -7,19 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
-import org.scapdev.jaxb.reflection.model.visitor.TypeInfoVisitor;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
+import org.scapdev.jaxb.reflection.model.visitor.JAXBClassVisitor;
 
-class InitializingTypeInfoVisitor implements TypeInfoVisitor<DefaultTypeInfo> {
-	private final DefaultModel model;
+class InitializingJAXBClassVisitor implements JAXBClassVisitor {
+	private final JAXBModel model;
 	private final Map<String, BindingInfo<org.scapdev.content.annotation.Entity>> entities;
 	private final Map<String, BindingInfo<org.scapdev.content.annotation.SchemaDocument>> documents;
 	private final Map<String, KeyBindingInfo> keys;
 	private final Map<String, KeyRefBindingInfo> keyRefs;
 
-	InitializingTypeInfoVisitor(DefaultModel model) {
+	InitializingJAXBClassVisitor(JAXBModel model) {
 		this.model = model;
 		entities = new HashMap<String, BindingInfo<org.scapdev.content.annotation.Entity>>();
 		documents = new HashMap<String, BindingInfo<org.scapdev.content.annotation.SchemaDocument>>();
@@ -48,10 +48,10 @@ class InitializingTypeInfoVisitor implements TypeInfoVisitor<DefaultTypeInfo> {
 	}
 
 	/**
-	 * Visit each TypeInfo and identify each annotation type if they exist.
+	 * Visit each JAXBClass and identify each annotation type if they exist.
 	 */
 	@Override
-	public void visit(DefaultTypeInfo typeInfo) {
+	public void visit(JAXBClass typeInfo) {
 		Class<?> clazz = typeInfo.getType();
 		org.scapdev.content.annotation.Entity entity = clazz.getAnnotation(org.scapdev.content.annotation.Entity.class);
 		if (entity != null) {
@@ -76,7 +76,7 @@ class InitializingTypeInfoVisitor implements TypeInfoVisitor<DefaultTypeInfo> {
 
 			KeyIdentifyingPropertyPathModelVisitor keyIdVisitor = new KeyIdentifyingPropertyPathModelVisitor(key, typeInfo, model);
 			keyIdVisitor.visit();
-			Map<String, List<DefaultPropertyInfo>> propertyMap = keyIdVisitor.getPropertyMap();
+			Map<String, List<JAXBProperty>> propertyMap = keyIdVisitor.getPropertyMap();
 
 			KeyBindingInfo bindingInfo = new KeyBindingInfoImpl(id, key, propertyMap, typeInfo);
 			assert(!keys.containsKey(id));
@@ -89,7 +89,7 @@ class InitializingTypeInfoVisitor implements TypeInfoVisitor<DefaultTypeInfo> {
 
 			KeyRefIdentifyingPropertyPathModelVisitor keyRefIdVisitor = new KeyRefIdentifyingPropertyPathModelVisitor(keyRef, typeInfo, model);
 			keyRefIdVisitor.visit();
-			Map<String, List<DefaultPropertyInfo>> propertyMap = keyRefIdVisitor.getPropertyMap();
+			Map<String, List<JAXBProperty>> propertyMap = keyRefIdVisitor.getPropertyMap();
 
 			KeyRefBindingInfo bindingInfo = new KeyRefBindingInfoImpl(id, keyRef, propertyMap, typeInfo);
 			assert(!keyRefs.containsKey(id));

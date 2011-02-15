@@ -38,13 +38,13 @@ import org.scapdev.content.model.ModelInstanceException;
 import org.scapdev.content.model.SchemaInfo;
 
 class KeyRefInfoImpl implements KeyRefInfo {
-	private final LocalRelationshipInfo<Object> parent;
+	private final LocalRelationshipInfo parent;
 	private final String id;
 	private final List<FieldRefInfo> fields;
 	private final KeyRefBindingInfo binding;
 	private final KeyInfo referencedKey;
 
-	KeyRefInfoImpl(KeyRefType keyRef, LocalRelationshipInfo<Object> parent, JAXBMetadataModel loader, InitializingTypeInfoVisitor init) {
+	KeyRefInfoImpl(KeyRefType keyRef, LocalRelationshipInfo parent, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
 		this.id = keyRef.id;
 		this.parent = parent;
 		binding = init.getKeyRefBindingInfo(id);

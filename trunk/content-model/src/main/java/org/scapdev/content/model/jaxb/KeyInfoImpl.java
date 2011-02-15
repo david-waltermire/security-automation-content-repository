@@ -44,7 +44,7 @@ class KeyInfoImpl implements KeyInfo {
 	private final Map<String, FieldInfo> fields;
 	private final KeyBindingInfo binding;
 
-	KeyInfoImpl(KeyType key, EntityInfo parent, JAXBMetadataModel loader, InitializingTypeInfoVisitor init) {
+	KeyInfoImpl(KeyType key, EntityInfo parent, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
 		this.parent = parent;
 		id = key.getId();
 		binding = init.getKeyBindingInfo(id);

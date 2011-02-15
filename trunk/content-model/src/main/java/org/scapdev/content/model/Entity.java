@@ -25,7 +25,9 @@ package org.scapdev.content.model;
 
 import java.util.List;
 
-public interface Entity<DATA> {
+import javax.xml.bind.JAXBElement;
+
+public interface Entity {
 	/**
 	 * @return the entityInfo
 	 */
@@ -34,8 +36,8 @@ public interface Entity<DATA> {
 	/**
 	 * @return the object
 	 */
-	DATA getObject();
-	List<Relationship<DATA, ?>> getRelationships();
+	JAXBElement<Object> getObject();
+	List<Relationship> getRelationships();
 
 	Key getKey();
 }

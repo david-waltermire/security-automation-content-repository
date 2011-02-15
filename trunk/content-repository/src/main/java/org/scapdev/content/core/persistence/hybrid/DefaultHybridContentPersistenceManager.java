@@ -32,7 +32,7 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
 
 public class DefaultHybridContentPersistenceManager extends AbstractContentPersistenceManager implements HybridContentPersistenceManager {
-	final MetadataStore<Object> metadataStore;
+	final MetadataStore metadataStore;
 	private final ContentStore contentStore;
 
 	public DefaultHybridContentPersistenceManager() {
@@ -40,36 +40,36 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 		this.contentStore = new MemoryResidentContentStore();
 	}
 
-	protected DefaultHybridContentPersistenceManager(MetadataStore<Object> metadataStore, ContentStore contentStore) {
+	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		this.metadataStore = metadataStore;
 		this.contentStore = contentStore;
 	}
 
 	@Override
-	public Entity<Object> getEntityByKey(Key key) {
+	public Entity getEntityByKey(Key key) {
 		return generateEntity(key);
 	}
 
 	@Override
-	public void storeEntity(Entity<Object> entity) throws ContentException {
+	public void storeEntity(Entity entity) throws ContentException {
 		String contentId = contentStore.persist(entity.getObject());
 		metadataStore.persist(entity, contentId);
 	}
 
-	public EntityDescriptor<Object> getEntityDescriptorByKey(Key key) {
+	public EntityDescriptor getEntityDescriptorByKey(Key key) {
 		return metadataStore.getEntityDescriptor(key);
 	}
 	
-	public List<Relationship<Object, ?>> getRelationshipsByKey(Key key) {
+	public List<Relationship> getRelationshipsByKey(Key key) {
 		return getEntityDescriptorByKey(key).getRelationships();
 	}
 
-	private Entity<Object> generateEntity(Key key) {
-		EntityDescriptor<Object> desc = metadataStore.getEntityDescriptor(key);
+	private Entity generateEntity(Key key) {
+		EntityDescriptor desc = metadataStore.getEntityDescriptor(key);
 		return newEntity(desc, contentStore.getContentRetriever(desc.getContentId()));
 	}
 
-	protected Entity<Object> newEntity(EntityDescriptor<Object> desc, ContentRetriever<Object> retriever) {
-		return new AbstracPersistedtEntity<Object>(desc, retriever) {};
+	protected Entity newEntity(EntityDescriptor desc, ContentRetriever retriever) {
+		return new AbstracPersistedtEntity(desc, retriever) {};
 	}
 }

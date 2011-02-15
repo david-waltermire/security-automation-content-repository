@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.scapdev.content.annotation.Key;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 class KeyBindingInfoImpl extends AbstractIndexedBindingInfo<Key> implements KeyBindingInfo {
 
-	KeyBindingInfoImpl(String id, Key annotation, Map<String, List<DefaultPropertyInfo>> propertyMap, DefaultTypeInfo typeInfo) {
+	KeyBindingInfoImpl(String id, Key annotation, Map<String, List<JAXBProperty>> propertyMap, JAXBClass typeInfo) {
 		super(id, annotation, propertyMap, typeInfo);
 	}
 }

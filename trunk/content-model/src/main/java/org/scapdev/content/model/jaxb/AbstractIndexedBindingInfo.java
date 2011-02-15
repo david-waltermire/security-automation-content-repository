@@ -28,19 +28,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 abstract class AbstractIndexedBindingInfo<ANNOTATION extends Annotation> extends AbstractBindingInfo<ANNOTATION> implements IndexedBindingInfo<ANNOTATION> {
-	private final Map<String, List<DefaultPropertyInfo>> propertyMap;
+	private final Map<String, List<JAXBProperty>> propertyMap;
 
-	protected AbstractIndexedBindingInfo(String id, ANNOTATION annotation, Map<String, List<DefaultPropertyInfo>> propertyMap, DefaultTypeInfo typeInfo) {
+	protected AbstractIndexedBindingInfo(String id, ANNOTATION annotation, Map<String, List<JAXBProperty>> propertyMap, JAXBClass typeInfo) {
 		super(id, annotation, typeInfo);
 		this.propertyMap = Collections.unmodifiableMap(propertyMap);
 	}
 
 	/** {@inheritDoc} */
-	public Map<String, List<DefaultPropertyInfo>> getPropertyMap() {
+	public Map<String, List<JAXBProperty>> getPropertyMap() {
 		return propertyMap;
 	}
 }

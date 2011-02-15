@@ -29,12 +29,12 @@ import org.scapdev.content.model.FieldInfo;
 import org.scapdev.content.model.FieldRefInfo;
 import org.scapdev.content.model.KeyInfo;
 import org.scapdev.content.model.KeyRefInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 class FieldRefInfoImpl extends AbstractFieldInfo<FieldRefType, KeyRefInfo> implements FieldRefInfo {
 	private final FieldInfo referencedFieldInfo;
 	
-	FieldRefInfoImpl(FieldRefType field, KeyRefInfo parent, List<DefaultPropertyInfo> propertyPath, JAXBMetadataModel loader) {
+	FieldRefInfoImpl(FieldRefType field, KeyRefInfo parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
 		super(field, parent, propertyPath, loader);
 		KeyInfo keyInfo = parent.getKeyInfo();
 		String fieldRef = field.idRef;

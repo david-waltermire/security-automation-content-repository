@@ -48,7 +48,7 @@ public class LocalResolver implements Resolver {
 	}
 
 	@Override
-	public Map<Key, Entity<Object>> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
+	public Map<Key, Entity> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
 		ResolutionState state = new ResolutionState(keys);
 		do {
 			resolveResolvable(state, parameters);
@@ -72,12 +72,12 @@ public class LocalResolver implements Resolver {
 	}
 
 	private void resolveInternal(ResolutionState state, ResolutionParameters parameters) {
-		Map<Key, Entity<Object>> retrievedFragments = state.getRetrievedFragments();
+		Map<Key, Entity> retrievedFragments = state.getRetrievedFragments();
 		Set<Key> unresolvableKeys = state.getUnresolvableKeys();
 		Set<Key> unresolvedKeys = new HashSet<Key>();
 
 		for (Key key : state.getUnresolvedKeys()) {
-			Entity<Object> handle = database.getEntityByKey(key);
+			Entity handle = database.getEntityByKey(key);
 			if (handle == null) {
 				unresolvableKeys.add(key);
 			} else {
@@ -90,9 +90,9 @@ public class LocalResolver implements Resolver {
 		state.setUnresolvedKeys(unresolvedKeys);
 	}
 
-	private Set<Key> generateRelatedKeys(Entity<Object> entity, ResolutionParameters parameters) {
+	private Set<Key> generateRelatedKeys(Entity entity, ResolutionParameters parameters) {
 		Set<Key> keys = new LinkedHashSet<Key>();
-		for (Relationship<Object, ?> relationship : entity.getRelationships()) {
+		for (Relationship relationship : entity.getRelationships()) {
 			Key key = relationship.getKey();
 			keys.add(key);
 		}

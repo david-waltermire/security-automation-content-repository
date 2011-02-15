@@ -23,10 +23,12 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import javax.xml.bind.JAXBElement;
+
 public interface ContentStore {
 
 	Object getContent(String contentId);
-	String persist(Object object);
-	ContentRetriever<Object> getContentRetriever(String contentId);
+	String persist(JAXBElement<Object> object);
+	ContentRetriever getContentRetriever(String contentId);
 
 }

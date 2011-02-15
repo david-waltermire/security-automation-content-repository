@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBElement;
 import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.RelationshipInfo;
 import org.scapdev.content.model.SchemaInfo;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModelException;
 
 class SchemaInfoImpl implements SchemaInfo {
@@ -41,18 +41,18 @@ class SchemaInfoImpl implements SchemaInfo {
 	private String schemaLocation;
 	private String prefix;
 	private String schemaNode;
-	private Map<DefaultTypeInfo, EntityInfoImpl> entityMap;
-	private Map<DefaultTypeInfo, DocumentInfo> documentMap;
-	private Map<DefaultTypeInfo, RelationshipInfo<Object>> relationshipMap;
+	private Map<JAXBClass, EntityInfoImpl> entityMap;
+	private Map<JAXBClass, DocumentInfo> documentMap;
+	private Map<JAXBClass, RelationshipInfo> relationshipMap;
 
-	SchemaInfoImpl(SchemaType type, JAXBMetadataModel metadataModel, InitializingTypeInfoVisitor init) {
+	SchemaInfoImpl(SchemaType type, JAXBMetadataModel metadataModel, InitializingJAXBClassVisitor init) {
 		this.id = type.getId();
 		this.namespace = type.getNamespace();
 		this.schemaLocation = type.getSchemaLocation();
 		this.prefix = type.getPrefix();
 		this.schemaNode = type.getSchemaNode().getNode();
 
-		documentMap = new HashMap<DefaultTypeInfo, DocumentInfo>();
+		documentMap = new HashMap<JAXBClass, DocumentInfo>();
 		for (DocumentEntityType node : type.getDocuments().getDocument()) {
 			BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
 			org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
@@ -66,25 +66,25 @@ class SchemaInfoImpl implements SchemaInfo {
 			}
 
 			metadataModel.registerDocument(document);
-			documentMap.put(binding.getTypeInfo(), document);
+			documentMap.put(binding.getJaxbClass(), document);
 			
 		}
 
-		entityMap = new HashMap<DefaultTypeInfo, EntityInfoImpl>();
+		entityMap = new HashMap<JAXBClass, EntityInfoImpl>();
 		for (EntityType node : type.getEntities().getEntity()) {
 			EntityInfoImpl entity = new EntityInfoImpl(node, this, metadataModel, init);
 			metadataModel.registerEntity(entity);
-			entityMap.put(entity.getBinding().getTypeInfo(), entity);
+			entityMap.put(entity.getBinding().getJaxbClass(), entity);
 		}
 
-		relationshipMap = new HashMap<DefaultTypeInfo, RelationshipInfo<Object>>();
+		relationshipMap = new HashMap<JAXBClass, RelationshipInfo>();
 		for (JAXBElement<? extends RelationshipType> element : type.getRelationships().getRelationship()) {
-			RelationshipInfo<Object> relationship;
-			DefaultTypeInfo typeInfo;
+			RelationshipInfo relationship;
+			JAXBClass typeInfo;
 			if (element.getDeclaredType().isAssignableFrom(LocalRelationshipType.class)) {
 				LocalRelationshipType node = (LocalRelationshipType)element.getValue();
 				LocalRelationshipInfoImpl relationshipInfo = new LocalRelationshipInfoImpl(node, this, metadataModel, init);
-				typeInfo = relationshipInfo.getKeyRefInfo().getBinding().getTypeInfo();
+				typeInfo = relationshipInfo.getKeyRefInfo().getBinding().getJaxbClass();
 				relationship = relationshipInfo;
 			} else {
 				UnsupportedOperationException e = new UnsupportedOperationException("Unsupported relationship: "+element.getDeclaredType().getName());

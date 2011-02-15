@@ -26,9 +26,9 @@ package org.scapdev.content.core.persistence.hybrid;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
-public interface MetadataStore<DATA> {
+public interface MetadataStore {
 
-	EntityDescriptor<DATA> getEntityDescriptor(Key key);
+	EntityDescriptor getEntityDescriptor(Key key);
 
-	void persist(Entity<Object> entity, String contentId);
+	void persist(Entity entity, String contentId);
 }

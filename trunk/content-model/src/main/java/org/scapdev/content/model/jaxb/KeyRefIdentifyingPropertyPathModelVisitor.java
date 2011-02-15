@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.scapdev.content.annotation.FieldRef;
 import org.scapdev.content.annotation.KeyRef;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
 class KeyRefIdentifyingPropertyPathModelVisitor extends
 		AbstractIndexIdentifyingPropertyPathModelVisitor<KeyRef, FieldRef> {
 
-	protected KeyRefIdentifyingPropertyPathModelVisitor(KeyRef indexedAnnotation, DefaultTypeInfo typeInfo, DefaultModel model) {
+	protected KeyRefIdentifyingPropertyPathModelVisitor(KeyRef indexedAnnotation, JAXBClass typeInfo, JAXBModel model) {
 		super(indexedAnnotation, typeInfo, model, KeyRef.class, FieldRef.class);
 	}
 

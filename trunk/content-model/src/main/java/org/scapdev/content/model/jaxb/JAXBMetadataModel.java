@@ -40,43 +40,45 @@ import org.scapdev.content.model.KeyRefInfo;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.RelationshipInfo;
 import org.scapdev.content.model.SchemaInfo;
-import org.scapdev.jaxb.reflection.model.DefaultTypeInfo;
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultModel;
+import org.scapdev.jaxb.reflection.JAXBContextFactory;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.jaxb.JAXBModel;
 
 public class JAXBMetadataModel implements MetadataModel {
-	private final DefaultModel model;
+	private final JAXBModel model;
+	private final JAXBContext context;
 	private final Map<String, SchemaInfo> schemaMap;
-	private final Map<DefaultTypeInfo, EntityInfo> entityMap;
-	private final Map<DefaultTypeInfo, DocumentInfo> documentMap;
-	private final Map<DefaultTypeInfo, RelationshipInfo<Object>> relationshipMap;
+	private final Map<JAXBClass, EntityInfo> entityMap;
+	private final Map<JAXBClass, DocumentInfo> documentMap;
+	private final Map<JAXBClass, RelationshipInfo> relationshipMap;
 	private final Map<String, EntityInfo> keyIdToEntityMap;
-	private final Map<String, RelationshipInfo<Object>> keyRefIdToRelationshipMap;
+	private final Map<String, RelationshipInfo> keyRefIdToRelationshipMap;
 	private final Map<String, EntityInfo> entityIdToEntityMap;
 	
-	public JAXBMetadataModel() throws IOException, JAXBException {
+	public JAXBMetadataModel() throws IOException, JAXBException, ClassNotFoundException {
 		// Initialize JAXB reflection model
-		model = new DefaultModel(this.getClass().getClassLoader());
+		ClassLoader loader = this.getClass().getClassLoader();
+		context = JAXBContextFactory.getJAXBContext(loader);
+		model = JAXBModel.newInstanceFromPackageNames(JAXBContextFactory.getPackagesForContext(context), loader);
 
 		// Identify objects of interest
-		InitializingTypeInfoVisitor init = new InitializingTypeInfoVisitor(model);
-		for (DefaultTypeInfo typeInfo : model.getTypeInfos()) {
-			init.visit(typeInfo);
-		}
+		InitializingJAXBClassVisitor init = new InitializingJAXBClassVisitor(model);
+		model.visit(init);
 
 		schemaMap = new HashMap<String, SchemaInfo>();
-		entityMap = new HashMap<DefaultTypeInfo, EntityInfo>();
-		documentMap = new HashMap<DefaultTypeInfo, DocumentInfo>();
-		relationshipMap = new HashMap<DefaultTypeInfo, RelationshipInfo<Object>>();
+		entityMap = new HashMap<JAXBClass, EntityInfo>();
+		documentMap = new HashMap<JAXBClass, DocumentInfo>();
+		relationshipMap = new HashMap<JAXBClass, RelationshipInfo>();
 		keyIdToEntityMap = new HashMap<String, EntityInfo>();
 		entityIdToEntityMap = new HashMap<String, EntityInfo>();
-		keyRefIdToRelationshipMap = new HashMap<String, RelationshipInfo<Object>>();
+		keyRefIdToRelationshipMap = new HashMap<String, RelationshipInfo>();
 
 		// Load metadata and associate with JAXB info
 		loadMetadata(init);
 	}
 
-	private void loadMetadata(InitializingTypeInfoVisitor init) throws IOException, JAXBException {
-		Unmarshaller unmarshaller = model.getJAXBContext().createUnmarshaller();
+	private void loadMetadata(InitializingJAXBClassVisitor init) throws IOException, JAXBException {
+		Unmarshaller unmarshaller = context.createUnmarshaller();
 
 		InputStream is = this.getClass().getResourceAsStream("/META-INF/metamodels/manifest");
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -89,7 +91,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		}
 	}
 
-	private void processModel(MetaModel metaModel, InitializingTypeInfoVisitor init) {
+	private void processModel(MetaModel metaModel, InitializingJAXBClassVisitor init) {
 		for (SchemaType schemaType : metaModel.getSchemas().getSchema()) {
 			SchemaInfo schema = new SchemaInfoImpl(schemaType, this, init);
 			schemaMap.put(schema.getId(), schema);
@@ -97,26 +99,26 @@ public class JAXBMetadataModel implements MetadataModel {
 	}
 
 	void registerEntity(EntityInfoImpl entity) {
-		entityMap.put(entity.getBinding().getTypeInfo(), entity);
+		entityMap.put(entity.getBinding().getJaxbClass(), entity);
 		keyIdToEntityMap.put(entity.getKeyInfo().getId(), entity);
 		entityIdToEntityMap.put(entity.getId(), entity);
 	}
 
-	void registerRelationship(DefaultTypeInfo typeInfo, RelationshipInfo<Object> relationship) {
+	void registerRelationship(JAXBClass typeInfo, RelationshipInfo relationship) {
 		relationshipMap.put(typeInfo, relationship);
 		KeyRefInfo keyRefInfo = relationship.getKeyRefInfo();
 		keyRefIdToRelationshipMap.put(keyRefInfo.getId(), relationship);
 	}
 
 	public void registerDocument(AbstractDocumentBase document) {
-		documentMap.put(document.getBinding().getTypeInfo(), document);
+		documentMap.put(document.getBinding().getJaxbClass(), document);
 	}
 
 	public JAXBContext getJAXBContext() {
-		return model.getJAXBContext();
+		return context;
 	}
 
-	public DefaultModel getModel() {
+	public JAXBModel getModel() {
 		return model;
 	}
 
@@ -124,7 +126,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		return keyIdToEntityMap.get(keyId);
 	}
 
-	public RelationshipInfo<Object> getRelationshipByKeyRefId(String keyRefId) {
+	public RelationshipInfo getRelationshipByKeyRefId(String keyRefId) {
 		return keyRefIdToRelationshipMap.get(keyRefId);
 	}
 

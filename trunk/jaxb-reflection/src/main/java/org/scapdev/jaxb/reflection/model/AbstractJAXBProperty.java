@@ -23,13 +23,21 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
-import org.scapdev.jaxb.reflection.model.jaxb.DefaultPropertyInfo;
+public abstract class AbstractJAXBProperty implements JAXBProperty {
+	private final JAXBClass jaxbClass;
+	private final Type type;
 
+	protected AbstractJAXBProperty(JAXBClass jaxbClass, Type propertyType) {
+		this.jaxbClass = jaxbClass;
+		this.type = propertyType;
+	}
 
+	@Override
+	public JAXBClass getJAXBClass() {
+		return jaxbClass;
+	}
 
-public class DefaultTypeInfo extends AbstractTypeInfo<DefaultPropertyInfo> {
-
-	public DefaultTypeInfo(Class<?> type, SchemaModel schemaModel) {
-		super(type, schemaModel);
+	public Type getType() {
+		return type;
 	}
 }

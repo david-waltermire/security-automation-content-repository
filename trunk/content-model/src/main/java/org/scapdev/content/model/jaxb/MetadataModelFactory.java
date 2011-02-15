@@ -32,7 +32,7 @@ public class MetadataModelFactory {
 		// Avoid instantiation
 	}
 
-	public static JAXBMetadataModel newInstance() throws IOException, JAXBException {
+	public static JAXBMetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
 		return new JAXBMetadataModel();
 	}
 }
