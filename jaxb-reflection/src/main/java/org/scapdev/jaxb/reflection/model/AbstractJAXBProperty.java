@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
-public abstract class AbstractJAXBProperty implements JAXBProperty {
+abstract class AbstractJAXBProperty implements JAXBProperty {
 	private final JAXBClass jaxbClass;
 	private final Type type;
 

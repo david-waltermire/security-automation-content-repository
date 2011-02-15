@@ -32,9 +32,9 @@ import java.util.concurrent.Future;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.JAXBMetadataModel;
+import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.Relationship;
-import org.scapdev.content.model.jaxb.JAXBMetadataModel;
-import org.scapdev.content.model.jaxb.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.processor.EntityProcessor;
 import org.scapdev.content.model.processor.Importer;
 

@@ -21,48 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
-
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
-
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
-	}
-
-	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
-	}
-
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
-	}
+interface IndexedBindingInfo<ANNOTATION extends Annotation> extends BindingInfo<ANNOTATION> {
+	/**
+	 * @return the propertyMap
+	 */
+	Map<String, List<JAXBProperty>> getPropertyMap();
 }

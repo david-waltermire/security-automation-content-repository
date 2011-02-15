@@ -21,48 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.scapdev.content.annotation.Field;
+import org.scapdev.content.annotation.Key;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModel;
-import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
+class KeyIdentifyingPropertyPathModelVisitor extends
+		AbstractIndexIdentifyingPropertyPathModelVisitor<Key, Field> {
 
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
-
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
-
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
-
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
+	protected KeyIdentifyingPropertyPathModelVisitor(Key indexedAnnotation, JAXBClass typeInfo, JAXBModel model) {
+		super(indexedAnnotation, typeInfo, model, Key.class, Field.class);
 	}
 
 	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
+	protected String getIndexedAnnotationId() {
+		return getIndexedAnnotation().id();
 	}
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
+	@Override
+	protected String getIndexedFieldId(Field field) {
+		return field.id();
 	}
 
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	@Override
+	protected List<String> getIndexedFields() {
+		return Arrays.asList(getIndexedAnnotation().keyIds());
 	}
 }

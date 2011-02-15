@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-public class JAXBFieldPropertyImpl extends AbstractJAXBProperty implements JAXBFieldProperty {
+class JAXBFieldPropertyImpl extends AbstractJAXBProperty implements JAXBFieldProperty {
 	private final Field field;
 
 	public JAXBFieldPropertyImpl(Field field, Type propertyType, JAXBClass jaxbClass) {

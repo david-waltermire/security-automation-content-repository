@@ -21,48 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+package org.scapdev.jaxb.reflection.model.instance;
 
 import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
+public interface InstanceVisitor {
 
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
-	}
+	JAXBClass getJAXBClass(Class<?> clazz);
 
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
-	}
+	boolean beforeDocument(Object document, JAXBClass jaxbClass);
+	void afterDocument(Object document, JAXBClass jaxbClass);
 
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
-	}
+	boolean beforeNode(Object instance, JAXBClass jaxbClass);
+	void afterNode(Object instance, JAXBClass jaxbClass);
 
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getJAXBClass();
-	}
+	void beforeJAXBClass(Object instance, JAXBClass jaxbClass);
+	void afterJAXBClass(Object instance, JAXBClass jaxbClass);
 
-	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
-	}
+	void beforeJAXBProperty(Object instance, JAXBProperty property);
+	void afterJAXBProperty(Object instance, JAXBProperty property);
 
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
-	}
+	void handleObject(Object instance, JAXBProperty property);
 }

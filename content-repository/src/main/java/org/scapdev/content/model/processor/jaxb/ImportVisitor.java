@@ -28,9 +28,9 @@ import javax.xml.namespace.QName;
 
 import org.scapdev.content.annotation.Entity;
 import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.jaxb.JAXBMetadataModel;
-import org.scapdev.jaxb.reflection.instance.DefaultInstanceVisitor;
+import org.scapdev.content.model.JAXBMetadataModel;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 class ImportVisitor extends DefaultInstanceVisitor {
 	private final JAXBEntityProcessor processor;
