@@ -1,0 +1,6 @@
+<components xmlns="http://jboss.com/products/seam/components" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:resteasy="http://jboss.com/products/seam/resteasy"
+            xsi:schemaLocation="http://jboss.com/products/seam/resteasy http://jboss.com/products/seam/resteasy-2.2.xsd
+     							http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+</components>
