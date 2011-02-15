@@ -1,6 +1,28 @@
-<components xmlns="http://jboss.com/products/seam/components" 
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:resteasy="http://jboss.com/products/seam/resteasy"
-            xsi:schemaLocation="http://jboss.com/products/seam/resteasy http://jboss.com/products/seam/resteasy-2.2.xsd
+<components xmlns="http://jboss.com/products/seam/components"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:resteasy="http://jboss.com/products/seam/resteasy"
+	xmlns:core="http://jboss.com/products/seam/core"
+	xsi:schemaLocation="http://jboss.com/products/seam/resteasy http://jboss.com/products/seam/resteasy-2.2.xsd
+	http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
      							http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+
+   <core:manager concurrent-request-timeout="500"
+      conversation-timeout="120000"
+      conversation-id-parameter="cid"
+      parent-conversation-id-parameter="pid" />
+      
+         <core:resource-loader>
+      <core:bundle-names>
+         <value>messages</value>
+      </core:bundle-names>
+   </core:resource-loader>
+	<resteasy:application scan-providers="false"
+		scan-resources="true" use-builtin-providers="true"
+		resource-path-prefix="/rest">
+
+<!-- 		<resteasy:resource-class-names>
+			<value>com.yourcompany....YourResource</value>
+		</resteasy:resource-class-names>
+ -->
+	</resteasy:application>
 </components>
