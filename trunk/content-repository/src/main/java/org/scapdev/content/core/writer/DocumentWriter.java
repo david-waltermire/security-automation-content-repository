@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.core.writer;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
-import org.scapdev.jaxb.reflection.model.JAXBClass;
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
-abstract class AbstractDocumentBase extends AbstractDocument {
-	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
+public class DocumentWriter {
+	private final DocumentData documentData;
+	private final XMLStreamWriter writer;
+	private final Marshaller marshaller;
 
-	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
-		super(entity, schema);
-		binding = init.getDocumentBindingInfo(entity.getId());
+	protected DocumentWriter(DocumentData documentData, XMLStreamWriter writer, Marshaller marshaller) {
+		this.documentData = documentData;
+		this.writer = writer;
+		this.marshaller = marshaller;
 	}
 
-	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
-		return binding;
+	public void write() throws XMLStreamException {
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		writeDocument(factory);
 	}
 
-	@Override
-	public JAXBClass getType() {
-		return binding.getJaxbClass();
+	public void writeDocument(XMLEventFactory factory) throws XMLStreamException {
+		writer.writeStartDocument();
+		writeInstance(factory);
+		writer.writeEndDocument();
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AbstractDocumentBase))
-			return false;
-		AbstractDocumentBase other = (AbstractDocumentBase) obj;
-		if (!getId().equals(other.getId())) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = 13;
-		result = 37 * result +  getId().hashCode();
-		return result;
+	private void writeInstance(XMLEventFactory factory) {
+		XmlEventGeneratingDocumentModelVisitor visitor = new XmlEventGeneratingDocumentModelVisitor(
+				documentData,
+				writer,
+				marshaller);
+		visitor.visit();
 	}
 }

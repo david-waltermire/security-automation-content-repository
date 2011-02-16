@@ -25,9 +25,12 @@ package org.scapdev.content.core.writer;
 
 import java.io.IOException;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
+
 import org.scapdev.content.core.query.QueryResult;
 
 public interface InstanceWriter {
 
-	void write(QueryResult queryResult) throws IOException;
+	void write(QueryResult queryResult) throws IOException, XMLStreamException, FactoryConfigurationError;
 }

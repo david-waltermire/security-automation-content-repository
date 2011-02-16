@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.jaxb.reflection.model.visitor;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBModel;
 
-abstract class AbstractDocumentBase extends AbstractDocument {
-	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
+public class CyclePreventingModelVisitor extends DefaultModelVisitor {
+	private final Set<JAXBClass> cycleSet; 
 
-	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
-		super(entity, schema);
-		binding = init.getDocumentBindingInfo(entity.getId());
-	}
-
-	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
-		return binding;
+	public CyclePreventingModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
+		super(jaxbClass, model);
+		cycleSet = new HashSet<JAXBClass>();
 	}
 
 	@Override
-	public JAXBClass getType() {
-		return binding.getJaxbClass();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AbstractDocumentBase))
-			return false;
-		AbstractDocumentBase other = (AbstractDocumentBase) obj;
-		if (!getId().equals(other.getId())) {
-			return false;
+	protected void processNode(JAXBClass jaxbClass) {
+		if (cycleSet.contains(jaxbClass)) {
+			return;
 		}
-		return true;
+		cycleSet.add(jaxbClass);
+		super.processNode(jaxbClass);
+		cycleSet.remove(jaxbClass);
 	}
 
-	@Override
-	public int hashCode() {
-		int result = 13;
-		result = 37 * result +  getId().hashCode();
-		return result;
-	}
 }

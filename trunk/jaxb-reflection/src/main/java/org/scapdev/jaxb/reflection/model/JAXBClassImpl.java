@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 
 class JAXBClassImpl implements JAXBClass {
 	private final Class<?> clazz;
@@ -201,5 +202,15 @@ class JAXBClassImpl implements JAXBClass {
 				this.elementProperties = Collections.unmodifiableMap(elements);
 			}
 		}
+	}
+
+	@Override
+	public QName getQName() {
+		QName result = null;
+		XmlRootElement root = getRootElement();
+		if (root != null) {
+			result = new QName(jaxbPackage.getNamespace(), root.name());
+		}
+		return result;
 	}
 }

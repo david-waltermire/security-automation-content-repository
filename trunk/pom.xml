@@ -42,6 +42,17 @@
       <layout>legacy</layout>
     </repository>
     <repository>
+      <id>goldin.org-snapshots</id>
+      <name>goldin.org Maven 2 Repository</name>
+      <url>http://evgeny-goldin.org/artifactory/libs-snapshots-local</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>goldin.org-releases</id>
       <name>goldin.org Maven 2 Repository</name>
       <url>http://evgeny-goldin.org/artifactory/libs-releases</url>
@@ -65,16 +76,15 @@
       <layout>legacy</layout>
     </pluginRepository>
     <pluginRepository>
-      <id>plugins-releases</id>
-      <url>http://evgeny-goldin.org/artifactory/plugins-releases</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>plugins-snapshots</id>
-      <url>http://evgeny-goldin.org/artifactory/plugins-snapshots</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
+      <id>goldin.org-plugins-releases</id>
+<!--      <url>http://evgeny-goldin.org/artifactory/plugins-releases</url>-->
+      <url>http://evgeny-goldin.org/artifactory/plugins-snapshots-local</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </pluginRepository>
   </pluginRepositories>
 
@@ -116,6 +126,11 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>wstx-asl</artifactId>
+        <version>3.2.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -159,7 +174,7 @@
         <plugin>
           <groupId>com.goldin.plugins</groupId>
           <artifactId>maven-copy-plugin</artifactId>
-          <version>0.2</version>
+          <version>0.3-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>

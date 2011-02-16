@@ -26,6 +26,7 @@ package org.scapdev.content.core;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager;
@@ -36,6 +37,8 @@ import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.core.query.SimpleQuery;
 import org.scapdev.content.core.resolver.LocalResolver;
 import org.scapdev.content.core.resolver.Resolver;
+import org.scapdev.content.core.writer.DefaultInstanceWriter;
+import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.JAXBMetadataModel;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModelFactory;
@@ -93,5 +96,14 @@ public class ContentRepository {
 
 	public void shutdown() {
 		processor.shutdown();
+	}
+
+	public InstanceWriter newInstanceWriter() throws JAXBException {
+		return new DefaultInstanceWriter(getMarshaller());
+	}
+
+	private Marshaller getMarshaller() throws JAXBException {
+		Marshaller marshaller = model.getJAXBContext().createMarshaller();
+		return marshaller;
 	}
 }
