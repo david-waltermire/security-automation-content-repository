@@ -27,6 +27,9 @@ import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 public interface ModelVisitor {
+	boolean beforeNode(JAXBClass typeInfo);
+	void afterNode(JAXBClass typeInfo);
+
 	boolean beforeJAXBClass(JAXBClass jaxbClass);
 	void afterJAXBClass(JAXBClass jaxbClass);
 

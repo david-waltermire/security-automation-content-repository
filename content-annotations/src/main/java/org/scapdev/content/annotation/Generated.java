@@ -21,47 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.annotation;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
-import org.scapdev.jaxb.reflection.model.JAXBClass;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-abstract class AbstractDocumentBase extends AbstractDocument {
-	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
-
-	AbstractDocumentBase(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
-		super(entity, schema);
-		binding = init.getDocumentBindingInfo(entity.getId());
-	}
-
-	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
-		return binding;
-	}
-
-	@Override
-	public JAXBClass getType() {
-		return binding.getJaxbClass();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AbstractDocumentBase))
-			return false;
-		AbstractDocumentBase other = (AbstractDocumentBase) obj;
-		if (!getId().equals(other.getId())) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = 13;
-		result = 37 * result +  getId().hashCode();
-		return result;
-	}
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface Generated {
+	GeneratorType type() default GeneratorType.INSTANCE;
+	String text() default "";
 }

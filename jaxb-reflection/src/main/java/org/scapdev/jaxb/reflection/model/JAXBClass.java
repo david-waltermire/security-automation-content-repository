@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 
 /**
  * This interface describes the general properties of a bound XML class
@@ -87,4 +88,10 @@ public interface JAXBClass {
 	 * @return a property descriptor for the specified property or <code>null</code> if no such property exists 
 	 */
 	JAXBProperty getProperty(String property);
+	/**
+	 * 
+	 * @return the element QName if the element is a global element or
+	 * 		<code>null</code> otherwise
+	 */
+	QName getQName();
 }

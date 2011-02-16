@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,48 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.jaxb.reflection.model.visitor;
+package org.scapdev.content.core.writer;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
-import org.scapdev.jaxb.reflection.model.JAXBModel;
-import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.content.model.DocumentInfo;
+import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.Key;
 
-public class PropertyPathModelVisitor extends DefaultModelVisitor {
-	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
+class DocumentData {
+	private final DocumentInfo documentInfo;
+	private final Map<String, Map<Key, Entity>> entityTypeToEntityMap;
 
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
+	public DocumentData(DocumentInfo info) {
+		this.documentInfo = info;
+		this.entityTypeToEntityMap = new HashMap<String, Map<Key, Entity>>();
 	}
 
-	public List<JAXBProperty> getPropertyPath() {
-		return new ArrayList<JAXBProperty>(propertyPath);
+	public void addEntity(Entity entity) {
+		String entityTypeId = entity.getEntityInfo().getId();
+		Map<Key, Entity> entityMap = entityTypeToEntityMap.get(entityTypeId);
+		if (entityMap == null) {
+			entityMap = new LinkedHashMap<Key, Entity>();
+			entityTypeToEntityMap.put(entityTypeId, entityMap);
+		}
+		entityMap.put(entity.getKey(), entity);
 	}
 
-	public final JAXBProperty getCurrentJAXBProperty() {
-		return propertyPath.peekLast();
+	/**
+	 * @return the info
+	 */
+	public DocumentInfo getDocumentInfo() {
+		return documentInfo;
 	}
 
-	public JAXBClass getCurrentTypeInfo() {
-		return getCurrentJAXBProperty().getEnclosingJAXBClass();
-	}
-
-	@Override
-	protected void processJaxbProperty(JAXBProperty property) {
-		pushPropertyInfo(property);
-		super.processJaxbProperty(property);
-		popPropertyInfo(property);
-	}
-
-	private void popPropertyInfo(JAXBProperty info) {
-		JAXBProperty poppedInfo = propertyPath.pollLast();
-		assert(poppedInfo == info);
-	}
-
-	private void pushPropertyInfo(JAXBProperty info) {
-		propertyPath.addLast(info);
+	public Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds) {
+		Collection<Entity> result = new LinkedList<Entity>();
+		for (String entityTypeId : entityTypeIds) {
+			result.addAll(entityTypeToEntityMap.get(entityTypeId).values());
+		}
+		return result;
 	}
 }

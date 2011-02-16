@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+
 public interface DocumentInfo extends SchemaComponent {
 	SchemaInfo getSchemaInfo();
+	JAXBClass getType();
 }

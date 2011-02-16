@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model;
 
+
 abstract class AbstractJAXBProperty implements JAXBProperty {
 	private final JAXBClass jaxbClass;
 	private final Type type;
@@ -33,11 +34,21 @@ abstract class AbstractJAXBProperty implements JAXBProperty {
 	}
 
 	@Override
-	public JAXBClass getJAXBClass() {
+	public JAXBClass getEnclosingJAXBClass() {
 		return jaxbClass;
 	}
 
-	public Type getType() {
+	public Type getXmlNodeType() {
 		return type;
+	}
+
+	@Override
+	public boolean isAttribute() {
+		return Type.ATTRIBUTE.equals(getXmlNodeType());
+	}
+
+	@Override
+	public boolean isElement() {
+		return Type.ELEMENT.equals(getXmlNodeType());
 	}
 }

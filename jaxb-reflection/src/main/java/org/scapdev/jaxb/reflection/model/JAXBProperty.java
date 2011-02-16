@@ -26,6 +26,9 @@ package org.scapdev.jaxb.reflection.model;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.namespace.QName;
+
 public interface JAXBProperty {
 	public enum Type {
 		ELEMENT,
@@ -41,14 +44,14 @@ public interface JAXBProperty {
 //	 * @return the PropertyValue associated with the property
 //	 */
 //	PropertyValue getValue();
-	Type getType();
+	Type getXmlNodeType();
 	boolean isRequired();
 	boolean isNillable();
 	/**
 	 * Retrieves the JAXBClass records of the bound XML class for which this property is a member
 	 * @return the JAXBClass record of the associated XML bound class
 	 */
-	JAXBClass getJAXBClass();
+	JAXBClass getEnclosingJAXBClass();
 	/**
 	 * Retrieves the properties' name
 	 * @return the property name
@@ -84,4 +87,20 @@ public interface JAXBProperty {
  	 */
 	Object getInstance(Object classInstance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
 	<T extends Annotation> T getAnnotation(Class<T> annotation);
+	String getXmlLocalPart();
+	boolean isList();
+	/**
+	 * Gets the Type of the property.  This is commonly the Type of the field or
+	 * getter/setter.
+	 * @return
+	 */
+	java.lang.reflect.Type getType();
+	/**
+	 * Gets the actual type within the List (if used), the effective type if
+	 * substitution is used or the actual type if otherwise.
+	 * @return
+	 */
+	Class<?> getActualType();
+	JAXBProperty newSubstitutionJAXBProperty(XmlElement element);
+	QName getQName();
 }

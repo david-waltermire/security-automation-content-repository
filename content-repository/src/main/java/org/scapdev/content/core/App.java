@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.scapdev.content.core.query.QueryResult;
-import org.scapdev.content.core.writer.DefaultInstanceWriter;
+import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
@@ -48,7 +50,7 @@ import org.scapdev.content.model.processor.jaxb.ImportData;
 public class App {
 	private static final Logger log = Logger.getLogger(App.class);
 
-    public static void main( String[] args ) throws IOException, JAXBException, ImportException, ClassNotFoundException {
+    public static void main( String[] args ) throws IOException, JAXBException, ImportException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
     	ContentRepository repository = null;
     	{
 	    	StopWatch watch = new StopWatch();
@@ -109,7 +111,8 @@ public class App {
 	    	watch.stop();
 	    	log.info("Definition query: "+watch.toString());
 	
-	    	new DefaultInstanceWriter().write(result);
+	    	InstanceWriter writer = repository.newInstanceWriter();
+	    	writer.write(result);
     	}
     	repository.shutdown();
     }

@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.jaxb.reflection.model.visitor;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+
 import org.apache.log4j.Logger;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModel;
@@ -47,8 +50,11 @@ public class DefaultModelVisitor implements ModelVisitor {
 
 	public void visit() {
 		log.debug("visiting type: "+jaxbClass.getType().getName());
-		processJaxbClass(jaxbClass);
+		processNode(jaxbClass);
 	}
+
+	public boolean beforeNode(JAXBClass typeInfo) { return true; }
+	public void afterNode(JAXBClass typeInfo) { }
 
 	public boolean beforeJAXBClass(JAXBClass typeInfo) { return true; }
 	public void afterJAXBClass(JAXBClass typeInfo) { }
@@ -56,8 +62,15 @@ public class DefaultModelVisitor implements ModelVisitor {
 	public boolean beforeJAXBProperty(JAXBProperty property) { return true; }
 	public void afterJAXBProperty(JAXBProperty property) {}
 
-	protected void processJaxbClass(JAXBClass jaxbClass) {
+	protected void processNode(JAXBClass jaxbClass) {
 		log.trace("visiting JAXBClass: "+jaxbClass.getType().getName());
+		if (beforeNode(jaxbClass)) {
+			processJaxbClass(jaxbClass);
+		}
+		afterNode(jaxbClass);
+	}
+
+	protected void processJaxbClass(JAXBClass jaxbClass) {
 		if (beforeJAXBClass(jaxbClass)) {
 	
 			JAXBClass parent = jaxbClass.getSuperclass();
@@ -86,6 +99,34 @@ public class DefaultModelVisitor implements ModelVisitor {
 	}
 
 	private void processPropertyValue(JAXBProperty property) {
-		throw new UnsupportedOperationException();
+		if (property.isList()) {
+			// TODO: resolve generic
+			processPropertyValueType(property, property.getActualType());
+		} else {
+			processPropertyValueType(property, property.getActualType());
+		}
+	}
+
+	private void processPropertyValueType(JAXBProperty property, Class<?> clazz) {
+		if (property.isAttribute()) {
+			processPropertyValueInternal(property, clazz);
+		} else if (property.isElement()) {
+			XmlElements elements = property.getAnnotation(XmlElements.class);
+			if (elements != null) {
+				for (XmlElement element : elements.value()) {
+					JAXBProperty subProperty = property.newSubstitutionJAXBProperty(element);
+					processPropertyValueInternal(subProperty, subProperty.getActualType());
+				}
+			} else {
+				processPropertyValueInternal(property, clazz);
+			}
+		}
+	}
+
+	private void processPropertyValueInternal(JAXBProperty property, Class<?> actualType) {
+		JAXBClass jaxbClass = model.getClass(actualType);
+		if (jaxbClass != null) {
+			processNode(jaxbClass);
+		}
 	}
 }

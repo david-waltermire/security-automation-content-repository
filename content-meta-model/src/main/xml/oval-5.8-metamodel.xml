@@ -203,6 +203,21 @@
                 <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:variable"/>
               </entity-schema-node>
             </entity-container>
+            <generated-property>
+              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='definitions']"/>
+            </generated-property>
+            <generated-property>
+              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='tests']"/>
+            </generated-property>
+            <generated-property>
+              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='objects']"/>
+            </generated-property>
+            <generated-property>
+              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='states']"/>
+            </generated-property>
+            <generated-property>
+              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='variables']"/>
+            </generated-property>
           </generated-document-model>
         </document>
       </documents>

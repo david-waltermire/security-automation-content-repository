@@ -303,6 +303,7 @@
       <xs:extension base="DocumentModelType">
         <xs:sequence>
           <xs:element name="entity-container" type="EntityContainerType" maxOccurs="unbounded"/>
+          <xs:element ref="generated-property" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -345,6 +346,13 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="entity-schema-node" type="EntityNodeReferenceType"/>
+
+  <xs:complexType name="GeneratedPropertyType">
+    <xs:sequence>
+      <xs:element ref="schema-node"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="generated-property" type="GeneratedPropertyType"/>
 
   <!-- ********************************************************************** -->
   <!-- * Relationship                                                       * -->

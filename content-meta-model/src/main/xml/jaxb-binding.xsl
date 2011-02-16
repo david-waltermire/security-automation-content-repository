@@ -92,6 +92,16 @@
     </jaxb:bindings>
   </xsl:template>
 
+  <xsl:template match="meta:generated-property" mode="container">
+    <xsl:param name="document-id" tunnel="yes">unset</xsl:param>
+    <xsl:comment>generated-property <xsl:value-of select="$document-id"/></xsl:comment>
+    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
+      <annox:annotate target="field">
+        <annox:annotate annox:class="org.scapdev.content.annotation.Generated"/>
+      </annox:annotate>
+    </jaxb:bindings>
+  </xsl:template>
+
   <xsl:template match="meta:entity-schema-node" mode="container">
     <annox:annotate target="field">
       <annox:annotate annox:class="org.scapdev.content.annotation.EntityContainer" id="urn:scap-content:container:org.mitre.oval:definitions">
