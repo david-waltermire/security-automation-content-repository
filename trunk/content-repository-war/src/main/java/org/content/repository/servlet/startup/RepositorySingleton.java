@@ -1,18 +1,18 @@
 package org.content.repository.servlet.startup;
 
-import org.scapdev.content.core.ContentRepository;
+//import org.scapdev.content.core.ContentRepository;
 
 public enum RepositorySingleton 
 {
 	INSTANCE;
 	
-	private ContentRepository repo;
+//	private ContentRepository repo;
 	
 	private RepositorySingleton()
 	{
 		try
 		{
-			repo = new ContentRepository(ContentRepositoryStartupServlet.class.getClassLoader());			
+//			repo = new ContentRepository(ContentRepositoryStartupServlet.class.getClassLoader());			
 		}
 		catch(Exception e)
 		{
