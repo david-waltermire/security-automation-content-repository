@@ -21,18 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.annotation;
 
-import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.xml.bind.JAXBException;
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface IndirectQualifier {
 
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
-	}
-
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
-	}
 }

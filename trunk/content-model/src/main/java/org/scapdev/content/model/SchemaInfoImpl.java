@@ -24,6 +24,7 @@
 package org.scapdev.content.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.jaxb.DocumentEntityType;
 import org.scapdev.content.model.jaxb.EntityType;
+import org.scapdev.content.model.jaxb.IndirectRelationshipType;
 import org.scapdev.content.model.jaxb.LocalRelationshipType;
 import org.scapdev.content.model.jaxb.RelationshipType;
 import org.scapdev.content.model.jaxb.SchemaType;
@@ -54,46 +56,68 @@ class SchemaInfoImpl implements SchemaInfo {
 		this.prefix = type.getPrefix();
 		this.schemaNode = type.getSchemaNode().getNode();
 
-		documentMap = new HashMap<JAXBClass, DocumentInfo>();
-		for (DocumentEntityType node : type.getDocuments().getDocument()) {
-			BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
-			org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
-			AbstractDocumentBase document;
-			switch (annotation.type()) {
-			case GENERATED:
-				document = new GeneratedDocumentInfoImpl(node, this, metadataModel, init);
-				break;
-			default:
-				throw new UnsupportedOperationException("Document Type: "+annotation.type().toString());
+		SchemaType.Documents documents = type.getDocuments();
+		if (documents != null) {
+			documentMap = new HashMap<JAXBClass, DocumentInfo>();
+			for (DocumentEntityType node : documents.getDocument()) {
+				BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
+				org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
+				AbstractDocumentBase document;
+				switch (annotation.type()) {
+				case GENERATED:
+					document = new GeneratedDocumentInfoImpl(node, this, metadataModel, init);
+					break;
+				default:
+					throw new UnsupportedOperationException("Document Type: "+annotation.type().toString());
+				}
+	
+				metadataModel.registerDocument(document);
+				documentMap.put(binding.getJaxbClass(), document);
+				
 			}
-
-			metadataModel.registerDocument(document);
-			documentMap.put(binding.getJaxbClass(), document);
-			
+		} else {
+			documentMap = Collections.emptyMap();
 		}
 
-		entityMap = new HashMap<JAXBClass, EntityInfoImpl>();
-		for (EntityType node : type.getEntities().getEntity()) {
-			EntityInfoImpl entity = new EntityInfoImpl(node, this, metadataModel, init);
-			metadataModel.registerEntity(entity);
-			entityMap.put(entity.getBinding().getJaxbClass(), entity);
+		SchemaType.Entities entities = type.getEntities();
+		if (entities != null) {
+			entityMap = new HashMap<JAXBClass, EntityInfoImpl>();
+			for (EntityType node : entities.getEntity()) {
+				EntityInfoImpl entity = new EntityInfoImpl(node, this, metadataModel, init);
+				metadataModel.registerEntity(entity);
+				entityMap.put(entity.getBinding().getJaxbClass(), entity);
+			}
+		} else {
+			entityMap = Collections.emptyMap();
 		}
 
-		relationshipMap = new HashMap<JAXBClass, RelationshipInfo>();
-		for (JAXBElement<? extends RelationshipType> element : type.getRelationships().getRelationship()) {
-			RelationshipInfo relationship;
-			JAXBClass typeInfo;
-			if (element.getDeclaredType().isAssignableFrom(LocalRelationshipType.class)) {
-				LocalRelationshipType node = (LocalRelationshipType)element.getValue();
-				LocalRelationshipInfoImpl relationshipInfo = new LocalRelationshipInfoImpl(node, this, metadataModel, init);
-				typeInfo = relationshipInfo.getKeyRefInfo().getBinding().getJaxbClass();
-				relationship = relationshipInfo;
-			} else {
-				UnsupportedOperationException e = new UnsupportedOperationException("Unsupported relationship: "+element.getDeclaredType().getName());
-				throw new JAXBModelException(e);
+		SchemaType.Relationships relationships = type.getRelationships();
+		if (relationships != null) {
+			relationshipMap = new HashMap<JAXBClass, RelationshipInfo>();
+			for (JAXBElement<? extends RelationshipType> element : relationships.getRelationship()) {
+				RelationshipInfo relationship;
+				JAXBClass jaxbClass;
+				Class<?> declaredType = element.getDeclaredType();
+				if (declaredType.isAssignableFrom(LocalRelationshipType.class)) {
+					LocalRelationshipType node = (LocalRelationshipType)element.getValue();
+					LocalRelationshipInfoImpl relationshipInfo = new LocalRelationshipInfoImpl(node, this, metadataModel, init);
+					jaxbClass = relationshipInfo.getKeyRefInfo().getBinding().getJaxbClass();
+					metadataModel.registerRelationship(jaxbClass, relationshipInfo);
+					relationship = relationshipInfo;
+				} else if (declaredType.isAssignableFrom(IndirectRelationshipType.class)) {
+					IndirectRelationshipType node = (IndirectRelationshipType)element.getValue();
+					IndirectRelationshipInfo relationshipInfo = new IndirectRelationshipInfoImpl(node, this, metadataModel, init);
+					jaxbClass = relationshipInfo.getOwningJAXBClass();
+					metadataModel.registerRelationship(jaxbClass, relationshipInfo);
+					relationship = relationshipInfo;
+				} else {
+					UnsupportedOperationException e = new UnsupportedOperationException("Unsupported relationship: "+element.getDeclaredType().getName());
+					throw new JAXBModelException(e);
+				}
+				relationshipMap.put(jaxbClass, relationship);
 			}
-			metadataModel.registerRelationship(typeInfo, relationship);
-			relationshipMap.put(typeInfo, relationship);
+		} else {
+			relationshipMap = Collections.emptyMap();
 		}
 	}
 

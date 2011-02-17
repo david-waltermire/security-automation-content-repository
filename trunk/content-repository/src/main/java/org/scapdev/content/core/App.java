@@ -25,7 +25,10 @@ package org.scapdev.content.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.FactoryConfigurationError;
@@ -98,6 +101,7 @@ public class App {
 	    	log.info("Import timing: "+watch.toString());
     	}
 
+    	InstanceWriter writer = repository.newInstanceWriter();
     	{
 	    	StopWatch watch = new StopWatch();
 	    	watch.start();
@@ -111,9 +115,27 @@ public class App {
 	    	watch.stop();
 	    	log.info("Definition query: "+watch.toString());
 	
-	    	InstanceWriter writer = repository.newInstanceWriter();
 	    	writer.write(result);
     	}
+
+    	{
+	    	StopWatch watch = new StopWatch();
+	    	watch.start();
+
+	    	List<String> cces = new LinkedList<String>();
+	    	cces.add("CCE-9345-0");
+	    	cces.add("CCE-8414-5");
+
+	    	QueryResult result = repository.query("urn:scap-content:external-identifier:org.mitre:cce-5", cces, Collections.singleton("urn:scap-content:entity:org.mitre.oval:definition"), true);
+	    	for (Entity entity : result.getEntities().values()) {
+	    		log.info("Retrieved entity: "+entity.getKey());
+	    	}
+	    	watch.stop();
+	    	log.info("Definition query: "+watch.toString());
+	
+	    	writer.write(result);
+    	}
+    	
     	repository.shutdown();
     }
 }

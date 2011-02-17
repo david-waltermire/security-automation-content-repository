@@ -23,12 +23,18 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.ExternalIdentifierInfo;
 import org.scapdev.content.model.Key;
 
 public interface MetadataStore {
 
 	EntityDescriptor getEntityDescriptor(Key key);
-
+	List<EntityDescriptor> getEntityDescriptor(ExternalIdentifierInfo externalIdentifierInfo, String value);
 	void persist(Entity entity, String contentId);
+	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
 }

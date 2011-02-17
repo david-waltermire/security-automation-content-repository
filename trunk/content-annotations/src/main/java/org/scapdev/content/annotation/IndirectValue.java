@@ -21,20 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.writer.jaxb;
+package org.scapdev.content.annotation;
 
-import javax.xml.bind.Marshaller;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class GeneratedDocumentWriter implements DocumentWriter {
-
-	public GeneratedDocumentWriter() {
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public void write(Marshaller marshaller) {
-		// TODO Auto-generated method stub
-
-	}
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface IndirectValue {
 
 }

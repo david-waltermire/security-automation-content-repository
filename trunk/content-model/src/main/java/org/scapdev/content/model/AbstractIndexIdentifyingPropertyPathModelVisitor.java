@@ -82,17 +82,14 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 
 	@Override
 	public boolean beforeJAXBProperty(JAXBProperty property) {
-		// TODO: support elements
-//		if (property.isAttribute()) {
-			FIELD field = property.getAnnotation(fieldClass);
-			if (field != null) {
-				String id = getIndexedFieldId(field);
-				if (propertyMap.containsKey(id)) {
-					throw new ModelException("Duplicate field found for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+id);
-				}
-				propertyMap.put(id, getPropertyPath());
+		FIELD field = property.getAnnotation(fieldClass);
+		if (field != null) {
+			String id = getIndexedFieldId(field);
+			if (propertyMap.containsKey(id)) {
+				throw new ModelException("Duplicate field found for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+id);
 			}
-//		}
+			propertyMap.put(id, getPropertyPath());
+		}
 		return false;
 	}
 }

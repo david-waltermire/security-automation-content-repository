@@ -39,7 +39,7 @@ class KeyRefInfoImpl implements KeyRefInfo {
 	private final KeyRefBindingInfo binding;
 	private final KeyInfo referencedKey;
 
-	KeyRefInfoImpl(KeyRefType keyRef, LocalRelationshipInfo parent, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
+	KeyRefInfoImpl(KeyRefType keyRef, LocalRelationshipInfo parent, MetadataModel loader, InitializingJAXBClassVisitor init) {
 		this.id = keyRef.getId();
 		this.parent = parent;
 		binding = init.getKeyRefBindingInfo(id);

@@ -23,7 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.AbstractContentPersistenceManager;
@@ -71,5 +73,10 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 
 	protected Entity newEntity(EntityDescriptor desc, ContentRetriever retriever) {
 		return new AbstracPersistedtEntity(desc, retriever) {};
+	}
+
+	@Override
+	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
+		return metadataStore.getKeysForIndirectIds(indirectType, indirectIds, entityType);
 	}
 }

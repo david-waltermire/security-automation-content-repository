@@ -38,6 +38,8 @@ public interface Entity {
 	 */
 	JAXBElement<Object> getObject();
 	List<Relationship> getRelationships();
+	List<KeyedRelationship> getKeyedRelationships();
+	List<IndirectRelationship> getIndirectRelationships();
 
 	Key getKey();
 }

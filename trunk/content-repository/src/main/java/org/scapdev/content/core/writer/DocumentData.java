@@ -63,7 +63,10 @@ class DocumentData {
 	public Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds) {
 		Collection<Entity> result = new LinkedList<Entity>();
 		for (String entityTypeId : entityTypeIds) {
-			result.addAll(entityTypeToEntityMap.get(entityTypeId).values());
+			Map<Key, Entity> entityMap = entityTypeToEntityMap.get(entityTypeId);
+			if (entityMap != null) {
+				result.addAll(entityMap.values());
+			}
 		}
 		return result;
 	}

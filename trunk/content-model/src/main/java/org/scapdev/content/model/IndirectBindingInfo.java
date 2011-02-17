@@ -23,16 +23,25 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-import javax.xml.bind.JAXBException;
+import org.scapdev.content.annotation.Indirect;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
-	}
+interface IndirectBindingInfo extends BindingInfo<Indirect> {
+	/**
+	 * @return a map (key: qualifier, value: external identifier id) containing the externalIdentifierRefs
+	 */
+	Map<String, String> getExternalIdentifierRefs();
+	/**
+	 * @return the qualifierPath
+	 */
+	List<JAXBProperty> getQualifierPath();
 
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
-	}
+	/**
+	 * @return the valuePath
+	 */
+	List<JAXBProperty> getValuePath();
+
 }

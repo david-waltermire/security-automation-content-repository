@@ -23,8 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -65,5 +67,11 @@ public class MemoryResidentContentPersistenceManager extends AbstractContentPers
 			throw new ContentException("Record already exists in the database identified by key: "+key);
 		}
 		idMap.put(key, entity);
+	}
+
+	@Override
+	public Set<Key> getKeysForIndirectIds(String indirectType,
+			Collection<String> indirectIds, Set<String> entityType) {
+		throw new UnsupportedOperationException();
 	}
 }

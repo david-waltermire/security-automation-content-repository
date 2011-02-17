@@ -23,16 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.io.IOException;
+public interface IndirectRelationship extends Relationship {
+	IndirectRelationshipInfo getRelationshipInfo();
+	/**
+	 * @return the externalIdentifier
+	 */
+	ExternalIdentifier getExternalIdentifier();
 
-import javax.xml.bind.JAXBException;
-
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
-	}
-
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
-	}
 }

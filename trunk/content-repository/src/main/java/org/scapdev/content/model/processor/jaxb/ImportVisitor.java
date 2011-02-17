@@ -29,15 +29,16 @@ import javax.xml.namespace.QName;
 import org.scapdev.content.annotation.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.JAXBMetadataModel;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 class ImportVisitor extends DefaultInstanceVisitor {
 	private final JAXBEntityProcessor processor;
-	private final JAXBMetadataModel metadataModel;
+	private final MetadataModel metadataModel;
 	private ImportData state;
 
-	public ImportVisitor(Object document, JAXBEntityProcessor processor, JAXBMetadataModel metadataModel) {
+	public ImportVisitor(Object document, JAXBEntityProcessor processor, MetadataModel metadataModel) {
 		super(document, metadataModel.getModel());
 		this.processor = processor;
 		this.metadataModel = metadataModel;

@@ -18,6 +18,7 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 	private final Map<String, BindingInfo<org.scapdev.content.annotation.SchemaDocument>> documents;
 	private final Map<String, KeyBindingInfo> keys;
 	private final Map<String, KeyRefBindingInfo> keyRefs;
+	private final Map<String, IndirectBindingInfo> indirects;
 
 	InitializingJAXBClassVisitor(JAXBModel model) {
 		this.model = model;
@@ -25,6 +26,7 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		documents = new HashMap<String, BindingInfo<org.scapdev.content.annotation.SchemaDocument>>();
 		keys = new HashMap<String, KeyBindingInfo>();
 		keyRefs = new HashMap<String, KeyRefBindingInfo>();
+		indirects = new HashMap<String, IndirectBindingInfo>();
 	}
 
 	protected BindingInfo<org.scapdev.content.annotation.Entity> getEntityBindingInfo(String id) {
@@ -43,21 +45,21 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		return keyRefs.get(id);
 	}
 
-	protected BindingInfo<org.scapdev.content.annotation.Field> getFieldBindingInfo(String id) {
-		return null;
+	public IndirectBindingInfo getIndirectBindingInfo(String id) {
+		return indirects.get(id);
 	}
 
 	/**
 	 * Visit each JAXBClass and identify each annotation type if they exist.
 	 */
 	@Override
-	public void visit(JAXBClass typeInfo) {
-		Class<?> clazz = typeInfo.getType();
+	public void visit(JAXBClass jaxbClass) {
+		Class<?> clazz = jaxbClass.getType();
 		org.scapdev.content.annotation.Entity entity = clazz.getAnnotation(org.scapdev.content.annotation.Entity.class);
 		if (entity != null) {
 			String id = entity.id();
 			
-			BindingInfo<org.scapdev.content.annotation.Entity> bindingInfo = new DefaultBindingInfo<org.scapdev.content.annotation.Entity>(id, entity, typeInfo);
+			BindingInfo<org.scapdev.content.annotation.Entity> bindingInfo = new DefaultBindingInfo<org.scapdev.content.annotation.Entity>(id, entity, jaxbClass);
 			assert(!entities.containsKey(id));
 			entities.put(id, bindingInfo);
 		}
@@ -65,7 +67,7 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		org.scapdev.content.annotation.SchemaDocument document = clazz.getAnnotation(org.scapdev.content.annotation.SchemaDocument.class);
 		if (document != null) {
 			String id = document.id();
-			BindingInfo<org.scapdev.content.annotation.SchemaDocument> bindingInfo = new DefaultBindingInfo<org.scapdev.content.annotation.SchemaDocument>(id, document, typeInfo);
+			BindingInfo<org.scapdev.content.annotation.SchemaDocument> bindingInfo = new DefaultBindingInfo<org.scapdev.content.annotation.SchemaDocument>(id, document, jaxbClass);
 			assert(!documents.containsKey(id));
 			documents.put(id, bindingInfo);
 		}
@@ -74,11 +76,11 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		if (key != null) {
 			String id = key.id();
 
-			KeyIdentifyingPropertyPathModelVisitor keyIdVisitor = new KeyIdentifyingPropertyPathModelVisitor(key, typeInfo, model);
-			keyIdVisitor.visit();
-			Map<String, List<JAXBProperty>> propertyMap = keyIdVisitor.getPropertyMap();
+			KeyIdentifyingPropertyPathModelVisitor visitor = new KeyIdentifyingPropertyPathModelVisitor(key, jaxbClass, model);
+			visitor.visit();
+			Map<String, List<JAXBProperty>> propertyMap = visitor.getPropertyMap();
 
-			KeyBindingInfo bindingInfo = new KeyBindingInfoImpl(id, key, propertyMap, typeInfo);
+			KeyBindingInfo bindingInfo = new KeyBindingInfoImpl(id, key, propertyMap, jaxbClass);
 			assert(!keys.containsKey(id));
 			keys.put(id, bindingInfo);
 		}
@@ -87,13 +89,25 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		if (keyRef != null) {
 			String id = keyRef.id();
 
-			KeyRefIdentifyingPropertyPathModelVisitor keyRefIdVisitor = new KeyRefIdentifyingPropertyPathModelVisitor(keyRef, typeInfo, model);
-			keyRefIdVisitor.visit();
-			Map<String, List<JAXBProperty>> propertyMap = keyRefIdVisitor.getPropertyMap();
+			KeyRefIdentifyingPropertyPathModelVisitor visitor = new KeyRefIdentifyingPropertyPathModelVisitor(keyRef, jaxbClass, model);
+			visitor.visit();
+			Map<String, List<JAXBProperty>> propertyMap = visitor.getPropertyMap();
 
-			KeyRefBindingInfo bindingInfo = new KeyRefBindingInfoImpl(id, keyRef, propertyMap, typeInfo);
+			KeyRefBindingInfo bindingInfo = new KeyRefBindingInfoImpl(id, keyRef, propertyMap, jaxbClass);
 			assert(!keyRefs.containsKey(id));
 			keyRefs.put(id, bindingInfo);
+		}
+
+		org.scapdev.content.annotation.Indirect indirect = clazz.getAnnotation(org.scapdev.content.annotation.Indirect.class);
+		if (indirect != null) {
+			String id = indirect.id();
+
+			IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor = new IndirectRelationshipIdentifyingPropertyPathModelVisitor(indirect, jaxbClass, model);
+			visitor.visit();
+
+			IndirectBindingInfo bindingInfo = new IndirectBindingInfoImpl(id, indirect, visitor, jaxbClass);
+			assert(!keyRefs.containsKey(id));
+			indirects.put(id, bindingInfo);
 		}
 	}
 }

@@ -24,6 +24,8 @@
 package org.scapdev.content.core;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -39,14 +41,15 @@ import org.scapdev.content.core.resolver.LocalResolver;
 import org.scapdev.content.core.resolver.Resolver;
 import org.scapdev.content.core.writer.DefaultInstanceWriter;
 import org.scapdev.content.core.writer.InstanceWriter;
-import org.scapdev.content.model.JAXBMetadataModel;
+import org.scapdev.content.core.writer.NamespaceMapper;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.MetadataModelFactory;
 import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
 
 public class ContentRepository {
 	private final ContentPersistenceManager persistenceManager;
-	private final JAXBMetadataModel model;
+	private final MetadataModel model;
 	private final JAXBEntityProcessor processor;
 //	private final ProcessingFactory processingFactory;
 //	private final InstanceWriterFactory instanceWriterFactory;
@@ -65,7 +68,7 @@ public class ContentRepository {
 		queryProcessor = new DefaultQueryProcessor(resolver);
 	}
 
-	public JAXBMetadataModel getMetadataModel() {
+	public MetadataModel getMetadataModel() {
 		return model;
 	}
 //
@@ -85,6 +88,12 @@ public class ContentRepository {
 		return query(query);
 	}
 
+	public QueryResult query(String indirectType, Collection<String> indirectIds, Set<String> requestedEntityIds, boolean resolveReferences) throws IOException {
+		IndirectQuery query = new IndirectQuery(indirectType, indirectIds, requestedEntityIds, persistenceManager);
+		query.setResolveReferences(resolveReferences);
+		return query(query);
+	}
+
 	public <RESULT extends QueryResult> RESULT query(Query<RESULT> query) {
 		RESULT queryResult = queryProcessor.query(query);
 		return queryResult;
@@ -99,7 +108,10 @@ public class ContentRepository {
 	}
 
 	public InstanceWriter newInstanceWriter() throws JAXBException {
-		return new DefaultInstanceWriter(getMarshaller());
+		Marshaller marshaller = getMarshaller();
+		NamespaceMapper mapper = new NamespaceMapper(model);
+		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", mapper);
+		return new DefaultInstanceWriter(marshaller, model);
 	}
 
 	private Marshaller getMarshaller() throws JAXBException {

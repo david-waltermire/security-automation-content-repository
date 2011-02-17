@@ -23,20 +23,33 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
+import org.scapdev.content.model.ExternalIdentifier;
+import org.scapdev.content.model.ExternalIdentifierInfo;
+import org.scapdev.content.model.IndirectRelationship;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
 public class MemoryResidentMetadataStore implements MetadataStore {
+	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
 	private final Map<Key, EntityDescriptor> descriptorMap;
+	private final Map<String, Map<String, List<EntityDescriptor>>> externalIdentifierToValueMap;
 
 	public MemoryResidentMetadataStore() {
 		this.descriptorMap = new HashMap<Key, EntityDescriptor>();
+		this.externalIdentifierToValueMap = new HashMap<String, Map<String, List<EntityDescriptor>>>();
 	}
 
 	@Override
@@ -45,9 +58,59 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	@Override
+	public List<EntityDescriptor> getEntityDescriptor(ExternalIdentifierInfo externalIdentifierInfo, String value) {
+		Map<String, List<EntityDescriptor>> externalIdentifierValueToEntityDescriptorMap = externalIdentifierToValueMap.get(externalIdentifierInfo.getId());
+		List<EntityDescriptor> result;
+		if (externalIdentifierValueToEntityDescriptorMap.containsKey(value)) {
+			result = Collections.unmodifiableList(externalIdentifierValueToEntityDescriptorMap.get(value));
+		} else {
+			result = Collections.emptyList();
+		}
+		return result;
+	}
+
+	@Override
+	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
+		Set<Key> result = Collections.emptySet();
+		Map<String, List<EntityDescriptor>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
+		if (indirectValueToDescriptorsMap != null) {
+			result = new HashSet<Key>();
+			for (String indirectId : indirectIds) {
+				List<EntityDescriptor> descs = indirectValueToDescriptorsMap.get(indirectId);
+				if (descs != null) {
+					for (EntityDescriptor desc : descs) {
+						if (entityType.contains(desc.getEntityInfo().getId())) {
+							result.add(desc.getKey());
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public void persist(Entity entity, String contentId) {
 		EntityDescriptor desc = new InternalEntityDescriptor(entity, contentId);
 		descriptorMap.put(entity.getKey(), desc);
+
+		for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
+			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
+			Map<String, List<EntityDescriptor>> externalIdentifierValueToEntityDescriptorMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
+			if (externalIdentifierValueToEntityDescriptorMap == null) {
+				externalIdentifierValueToEntityDescriptorMap = new HashMap<String, List<EntityDescriptor>>();
+				externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityDescriptorMap);
+			}
+			List<EntityDescriptor> descriptorList = externalIdentifierValueToEntityDescriptorMap.get(externalIdentifier.getValue());
+			if (descriptorList == null) {
+				descriptorList = new LinkedList<EntityDescriptor>();
+				externalIdentifierValueToEntityDescriptorMap.put(externalIdentifier.getValue(), descriptorList);
+			}
+			descriptorList.add(desc);
+			if (descriptorList.size() >= 2) {
+				log.info("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
+			}
+		}
 	}
 
 	private static class InternalEntityDescriptor implements EntityDescriptor {
@@ -78,6 +141,15 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 		public List<Relationship> getRelationships() {
 			return entity.getRelationships();
 		}
-		
+
+		@Override
+		public List<IndirectRelationship> getIndirectRelationships() {
+			return entity.getIndirectRelationships();
+		}
+
+		@Override
+		public List<KeyedRelationship> getKeyedRelationships() {
+			return entity.getKeyedRelationships();
+		}
 	}
 }

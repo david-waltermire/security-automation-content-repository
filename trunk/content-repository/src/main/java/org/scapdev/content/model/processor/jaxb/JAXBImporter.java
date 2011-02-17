@@ -37,7 +37,7 @@ import javax.xml.transform.Source;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.JAXBMetadataModel;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
 import org.w3c.dom.Node;
@@ -51,7 +51,7 @@ public class JAXBImporter implements Importer {
 		this.jaxbEntityProcessor = jaxbEntityProcessor;
 	}
 
-	public JAXBMetadataModel getMetadataModel() {
+	public MetadataModel getMetadataModel() {
 		return jaxbEntityProcessor.getMetadataModel();
 	}
 

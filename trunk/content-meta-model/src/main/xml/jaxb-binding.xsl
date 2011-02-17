@@ -164,6 +164,16 @@
     </jaxb:bindings>
   </xsl:template>
 
+  <xsl:template match="meta:indirect-relationship" mode="relationship">
+    <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>
+    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
+      <annox:annotate>
+        <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}"/>
+      </annox:annotate>
+    </jaxb:bindings>
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="meta:key-ref" mode="relationship">
     <annox:annotate>
       <annox:annotate annox:class="org.scapdev.content.annotation.KeyRef" id="{@id}" keyId="{@id-ref}">
@@ -184,6 +194,37 @@
     <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
       <annox:annotate target="field">
         <annox:annotate annox:class="org.scapdev.content.annotation.FieldRef" id="{@id}" idRef="{@id-ref}"/>
+      </annox:annotate>
+    </jaxb:bindings>
+  </xsl:template>
+
+  <xsl:template match="meta:indirect-relationship" mode="relationship">
+    <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>
+    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
+      <annox:annotate>
+        <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}">
+          <annox:annotate annox:field="externalIdentifiers">
+            <xsl:for-each select="meta:external-identifier-ref">
+                <annox:annotate annox:class="org.scapdev.content.annotation.ExternalIdentifierRef" idRef="{@id-ref}">
+                  <xsl:if test="@qualifier-value">
+                    <annox:annotate annox:field="qualifier"><xsl:value-of select="@qualifier-value"/></annox:annotate>
+                  </xsl:if>
+                </annox:annotate>
+            </xsl:for-each>
+          </annox:annotate>
+        </annox:annotate>
+      </annox:annotate>
+    </jaxb:bindings>
+    <xsl:if test="meta:qualifier-node">
+      <jaxb:bindings node="{meta:qualifier-node/@node}">
+        <annox:annotate target="field">
+          <annox:annotate annox:class="org.scapdev.content.annotation.IndirectQualifier"/>
+        </annox:annotate>
+      </jaxb:bindings>
+    </xsl:if>
+    <jaxb:bindings node="{meta:value-node/@node}">
+      <annox:annotate target="field">
+        <annox:annotate annox:class="org.scapdev.content.annotation.IndirectValue"/>
       </annox:annotate>
     </jaxb:bindings>
   </xsl:template>

@@ -26,7 +26,6 @@ package org.scapdev.content.model;
 import org.scapdev.content.model.jaxb.RelationshipType;
 
 abstract class AbstractRelationshipInfo extends AbstractSchemaComponent implements RelationshipInfo {
-
 	protected AbstractRelationshipInfo(RelationshipType type, SchemaInfo schemaInfo) {
 		super(type.getId(), schemaInfo, type.getSchemaNode().getNode());
 	}
