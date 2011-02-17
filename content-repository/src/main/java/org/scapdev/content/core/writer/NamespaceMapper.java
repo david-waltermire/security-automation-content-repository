@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.core.writer;
 
-import java.io.IOException;
+import org.scapdev.content.model.MetadataModel;
 
-import javax.xml.bind.JAXBException;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
+public class NamespaceMapper extends NamespacePrefixMapper{
+	private final MetadataModel model;
+
+	public NamespaceMapper(MetadataModel model) {
+		super();
+		this.model = model;
 	}
 
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
+
+	@Override
+	public String getPreferredPrefix(String namespaceUri, String suggestion,
+			boolean requirePrefix) {
+		return model.getNamespaceToPrefixMap().get(namespaceUri);
 	}
 }

@@ -29,28 +29,41 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.scapdev.content.annotation.Indirect;
 import org.scapdev.content.annotation.KeyRef;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVisitor {
 	private final Entity owningEntity;
-	private final JAXBMetadataModel metadataModel;
-	private final List<Relationship> relationships;
+	private final MetadataModel metadataModel;
+	private final List<KeyedRelationship> keyedRelationships;
+	private final List<IndirectRelationship> indirectRelationships;
 
-	public JAXBRelationshipIdentifyingImportVisitor(Entity owningEntity, JAXBElement<Object> node, JAXBMetadataModel metadataModel) {
+	public JAXBRelationshipIdentifyingImportVisitor(Entity owningEntity, JAXBElement<Object> node, MetadataModel metadataModel) {
 		super(node, metadataModel.getModel());
 		this.owningEntity = owningEntity;
 		this.metadataModel = metadataModel;
-		relationships = new LinkedList<Relationship>();
+		keyedRelationships = new LinkedList<KeyedRelationship>();
+		indirectRelationships = new LinkedList<IndirectRelationship>();
 	}
 
-	public List<Relationship> getRelationships() {
-		List<Relationship> retval;
-		if (relationships.isEmpty()) {
+	public List<KeyedRelationship> getKeyedRelationships() {
+		List<KeyedRelationship> retval;
+		if (keyedRelationships.isEmpty()) {
 			retval = Collections.emptyList();
 		} else {
-			retval = Collections.unmodifiableList(relationships);
+			retval = Collections.unmodifiableList(keyedRelationships);
+		}
+		return retval;
+	}
+
+	public List<IndirectRelationship>  getIndirectRelationships() {
+		List<IndirectRelationship> retval;
+		if (indirectRelationships.isEmpty()) {
+			retval = Collections.emptyList();
+		} else {
+			retval = Collections.unmodifiableList(indirectRelationships);
 		}
 		return retval;
 	}
@@ -67,10 +80,25 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 		if (instance != null) {
 			KeyRef annotation = typeInfo.getAnnotation(KeyRef.class, true);
 			if (annotation != null) {
-				RelationshipInfo relationshipInfo = metadataModel.getRelationshipByKeyRefId(annotation.id());
+				KeyedRelationshipInfo relationshipInfo = (KeyedRelationshipInfo) metadataModel.getRelationshipByKeyRefId(annotation.id());
 				try {
-					Relationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
-					relationships.add(relationship);
+					KeyedRelationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
+					keyedRelationships.add(relationship);
+				} catch (NullFieldValueException e) {
+					// This indicates that the relationship is not properly formed
+					// do nothing, ignoring the relationship
+				}
+				processContent = false;
+			}
+
+			Indirect indirect = typeInfo.getAnnotation(Indirect.class, true);
+			if (indirect != null) {
+				IndirectRelationshipInfo relationshipInfo = (IndirectRelationshipInfo) metadataModel.getRelationshipById(indirect.id());
+				try {
+					IndirectRelationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
+					if (relationship != null) {
+						indirectRelationships.add(relationship);
+					}
 				} catch (NullFieldValueException e) {
 					// This indicates that the relationship is not properly formed
 					// do nothing, ignoring the relationship

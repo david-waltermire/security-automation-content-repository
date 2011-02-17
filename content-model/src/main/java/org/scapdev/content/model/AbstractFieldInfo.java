@@ -39,7 +39,7 @@ abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT e
 	private final String schemaNode;
 	private final List<JAXBProperty> propertyPath;
 	
-	AbstractFieldInfo(JAXB_TYPE field, PARENT parent, List<JAXBProperty> propertyPath, JAXBMetadataModel loader) {
+	AbstractFieldInfo(JAXB_TYPE field, PARENT parent, List<JAXBProperty> propertyPath, MetadataModel loader) {
 		this.parent = parent;
 		id = field.getId();
 		schemaNode = field.getSchemaNode().getNode();

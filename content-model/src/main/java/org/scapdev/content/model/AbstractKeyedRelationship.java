@@ -23,16 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.io.IOException;
+public abstract class AbstractKeyedRelationship<INFO extends KeyedRelationshipInfo> extends AbstractRelationship<INFO> implements KeyedRelationship {
 
-import javax.xml.bind.JAXBException;
-
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
+	protected AbstractKeyedRelationship(INFO relationshipInfo,
+			Entity owningEntity) {
+		super(relationshipInfo, owningEntity);
 	}
 
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
-	}
 }

@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.model.processor.jaxb;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,14 +31,20 @@ import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.AbstractEntity;
 import org.scapdev.content.model.EntityInfo;
+import org.scapdev.content.model.IndirectRelationship;
+import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
 class EntityImpl extends AbstractEntity {
 	private List<Relationship> relationships;
+	private List<KeyedRelationship> keyedRelationships;
+	private List<IndirectRelationship> indirectRelationships;
 
 	public EntityImpl(EntityInfo entityInfo, JAXBElement<Object> object) {
 		super(entityInfo.getKeyInfo().getKey(object.getValue()), entityInfo, object);
 		relationships = Collections.emptyList();
+		keyedRelationships = Collections.emptyList();
+		indirectRelationships = Collections.emptyList();
 	}
 
 	/**
@@ -49,12 +56,32 @@ class EntityImpl extends AbstractEntity {
 		}
 	}
 
+	@Override
+	public List<IndirectRelationship> getIndirectRelationships() {
+		synchronized (this) {
+			return indirectRelationships;
+		}
+	}
+
+	@Override
+	public List<KeyedRelationship> getKeyedRelationships() {
+		synchronized (this) {
+			return keyedRelationships;
+		}
+	}
+
 	/**
 	 * @param relationships the relationships to set
 	 */
-	public void setRelationships(List<Relationship> relationships) {
+	public void setRelationships(List<KeyedRelationship> keyedRelationships, List<IndirectRelationship> indirectRelationships) {
 		synchronized (this) {
-			this.relationships = Collections.unmodifiableList(relationships);
+			this.keyedRelationships = Collections.unmodifiableList(keyedRelationships);
+			this.indirectRelationships = Collections.unmodifiableList(indirectRelationships);
+
+			List<Relationship> localRelationships = new ArrayList<Relationship>(keyedRelationships.size()+indirectRelationships.size());
+			localRelationships.addAll(keyedRelationships);
+			localRelationships.addAll(indirectRelationships);
+			this.relationships = Collections.unmodifiableList(localRelationships);
 		}
 	}
 }

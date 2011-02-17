@@ -23,5 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface LocalRelationship extends Relationship {
+public interface LocalRelationship extends KeyedRelationship {
+	
 }

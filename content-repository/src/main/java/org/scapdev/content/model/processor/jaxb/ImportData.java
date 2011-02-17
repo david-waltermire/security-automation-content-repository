@@ -20,30 +20,31 @@ import org.scapdev.content.model.processor.ImportException;
 public class ImportData {
 	private static final Logger log = Logger.getLogger(ImportData.class);
 
-	private final List<Future<List<Relationship>>> futures;
+	private final List<Future<Entity>> futures;
 	private final List<Entity> entities;
 
 	ImportData() {
 		this.entities = new LinkedList<Entity>();
-		this.futures = new LinkedList<Future<List<Relationship>>>();
+		this.futures = new LinkedList<Future<Entity>>();
 	}
 
-	void registerRelationshipData(Future<List<Relationship>> future) {
+	void registerRelationshipData(Future<Entity> future) {
 		futures.add(future);
 	}
 
 	void newEntity(EntityInfo entityInfo, JAXBElement<Object> obj, JAXBEntityProcessor processor) {
 		log.log(Level.TRACE,"Creating entity type: "+entityInfo.getId());
 		EntityImpl entity = new EntityImpl(entityInfo, obj);
-		Future<List<Relationship>> future = processor.processEntity(entity, obj);
+		Future<Entity> future = processor.processEntity(entity, obj);
 		registerRelationshipData(future);
 		entities.add(entity);
 	}
 
 	void validateRelationships() {
-		for (Future<List<Relationship>> future : futures) {
+		for (Future<Entity> future : futures) {
 			try {
-				for (Relationship relationship : future.get()) {
+				Entity entity = future.get();
+				for (Relationship relationship : entity.getRelationships()) {
 					validateRelationship(relationship);
 				}
 			} catch (InterruptedException e) {

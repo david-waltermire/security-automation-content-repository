@@ -23,16 +23,19 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.io.IOException;
+import org.scapdev.content.model.jaxb.ExternalIdentifierType;
 
-import javax.xml.bind.JAXBException;
+class ExternalIdentifierInfoImpl implements ExternalIdentifierInfo {
+	private final String id;
 
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
+	public ExternalIdentifierInfoImpl(ExternalIdentifierType externalIdentifierType) {
+		this.id = externalIdentifierType.getId();
 	}
 
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
+	
+	@Override
+	public String getId() {
+		return id;
 	}
+
 }

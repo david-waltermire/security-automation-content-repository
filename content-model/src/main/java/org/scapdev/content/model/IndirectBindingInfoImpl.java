@@ -21,31 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.writer.jaxb;
-//
-//import java.io.OutputStream;
-//
-//import javax.xml.bind.JAXBException;
-//
-//import org.scapdev.content.core.InstanceWriterFactory;
-//import org.scapdev.content.core.model.MutableSCAPModel;
-//import org.scapdev.content.core.writer.InstanceWriter;
-//
-//public class JAXBInstanceWriterFactory implements InstanceWriterFactory {
-//	private final MutableSCAPModel model;
-//
-//	public JAXBInstanceWriterFactory(MutableSCAPModel model) {
-//		this.model = model;
-//	}
-//
-//	@Override
-//	public InstanceWriter newInstanceWriter(OutputStream os) {
-//		try {
-//			return new JAXBInstanceWriter(model, os);
-//		} catch (JAXBException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
-//}
+package org.scapdev.content.model;
+
+import java.util.List;
+import java.util.Map;
+
+import org.scapdev.content.annotation.Indirect;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
+
+class IndirectBindingInfoImpl extends AbstractBindingInfo<Indirect> implements IndirectBindingInfo {
+	private final List<JAXBProperty> qualifierPath;
+	private final List<JAXBProperty> valuePath;
+	private final Map<String, String> externalIdentifierRefs;
+
+	public IndirectBindingInfoImpl(String id, Indirect annotation, IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor, JAXBClass jaxbClass) {
+		super(id, annotation, jaxbClass);
+
+		this.qualifierPath = visitor.getQualifierPath();
+		this.valuePath = visitor.getValuePath();
+		this.externalIdentifierRefs = visitor.getExternalIdentifierRefs();
+	}
+
+	/**
+	 * @return the externalIdentifierRefs
+	 */
+	public Map<String, String> getExternalIdentifierRefs() {
+		return externalIdentifierRefs;
+	}
+
+	/**
+	 * @return the qualifierPath
+	 */
+	public List<JAXBProperty> getQualifierPath() {
+		return qualifierPath;
+	}
+
+	/**
+	 * @return the valuePath
+	 */
+	public List<JAXBProperty> getValuePath() {
+		return valuePath;
+	}
+}

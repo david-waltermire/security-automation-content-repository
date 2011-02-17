@@ -23,7 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+
 public interface RelationshipInfo extends SchemaComponent {
-	KeyRefInfo getKeyRefInfo();
+	JAXBClass getOwningJAXBClass();
 	Relationship newRelationship(Object instance, Entity owningEntity);
 }

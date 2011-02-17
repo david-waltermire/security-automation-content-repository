@@ -31,6 +31,13 @@
   <xs:element name="meta-model">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="external-identifiers" minOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="external-identifier" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="schemas">
           <xs:complexType>
             <xs:sequence>
@@ -40,7 +47,7 @@
         </xs:element>
       </xs:sequence>
     </xs:complexType>
-    
+
     <xs:key name="SchemaKey">
       <xs:selector xpath=".//tns:schema"/>
       <xs:field xpath="@id"/>
@@ -86,11 +93,20 @@
       <xs:selector xpath=".//tns:field-ref"/>
       <xs:field xpath="@id"/>
     </xs:unique>
-    
+
     <xs:key name="DocumentKey">
       <xs:selector xpath=".//tns:schema/tns:documents/tns:document"/>
       <xs:field xpath="@id"/>
     </xs:key>
+    
+    <xs:key name="ExternalIdentifierKey">
+      <xs:selector xpath=".//tns:external-identifiers/tns:external-identifier"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:keyref name="ExternalIdentifierKeyRef" refer="ExternalIdentifierKey">
+      <xs:selector xpath=".//tns:external-identifier-ref"/>
+      <xs:field xpath="@id-ref"/>
+    </xs:keyref>
   </xs:element>
 
   <xs:complexType name="ComponentType">
@@ -112,7 +128,21 @@
       <xs:pattern value="urn:scap-content:[a-z-]+:[a-z][a-z0-9.-_]+:[a-z][a-z0-9-]+"/>
     </xs:restriction>
   </xs:simpleType>
+  
+  <!-- ********************************************************************** -->
+  <!-- * External Identifier                                                             * -->
+  <!-- ********************************************************************** -->
+  <xs:simpleType name="ExternalIdentifierComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:external-identifier:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
 
+  <xs:complexType name="ExternalIdentifierType">
+    <xs:attribute name="id" type="ExternalIdentifierComponentIdType" use="required"/>
+  </xs:complexType>
+  <xs:element name="external-identifier" type="ExternalIdentifierType"/>
+  
   <!-- ********************************************************************** -->
   <!-- * Schema                                                             * -->
   <!-- ********************************************************************** -->
@@ -138,21 +168,21 @@
     <xs:complexContent>
       <xs:extension base="SchemaSchemaComponentType">
         <xs:sequence>
-          <xs:element name="entities">
+          <xs:element name="entities" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
                 <xs:element ref="entity" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element name="relationships">
+          <xs:element name="relationships" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
                 <xs:element ref="relationship" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element name="documents">
+          <xs:element name="documents" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
                 <xs:element ref="document" maxOccurs="unbounded"/>
@@ -175,7 +205,7 @@
       <xs:pattern value="urn:scap-content:entity:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="EntitySchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -207,7 +237,7 @@
       <xs:pattern value="urn:scap-content:document:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="DocumentSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -247,7 +277,7 @@
       <xs:pattern value="urn:scap-content:key:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="KeyComponentType">
     <xs:complexContent>
       <xs:restriction base="ComponentType">
@@ -255,7 +285,7 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:element name="key" type="KeyType"/>
   <xs:complexType name="KeyType">
     <xs:complexContent>
@@ -273,7 +303,7 @@
       <xs:pattern value="urn:scap-content:field:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="FieldSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -287,8 +317,7 @@
 
   <xs:complexType name="FieldType">
     <xs:complexContent>
-      <xs:extension base="FieldSchemaComponentType">
-      </xs:extension>
+      <xs:extension base="FieldSchemaComponentType"> </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
@@ -314,7 +343,7 @@
       <xs:pattern value="urn:scap-content:container:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="ContainerSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -362,8 +391,8 @@
       <xs:pattern value="urn:scap-content:relationship:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
-  <xs:complexType name="RelationshipSchemaComponentType">
+
+  <xs:complexType name="RelationshipType" abstract="true">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
         <xs:sequence>
@@ -371,15 +400,6 @@
         </xs:sequence>
         <xs:attribute name="id" type="RelationshipComponentIdType" use="required"/>
       </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="RelationshipType" abstract="true">
-    <xs:complexContent>
-      <xs:extension base="RelationshipSchemaComponentType">
-        <xs:sequence>
-        </xs:sequence>
-      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="relationship" type="RelationshipType" abstract="true"/>
@@ -390,7 +410,7 @@
       <xs:pattern value="urn:scap-content:key-ref:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="KeyRefComponentType">
     <xs:complexContent>
       <xs:restriction base="ComponentType">
@@ -398,7 +418,7 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:complexType name="KeyRefType">
     <xs:complexContent>
       <xs:extension base="KeyRefComponentType">
@@ -416,7 +436,7 @@
       <xs:pattern value="urn:scap-content:field-ref:.+"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="FieldRefSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -427,7 +447,7 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:complexType name="FieldRefType">
     <xs:complexContent>
       <xs:extension base="FieldRefSchemaComponentType">
@@ -435,7 +455,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  
+
 
   <xs:complexType name="LocalRelationshipType">
     <xs:complexContent>
@@ -454,20 +474,27 @@
       <xs:extension base="RelationshipType"> </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <xs:complexType name="DirectExternalRelationshipType">
-    <xs:complexContent>
-      <xs:extension base="ExternalRelationshipType"> </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="direct-external-relationship" type="DirectExternalRelationshipType"
+  <xs:element name="external-relationship" type="ExternalRelationshipType"
     substitutionGroup="relationship"/>
 
-  <xs:complexType name="IndirectExternalRelationshipType">
+  <!-- indirect relationship -->
+  <xs:complexType name="ExternalIdentifierReferenceType">
+    <!-- TODO: write a schematron rule requiring that qualifier-value is specified if qualifier is. -->
+    <xs:attribute name="id-ref" type="ExternalIdentifierComponentIdType" use="required"/>
+    <xs:attribute name="qualifier-value" type="xs:anyURI"/>
+  </xs:complexType>
+  
+  <xs:complexType name="IndirectRelationshipType">
     <xs:complexContent>
-      <xs:extension base="ExternalRelationshipType"> </xs:extension>
+      <xs:extension base="RelationshipType">
+        <xs:sequence>
+          <xs:element name="qualifier-node" type="SchemaReferenceType" minOccurs="0"/>
+          <xs:element name="value-node" type="SchemaReferenceType"/>
+          <xs:element name="external-identifier-ref" type="ExternalIdentifierReferenceType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="indirect-external-relationship" type="IndirectExternalRelationshipType"
+  <xs:element name="indirect-relationship" type="IndirectRelationshipType"
     substitutionGroup="relationship"/>
 </xs:schema>

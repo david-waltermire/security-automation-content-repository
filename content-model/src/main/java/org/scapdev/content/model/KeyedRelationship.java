@@ -21,12 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.writer.jaxb;
+package org.scapdev.content.model;
 
-import javax.xml.bind.Marshaller;
-
-public interface DocumentWriter {
-
-	void write(Marshaller marshaller);
-
+public interface KeyedRelationship extends Relationship {
+	Key getKey();
+	KeyedRelationshipInfo getRelationshipInfo();
 }

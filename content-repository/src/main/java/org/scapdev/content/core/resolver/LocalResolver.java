@@ -32,7 +32,7 @@ import java.util.Set;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
-import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.KeyedRelationship;
 
 public class LocalResolver implements Resolver {
 	private final ContentPersistenceManager database;
@@ -92,7 +92,7 @@ public class LocalResolver implements Resolver {
 
 	private Set<Key> generateRelatedKeys(Entity entity, ResolutionParameters parameters) {
 		Set<Key> keys = new LinkedHashSet<Key>();
-		for (Relationship relationship : entity.getRelationships()) {
+		for (KeyedRelationship relationship : entity.getKeyedRelationships()) {
 			Key key = relationship.getKey();
 			keys.add(key);
 		}

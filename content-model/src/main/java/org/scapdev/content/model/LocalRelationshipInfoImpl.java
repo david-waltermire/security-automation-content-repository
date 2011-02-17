@@ -24,12 +24,13 @@
 package org.scapdev.content.model;
 
 import org.scapdev.content.model.jaxb.LocalRelationshipType;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-class LocalRelationshipInfoImpl extends AbstractRelationshipInfo implements LocalRelationshipInfo {
+class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements LocalRelationshipInfo {
 
 	private final KeyRefInfoImpl keyRefInfo;
 
-	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
+	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, MetadataModel loader, InitializingJAXBClassVisitor init) {
 		super(type, schemaInfo);
 		keyRefInfo = new KeyRefInfoImpl(type.getKeyRef(), this, loader, init);
 	}
@@ -51,7 +52,12 @@ class LocalRelationshipInfoImpl extends AbstractRelationshipInfo implements Loca
 
 	@Override
 	public LocalRelationship newRelationship(Object instance, Entity owningEntity) {
-		return new LocalRelationshipImpl<Object>(this, owningEntity, getKey(instance));
+		return new LocalRelationshipImpl(this, owningEntity, getKey(instance));
+	}
+
+	@Override
+	public JAXBClass getOwningJAXBClass() {
+		return getKeyRefInfo().getBinding().getJaxbClass();
 	}
 
 	@Override

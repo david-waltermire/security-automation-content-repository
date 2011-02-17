@@ -23,16 +23,18 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.io.IOException;
+class IndirectRelationshipImpl extends AbstractRelationship<IndirectRelationshipInfo> implements IndirectRelationship {
+	private final ExternalIdentifier externalIdentifier;
 
-import javax.xml.bind.JAXBException;
-
-public class MetadataModelFactory {
-	private MetadataModelFactory() {
-		// Avoid instantiation
+	protected IndirectRelationshipImpl(IndirectRelationshipInfo relationshipInfo, Entity owningEntity, ExternalIdentifier externalIdentifier) {
+		super(relationshipInfo, owningEntity);
+		this.externalIdentifier = externalIdentifier;
 	}
 
-	public static MetadataModel newInstance() throws IOException, JAXBException, ClassNotFoundException {
-		return new JAXBMetadataModel();
+	/**
+	 * @return the externalIdentifier
+	 */
+	public ExternalIdentifier getExternalIdentifier() {
+		return externalIdentifier;
 	}
 }

@@ -23,6 +23,19 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface MetadataModel {
+import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+
+import org.scapdev.jaxb.reflection.model.JAXBModel;
+
+public interface MetadataModel {
+	Map<String, String> getNamespaceToPrefixMap();
+	JAXBModel getModel();
+	JAXBContext getJAXBContext();
+	RelationshipInfo getRelationshipByKeyRefId(String id);
+	EntityInfo getEntityById(String id);
+	RelationshipInfo getRelationshipById(String id);
+	EntityInfo getEntityByKeyId(String idRef);
+	ExternalIdentifierInfo getExternalIdentifierById(String externalIdentifierId);
 }

@@ -24,6 +24,8 @@
 package org.scapdev.content.core.writer;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,33 +41,42 @@ import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.util.XmlStreamWriterNamespaceFilter;
 
 public class DefaultInstanceWriter implements InstanceWriter {
 	private static final Logger log = Logger.getLogger(DefaultInstanceWriter.class);
 	private final Marshaller marshaller;
+	private final MetadataModel model;
 
-	public DefaultInstanceWriter(Marshaller marshaller) {
+	public DefaultInstanceWriter(Marshaller marshaller, MetadataModel model) {
 		this.marshaller = marshaller;
+		this.model = model;
 	}
 
 	@Override
 	public void write(QueryResult queryResult) throws IOException, XMLStreamException, FactoryConfigurationError {
+//		XMLOutputFactory factory = XMLOutputFactory.newFactory();
+		XMLOutputFactory2 factory = (XMLOutputFactory2)XMLOutputFactory2.newFactory();
+		factory.configureForRobustness();
+		factory.setProperty(XMLOutputFactory2.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+		factory.setProperty(XMLOutputFactory2.P_AUTOMATIC_NS_PREFIX, Boolean.TRUE);
+		factory.setProperty(XMLOutputFactory2.XSP_NAMESPACE_AWARE, Boolean.TRUE);
 
 		for (Map.Entry<DocumentInfo, DocumentData> entry : generateDocumentEntityMap(queryResult).entrySet()) {
 			log.info("writing document: "+entry.getKey().getId());
 			DocumentData documentData = entry.getValue();
-//			XMLOutputFactory factory = XMLOutputFactory.newFactory();
-			XMLOutputFactory2 factory = (XMLOutputFactory2)XMLOutputFactory2.newFactory();
-			factory.configureForRobustness();
-			factory.setProperty(XMLOutputFactory2.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
-			factory.setProperty(XMLOutputFactory2.P_AUTOMATIC_NS_PREFIX, Boolean.TRUE);
-			factory.setProperty(XMLOutputFactory2.XSP_NAMESPACE_AWARE, Boolean.TRUE);
-//			XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(new File("test.xml")));
-			XMLStreamWriter writer = factory.createXMLStreamWriter(System.out);
+
+			//			XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(new File("test.xml")));
+			Writer stringWriter = new StringWriter();
+			XMLStreamWriter writer = factory.createXMLStreamWriter(stringWriter);
 			writer = new XmlStreamWriterNamespaceFilter(writer);
+			for (Map.Entry<String, String> namespaceEntry : model.getNamespaceToPrefixMap().entrySet()) {
+				writer.setPrefix(namespaceEntry.getValue(), namespaceEntry.getKey());
+			}
 			new DocumentWriter(documentData, writer, marshaller).write();
 			writer.flush();
+			log.info(stringWriter.toString());
 		}
 	}
 

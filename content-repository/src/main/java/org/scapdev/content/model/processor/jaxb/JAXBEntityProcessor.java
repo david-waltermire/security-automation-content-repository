@@ -23,7 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model.processor.jaxb;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,18 +31,18 @@ import java.util.concurrent.Future;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.JAXBMetadataModel;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
-import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.processor.EntityProcessor;
 import org.scapdev.content.model.processor.Importer;
 
 public class JAXBEntityProcessor implements EntityProcessor {
-	private final JAXBMetadataModel model;
+	private final MetadataModel model;
 	private final ExecutorService service;
 	private final ContentPersistenceManager persistenceManager;
 
-	public JAXBEntityProcessor(JAXBMetadataModel model, ContentPersistenceManager persistenceManager) {
+	public JAXBEntityProcessor(MetadataModel model, ContentPersistenceManager persistenceManager) {
 		this.model = model;
 		this.persistenceManager = persistenceManager;
 		this.service = Executors.newFixedThreadPool(2);
@@ -67,34 +66,33 @@ public class JAXBEntityProcessor implements EntityProcessor {
 	/**
 	 * @return the model
 	 */
-	public JAXBMetadataModel getMetadataModel() {
+	public MetadataModel getMetadataModel() {
 		return model;
 	}
 
 
-	private static class RelationshipExtractingTask implements Callable<List<Relationship>> {
+	private static class RelationshipExtractingTask implements Callable<Entity> {
 		private final EntityImpl entity;
 		private final JAXBRelationshipIdentifyingImportVisitor visitor;
 
-		RelationshipExtractingTask(EntityImpl entity, JAXBElement<Object> node, JAXBMetadataModel model) {
+		RelationshipExtractingTask(EntityImpl entity, JAXBElement<Object> node, MetadataModel model) {
 			this.entity = entity;
 			this.visitor = new JAXBRelationshipIdentifyingImportVisitor(entity, node, model);
 		}
 
 		@Override
-		public List<Relationship> call() throws Exception {
+		public EntityImpl call() throws Exception {
 			visitor.visit();
-			List<Relationship> relationships = visitor.getRelationships();
-			entity.setRelationships(relationships);
-			return relationships;
+			entity.setRelationships(visitor.getKeyedRelationships(), visitor.getIndirectRelationships());
+			return entity;
 		}
 		
 	}
 
 
-	public Future<List<Relationship>> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
+	public Future<Entity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
 		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, model);
-		Future<List<Relationship>> future = service.submit(task);
+		Future<Entity> future = service.submit(task);
 		return future;
 	}
 }
