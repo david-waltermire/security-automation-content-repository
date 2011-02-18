@@ -69,7 +69,7 @@
   		<artifactId>jaxb-impl</artifactId>
   		<type>jar</type>
   		<optional>false</optional>
-  		<scope>runtime</scope>
+        <scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>log4j</groupId>
@@ -82,8 +82,11 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.woodstox</groupId>
-      <artifactId>wstx-asl</artifactId>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>wstx-asl</artifactId>
+  		<type>jar</type>
+  		<optional>false</optional>
+        <scope>compile</scope>
     </dependency>
   </dependencies>
  

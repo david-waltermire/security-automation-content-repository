@@ -57,7 +57,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 	@Override
 	public void write(QueryResult queryResult) throws IOException, XMLStreamException, FactoryConfigurationError {
 //		XMLOutputFactory factory = XMLOutputFactory.newFactory();
-		XMLOutputFactory2 factory = (XMLOutputFactory2)XMLOutputFactory2.newFactory();
+		XMLOutputFactory2 factory = (XMLOutputFactory2)XMLOutputFactory2.newInstance();
 		factory.configureForRobustness();
 		factory.setProperty(XMLOutputFactory2.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		factory.setProperty(XMLOutputFactory2.P_AUTOMATIC_NS_PREFIX, Boolean.TRUE);
