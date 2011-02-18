@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>content</artifactId>
         <groupId>scap-content</groupId>
+        <artifactId>content</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -26,21 +26,20 @@
             <version>6.0</version>
             <scope>provided</scope>
         </dependency>
-        
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--        	<groupId>scap-content</groupId>-->
-<!--        	<artifactId>content-repository</artifactId>-->
-<!--        	<version>1.0-SNAPSHOT</version>-->
-<!--        	<type>jar</type>-->
-<!--        	<scope>compile</scope>-->
-<!--        </dependency>-->
+        <dependency>
+        	<groupId>scap-content</groupId>
+        	<artifactId>content-repository-flex-console</artifactId>
+        	<version>1.0-SNAPSHOT</version>
+        	<type>zip</type>
+        	<classifier>swf</classifier>
+        	<scope>compile</scope>
+        </dependency>
         <dependency>
         	<groupId>org.slf4j</groupId>
         	<artifactId>slf4j-api</artifactId>
@@ -92,12 +91,13 @@
                 <version>2.1</version>
                 <executions>
                     <execution>
+                    	<id>copy-endorsed-jars</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${endorsed.dir}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib</outputDirectory>
                             <silent>true</silent>
                             <artifactItems>
                                 <artifactItem>
@@ -109,10 +109,27 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                    	<id>import-repository-console</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+						        	<groupId>scap-content</groupId>
+						        	<artifactId>content-repository-flex-console</artifactId>
+						        	<version>1.0-SNAPSHOT</version>
+						        	<type>zip</type>
+						        	<classifier>swf</classifier>
+						        	<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/console</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
-        <finalName>content-repository-war</finalName>
     </build>
-
 </project>
