@@ -192,6 +192,7 @@
    	        <groupId>scap-content</groupId>
   			<artifactId>content-annotations</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
           </dependency>
 	  	  <dependency>
 		  	<groupId>commons-logging</groupId>
