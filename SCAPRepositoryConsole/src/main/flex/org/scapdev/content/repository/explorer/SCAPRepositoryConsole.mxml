@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+
+	<fx:Script>
+		<![CDATA[
+			protected function browseButton_clickHandler(event:MouseEvent):void
+			{
+				// open filechooser
+				
+			}
+
+			protected function loadButton_clickHandler(event:MouseEvent):void
+			{
+				// post content for peforming import
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Label x="14" y="29" text="Security Automation Content Repository" fontSize="32"/>
+	<s:Label text="Filename" paddingTop="5" paddingLeft="2" width="62" height="20" x="16" y="70"/>
+	<s:TextInput x="82" y="70" id="txtFilename" width="148"/>
+	<s:Button x="238" y="70" label="Browse" id="browseButton" click="browseButton_clickHandler(event)"/>
+	<s:Button x="14" y="113" label="Load" id="loadButton" click="loadButton_clickHandler(event)"/>
+</s:Application>

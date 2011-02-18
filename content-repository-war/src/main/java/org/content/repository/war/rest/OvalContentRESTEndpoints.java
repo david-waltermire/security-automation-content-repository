@@ -18,16 +18,5 @@ public class OvalContentRESTEndpoints {
 		return ret;
 	}
 
-	@Path("/get/definitions")
-	@GET
-	@Produces("text/plain")
-	public String loadOvalDocument() {
-		String ret = "LoadContent";
-
-		// TODO: make call to RepositorySingleton
-
-		return ret;
-	}
-
 	// TODO: Flesh out more rest endpoints
 }

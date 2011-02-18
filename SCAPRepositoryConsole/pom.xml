@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>scap-content</groupId>
+		<artifactId>content</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>scap-content</groupId>
+	<artifactId>content-repository-flex-console</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>content-repository Flex Console</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<flex.compiler>${env.FLEX_HOME}/bin/mxmlc</flex.compiler>
+		<console.app.name>SCAPRepositoryConsole</console.app.name>
+		<swf>${console.app.name}</swf>
+	</properties>
+
+	<dependencies>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<id>copy-wrapper-html-and-dependencies</id>
+						<!-- here the phase you need -->
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/swf</outputDirectory>
+							<resources>
+								<resource>
+									<directory>html-template</directory>
+									<filtering>true</filtering>
+									<excludes>
+										<exclude>index.template.html</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${basedir}/src/main/assembly/swf_assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<id>compile_repository_console</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>${flex.compiler}</executable>
+					<workingDirectory>${basedir}/src/main/flex/org/scapdev/content/repository/explorer</workingDirectory>
+					<arguments>
+						<argument>-output</argument>
+						<argument>${project.build.directory}/swf/${console.app.name}.swf</argument>
+						<argument>--</argument>
+						<argument>${basedir}/src/main/flex/org/scapdev/content/repository/explorer/${console.app.name}.mxml</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		</plugins>
+		<finalName>content-repository-war</finalName>
+	</build>
+
+</project>
