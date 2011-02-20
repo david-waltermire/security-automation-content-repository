@@ -31,18 +31,21 @@ import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.AbstractContentPersistenceManager;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.Relationship;
 
 public class DefaultHybridContentPersistenceManager extends AbstractContentPersistenceManager implements HybridContentPersistenceManager {
 	final MetadataStore metadataStore;
 	private final ContentStore contentStore;
 
-	public DefaultHybridContentPersistenceManager() {
+	public DefaultHybridContentPersistenceManager(MetadataModel model) {
+		super(model);
 		this.metadataStore = new MemoryResidentMetadataStore();
 		this.contentStore = new MemoryResidentContentStore();
 	}
 
-	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
+	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore, MetadataModel model) {
+		super(model);
 		this.metadataStore = metadataStore;
 		this.contentStore = contentStore;
 	}
@@ -54,7 +57,7 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 
 	@Override
 	public void storeEntity(Entity entity) throws ContentException {
-		String contentId = contentStore.persist(entity.getObject());
+		String contentId = contentStore.persist(entity);
 		metadataStore.persist(entity, contentId);
 	}
 

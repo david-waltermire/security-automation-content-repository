@@ -58,12 +58,10 @@ public class ContentRepository {
 
 
 	public ContentRepository(ClassLoader classLoader) throws IOException, JAXBException, ClassNotFoundException {
-//		persistenceManager = new MemoryResidentPersistenceManager();
-		persistenceManager = new DefaultHybridContentPersistenceManager();
 		model = MetadataModelFactory.newInstance();
+//		persistenceManager = new MemoryResidentPersistenceManager();
+		persistenceManager = new DefaultHybridContentPersistenceManager(model);
 		processor = new JAXBEntityProcessor(model, persistenceManager);
-//		processingFactory = new JAXBProcessingFactory(contentDatabase, model);
-//		instanceWriterFactory = new JAXBInstanceWriterFactory(model);
 		resolver = new LocalResolver(persistenceManager);
 		queryProcessor = new DefaultQueryProcessor(resolver);
 	}

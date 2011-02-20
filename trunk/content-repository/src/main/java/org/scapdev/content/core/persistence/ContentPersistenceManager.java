@@ -29,10 +29,12 @@ import java.util.Set;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 
 
 public interface ContentPersistenceManager {
 	Entity getEntityByKey(Key key);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
 	void storeEntity(Entity entity) throws ContentException;
+	MetadataModel getMetadataModel();
 }
