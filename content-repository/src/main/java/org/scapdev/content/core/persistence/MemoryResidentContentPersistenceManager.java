@@ -33,13 +33,15 @@ import org.apache.log4j.Logger;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 
 public class MemoryResidentContentPersistenceManager extends AbstractContentPersistenceManager {
 	private static Logger log = Logger.getLogger(MemoryResidentContentPersistenceManager.class);
 
 	private Map<String, Map<Key, Entity>> fragmentIndex;
 
-	public MemoryResidentContentPersistenceManager() {
+	public MemoryResidentContentPersistenceManager(MetadataModel model) {
+		super(model);
 		log.info("Initializing database");
 		fragmentIndex = new HashMap<String, Map<Key, Entity>>();
 		log.info("Database initialized");

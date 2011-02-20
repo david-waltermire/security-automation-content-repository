@@ -28,6 +28,8 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 
+import org.scapdev.content.model.Entity;
+
 public class MemoryResidentContentStore implements ContentStore {
 	private int index = 0;
 	private Map<Integer, JAXBElement<Object>> contentMap;
@@ -42,9 +44,9 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
-	public String persist(JAXBElement<Object> content) {
+	public String persist(Entity entity) {
 		Integer key = Integer.valueOf(++index);
-		contentMap.put(key, content);
+		contentMap.put(key, entity.getObject());
 		return key.toString();
 	}
 

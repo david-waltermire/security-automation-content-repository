@@ -23,6 +23,17 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence;
 
+import org.scapdev.content.model.MetadataModel;
+
 
 public abstract class AbstractContentPersistenceManager implements ContentPersistenceManager {
+	private final MetadataModel model;
+
+	public AbstractContentPersistenceManager(MetadataModel model) {
+		this.model = model;
+	}
+
+	public MetadataModel getMetadataModel() {
+		return model;
+	}
 }
