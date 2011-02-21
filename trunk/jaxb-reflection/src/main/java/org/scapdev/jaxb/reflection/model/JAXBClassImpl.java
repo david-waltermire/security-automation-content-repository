@@ -154,7 +154,14 @@ class JAXBClassImpl implements JAXBClass {
 	 */
 	public final void generateProperties() {
 		Iterator<JAXBProperty> iterator;
-		switch (getXmlAccessType()) {
+
+		XmlAccessType accessType;;
+		if (clazz.isEnum()) {
+			accessType = XmlAccessType.FIELD;
+		} else {
+			accessType = getXmlAccessType();
+		}
+		switch (accessType) {
 		case FIELD:
 			iterator = new FieldIterator(this);
 			break;

@@ -25,7 +25,7 @@
 <meta-model xmlns="http://scapdev.org/schema/meta-model/0.1"
   xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://scapdev.org/schema/meta-model/0.1 ../xsd/MetaModel.xsd">
+  xsi:schemaLocation="http://scapdev.org/schema/meta-model/0.1 ../../../../content-model/src/main/xsd/MetaModel.xsd">
   <external-identifiers>
     <external-identifier id="urn:scap-content:external-identifier:org.mitre:cve"/>
     <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-4"/>

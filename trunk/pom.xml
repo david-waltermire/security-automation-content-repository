@@ -11,10 +11,10 @@
   <modules>
     <module>jaxb-reflection</module>
     <module>content-annotations</module>
-	<module>content-meta-model</module>
+    <module>content-meta-model</module>
     <module>content-model</module>
     <module>content-repository</module>
-	<module>content-repository-war</module>
+<!--    <module>content-repository-war</module>-->
   </modules>
 
   <properties>
