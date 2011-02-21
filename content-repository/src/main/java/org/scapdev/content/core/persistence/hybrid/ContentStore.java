@@ -26,11 +26,12 @@ package org.scapdev.content.core.persistence.hybrid;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.MetadataModel;
 
 public interface ContentStore {
 
-	JAXBElement<Object> getContent(String contentId);
-	String persist(Entity entity);
+	JAXBElement<Object> getContent(String contentId, MetadataModel model);
+	String persist(Entity entity, MetadataModel model);
 	ContentRetriever getContentRetriever(String contentId);
 
 }

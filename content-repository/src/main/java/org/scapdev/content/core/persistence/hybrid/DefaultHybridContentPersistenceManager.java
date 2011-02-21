@@ -57,7 +57,7 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 
 	@Override
 	public void storeEntity(Entity entity) throws ContentException {
-		String contentId = contentStore.persist(entity);
+		String contentId = contentStore.persist(entity, getMetadataModel());
 		metadataStore.persist(entity, contentId);
 	}
 
