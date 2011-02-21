@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.MetadataModel;
 
 public class MemoryResidentContentStore implements ContentStore {
 	private int index = 0;
@@ -39,12 +40,12 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
-	public JAXBElement<Object> getContent(String contentId) {
+	public JAXBElement<Object> getContent(String contentId, MetadataModel model) {
 		return contentMap.get(Integer.valueOf(contentId));
 	}
 
 	@Override
-	public String persist(Entity entity) {
+	public String persist(Entity entity, MetadataModel model) {
 		Integer key = Integer.valueOf(++index);
 		contentMap.put(key, entity.getObject());
 		return key.toString();
@@ -63,7 +64,7 @@ public class MemoryResidentContentStore implements ContentStore {
 
 		@Override
 		protected JAXBElement<Object> getContentInternal(String contentId) {
-			return MemoryResidentContentStore.this.getContent(contentId);
+			return MemoryResidentContentStore.this.getContent(contentId, null);
 		}
 	}
 }
