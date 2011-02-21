@@ -27,8 +27,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -57,6 +61,12 @@ public class JAXBContextFactory {
 		return info.getContext();
 	}
 
+	public static JAXBContext getJAXBContext(ClassLoader classLoader, Collection<String> additionalPackages) throws IOException, JAXBException {
+		ContextInfo info = new ContextInfo(classLoader, additionalPackages);
+		contextMap.put(info.getContext(), info);
+		return info.getContext();
+	}
+
 	public static Set<String> getPackagesForContext(JAXBContext context) {
 		ContextInfo info = contextMap.get(context);
 		if (info == null) {
@@ -68,24 +78,49 @@ public class JAXBContextFactory {
 	// TODO: this method will only find the manifest in a single jar associated
 	// with the class loader.  It might be better to allow multiple classloaders
 	// to be provided allowing multiple jars to be used.
-	private static Set<String> getContextPackages(ClassLoader classLoader) throws IOException {
-		log.info("Retrieving packages from jaxb-manifest");
-		InputStream is = classLoader.getResourceAsStream("/META-INF/jaxb-manifest");
-		if (is == null) {
-			is = JAXBContextFactory.class.getResourceAsStream("/META-INF/jaxb-manifest");
+	private static Set<String> getContextPackages(ClassLoader classLoader, Collection<String> additionalPackages) throws IOException {
+		log.info("Retrieving packages from jaxb-manifests");
+		Collection<URL> packageURLs = new LinkedList<URL>();
+		{
+			// for JARs
+			Collection<URL> urls = getManifiestURLs(classLoader, "/META-INF/jaxb-manifest");
+			packageURLs.addAll(urls);
 		}
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		{
+			// for regular classpath entries
+			Collection<URL> urls = getManifiestURLs(classLoader, "META-INF/jaxb-manifest");
+			packageURLs.addAll(urls);
+		}
 
 		Set<String> contextPackages = new LinkedHashSet<String>();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			log.debug("Package found: "+line);
-			contextPackages.add(line);
+		contextPackages.addAll(additionalPackages);
+		for (URL url : packageURLs) {
+			InputStream is = url.openStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				log.debug("Package found: "+line);
+				contextPackages.add(line);
+			}
+			reader.close();
 		}
-		reader.close();
 		return Collections.unmodifiableSet(contextPackages);
 	}
 
+	private static Collection<URL> getManifiestURLs(ClassLoader loader, String location) throws IOException {
+		Collection<URL> result = new LinkedList<URL>();
+		Enumeration<URL> enumeration = loader.getResources(location);
+		while (enumeration.hasMoreElements()) {
+			URL url = enumeration.nextElement();
+			result.add(url);
+		}
+		if (result.isEmpty()) {
+			result = Collections.emptyList();
+		}
+		return result;
+	}
+	
 	private static String buildContextPath(Set<String> contextPackages) {
 		StringBuilder contextPath = new StringBuilder();
 		for (String p : contextPackages) {
@@ -103,8 +138,12 @@ public class JAXBContextFactory {
 		private final JAXBContext context;
 
 		public ContextInfo(ClassLoader classLoader) throws JAXBException, IOException {
+			this(classLoader, Collections.<String>emptyList());
+		}
+
+		public ContextInfo(ClassLoader classLoader, Collection<String> additionalPackages) throws IOException, JAXBException {
 			this.classLoader = classLoader;
-			this.packages = getContextPackages(classLoader);
+			this.packages = getContextPackages(classLoader, additionalPackages);
 
 			log.info("Initializing JAXBContext");
 			this.context = JAXBContext.newInstance(buildContextPath(packages), classLoader);
