@@ -40,7 +40,7 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 
 	public DefaultHybridContentPersistenceManager(MetadataModel model) {
 		super(model);
-		this.metadataStore = new MemoryResidentMetadataStore();
+		this.metadataStore = new TripleStoreFacadeMetaDataManager();
 		this.contentStore = new MemoryResidentContentStore();
 	}
 
@@ -82,4 +82,5 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
 		return metadataStore.getKeysForIndirectIds(indirectType, indirectIds, entityType);
 	}
+	
 }

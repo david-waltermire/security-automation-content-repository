@@ -11,7 +11,7 @@
   <modules>
     <module>jaxb-reflection</module>
     <module>content-annotations</module>
-    <module>content-meta-model</module>
+   <!-- <module>content-meta-model</module>-->
     <module>content-model</module>
     <module>content-repository</module>
 <!--    <module>content-repository-war</module>-->
@@ -161,7 +161,12 @@
 		<artifactId>sesame-sail-memory</artifactId>
 		<version>${org.openrdf.sesame.version}</version>
       </dependency>
-      
+      <dependency>
+      	<!--  bridge to log4j from sesame log infrastructure -->
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>slf4j-log4j12</artifactId>
+    	<version>1.5.0</version>
+	  </dependency>
     </dependencies>
   </dependencyManagement>
 

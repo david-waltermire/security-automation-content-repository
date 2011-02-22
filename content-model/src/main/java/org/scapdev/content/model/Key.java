@@ -73,6 +73,14 @@ public class Key implements Comparable<Key> {
 	public Collection<String> getValues() {
 		return idToValueMap.values();
 	}
+	
+	/**
+	 * Returns back the mapping between key fieldsIds and values
+	 * @return
+	 */
+	public LinkedHashMap<String, String> getIdToValueMap() {
+		return idToValueMap;
+	}
 
 	public String toString() {
 		return new StringBuilder()
