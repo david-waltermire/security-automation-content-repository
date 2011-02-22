@@ -135,7 +135,6 @@ public class App {
 	
 	    	writer.write(result);
     	}
-    	
     	repository.shutdown();
     }
 }
