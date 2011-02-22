@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.content.repository.config.RepositoryConfiguration;
+
+
 /**
  * Called to properly initialize the RepositorySingleton instance.
  * 
@@ -29,9 +32,7 @@ public class ContentRepositoryStartupServlet extends HttpServlet {
 	 */
 	private void initRepo()
 	{
-		// force repository to be opened or created
-		RepositorySingleton rs = RepositorySingleton.INSTANCE;
-		
-		System.out.println("StartupServlet finished initializing repository.");
+		// initialize repository war configuration
+		RepositoryConfiguration rc = RepositoryConfiguration.INSTANCE;
 	}
 }

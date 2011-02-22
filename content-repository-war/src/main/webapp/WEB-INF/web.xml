@@ -20,7 +20,8 @@
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>org.content.repository.war.rest</param-value>
+			<!-- ; separated list of package names to look in -->
+			<param-value>org.content.repository.war.rest;org.content.repository.war.rest.oval</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
