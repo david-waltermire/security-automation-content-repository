@@ -71,7 +71,7 @@ public class DefaultHybridContentPersistenceManager extends AbstractContentPersi
 
 	private Entity generateEntity(Key key) {
 		EntityDescriptor desc = metadataStore.getEntityDescriptor(key);
-		return newEntity(desc, contentStore.getContentRetriever(desc.getContentId()));
+		return newEntity(desc, contentStore.getContentRetriever(desc.getContentId(), getMetadataModel()));
 	}
 
 	protected Entity newEntity(EntityDescriptor desc, ContentRetriever retriever) {
