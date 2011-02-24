@@ -404,17 +404,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 
 		@Override
-		public List<Relationship> getRelationships() {
+		public Collection<Relationship> getRelationships() {
 			return entity.getRelationships();
 		}
 
 		@Override
-		public List<IndirectRelationship> getIndirectRelationships() {
+		public Collection<IndirectRelationship> getIndirectRelationships() {
 			return entity.getIndirectRelationships();
 		}
 
 		@Override
-		public List<KeyedRelationship> getKeyedRelationships() {
+		public Collection<KeyedRelationship> getKeyedRelationships() {
 			return entity.getKeyedRelationships();
 		}
 	}

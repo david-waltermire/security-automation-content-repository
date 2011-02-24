@@ -58,13 +58,13 @@ public class App {
     	{
 	    	StopWatch watch = new StopWatch();
 	    	watch.start();
-	    	repository = new ContentRepository(App.class.getClassLoader());
+	    	repository = new ContentRepository();
 	    	watch.stop();
 	    	
 	    	log.info("Repository startup: "+watch.toString());
     	}
 
-    	Importer importer = repository.getProcessor().newImporter();
+    	Importer importer = repository.getJaxbEntityProcessor().newImporter();
     	{
     		File file = new File("target/content/com.redhat.rhsa-all.xml");
     		log.info("importing: "+file);

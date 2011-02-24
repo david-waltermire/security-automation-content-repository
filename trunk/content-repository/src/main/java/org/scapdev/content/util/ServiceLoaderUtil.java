@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.util;
 
-/**
- * Represents an identifiable component within a schema model. 
- * @see ComponentType
- */
-public interface Component {
-	/**
-	 * Gets the schema information associated with this schema component
-	 * @return the SchemaInfo associated with this component
-	 */
-	SchemaInfo getSchemaInfo();
-	/**
-	 * Retrieves the unique identifier for the schema component 
-	 * @return
-	 */
-	String getId();
+import java.util.ServiceLoader;
+
+public class ServiceLoaderUtil<SERVICE> {
+
+	public static <SERVICE> SERVICE load(Class<SERVICE> serviceClass, String expectedInstance) {
+		return load(serviceClass, expectedInstance, null);
+	}
+
+	public static <SERVICE> SERVICE load(Class<SERVICE> serviceClass, String expectedInstance, ClassLoader classLoader) {
+		ServiceLoader<SERVICE> loader = ServiceLoader.load(serviceClass, classLoader);
+
+		SERVICE result = null;
+		for (SERVICE service : loader) {
+			if (expectedInstance.equals(service.getClass().getName())) {
+				result = service;
+				break;
+			}
+		}
+		return result;
+	}
 }

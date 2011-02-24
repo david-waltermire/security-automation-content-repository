@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
+import org.scapdev.content.core.resolver.Resolver;
+
 public interface QueryProcessor {
-	<T extends QueryResult> T query(Query<T> query);
+	<T extends QueryResult> T query(Query<T> query, Resolver resolver);
 }

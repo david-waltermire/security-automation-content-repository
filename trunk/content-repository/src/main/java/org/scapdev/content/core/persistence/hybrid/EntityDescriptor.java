@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.IndirectRelationship;
@@ -32,11 +32,10 @@ import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
 public interface EntityDescriptor {
+	EntityInfo getEntityInfo();
 	Key getKey();
 	String getContentId();
-	List<Relationship> getRelationships();
-
-	EntityInfo getEntityInfo();
-	List<KeyedRelationship> getKeyedRelationships();
-	List<IndirectRelationship> getIndirectRelationships();
+	Collection<Relationship> getRelationships();
+	Collection<KeyedRelationship> getKeyedRelationships();
+	Collection<IndirectRelationship> getIndirectRelationships();
 }

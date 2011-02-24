@@ -23,6 +23,14 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+/**
+ * Represents information about a declared entity type within a schema metamodel.
+ */
 public interface EntityInfo extends SchemaComponent, Indexed {
+	/**
+	 * Retrieves the element name (without the namespace) within the XML schema
+	 * schema model associated with this entity type.
+	 * @return a string representing the element name
+	 */
 	String getLocalPart();
 }

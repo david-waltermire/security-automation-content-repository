@@ -29,21 +29,24 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.PersistenceContext;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.KeyedRelationship;
+import org.scapdev.content.model.MetadataModel;
 
 public class LocalResolver implements Resolver {
-	private final ContentPersistenceManager database;
+	private final PersistenceContext persistenceContext;
 	private final Resolver delegate;
 
-	public LocalResolver(ContentPersistenceManager database) {
-		this(database, null);
+
+	public LocalResolver(PersistenceContext persistenceContext) {
+		this(persistenceContext, null);
 	}
 
-	public LocalResolver(ContentPersistenceManager database, Resolver delegate) {
-		this.database = database;
+	public LocalResolver(PersistenceContext persistenceContext, Resolver delegate) {
+		this.persistenceContext = persistenceContext;
 		this.delegate = delegate;
 	}
 
@@ -76,8 +79,10 @@ public class LocalResolver implements Resolver {
 		Set<Key> unresolvableKeys = state.getUnresolvableKeys();
 		Set<Key> unresolvedKeys = new HashSet<Key>();
 
+		MetadataModel model = persistenceContext.getMetadataModel();
+		ContentPersistenceManager contentPersistenceManager = persistenceContext.getContentPersistenceManager();
 		for (Key key : state.getUnresolvedKeys()) {
-			Entity handle = database.getEntityByKey(key);
+			Entity handle = contentPersistenceManager.getEntityByKey(key, model);
 			if (handle == null) {
 				unresolvableKeys.add(key);
 			} else {

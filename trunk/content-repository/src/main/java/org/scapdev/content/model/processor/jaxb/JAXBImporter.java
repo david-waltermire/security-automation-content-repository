@@ -83,7 +83,7 @@ public class JAXBImporter implements Importer {
 	private void importData(ImportData data) {
 		ContentPersistenceManager manager = getEntityProcessor().getPersistenceManager();
 		for (Entity entity : data.getEntities()) {
-			manager.storeEntity(entity);
+			manager.storeEntity(entity, getEntityProcessor().getMetadataModel());
 		}
 	}
 

@@ -3,7 +3,6 @@ package org.content.repository.config;
 import java.io.File;
 import java.util.Properties;
 
-import org.content.repository.servlet.startup.ContentRepositoryStartupServlet;
 import org.scapdev.content.core.ContentRepository;
 
 /**
@@ -53,7 +52,7 @@ public enum RepositoryConfiguration {
 	{
 		try
 		{
-			repo = new ContentRepository(ContentRepositoryStartupServlet.class.getClassLoader());			
+			repo = new ContentRepository();			
 		}
 		catch(Exception e)
 		{

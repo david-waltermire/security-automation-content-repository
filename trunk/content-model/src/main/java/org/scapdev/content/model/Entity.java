@@ -23,23 +23,47 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBElement;
 
+/**
+ * Represents an instance of an identifiable XML node that may be a document
+ * instance or a standalone fragment of a larger document.
+ * @see EntityInfo
+ */
 public interface Entity {
 	/**
+	 * Retrieves information about the entity type for this instance defined
+	 * within a schema model.
 	 * @return the entityInfo
 	 */
 	EntityInfo getEntityInfo();
-
 	/**
+	 * Retrieves the key that identifies this XML node
+	 * @return a key
+	 */
+	Key getKey();
+	/**
+	 * Retrieves the JAXB data associated with this instance.
 	 * @return the object
 	 */
 	JAXBElement<Object> getObject();
-	List<Relationship> getRelationships();
-	List<KeyedRelationship> getKeyedRelationships();
-	List<IndirectRelationship> getIndirectRelationships();
-
-	Key getKey();
+	/**
+	 * This method retrieves the combination of instances returned by
+	 * {@link #getKeyedRelationships} and {@link #getIndirectRelationships}.  It
+	 * can be used to retrieve all relationships associated with this entity. 
+	 * @return a collection of relationships
+	 */
+	Collection<Relationship> getRelationships();
+	/**
+	 * This method retrieves all keyed relationships associated with this entity.
+	 * @return a collection of relationships
+	 */
+	Collection<KeyedRelationship> getKeyedRelationships();
+	/**
+	 * This method retrieves all indirect relationships associated with this entity.
+	 * @return a collection of relationships
+	 */
+	Collection<IndirectRelationship> getIndirectRelationships();
 }

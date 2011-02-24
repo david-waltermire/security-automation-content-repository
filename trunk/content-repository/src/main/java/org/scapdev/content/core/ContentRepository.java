@@ -47,73 +47,140 @@ import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.MetadataModelFactory;
 import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
 
+/**
+ * This class encapsolates all content repository functionality.  It has methods
+ * that enable importing and retrieving content from the repository.
+ */
 public class ContentRepository {
-	private final ContentPersistenceManager persistenceManager;
-	private final MetadataModel model;
-	private final JAXBEntityProcessor processor;
-//	private final ProcessingFactory processingFactory;
-//	private final InstanceWriterFactory instanceWriterFactory;
+	private final JAXBEntityProcessor jaxbEntityProcessor;
 	private final Resolver resolver;
 	private final QueryProcessor queryProcessor;
+	private final DefaultPersistenceContext persistenceContext;
 
-
-	public ContentRepository(ClassLoader classLoader) throws IOException, JAXBException, ClassNotFoundException {
-		model = MetadataModelFactory.newInstance();
-//		persistenceManager = new MemoryResidentPersistenceManager();
-		persistenceManager = new DefaultHybridContentPersistenceManager(model);
-		processor = new JAXBEntityProcessor(model, persistenceManager);
-		resolver = new LocalResolver(persistenceManager);
-		queryProcessor = new DefaultQueryProcessor(resolver);
+	public ContentRepository() throws IOException, JAXBException, ClassNotFoundException {
+		persistenceContext = new DefaultPersistenceContext();
+		persistenceContext.setMetadataModel(MetadataModelFactory.newInstance());
+//		persistenceContext.setContentPersistenceManager(new MemoryResidentPersistenceManager()());
+		persistenceContext.setContentPersistenceManager(new DefaultHybridContentPersistenceManager());
+		jaxbEntityProcessor = new JAXBEntityProcessor(persistenceContext);
+		resolver = new LocalResolver(persistenceContext);
+		queryProcessor = new DefaultQueryProcessor();
 	}
 
+	/**
+	 * Retrieves the metadata schema model associated with this repository. This
+	 * instance is automatically generated using JAXB reflection based on classes
+	 * on the classpath.
+	 * @return the metadata schema model instance
+	 */
 	public MetadataModel getMetadataModel() {
-		return model;
+		return persistenceContext.getMetadataModel();
 	}
-//
-//	public void retrieveContentFragment(Key key, OutputStream os) throws IOException {
-//		QueryResult queryResult = queryProcessor.query(new SimpleQuery(key));
-//		InstanceWriter writer = instanceWriterFactory.newInstanceWriter(os);
-//		writer.write(queryResult);
-//	}
 
+	public ContentPersistenceManager getContentPersistenceManager() {
+		return persistenceContext.getContentPersistenceManager();
+	}
+
+	public void setContentPersistenceManager(ContentPersistenceManager contentPersistenceManager) {
+		persistenceContext.setContentPersistenceManager(contentPersistenceManager);
+	}
+
+	public QueryProcessor getQueryProcessor() {
+		return queryProcessor;
+	}
+
+	public Resolver getResolver() {
+		return resolver;
+	}
+
+	/**
+	 * Retrieves the JAXB-based processor that supports importing content into
+	 * the metadata repository.
+	 * @see JAXBEntityProcessor#newImporter()
+	 * @return the entity processor for the content repository
+	 */
+	public JAXBEntityProcessor getJaxbEntityProcessor() {
+		return jaxbEntityProcessor;
+	}
+
+	/**
+	 * This convenience method executes a basic query that retrieves the entity
+	 * associated with the provided key
+	 * @param key the entity key
+	 * @return a query result containing the entity associated with the key
+	 * @throws IOException
+	 */
 	public QueryResult query(Key key) throws IOException {
 		return query(key, false);
 	}
 
+	/**
+	 * This convenience method executes a basic query that retrieves the entity
+	 * associated with the provided key
+	 * @param key the entity key
+	 * @param resolveReferences if <code>true</code> relationships on the entity
+	 * 		matching the key will be resolved recursively causing all related
+	 * 		entities to also be retrieved in the query result
+	 * @return a query result containing the entity associated with the key
+	 * @throws IOException
+	 */
 	public QueryResult query(Key key, boolean resolveReferences) throws IOException {
 		SimpleQuery query = new SimpleQuery(key);
 		query.setResolveReferences(resolveReferences);
 		return query(query);
 	}
 
-	public QueryResult query(String indirectType, Collection<String> indirectIds, Set<String> requestedEntityIds, boolean resolveReferences) throws IOException {
-		IndirectQuery query = new IndirectQuery(indirectType, indirectIds, requestedEntityIds, persistenceManager);
+	/**
+	 * This convenience method executes a query that retrieves entities of a
+	 * specified type that are associated with external identifiers of a
+	 * specified type.
+	 * @param externalIdType the external identifier type to query for 
+	 * @param externalIds a collection of external identifier values to query
+	 * 		for that are of the type defined by the externalIdType parameter
+	 * @param requestedEntityTypes the type of entities to return that have an
+	 * 		association with the specified external identifiers
+	 * @param resolveReferences if <code>true</code> relationships on the matching
+	 * 		entities will be resolved recursively causing all related
+	 * 		entities to also be retrieved in the query result
+	 * @return a query result containing the entities associated with the
+	 * 		external identifiers
+	 * @throws IOException
+	 */
+	public QueryResult query(String externalIdType, Collection<String> externalIds, Set<String> requestedEntityTypes, boolean resolveReferences) throws IOException {
+		IndirectQuery query = new IndirectQuery(externalIdType, externalIds, requestedEntityTypes, getContentPersistenceManager());
 		query.setResolveReferences(resolveReferences);
 		return query(query);
 	}
 
+	/**
+	 * 
+	 * @param <RESULT> the type of the query result that will be produced by the
+	 * 		query.
+	 * @param query the query to execute against the repository
+	 * @return the query result
+	 */
 	public <RESULT extends QueryResult> RESULT query(Query<RESULT> query) {
-		RESULT queryResult = queryProcessor.query(query);
+		RESULT queryResult = queryProcessor.query(query, resolver);
 		return queryResult;
 	}
 
-	public JAXBEntityProcessor getProcessor() {
-		return processor;
-	}
-
+	/**
+	 * This method should be called to cleanly shutdown the repository.
+	 */
 	public void shutdown() {
-		processor.shutdown();
+		jaxbEntityProcessor.shutdown();
 	}
 
+	/**
+	 * Retrieves an instance writer that can be used to assemble a query
+	 * result into an XML document containing the queried entities.
+	 * @return
+	 * @throws JAXBException
+	 */
 	public InstanceWriter newInstanceWriter() throws JAXBException {
-		Marshaller marshaller = getMarshaller();
-		NamespaceMapper mapper = new NamespaceMapper(model);
+		Marshaller marshaller = getMetadataModel().getJAXBContext().createMarshaller();
+		NamespaceMapper mapper = new NamespaceMapper(getMetadataModel());
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", mapper);
-		return new DefaultInstanceWriter(marshaller, model);
-	}
-
-	private Marshaller getMarshaller() throws JAXBException {
-		Marshaller marshaller = model.getJAXBContext().createMarshaller();
-		return marshaller;
+		return new DefaultInstanceWriter(marshaller, getMetadataModel());
 	}
 }
