@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 paul
+ * Copyright (c) 2011 Paul Cichonski
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -153,15 +153,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					modelLoaded = true;
 				}
 				List<Statement> statements = new LinkedList<Statement>();
+				log.info("about to add triples");
 				
 				// first handle the basic entity assertion
 				URI entityUri = genInstanceURI(contentId);
-				
-				log.info("about to add triples");
-				//add statements
 				statements.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
 				statements.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(contentId)));
-				statements.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID_RELATIONSHIP.URI, factory.createLiteral(contentId)));
+				statements.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
 				
 				
 				// now handle the key of the entity, right now I see no reason to not use bnodes....that may change
@@ -178,6 +176,29 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					statements.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFields.getValue())));
 				}
 				
+				
+				// now handle all relationship information
+				
+				// handle indirect relationships first
+				for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
+					ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
+					URI boundaryObjectURI = genInstanceURI(externalIdentifier.getValue());
+					statements.add(factory.createStatement(boundaryObjectURI, RDF.TYPE, ontology.BOUNDARY_OBJECT_CLASS.URI));
+					statements.add(factory.createStatement(boundaryObjectURI, RDFS.LABEL, factory.createLiteral(externalIdentifier.getValue())));
+					statements.add(factory.createStatement(entityUri, ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI, boundaryObjectURI));
+				}
+				
+				// handle keyed relationships
+				for (KeyedRelationship relationship : entity.getKeyedRelationships()){
+					URI relatedEntityURI = findEntityURI(relationship.getKey());
+					if (relatedEntityURI == null){
+						//TODO: need to callback to caller to get actual entity... or queue for later
+					}
+//					statements.add(factory.createStatement(entityUri, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, relatedEntityURI));
+					//add symmetric side of this as well until inferencing is hooked up
+//					statements.add(factory.createStatement(relatedEntityURI, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, entityUri));
+				}
+				
 				conn.add(statements);
 			} finally {
 				conn.close();
@@ -186,6 +207,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
+		
+
+
 		
 		
 		//all below code is a HACK, REMOVE ONCE TRIPLE STORE HANDLES
@@ -210,6 +234,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			}
 		}
 	}
+	
+	
+	
+	/**
+	 * Helper method to find an EntityURI from triple store based on given key.
+	 */
+	private URI findEntityURI(Key key) {
+		// TODO Implement!!
+		return null;
+	}
+
 
 	// for testing
 	public void outputContents(){
@@ -226,6 +261,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			    		   Value predicate = bindingSet.getValue("p");
 			    		   Value object = bindingSet.getValue("y");
 			    		   log.info("triple: " + subject.stringValue() + " " + predicate.stringValue() + " " + object.stringValue());
+			    		   
 			    	  }
 			      }
 			      finally {
@@ -259,14 +295,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		final Construct ENTITY_CLASS;
 		final Construct KEY_CLASS;  //key of an entity
 		final Construct FIELD_CLASS; // field of a key (to include both field id and value)
+		final Construct BOUNDARY_OBJECT_CLASS; //same as 'externalId' from java model
 		
 		//** relationships in model **
-		final Construct HAS_CONTENT_ID_RELATIONSHIP; //persistence ID of an entity
+		final Construct HAS_CONTENT_ID; //persistence ID of an entity
 		final Construct HAS_KEY; // key of an entity
 		final Construct HAS_KEY_TYPE; // type of key.....this should be refactored into a class heiarch???
 		final Construct HAS_FIELD_DATA; // n-ary relationship between a key and the field_id/value
 		final Construct HAS_FIELD_TYPE; // type (or id) of a key field
 		final Construct HAS_FIELD_VALUE; // value of a field (for a specific field type).
+		final Construct HAS_INDIRECT_RELATIONSHIP_TO; // Equivalent to the IndirectRelationship class...range should always be a boundary object
+		final Construct HAS_DIRECT_RELATIONSHIP_TO; // entity to entity relationship
 		
 		MetaDataOntology(ValueFactory factory) {
 			this.factory = factory;
@@ -275,15 +314,18 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			ENTITY_CLASS = new Construct(genModelURI("entity"), "entity");
 			KEY_CLASS = new Construct(genModelURI("Key"), "Key");
 			FIELD_CLASS = new Construct(genModelURI("Field"), "Field");
+			BOUNDARY_OBJECT_CLASS = new Construct(genModelURI("Boundary Object"), "Boundary Object");
 			
 			
 			// define relationships
-			HAS_CONTENT_ID_RELATIONSHIP = new Construct(genModelURI("hasContentId"), "hasContentId");
+			HAS_CONTENT_ID = new Construct(genModelURI("hasContentId"), "hasContentId");
 			HAS_KEY = new Construct(genModelURI("hasKey"), "hasKey");
 			HAS_KEY_TYPE = new Construct(genModelURI("hasKeyType"), "hasKeyType");
 			HAS_FIELD_DATA = new Construct(genModelURI("hasFieldData"), "hasFieldData");
 			HAS_FIELD_TYPE = new Construct(genModelURI("hasFieldType"), "hasFieldType");
 			HAS_FIELD_VALUE = new Construct(genModelURI("hasFieldValue"), "hasFieldValue");
+			HAS_INDIRECT_RELATIONSHIP_TO = new Construct(genModelURI("hasIndirectRelationshipTo"), "hasIndirectRelationshipTo");
+			HAS_DIRECT_RELATIONSHIP_TO = new Construct(genModelURI("hasDirectRelationshipTo"), "hasDirectRelationshipTo");
 		}
 		
 		void loadModel(RepositoryConnection conn) throws RepositoryException {
@@ -296,7 +338,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			statements.addAll(createClass(FIELD_CLASS.URI, FIELD_CLASS.LABEL));
 			
 			// assert Predicates
-			statements.addAll(createPredicate(HAS_CONTENT_ID_RELATIONSHIP.URI, HAS_CONTENT_ID_RELATIONSHIP.LABEL));
+			statements.addAll(createPredicate(HAS_CONTENT_ID.URI, HAS_CONTENT_ID.LABEL));
 			statements.addAll(createPredicate(HAS_KEY.URI, HAS_KEY.LABEL));
 			statements.addAll(createPredicate(HAS_KEY_TYPE.URI, HAS_KEY_TYPE.LABEL));
 			statements.addAll(createPredicate(HAS_FIELD_DATA.URI, HAS_FIELD_DATA.LABEL));
