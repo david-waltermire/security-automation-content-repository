@@ -59,6 +59,7 @@ public class ContentUploadEndpoints {
 				try {
 					items = upload.parseRequest(request);
 				} catch (FileUploadException fue) {
+					// TODO: is the temp dir removed?
 					ret.setCause(fue);
 					return ret;
 				}
@@ -114,7 +115,7 @@ public class ContentUploadEndpoints {
 								return ret;
 							}
 							
-							Importer importer = RepositoryConfiguration.INSTANCE.getRepo().getProcessor().newImporter();
+							Importer importer = RepositoryConfiguration.INSTANCE.getRepo().getJaxbEntityProcessor().newImporter();
 							
 							// assuming no exception occurred, try to load the file into the repository
 							File[] uploadedfiles = tmpSubDir.listFiles();

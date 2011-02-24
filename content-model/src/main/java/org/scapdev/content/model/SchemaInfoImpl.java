@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
+import org.scapdev.content.model.jaxb.DocumentType;
 import org.scapdev.content.model.jaxb.EntityType;
 import org.scapdev.content.model.jaxb.IndirectRelationshipType;
 import org.scapdev.content.model.jaxb.LocalRelationshipType;
@@ -59,7 +59,7 @@ class SchemaInfoImpl implements SchemaInfo {
 		SchemaType.Documents documents = type.getDocuments();
 		if (documents != null) {
 			documentMap = new HashMap<JAXBClass, DocumentInfo>();
-			for (DocumentEntityType node : documents.getDocument()) {
+			for (DocumentType node : documents.getDocument()) {
 				BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
 				org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
 				AbstractDocumentBase document;

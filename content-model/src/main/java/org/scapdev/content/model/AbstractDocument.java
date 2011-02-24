@@ -23,11 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
+import org.scapdev.content.model.jaxb.DocumentType;
 
 public abstract class AbstractDocument extends AbstractSchemaComponent implements DocumentInfo {
 
-	protected AbstractDocument(DocumentEntityType entity, SchemaInfo schema) {
+	protected AbstractDocument(DocumentType entity, SchemaInfo schema) {
 		super(entity.getId(), schema, entity.getSchemaNode().getNode());
 	}
 }

@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBElement;
 
+import org.scapdev.content.core.PersistenceContext;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
@@ -38,13 +39,11 @@ import org.scapdev.content.model.processor.EntityProcessor;
 import org.scapdev.content.model.processor.Importer;
 
 public class JAXBEntityProcessor implements EntityProcessor {
-	private final MetadataModel model;
+	private final PersistenceContext persistenceContext;
 	private final ExecutorService service;
-	private final ContentPersistenceManager persistenceManager;
 
-	public JAXBEntityProcessor(MetadataModel model, ContentPersistenceManager persistenceManager) {
-		this.model = model;
-		this.persistenceManager = persistenceManager;
+	public JAXBEntityProcessor(PersistenceContext persistenceContext) {
+		this.persistenceContext = persistenceContext;
 		this.service = Executors.newFixedThreadPool(2);
 	}
 
@@ -60,16 +59,21 @@ public class JAXBEntityProcessor implements EntityProcessor {
 	 * @return the persistenceManager
 	 */
 	public ContentPersistenceManager getPersistenceManager() {
-		return persistenceManager;
+		return persistenceContext.getContentPersistenceManager();
 	}
 
 	/**
 	 * @return the model
 	 */
 	public MetadataModel getMetadataModel() {
-		return model;
+		return persistenceContext.getMetadataModel();
 	}
 
+	public Future<Entity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
+		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, getMetadataModel());
+		Future<Entity> future = service.submit(task);
+		return future;
+	}
 
 	private static class RelationshipExtractingTask implements Callable<Entity> {
 		private final EntityImpl entity;
@@ -87,12 +91,5 @@ public class JAXBEntityProcessor implements EntityProcessor {
 			return entity;
 		}
 		
-	}
-
-
-	public Future<Entity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
-		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, model);
-		Future<Entity> future = service.submit(task);
-		return future;
 	}
 }

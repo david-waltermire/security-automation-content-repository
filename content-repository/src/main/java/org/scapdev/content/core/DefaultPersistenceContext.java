@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence;
+package org.scapdev.content.core;
 
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.MetadataModel;
 
+public class DefaultPersistenceContext implements PersistenceContext {
 
-public abstract class AbstractContentPersistenceManager implements ContentPersistenceManager {
-	private final MetadataModel model;
+	private MetadataModel metadataModel;
+	private ContentPersistenceManager contentPersistenceManager;
 
-	public AbstractContentPersistenceManager(MetadataModel model) {
-		this.model = model;
+	@Override
+	public MetadataModel getMetadataModel() {
+		return metadataModel;
 	}
 
-	public MetadataModel getMetadataModel() {
-		return model;
+	public void setMetadataModel(MetadataModel metadataModel) {
+		this.metadataModel = metadataModel;
+		
+	}
+
+	@Override
+	public ContentPersistenceManager getContentPersistenceManager() {
+		return contentPersistenceManager;
+	}
+
+	public void setContentPersistenceManager(ContentPersistenceManager contentPersistenceManager) {
+		this.contentPersistenceManager = contentPersistenceManager;
 	}
 }

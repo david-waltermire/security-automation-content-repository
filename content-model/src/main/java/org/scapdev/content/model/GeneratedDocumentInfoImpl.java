@@ -23,13 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import org.scapdev.content.model.jaxb.DocumentEntityType;
-
-
+import org.scapdev.content.model.jaxb.DocumentType;
 
 class GeneratedDocumentInfoImpl extends AbstractDocumentBase {
 
-	GeneratedDocumentInfoImpl(DocumentEntityType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
+	GeneratedDocumentInfoImpl(DocumentType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
 		super(entity, schema, model, init);
 	}
 }

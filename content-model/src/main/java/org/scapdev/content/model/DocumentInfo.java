@@ -25,7 +25,15 @@ package org.scapdev.content.model;
 
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
+/**
+ * Represents information about a declared document type within a schema metamodel.
+ * @see org.scapdev.content.model.DocumentType
+ */
 public interface DocumentInfo extends SchemaComponent {
-	SchemaInfo getSchemaInfo();
+	/**
+	 * Retrieves the JAXB reflection class instance associated with this
+	 * document type.
+	 * @return a JAXB reflection class instance
+	 */
 	JAXBClass getType();
 }

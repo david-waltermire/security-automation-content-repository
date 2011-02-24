@@ -28,13 +28,11 @@ import org.scapdev.content.core.resolver.Resolver;
 
 public class DefaultQueryProcessor implements QueryProcessor {
 	private static final Logger log = Logger.getLogger(DefaultQueryProcessor.class);
-	private final Resolver resolver;
 
-	public DefaultQueryProcessor(Resolver resolver) {
-		this.resolver = resolver;
+	public DefaultQueryProcessor() {
 	}
 
-	public <T extends QueryResult> T query(Query<T> query) {
+	public <T extends QueryResult> T query(Query<T> query, Resolver resolver) {
 		log.info("Executing query: "+query);
 		return query.resolve(resolver);
 	}

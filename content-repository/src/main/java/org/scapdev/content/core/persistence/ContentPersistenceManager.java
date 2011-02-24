@@ -33,8 +33,7 @@ import org.scapdev.content.model.MetadataModel;
 
 
 public interface ContentPersistenceManager {
-	Entity getEntityByKey(Key key);
+	Entity getEntityByKey(Key key, MetadataModel model);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
-	void storeEntity(Entity entity) throws ContentException;
-	MetadataModel getMetadataModel();
+	void storeEntity(Entity entity, MetadataModel model) throws ContentException;
 }

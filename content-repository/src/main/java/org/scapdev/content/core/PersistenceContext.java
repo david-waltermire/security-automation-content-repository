@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.core;
 
-/**
- * Represents an identifiable component within a schema model. 
- * @see ComponentType
- */
-public interface Component {
-	/**
-	 * Gets the schema information associated with this schema component
-	 * @return the SchemaInfo associated with this component
-	 */
-	SchemaInfo getSchemaInfo();
-	/**
-	 * Retrieves the unique identifier for the schema component 
-	 * @return
-	 */
-	String getId();
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.MetadataModel;
+
+public interface PersistenceContext {
+	MetadataModel getMetadataModel();
+	ContentPersistenceManager getContentPersistenceManager();
 }

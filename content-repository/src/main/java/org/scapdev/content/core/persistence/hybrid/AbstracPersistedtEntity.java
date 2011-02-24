@@ -23,8 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
@@ -38,17 +38,17 @@ import org.scapdev.content.model.Relationship;
 public class AbstracPersistedtEntity implements Entity {
 	private final Key key;
 	private final EntityInfo entityInfo;
-	private final List<Relationship> relationships;
-	private final List<KeyedRelationship> keyedRelationships;
-	private final List<IndirectRelationship> indirectRelationships;
+	private final Collection<Relationship> relationships;
+	private final Collection<KeyedRelationship> keyedRelationships;
+	private final Collection<IndirectRelationship> indirectRelationships;
 	private final ContentRetriever retriever;
 
 	// TODO: enable the object to be retrieved using lazy fetch
 	public AbstracPersistedtEntity(EntityDescriptor desc, ContentRetriever retriever) {
 		this.key = desc.getKey();
-		this.relationships = Collections.unmodifiableList(desc.getRelationships());
-		this.keyedRelationships = Collections.unmodifiableList(desc.getKeyedRelationships());
-		this.indirectRelationships = Collections.unmodifiableList(desc.getIndirectRelationships());
+		this.relationships = Collections.unmodifiableCollection(desc.getRelationships());
+		this.keyedRelationships = Collections.unmodifiableCollection(desc.getKeyedRelationships());
+		this.indirectRelationships = Collections.unmodifiableCollection(desc.getIndirectRelationships());
 		this.entityInfo = desc.getEntityInfo();
 		this.retriever = retriever;
 	}
@@ -66,17 +66,17 @@ public class AbstracPersistedtEntity implements Entity {
 	}
 
 	@Override
-	public List<Relationship> getRelationships() {
+	public Collection<Relationship> getRelationships() {
 		return relationships;
 	}
 
 	@Override
-	public List<IndirectRelationship> getIndirectRelationships() {
+	public Collection<IndirectRelationship> getIndirectRelationships() {
 		return indirectRelationships;
 	}
 
 	@Override
-	public List<KeyedRelationship> getKeyedRelationships() {
+	public Collection<KeyedRelationship> getKeyedRelationships() {
 		return keyedRelationships;
 	}
 

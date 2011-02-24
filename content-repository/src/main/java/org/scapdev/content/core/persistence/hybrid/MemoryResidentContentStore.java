@@ -52,7 +52,7 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
-	public ContentRetriever getContentRetriever(String contentId, MetadataModel model) {
+	public InternalContentRetriever getContentRetriever(String contentId, MetadataModel model) {
 		return new InternalContentRetriever(contentId, model);
 	}
 

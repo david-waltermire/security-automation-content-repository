@@ -20,6 +20,7 @@ public class OVALEndpointProviderImpl implements IOVALEndpointProvider {
 		LOG.info("Entering getDefinitionsList()");
 		
 		// TODO: make call to Repository
+		// TODO: create MessageBodyWriter that supports QueryResult
 		return ret;
 	}
 }

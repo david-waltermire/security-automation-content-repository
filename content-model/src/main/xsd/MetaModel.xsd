@@ -249,8 +249,8 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:element name="document" type="DocumentEntityType"/>
-  <xs:complexType name="DocumentEntityType">
+  <xs:element name="document" type="DocumentType"/>
+  <xs:complexType name="DocumentType">
     <xs:complexContent>
       <xs:extension base="DocumentSchemaComponentType">
         <xs:sequence>
