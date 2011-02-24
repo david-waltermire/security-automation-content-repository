@@ -52,19 +52,19 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
-	public ContentRetriever getContentRetriever(String contentId) {
-		return new InternalContentRetriever(contentId);
+	public ContentRetriever getContentRetriever(String contentId, MetadataModel model) {
+		return new InternalContentRetriever(contentId, model);
 	}
 
 	private class InternalContentRetriever extends AbstractContentRetriever<Object> {
 
-		public InternalContentRetriever(String contentId) {
-			super(contentId);
+		public InternalContentRetriever(String contentId, MetadataModel model) {
+			super(contentId, model);
 		}
 
 		@Override
-		protected JAXBElement<Object> getContentInternal(String contentId) {
-			return MemoryResidentContentStore.this.getContent(contentId, null);
+		protected JAXBElement<Object> getContentInternal(String contentId, MetadataModel model) {
+			return MemoryResidentContentStore.this.getContent(contentId, model);
 		}
 	}
 }

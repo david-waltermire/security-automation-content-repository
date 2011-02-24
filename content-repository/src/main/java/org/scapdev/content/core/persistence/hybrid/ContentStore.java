@@ -32,6 +32,6 @@ public interface ContentStore {
 
 	JAXBElement<Object> getContent(String contentId, MetadataModel model);
 	String persist(Entity entity, MetadataModel model);
-	ContentRetriever getContentRetriever(String contentId);
+	ContentRetriever getContentRetriever(String contentId, MetadataModel model);
 
 }
