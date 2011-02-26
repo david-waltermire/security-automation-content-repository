@@ -110,11 +110,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				URI entityURI = queryService.findEntityURI(key, conn);
 				Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
 				//no need to run inferencing here
-//				return entityTranslator.translateToJava(
-//						Iterations.addAll(conn.getStatements(null, null, null,
-//								false, entityContextURI),
-//								new LinkedList<Statement>()), model,
-//						contentRetrieverFactory);
+				return entityTranslator.translateToJava(
+						Iterations.addAll(conn.getStatements(null, null, null,
+								false, entityContextURI),
+								new LinkedList<Statement>()), model,
+						contentRetrieverFactory);
 			} catch (MalformedQueryException e){
 				log.error(e);
 				throw new RuntimeException(e);
@@ -166,8 +166,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 		return result;
 	}
-
-	public void persist(Entity entity, String contentId) {
+	
+	@Override
+	public void persist(Map<String, Entity> contentIdToEntityMap) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {
@@ -175,39 +176,46 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					ontology.loadModel(conn);
 					modelLoaded = true;
 				}
-				BNode context = factory.createBNode();
-				conn.add(entityTranslator.translateToRdf(entity, contentId), context);
+				for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
+					String contentId = entry.getKey();
+					Entity entity = entry.getValue();
+					
+					BNode context = factory.createBNode();
+					conn.add(entityTranslator.translateToRdf(entity, contentId), context);
+				}
 			} finally {
 				conn.close();
 			}
-
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
 		
 		//all below code is a HACK, REMOVE ONCE TRIPLE STORE HANDLES
-		descriptorMap.put(entity.getKey(), entity);
+		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
+			Entity entity = entry.getValue();
+			descriptorMap.put(entity.getKey(), entity);
 		
-		for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
-			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
-			Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
-			if (externalIdentifierValueToEntityMap == null) {
-				externalIdentifierValueToEntityMap = new HashMap<String, List<Entity>>();
-				externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityMap);
-			}
-			List<Entity> descriptorList = externalIdentifierValueToEntityMap.get(externalIdentifier.getValue());
-			if (descriptorList == null) {
-				descriptorList = new LinkedList<Entity>();
-				externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
-			}
-			descriptorList.add(entity);
-			if (descriptorList.size() >= 2) {
-				log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
-			}
+			for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
+	
+					ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
+					Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
+					if (externalIdentifierValueToEntityMap == null) {
+						externalIdentifierValueToEntityMap = new HashMap<String, List<Entity>>();
+						externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityMap);
+					}
+					List<Entity> descriptorList = externalIdentifierValueToEntityMap.get(externalIdentifier.getValue());
+					if (descriptorList == null) {
+						descriptorList = new LinkedList<Entity>();
+						externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
+					}
+					descriptorList.add(entity);
+					if (descriptorList.size() >= 2) {
+						log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
+					}
+				}
 		}
+		
 	}
-
-
 
 
 	// for testing
@@ -243,6 +251,8 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			log.error(e3);
 		}
 	}
+
+
 
 
 
