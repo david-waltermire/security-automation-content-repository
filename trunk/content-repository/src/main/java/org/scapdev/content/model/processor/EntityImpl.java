@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.processor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,12 +32,12 @@ import javax.xml.bind.JAXBElement;
 import org.scapdev.content.model.AbstractEntity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.KeyedRelationship;
+import org.scapdev.content.model.MutableKeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
-class EntityImpl extends AbstractEntity {
+class EntityImpl extends AbstractEntity implements MutableEntity {
 	private List<Relationship> relationships;
-	private List<KeyedRelationship> keyedRelationships;
+	private List<MutableKeyedRelationship> keyedRelationships;
 	private List<IndirectRelationship> indirectRelationships;
 
 	public EntityImpl(EntityInfo entityInfo, JAXBElement<Object> object) {
@@ -64,7 +64,7 @@ class EntityImpl extends AbstractEntity {
 	}
 
 	@Override
-	public List<KeyedRelationship> getKeyedRelationships() {
+	public List<MutableKeyedRelationship> getKeyedRelationships() {
 		synchronized (this) {
 			return keyedRelationships;
 		}
@@ -73,7 +73,7 @@ class EntityImpl extends AbstractEntity {
 	/**
 	 * @param relationships the relationships to set
 	 */
-	public void setRelationships(List<KeyedRelationship> keyedRelationships, List<IndirectRelationship> indirectRelationships) {
+	public void setRelationships(List<MutableKeyedRelationship> keyedRelationships, List<IndirectRelationship> indirectRelationships) {
 		synchronized (this) {
 			this.keyedRelationships = Collections.unmodifiableList(keyedRelationships);
 			this.indirectRelationships = Collections.unmodifiableList(indirectRelationships);

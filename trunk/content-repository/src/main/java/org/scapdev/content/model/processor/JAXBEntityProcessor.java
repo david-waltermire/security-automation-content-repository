@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.processor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -32,11 +32,8 @@ import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.core.PersistenceContext;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.processor.EntityProcessor;
-import org.scapdev.content.model.processor.Importer;
 
 public class JAXBEntityProcessor implements EntityProcessor {
 	private final PersistenceContext persistenceContext;
@@ -69,13 +66,13 @@ public class JAXBEntityProcessor implements EntityProcessor {
 		return persistenceContext.getMetadataModel();
 	}
 
-	public Future<Entity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
+	public Future<MutableEntity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
 		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, getMetadataModel());
-		Future<Entity> future = service.submit(task);
+		Future<MutableEntity> future = service.submit(task);
 		return future;
 	}
 
-	private static class RelationshipExtractingTask implements Callable<Entity> {
+	private static class RelationshipExtractingTask implements Callable<MutableEntity> {
 		private final EntityImpl entity;
 		private final JAXBRelationshipIdentifyingImportVisitor visitor;
 

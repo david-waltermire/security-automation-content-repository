@@ -29,5 +29,5 @@ public interface KeyedRelationshipInfo extends RelationshipInfo {
 	KeyRefInfo getKeyRefInfo();
 	KeyInfo getKeyInfo();
 	Key getKey(Object instance) throws ModelInstanceException;
-	List<? extends KeyedRelationship> newRelationships(Object instance, Entity owningEntity);
+	List<? extends MutableKeyedRelationship> newRelationships(Object instance, Entity owningEntity);
 }

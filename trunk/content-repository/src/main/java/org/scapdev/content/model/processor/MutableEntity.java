@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.processor;
 
-public class RelationshipData {
+import java.util.List;
+
+import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.MutableKeyedRelationship;
+
+interface MutableEntity extends Entity {
+	List<MutableKeyedRelationship> getKeyedRelationships();
 
 }

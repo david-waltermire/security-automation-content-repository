@@ -46,7 +46,7 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
-	public Map<String, Entity> persist(List<Entity> entities, MetadataModel model) {
+	public Map<String, Entity> persist(List<? extends Entity> entities, MetadataModel model) {
 		Map<String, Entity> result = new HashMap<String, Entity>();
 		for (Entity entity : entities) {
 			String contentId = persist(entity, model);

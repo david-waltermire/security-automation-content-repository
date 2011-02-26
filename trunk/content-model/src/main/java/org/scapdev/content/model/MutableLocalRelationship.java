@@ -21,10 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model;
 
-import org.scapdev.content.model.EntityInfo;
-
-interface ProcessingCallback {
-	void newEntity(EntityInfo entityInfo, Object obj, JAXBImporter importer);
+public interface MutableLocalRelationship extends LocalRelationship, MutableKeyedRelationship {
 }

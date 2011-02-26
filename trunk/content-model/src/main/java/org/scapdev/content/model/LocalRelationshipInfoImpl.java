@@ -54,8 +54,8 @@ class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements
 	}
 
 	@Override
-	public List<LocalRelationship> newRelationships(Object instance, Entity owningEntity) {
-		return Collections.<LocalRelationship>singletonList(new LocalRelationshipImpl(this, owningEntity, getKey(instance)));
+	public List<MutableLocalRelationship> newRelationships(Object instance, Entity owningEntity) {
+		return Collections.<MutableLocalRelationship>singletonList(new LocalRelationshipImpl(this, owningEntity, getKey(instance)));
 	}
 
 	@Override

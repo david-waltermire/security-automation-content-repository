@@ -41,9 +41,9 @@ import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.processor.ImportData;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
-import org.scapdev.content.model.processor.jaxb.ImportData;
 
 
 /**

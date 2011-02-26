@@ -32,7 +32,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
-import org.scapdev.content.model.processor.jaxb.ImportData;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
