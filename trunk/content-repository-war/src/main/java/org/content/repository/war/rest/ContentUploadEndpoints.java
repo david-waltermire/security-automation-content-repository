@@ -2,6 +2,7 @@ package org.content.repository.war.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,22 +18,24 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.log4j.Logger;
 import org.content.repository.config.ConfigProperties;
 import org.content.repository.config.RepositoryConfiguration;
 import org.content.repository.util.WarUtil;
+import org.content.repository.war.rest.response.FileUploadXMLResponse;
+import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.Importer;
 import org.scapdev.content.model.processor.jaxb.ImportData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@Path("/content")
+@Path("/upload")
 public class ContentUploadEndpoints {
 
-	private static Logger LOG = LoggerFactory.getLogger(ContentUploadEndpoints.class);
+	private static Logger LOG = Logger.getLogger(ContentUploadEndpoints.class);
 	
 	@POST
-	@Produces("application/xml")
-	@Path("/upload")
+	@Produces("text/xml")
+	@Path("/content")
 	public FileUploadXMLResponse uploadContent(@Context HttpServletRequest request) {
 		LOG.info("processing loadContentRequest");
 		
@@ -68,14 +71,11 @@ public class ContentUploadEndpoints {
 					Iterator<FileItem> itr = items.iterator();
 					while (itr.hasNext()) {
 						FileItem item = itr.next();
-						LOG.info("processing item field: " + item.getFieldName());
 						
 						if(!item.isFormField() && item.getSize() > 0)
 						{
 							String filename = item.getName();
-							
-							LOG.info("item name is " + filename);
-							
+														
 							String fileSeparator = null;
 							
 							int loc = -1;
@@ -107,7 +107,6 @@ public class ContentUploadEndpoints {
 							try
 							{
 								item.write(new File(tmpSubDir.getAbsolutePath() + File.separator + fnOnly));
-								ret.addUploadedFilename(fnOnly);
 							}
 							catch(Exception e)
 							{
@@ -130,8 +129,28 @@ public class ContentUploadEndpoints {
 									timer.start();
 									ImportData data = importer.read(f);
 									timer.stop();
-									LOG.info("Entities processed: " + data.getEntities().size());
-									LOG.info("Import timing for " + f.getAbsolutePath() + ": " + timer.toString());									
+									int entitiesProcessed = data.getEntities().size();
+									int relationshipsProcessed = 0;
+									
+									if(entitiesProcessed > 0)
+									{
+										List<Entity> entities = data.getEntities();
+										for(Iterator<Entity> eItr = entities.iterator(); eItr.hasNext();)
+										{
+											Entity e = eItr.next();
+											
+											Collection<Relationship> relationships = e.getRelationships();
+											if(relationships != null)
+											{
+												relationshipsProcessed = relationships.size();
+											}
+										}
+									}
+									LOG.info("Entities processed: " + entitiesProcessed);
+									LOG.info("Relationships processed: " + relationshipsProcessed);
+									
+									LOG.info("Import timing for " + f.getAbsolutePath() + ": " + timer.toString());	
+									ret.addUploadedFilename(f.getName(), entitiesProcessed, relationshipsProcessed);
 								}
 							}
 						}
