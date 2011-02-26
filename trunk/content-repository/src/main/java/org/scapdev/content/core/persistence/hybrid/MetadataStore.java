@@ -25,6 +25,7 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.model.Entity;
@@ -36,6 +37,6 @@ public interface MetadataStore {
 
 	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	void persist(Entity entity, String contentId);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
+	void persist(Map<String, Entity> contentIdToEntityMap);
 }

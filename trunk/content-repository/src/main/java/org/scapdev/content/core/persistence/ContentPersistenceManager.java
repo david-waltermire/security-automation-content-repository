@@ -24,6 +24,7 @@
 package org.scapdev.content.core.persistence;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
@@ -35,5 +36,5 @@ import org.scapdev.content.model.MetadataModel;
 public interface ContentPersistenceManager {
 	Entity getEntityByKey(Key key, MetadataModel model);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
-	void storeEntity(Entity entity, MetadataModel model) throws ContentException;
+	void storeEntities(List<Entity> entities, MetadataModel model) throws ContentException;
 }

@@ -3,8 +3,11 @@
  */
 package org.scapdev.content.model.processor.jaxb;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -14,7 +17,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.Key;
+import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.processor.ImportException;
 
 public class ImportData {
@@ -41,22 +45,29 @@ public class ImportData {
 	}
 
 	void validateRelationships() {
+		Map<Key, Entity> importedEntities = new HashMap<Key, Entity>();
+		Collection<KeyedRelationship> relationships = new LinkedList<KeyedRelationship>();
 		for (Future<Entity> future : futures) {
 			try {
 				Entity entity = future.get();
-				for (Relationship relationship : entity.getRelationships()) {
-					validateRelationship(relationship);
-				}
+				importedEntities.put(entity.getKey(), entity);
+				relationships.addAll(entity.getKeyedRelationships());
 			} catch (InterruptedException e) {
 				throw new ImportException(e);
 			} catch (ExecutionException e) {
 				throw new ImportException(e);
 			}
 		}
-	}
 
-	private void validateRelationship(Relationship relationship) {
-		// TODO: implement
+		for (KeyedRelationship relationship : relationships) {
+			Key keyRef = relationship.getKey();
+			// TODO: implement resolver to check for keys that reference entities that are already imported
+			Entity entity = importedEntities.get(keyRef);
+			if (entity == null) {
+				throw new ImportException("Invalid key reference '"+keyRef+"' on relationship: "+relationship);
+			}
+//			relationship.setRelatedEntity(entity);
+		}
 	}
 
 	public List<Entity> getEntities() {
