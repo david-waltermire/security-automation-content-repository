@@ -34,35 +34,33 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.ExternalIdentifierInfo;
 import org.scapdev.content.model.IndirectRelationship;
 import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.MetadataModel;
 
 public class MemoryResidentMetadataStore implements MetadataStore {
 	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
-	private final Map<Key, EntityDescriptor> descriptorMap;
-	private final Map<String, Map<String, List<EntityDescriptor>>> externalIdentifierToValueMap;
+	private final Map<Key, Entity> descriptorMap;
+	private final Map<String, Map<String, List<Entity>>> externalIdentifierToValueMap;
 
 	public MemoryResidentMetadataStore() {
-		this.descriptorMap = new HashMap<Key, EntityDescriptor>();
-		this.externalIdentifierToValueMap = new HashMap<String, Map<String, List<EntityDescriptor>>>();
+		this.descriptorMap = new HashMap<Key, Entity>();
+		this.externalIdentifierToValueMap = new HashMap<String, Map<String, List<Entity>>>();
 	}
 
 	@Override
-	public EntityDescriptor getEntityDescriptor(Key key) {
+	public Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
 		return descriptorMap.get(key);
 	}
 
 	@Override
-	public List<EntityDescriptor> getEntityDescriptor(ExternalIdentifierInfo externalIdentifierInfo, String value) {
-		Map<String, List<EntityDescriptor>> externalIdentifierValueToEntityDescriptorMap = externalIdentifierToValueMap.get(externalIdentifierInfo.getId());
-		List<EntityDescriptor> result;
-		if (externalIdentifierValueToEntityDescriptorMap.containsKey(value)) {
-			result = Collections.unmodifiableList(externalIdentifierValueToEntityDescriptorMap.get(value));
+	public List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
+		Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifierInfo.getId());
+		List<Entity> result;
+		if (externalIdentifierValueToEntityMap.containsKey(value)) {
+			result = Collections.unmodifiableList(externalIdentifierValueToEntityMap.get(value));
 		} else {
 			result = Collections.emptyList();
 		}
@@ -72,15 +70,15 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	@Override
 	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
 		Set<Key> result = Collections.emptySet();
-		Map<String, List<EntityDescriptor>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
+		Map<String, List<Entity>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
 		if (indirectValueToDescriptorsMap != null) {
 			result = new HashSet<Key>();
 			for (String indirectId : indirectIds) {
-				List<EntityDescriptor> descs = indirectValueToDescriptorsMap.get(indirectId);
-				if (descs != null) {
-					for (EntityDescriptor desc : descs) {
-						if (entityType.contains(desc.getEntityInfo().getId())) {
-							result.add(desc.getKey());
+				List<Entity> entities = indirectValueToDescriptorsMap.get(indirectId);
+				if (entities != null) {
+					for (Entity entity : entities) {
+						if (entityType.contains(entity.getEntityInfo().getId())) {
+							result.add(entity.getKey());
 						}
 					}
 				}
@@ -91,65 +89,26 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 
 	@Override
 	public void persist(Entity entity, String contentId) {
-		EntityDescriptor desc = new InternalEntityDescriptor(entity, contentId);
-		descriptorMap.put(entity.getKey(), desc);
-
+		descriptorMap.put(entity.getKey(), entity);
+		
 		for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
 			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
-			Map<String, List<EntityDescriptor>> externalIdentifierValueToEntityDescriptorMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
-			if (externalIdentifierValueToEntityDescriptorMap == null) {
-				externalIdentifierValueToEntityDescriptorMap = new HashMap<String, List<EntityDescriptor>>();
-				externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityDescriptorMap);
+			Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
+			if (externalIdentifierValueToEntityMap == null) {
+				externalIdentifierValueToEntityMap = new HashMap<String, List<Entity>>();
+				externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityMap);
 			}
-			List<EntityDescriptor> descriptorList = externalIdentifierValueToEntityDescriptorMap.get(externalIdentifier.getValue());
+			List<Entity> descriptorList = externalIdentifierValueToEntityMap.get(externalIdentifier.getValue());
 			if (descriptorList == null) {
-				descriptorList = new LinkedList<EntityDescriptor>();
-				externalIdentifierValueToEntityDescriptorMap.put(externalIdentifier.getValue(), descriptorList);
+				descriptorList = new LinkedList<Entity>();
+				externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
 			}
-			descriptorList.add(desc);
+			descriptorList.add(entity);
 			if (descriptorList.size() >= 2) {
 				log.info("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
 			}
 		}
 	}
 
-	private static class InternalEntityDescriptor implements EntityDescriptor {
-		private final Entity entity;
-		private final String contentId;
-		
-		InternalEntityDescriptor(Entity entity, String contentId) {
-			this.entity = entity;
-			this.contentId = contentId;
-		}
 
-		@Override
-		public String getContentId() {
-			return contentId;
-		}
-
-		@Override
-		public EntityInfo getEntityInfo() {
-			return entity.getEntityInfo();
-		}
-
-		@Override
-		public Key getKey() {
-			return entity.getKey();
-		}
-
-		@Override
-		public Collection<Relationship> getRelationships() {
-			return entity.getRelationships();
-		}
-
-		@Override
-		public Collection<IndirectRelationship> getIndirectRelationships() {
-			return entity.getIndirectRelationships();
-		}
-
-		@Override
-		public Collection<KeyedRelationship> getKeyedRelationships() {
-			return entity.getKeyedRelationships();
-		}
-	}
 }
