@@ -110,11 +110,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				URI entityURI = queryService.findEntityURI(key, conn);
 				Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
 				//no need to run inferencing here
-				return entityTranslator.translateToJava(
-						Iterations.addAll(conn.getStatements(null, null, null,
-								false, entityContextURI),
-								new LinkedList<Statement>()), model,
-						contentRetrieverFactory);
+//				return entityTranslator.translateToJava(
+//						Iterations.addAll(conn.getStatements(null, null, null,
+//								false, entityContextURI),
+//								new LinkedList<Statement>()), model,
+//						contentRetrieverFactory);
 			} catch (MalformedQueryException e){
 				log.error(e);
 				throw new RuntimeException(e);
