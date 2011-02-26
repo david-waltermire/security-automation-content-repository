@@ -38,19 +38,19 @@ import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVisitor {
 	private final Entity owningEntity;
 	private final MetadataModel metadataModel;
-	private final List<KeyedRelationship> keyedRelationships;
+	private final List<MutableKeyedRelationship> keyedRelationships;
 	private final List<IndirectRelationship> indirectRelationships;
 
 	public JAXBRelationshipIdentifyingImportVisitor(Entity owningEntity, JAXBElement<Object> node, MetadataModel metadataModel) {
 		super(node, metadataModel.getModel());
 		this.owningEntity = owningEntity;
 		this.metadataModel = metadataModel;
-		keyedRelationships = new LinkedList<KeyedRelationship>();
+		keyedRelationships = new LinkedList<MutableKeyedRelationship>();
 		indirectRelationships = new LinkedList<IndirectRelationship>();
 	}
 
-	public List<KeyedRelationship> getKeyedRelationships() {
-		List<KeyedRelationship> retval;
+	public List<MutableKeyedRelationship> getKeyedRelationships() {
+		List<MutableKeyedRelationship> retval;
 		if (keyedRelationships.isEmpty()) {
 			retval = Collections.emptyList();
 		} else {
@@ -83,7 +83,7 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 			if (annotation != null) {
 				KeyedRelationshipInfo relationshipInfo = (KeyedRelationshipInfo) metadataModel.getRelationshipByKeyRefId(annotation.id());
 				try {
-					List<? extends KeyedRelationship> relationships = relationshipInfo.newRelationships(instance, owningEntity);
+					List<? extends MutableKeyedRelationship> relationships = relationshipInfo.newRelationships(instance, owningEntity);
 					keyedRelationships.addAll(relationships);
 				} catch (NullFieldValueException e) {
 					// This indicates that the relationship is not properly formed

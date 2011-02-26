@@ -45,7 +45,7 @@ import org.scapdev.content.core.writer.NamespaceMapper;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.MetadataModelFactory;
-import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
+import org.scapdev.content.model.processor.JAXBEntityProcessor;
 
 /**
  * This class encapsolates all content repository functionality.  It has methods

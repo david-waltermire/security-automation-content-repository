@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.processor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,38 +18,37 @@ import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.processor.ImportException;
+import org.scapdev.content.model.MutableKeyedRelationship;
 
 public class ImportData {
 	private static final Logger log = Logger.getLogger(ImportData.class);
 
-	private final List<Future<Entity>> futures;
-	private final List<Entity> entities;
+	private final List<Future<MutableEntity>> futures;
+	private final List<MutableEntity> entities;
 
 	ImportData() {
-		this.entities = new LinkedList<Entity>();
-		this.futures = new LinkedList<Future<Entity>>();
+		this.entities = new LinkedList<MutableEntity>();
+		this.futures = new LinkedList<Future<MutableEntity>>();
 	}
 
-	void registerRelationshipData(Future<Entity> future) {
+	void registerRelationshipData(Future<MutableEntity> future) {
 		futures.add(future);
 	}
 
 	void newEntity(EntityInfo entityInfo, JAXBElement<Object> obj, JAXBEntityProcessor processor) {
 		log.log(Level.TRACE,"Creating entity type: "+entityInfo.getId());
 		EntityImpl entity = new EntityImpl(entityInfo, obj);
-		Future<Entity> future = processor.processEntity(entity, obj);
+		Future<MutableEntity> future = processor.processEntity(entity, obj);
 		registerRelationshipData(future);
 		entities.add(entity);
 	}
 
 	void validateRelationships() {
-		Map<Key, Entity> importedEntities = new HashMap<Key, Entity>();
-		Collection<KeyedRelationship> relationships = new LinkedList<KeyedRelationship>();
-		for (Future<Entity> future : futures) {
+		Map<Key, MutableEntity> importedEntities = new HashMap<Key, MutableEntity>();
+		Collection<MutableKeyedRelationship> relationships = new LinkedList<MutableKeyedRelationship>();
+		for (Future<MutableEntity> future : futures) {
 			try {
-				Entity entity = future.get();
+				MutableEntity entity = future.get();
 				importedEntities.put(entity.getKey(), entity);
 				relationships.addAll(entity.getKeyedRelationships());
 			} catch (InterruptedException e) {
@@ -59,18 +58,18 @@ public class ImportData {
 			}
 		}
 
-		for (KeyedRelationship relationship : relationships) {
+		for (MutableKeyedRelationship relationship : relationships) {
 			Key keyRef = relationship.getKey();
 			// TODO: implement resolver to check for keys that reference entities that are already imported
 			Entity entity = importedEntities.get(keyRef);
 			if (entity == null) {
 				throw new ImportException("Invalid key reference '"+keyRef+"' on relationship: "+relationship);
 			}
-//			relationship.setRelatedEntity(entity);
+			relationship.setRelatedEntity(entity);
 		}
 	}
 
-	public List<Entity> getEntities() {
+	public List<? extends Entity> getEntities() {
 		return entities;
 	}
 

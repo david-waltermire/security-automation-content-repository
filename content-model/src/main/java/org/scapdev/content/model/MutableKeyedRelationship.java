@@ -23,21 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public abstract class AbstractKeyedRelationship<INFO extends KeyedRelationshipInfo> extends AbstractRelationship<INFO> implements MutableKeyedRelationship {
-	private Entity relatedEntity;
-
-	protected AbstractKeyedRelationship(INFO relationshipInfo,
-			Entity owningEntity) {
-		super(relationshipInfo, owningEntity);
-	}
-
-	public Entity getRelatedEntity() {
-		return relatedEntity;
-	}
-
-	@Override
-	public void setRelatedEntity(Entity entity) {
-		this.relatedEntity = entity;
-	}
-
+public interface MutableKeyedRelationship extends KeyedRelationship {
+	void setRelatedEntity(Entity entity);
 }

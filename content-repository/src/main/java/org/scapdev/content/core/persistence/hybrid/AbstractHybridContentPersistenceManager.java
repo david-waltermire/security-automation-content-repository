@@ -48,7 +48,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	}
 
 	@Override
-	public void storeEntities(List<Entity> entities, MetadataModel model) {
+	public void storeEntities(List<? extends Entity> entities, MetadataModel model) {
 		Map<String, Entity> contentIdToEntityMap = contentStore.persist(entities, model);
 		metadataStore.persist(contentIdToEntityMap);
 	}

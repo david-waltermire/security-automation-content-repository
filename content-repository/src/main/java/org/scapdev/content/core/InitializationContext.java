@@ -27,7 +27,7 @@ import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.QueryProcessor;
 import org.scapdev.content.core.resolver.Resolver;
 import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.processor.jaxb.JAXBEntityProcessor;
+import org.scapdev.content.model.processor.JAXBEntityProcessor;
 
 public interface InitializationContext {
 	MetadataModel getMetadataModel();

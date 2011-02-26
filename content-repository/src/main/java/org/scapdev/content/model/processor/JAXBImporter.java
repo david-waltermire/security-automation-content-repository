@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor.jaxb;
+package org.scapdev.content.model.processor;
 
 import java.io.File;
 import java.io.InputStream;
@@ -37,8 +37,6 @@ import javax.xml.transform.Source;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.processor.ImportException;
-import org.scapdev.content.model.processor.Importer;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 

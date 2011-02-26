@@ -60,7 +60,7 @@ public interface Entity {
 	 * This method retrieves all keyed relationships associated with this entity.
 	 * @return a collection of relationships
 	 */
-	Collection<KeyedRelationship> getKeyedRelationships();
+	Collection<? extends KeyedRelationship> getKeyedRelationships();
 	/**
 	 * This method retrieves all indirect relationships associated with this entity.
 	 * @return a collection of relationships

@@ -34,7 +34,7 @@ import org.scapdev.content.model.MetadataModel;
 public interface ContentStore {
 
 	JAXBElement<Object> getContent(String contentId, MetadataModel model);
-	Map<String, Entity> persist(List<Entity> entities, MetadataModel model);
+	Map<String, Entity> persist(List<? extends Entity> entities, MetadataModel model);
 	ContentRetriever getContentRetriever(String contentId, MetadataModel model);
 
 }

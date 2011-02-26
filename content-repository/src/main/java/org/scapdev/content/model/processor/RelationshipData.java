@@ -21,23 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.model.processor;
 
-public abstract class AbstractKeyedRelationship<INFO extends KeyedRelationshipInfo> extends AbstractRelationship<INFO> implements MutableKeyedRelationship {
-	private Entity relatedEntity;
-
-	protected AbstractKeyedRelationship(INFO relationshipInfo,
-			Entity owningEntity) {
-		super(relationshipInfo, owningEntity);
-	}
-
-	public Entity getRelatedEntity() {
-		return relatedEntity;
-	}
-
-	@Override
-	public void setRelatedEntity(Entity entity) {
-		this.relatedEntity = entity;
-	}
+public class RelationshipData {
 
 }

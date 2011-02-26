@@ -27,5 +27,5 @@ import java.util.List;
 
 
 public interface LocalRelationshipInfo extends KeyedRelationshipInfo {
-	List<LocalRelationship> newRelationships(Object instance, Entity owningEntity);
+	List<MutableLocalRelationship> newRelationships(Object instance, Entity owningEntity);
 }

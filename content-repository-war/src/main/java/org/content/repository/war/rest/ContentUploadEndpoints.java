@@ -25,8 +25,8 @@ import org.content.repository.util.WarUtil;
 import org.content.repository.war.rest.response.FileUploadXMLResponse;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.processor.ImportData;
 import org.scapdev.content.model.processor.Importer;
-import org.scapdev.content.model.processor.jaxb.ImportData;
 
 @Path("/upload")
 public class ContentUploadEndpoints {

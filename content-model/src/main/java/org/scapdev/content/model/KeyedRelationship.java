@@ -26,4 +26,5 @@ package org.scapdev.content.model;
 public interface KeyedRelationship extends Relationship {
 	Key getKey();
 	KeyedRelationshipInfo getRelationshipInfo();
+	Entity getRelatedEntity();
 }
