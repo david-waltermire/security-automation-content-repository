@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
@@ -82,9 +81,10 @@ public class JAXBImporter implements Importer {
 
 	private void importData(ImportData data) {
 		ContentPersistenceManager manager = getEntityProcessor().getPersistenceManager();
-		for (Entity entity : data.getEntities()) {
-			manager.storeEntity(entity, getEntityProcessor().getMetadataModel());
-		}
+		manager.storeEntities(data.getEntities(), getEntityProcessor().getMetadataModel());
+//		for (Entity entity : data.getEntities()) {
+//			manager.storeEntity(entity, getEntityProcessor().getMetadataModel());
+//		}
 	}
 
 	@Override
