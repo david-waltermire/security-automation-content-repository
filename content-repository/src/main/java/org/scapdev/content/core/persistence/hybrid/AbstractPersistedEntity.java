@@ -35,7 +35,7 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
-public class AbstracPersistedtEntity implements Entity {
+public abstract class AbstractPersistedEntity implements Entity {
 	private final Key key;
 	private final EntityInfo entityInfo;
 	private final Collection<Relationship> relationships;
@@ -43,8 +43,7 @@ public class AbstracPersistedtEntity implements Entity {
 	private final Collection<IndirectRelationship> indirectRelationships;
 	private final ContentRetriever retriever;
 
-	// TODO: enable the object to be retrieved using lazy fetch
-	public AbstracPersistedtEntity(EntityDescriptor desc, ContentRetriever retriever) {
+	public AbstractPersistedEntity(EntityDescriptor desc, ContentRetriever retriever) {
 		this.key = desc.getKey();
 		this.relationships = Collections.unmodifiableCollection(desc.getRelationships());
 		this.keyedRelationships = Collections.unmodifiableCollection(desc.getKeyedRelationships());

@@ -32,7 +32,7 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.Relationship;
 
-public abstract class AbstractHybridContentPersistenceManager implements HybridContentPersistenceManager {
+public abstract class AbstractHybridContentPersistenceManager implements HybridContentPersistenceManager, ContentRetrieverFactory {
 
 	private final MetadataStore metadataStore;
 	private final ContentStore contentStore;
@@ -62,13 +62,18 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return getEntityDescriptorByKey(key).getRelationships();
 	}
 
+	@Override
+	public ContentRetriever newContentRetriever(String contentId, MetadataModel model) {
+		return contentStore.getContentRetriever(contentId, model);
+	}
+
 	private Entity generateEntity(Key key, MetadataModel model) {
 		EntityDescriptor desc = metadataStore.getEntityDescriptor(key);
 		return newEntity(desc, contentStore.getContentRetriever(desc.getContentId(), model));
 	}
 
 	protected Entity newEntity(EntityDescriptor desc, ContentRetriever retriever) {
-		return new AbstracPersistedtEntity(desc, retriever) {};
+		return new AbstractPersistedEntity(desc, retriever) {};
 	}
 
 	@Override
