@@ -90,7 +90,15 @@ public class EntityTranslator extends
 				descriptor.setRetriever((contentRetrieverFactory.newContentRetriever(contentId, model)));
 			}
 			if (predicate.equals(ontology.HAS_INDIRECT_RELATIONSHIP_TO)){
-				String boundaryObjectId = statement.getObject().stringValue();
+				String boundaryObjectURI = statement.getObject().stringValue();
+				IndirectRelationship indirectRel = indirectRelationships.get(boundaryObjectURI);
+				if (indirectRel == null){
+//					indirectRel = new 
+				}
+				
+				
+				
+				
 				
 			}
 			if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI)){
@@ -150,6 +158,16 @@ public class EntityTranslator extends
 		}
 		
 		return statements;
+	}
+	
+	private static class IndirectRelationshipBuilder{
+		// this is used to find the IndirectRelationshipInfo type
+		private String externalIdType;
+		private String externalIdValue;
+		
+		public IndirectRelationshipBuilder() {
+			// TODO Auto-generated constructor stub
+		}
 	}
 
 	private static class InternalEntity implements Entity {
