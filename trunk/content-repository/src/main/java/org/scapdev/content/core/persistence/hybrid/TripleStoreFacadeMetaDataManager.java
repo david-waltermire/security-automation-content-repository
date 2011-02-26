@@ -153,7 +153,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					modelLoaded = true;
 				}
 				List<Statement> statements = new LinkedList<Statement>();
-				log.info("about to add triples");
+				log.trace("about to add triples");
 				
 				// first handle the basic entity assertion
 				URI entityUri = genInstanceURI(contentId);
@@ -230,7 +230,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			}
 			descriptorList.add(desc);
 			if (descriptorList.size() >= 2) {
-				log.info("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
+				log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
 			}
 		}
 	}

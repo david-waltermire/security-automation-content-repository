@@ -30,9 +30,10 @@
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} [%t] %-5p %c %x - %m%n"/> 
     </layout> 
-  </appender> 
+  </appender>
+  
 <!--
-  <logger name="org.scapdev.content.core.reader.jaxb.DocumentIdentifierCollector">
+  <logger name="org.scapdev.content.core.persistence.hybrid.TripleStoreFacadeMetaDataManager">
     <level value="trace"/> 
   </logger>
 -->
