@@ -24,6 +24,7 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
@@ -45,6 +46,16 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	@Override
+	public Map<String, Entity> persist(List<Entity> entities, MetadataModel model) {
+		Map<String, Entity> result = new HashMap<String, Entity>();
+		for (Entity entity : entities) {
+			String contentId = persist(entity, model);
+			result.put(contentId, entity);
+		}
+		return result;
+	}
+
+	// TODO: remove this method and merge into persist above
 	public String persist(Entity entity, MetadataModel model) {
 		Integer key = Integer.valueOf(++index);
 		contentMap.put(key, entity.getObject());

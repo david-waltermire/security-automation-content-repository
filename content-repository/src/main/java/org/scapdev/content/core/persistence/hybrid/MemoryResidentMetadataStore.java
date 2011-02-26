@@ -88,6 +88,12 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	@Override
+	public void persist(Map<String, Entity> contentIdToEntityMap) {
+		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()) {
+			persist(entry.getValue(), entry.getKey());
+		}
+	}
+
 	public void persist(Entity entity, String contentId) {
 		descriptorMap.put(entity.getKey(), entity);
 		
@@ -109,6 +115,4 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 			}
 		}
 	}
-
-
 }

@@ -24,9 +24,10 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.scapdev.content.core.ContentException;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
@@ -47,14 +48,10 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	}
 
 	@Override
-	public void storeEntity(Entity entity, MetadataModel model)
-			throws ContentException {
-				String contentId = contentStore.persist(entity, model);
-				metadataStore.persist(entity, contentId);
-			}
-
-
-
+	public void storeEntities(List<Entity> entities, MetadataModel model) {
+		Map<String, Entity> contentIdToEntityMap = contentStore.persist(entities, model);
+		metadataStore.persist(contentIdToEntityMap);
+	}
 
 	@Override
 	public ContentRetriever newContentRetriever(String contentId, MetadataModel model) {
