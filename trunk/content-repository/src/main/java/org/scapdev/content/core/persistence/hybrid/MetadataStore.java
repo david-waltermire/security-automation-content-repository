@@ -30,11 +30,12 @@ import java.util.Set;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.ExternalIdentifierInfo;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 
 public interface MetadataStore {
 
-	EntityDescriptor getEntityDescriptor(Key key);
-	List<EntityDescriptor> getEntityDescriptor(ExternalIdentifierInfo externalIdentifierInfo, String value);
+	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
+	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	void persist(Entity entity, String contentId);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 Paul Cichonski
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.core.persistence.semantic.translation;
 
-import org.scapdev.content.core.persistence.semantic.TripleStoreFacadeMetaDataManager;
+import java.util.List;
+
+import org.openrdf.model.Statement;
+import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
+import org.scapdev.content.model.MetadataModel;
 
 
+/**
+ * <p>Translate back and forth between Java MetaModel instances and their RDF equivalents.</p>
+ *
+ *	TODO: need to remove all translation concepts...just serve to tie us to hard-coded semantics...not model driven
+ *
+ *	@param T - the metaModel type
+ */
+public interface SemanticTranslator<T> {
 
-public class DefaultHybridContentPersistenceManager extends AbstractHybridContentPersistenceManager {
-	public DefaultHybridContentPersistenceManager() {
-		super(new TripleStoreFacadeMetaDataManager(), new MemoryResidentContentStore());
-	}
-
-	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
-		super(metadataStore, contentStore);
-	}
+	/**
+	 * Translate from RDF graph to java instance of type T. List of statements
+	 * may contain more than the statements required to create instance of T.
+	 * 
+	 * @param statements
+	 *            - rdf graph
+	 * @return
+	 */
+	T translateToJava(List<Statement> statements, MetadataModel model, ContentRetrieverFactory contentRetrieverFactory);
+	
+	/**
+	 * Translate from java instance of type T to RDF graph representing instance.
+	 * @param instance
+	 * @param contentId - id to associate with content
+	 * @return 
+	 */
+	List<Statement> translateToRdf(T instance, String contentId);
 }

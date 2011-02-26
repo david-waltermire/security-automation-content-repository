@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 paul
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.core.persistence.semantic;
 
-import org.scapdev.content.core.persistence.semantic.TripleStoreFacadeMetaDataManager;
+public class EntityTranslator {
 
-
-
-public class DefaultHybridContentPersistenceManager extends AbstractHybridContentPersistenceManager {
-	public DefaultHybridContentPersistenceManager() {
-		super(new TripleStoreFacadeMetaDataManager(), new MemoryResidentContentStore());
-	}
-
-	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
-		super(metadataStore, contentStore);
-	}
 }
