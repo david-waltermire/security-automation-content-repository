@@ -134,8 +134,8 @@ public class ContentUploadEndpoints {
 									
 									if(entitiesProcessed > 0)
 									{
-										List<Entity> entities = data.getEntities();
-										for(Iterator<Entity> eItr = entities.iterator(); eItr.hasNext();)
+										List<? extends Entity> entities = data.getEntities();
+										for(Iterator<? extends Entity> eItr = entities.iterator(); eItr.hasNext();)
 										{
 											Entity e = eItr.next();
 											
