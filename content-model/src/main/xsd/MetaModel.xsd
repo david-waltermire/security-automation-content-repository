@@ -264,7 +264,7 @@
     <xs:attribute name="node" use="required"/>
     <xs:attribute name="javaLocation" default="TYPE">
       <xs:simpleType>
-        <xs:restriction>
+        <xs:restriction base="xs:token">
           <xs:enumeration value="TYPE"/>
           <xs:enumeration value="FIELD"/>
         </xs:restriction>
