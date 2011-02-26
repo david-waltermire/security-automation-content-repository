@@ -6,24 +6,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
-@XmlRootElement(name = "fileEntry")
+@XmlRootElement(name = "repositoryStatistics")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RepositoryStatisticsXMLResponse
 {
-	private String filename;
-	private int entitiesProcessed;
-	private int relationshipsProcessed;
-	
+	private int ovalDefinitions;
+	private int ovalTests;
+	private int ovalObjects;
+	private int ovalStates;
+	private int ovalVariables;
+		
 	// required by jaxb
 	public RepositoryStatisticsXMLResponse()
 	{
 		
-	}
-	
-	public RepositoryStatisticsXMLResponse(String filename, int entities, int relationships)
-	{
-		this.filename = filename;
-		this.entitiesProcessed = entities;
-		this.relationshipsProcessed = relationships;
-	}
+	}	
 }

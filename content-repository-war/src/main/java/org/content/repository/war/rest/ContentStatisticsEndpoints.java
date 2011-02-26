@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.content.repository.config.RepositoryConfiguration;
 import org.content.repository.war.rest.response.RepositoryStatisticsXMLResponse;
 import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.model.Key;
 
 @Path("/statistics")
 public class ContentStatisticsEndpoints {
@@ -25,7 +26,8 @@ public class ContentStatisticsEndpoints {
 
 		try 
 		{
-			ContentRepository contentRepo = RepositoryConfiguration.INSTANCE.getRepo();
+			ContentRepository cr = RepositoryConfiguration.INSTANCE.getRepo();
+			
 
 		} 
 		finally
