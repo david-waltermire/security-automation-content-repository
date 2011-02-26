@@ -20,6 +20,11 @@
 		<flex.compiler>${env.FLEX_HOME}/bin/mxmlc</flex.compiler>
 		<console.app.name>SCAPRepositoryConsole</console.app.name>
 		<swf>${console.app.name}</swf>
+		<width>1024</width>
+		<height>768</height>
+		<bgcolor>#FFFFFF</bgcolor>
+		<application>Security Automation Content Repository Console</application>
+		<title>${application}</title>
 	</properties>
 
 	<dependencies>
@@ -43,7 +48,7 @@
 							<resources>
 								<resource>
 									<directory>html-template</directory>
-									<filtering>true</filtering>
+									<filtering>false</filtering>
 									<excludes>
 										<exclude>index.template.html</exclude>
 									</excludes>
@@ -91,8 +96,11 @@
 					<executable>${flex.compiler}</executable>
 					<workingDirectory>${basedir}/src/main/flex/org/scapdev/content/repository/explorer</workingDirectory>
 					<arguments>
+						<argument>-static-link-runtime-shared-libraries</argument>
 						<argument>-output</argument>
 						<argument>${project.build.directory}/swf/${console.app.name}.swf</argument>
+						<argument>-compiler.source-path</argument>
+						<argument>${basedir}/src/main/flex</argument>						
 						<argument>--</argument>
 						<argument>${basedir}/src/main/flex/org/scapdev/content/repository/explorer/${console.app.name}.mxml</argument>
 					</arguments>

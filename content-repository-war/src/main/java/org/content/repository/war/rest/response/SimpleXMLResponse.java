@@ -1,4 +1,4 @@
-package org.content.repository.war.rest;
+package org.content.repository.war.rest.response;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
