@@ -43,6 +43,14 @@ class IndirectBindingInfoImpl extends AbstractBindingInfo<Indirect> implements I
 		this.externalIdentifierRefs = visitor.getExternalIdentifierRefs();
 	}
 
+	public IndirectBindingInfoImpl(String id, Indirect annotation, IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor, JAXBProperty property) {
+		super(id, annotation, property.getEnclosingJAXBClass());
+
+		this.qualifierPath = visitor.getQualifierPath();
+		this.valuePath = visitor.getValuePath();
+		this.externalIdentifierRefs = visitor.getExternalIdentifierRefs();
+	}
+
 	/**
 	 * @return the externalIdentifierRefs
 	 */

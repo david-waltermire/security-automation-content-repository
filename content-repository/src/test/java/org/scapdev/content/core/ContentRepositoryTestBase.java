@@ -37,10 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.core.persistence.hybrid.MemoryResidentHybridContentPersistenceManager;
 import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.Entity;
@@ -49,25 +46,11 @@ import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.Importer;
 import org.scapdev.content.model.processor.jaxb.ImportData;
 
-public class ITContentRepositoryTest {
-	private static final Logger log = Logger.getLogger(App.class);
+public class ContentRepositoryTestBase {
+	private static final Logger log = Logger.getLogger(ContentRepositoryTestBase.class);
 	protected static ContentRepository repository;
 	protected static Importer importer;
 	protected static InstanceWriter writer;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-    	StopWatch watch = new StopWatch();
-    	watch.start();
-    	repository = new ContentRepository();
-		ContentPersistenceManager persistenceManager = new MemoryResidentHybridContentPersistenceManager(); 
-		repository.setContentPersistenceManager(persistenceManager);
-    	watch.stop();
-    	log.info("Repository startup: "+watch.toString());
-
-    	importer = repository.getJaxbEntityProcessor().newImporter();
-    	writer = repository.newInstanceWriter();
-	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
@@ -78,9 +61,7 @@ public class ITContentRepositoryTest {
     	log.info("Repository shutdown: "+watch.toString());
 	}
 
-	@Test
-	public void importRedhatPatchContent() {
-		File file = new File("target/content/com.redhat.rhsa-all.xml");
+	private void importFile(File file) {
 		log.info("importing: "+file);
     	StopWatch watch = new StopWatch();
     	watch.start();
@@ -98,24 +79,23 @@ public class ITContentRepositoryTest {
 	}
 
 	@Test
-	public void importUSGCBWin7OVALContent() {
-		File file = new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
-		log.info("importing: "+file);
-		StopWatch watch = new StopWatch();
-    	watch.start();
-    	ImportData data = importer.read(file);
-    	watch.stop();
-    	log.info("Entities processed: "+data.getEntities().size());
-    	int relationships = 0;
-    	for (Entity entity : data.getEntities()) {
-    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
-    			++relationships;
-    		}
-    	}
-    	log.info("Relationships processed: "+relationships);
-    	log.info("Import timing: "+watch.toString());
+	public void importRedhatPatchContent() {
+		File file = new File("target/content/com.redhat.rhsa-all.xml");
+		importFile(file);
 	}
 
+	@Test
+	public void importUSGCBWin7OVALContent() {
+		File file = new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
+		importFile(file);
+	}
+
+	@Test
+	public void importNVDVuln2011Content() {
+		File file = new File("target/content/nvdcve-2.0-2011.xml");
+		importFile(file);
+	}
+	
 	@Test
 	public void writeWin7Definition() throws IOException, XMLStreamException, FactoryConfigurationError {
     	StopWatch watch = new StopWatch();

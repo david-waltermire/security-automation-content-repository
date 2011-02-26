@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.scapdev.content.model.jaxb.LocalRelationshipType;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
@@ -51,8 +54,8 @@ class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements
 	}
 
 	@Override
-	public LocalRelationship newRelationship(Object instance, Entity owningEntity) {
-		return new LocalRelationshipImpl(this, owningEntity, getKey(instance));
+	public List<LocalRelationship> newRelationships(Object instance, Entity owningEntity) {
+		return Collections.<LocalRelationship>singletonList(new LocalRelationshipImpl(this, owningEntity, getKey(instance)));
 	}
 
 	@Override

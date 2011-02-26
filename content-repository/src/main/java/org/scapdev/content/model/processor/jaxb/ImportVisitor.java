@@ -31,6 +31,7 @@ import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.JAXBMetadataModel;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 class ImportVisitor extends DefaultInstanceVisitor {
@@ -57,7 +58,7 @@ class ImportVisitor extends DefaultInstanceVisitor {
 	}
 
 	@Override
-	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) {
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass, JAXBProperty parentProperty) {
 		boolean processContent = true;
 		
 		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
@@ -73,20 +74,23 @@ class ImportVisitor extends DefaultInstanceVisitor {
 	}
 
 	@Override
-	public boolean beforeNode(Object instance, JAXBClass jaxbClass) {
+	public boolean beforeNode(Object instance, JAXBClass jaxbClass, JAXBProperty parentProperty) {
 		boolean processContent = true;
 		
 		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
 		if (entity != null) {
 			EntityInfo entityInfo = metadataModel.getEntityById(entity.id());
-
-			String localPart = entityInfo.getLocalPart();
-			if (localPart == null) {
+			QName qname = entityInfo.getQName();
+			if (qname == null) {
+				parentProperty.getQName();
+			}
+			if (qname == null) {
+				// TODO: extract ObjectFactory information for use with parentProperty.getQName();
 				throw new UnsupportedOperationException("Class is not a global element: "+instance.getClass().getName());
 			}
 			@SuppressWarnings("unchecked")
 			JAXBElement<Object> element = new JAXBElement<Object>(
-					new QName(entityInfo.getSchemaInfo().getNamespace(), localPart),
+					qname,
 					(Class<Object>) jaxbClass.getType(),
 					null,
 					instance);

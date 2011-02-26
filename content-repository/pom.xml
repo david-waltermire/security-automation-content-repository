@@ -51,6 +51,13 @@
     	<type>jar</type>
     	<scope>compile</scope>
     </dependency>
+     <dependency>
+    	<groupId>scap-content</groupId>
+    	<artifactId>content-meta-model</artifactId>
+    	<version>1.0-SNAPSHOT</version>
+    	<type>jar</type>
+    </dependency>
+ 
   	<dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
@@ -124,7 +131,7 @@
         <executions>
           <execution>
             <id>copy-resources</id>
-            <phase>generate-resources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -140,6 +147,10 @@
                   <preservePath>true</preservePath>
                   <unpack>true</unpack>
                 </resource>
+                <resource>
+                  <targetPath>${project.build.directory}/content</targetPath>
+                  <file>http://static.nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2011.xml</file>
+                </resource>
               </resources>
             </configuration>
           </execution>
@@ -152,7 +163,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.7</version>
       </plugin>
     </plugins>
   </reporting>

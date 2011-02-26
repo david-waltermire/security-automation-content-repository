@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBElement;
 import org.scapdev.content.annotation.Indirect;
 import org.scapdev.content.annotation.KeyRef;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
+import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.instance.DefaultInstanceVisitor;
 
 public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVisitor {
@@ -69,12 +70,12 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 	}
 
 	@Override
-	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) {
-		return beforeNode(instance.getValue(), jaxbClass);
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass, JAXBProperty parentProperty) {
+		return beforeNode(instance.getValue(), jaxbClass, parentProperty);
 	}
 
 	@Override
-	public boolean beforeNode(Object instance, JAXBClass typeInfo) {
+	public boolean beforeNode(Object instance, JAXBClass typeInfo, JAXBProperty parentProperty) {
 		boolean processContent = true;
 
 		if (instance != null) {
@@ -82,8 +83,8 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 			if (annotation != null) {
 				KeyedRelationshipInfo relationshipInfo = (KeyedRelationshipInfo) metadataModel.getRelationshipByKeyRefId(annotation.id());
 				try {
-					KeyedRelationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
-					keyedRelationships.add(relationship);
+					List<? extends KeyedRelationship> relationships = relationshipInfo.newRelationships(instance, owningEntity);
+					keyedRelationships.addAll(relationships);
 				} catch (NullFieldValueException e) {
 					// This indicates that the relationship is not properly formed
 					// do nothing, ignoring the relationship
@@ -92,21 +93,32 @@ public class JAXBRelationshipIdentifyingImportVisitor extends DefaultInstanceVis
 			}
 
 			Indirect indirect = typeInfo.getAnnotation(Indirect.class, true);
-			if (indirect != null) {
-				IndirectRelationshipInfo relationshipInfo = (IndirectRelationshipInfo) metadataModel.getRelationshipById(indirect.id());
-				try {
-					IndirectRelationship relationship = relationshipInfo.newRelationship(instance, owningEntity);
-					if (relationship != null) {
-						indirectRelationships.add(relationship);
-					}
-				} catch (NullFieldValueException e) {
-					// This indicates that the relationship is not properly formed
-					// do nothing, ignoring the relationship
-				}
+			if (processIndirectRelationship(instance, indirect, null)) {
 				processContent = false;
 			}
 		}
 		return processContent;
 	}
 
+	@Override
+	public void beforeJAXBProperty(Object instance, JAXBProperty property) {
+		Indirect indirect = property.getAnnotation(Indirect.class);
+		processIndirectRelationship(instance, indirect, property);
+	}
+
+	private boolean processIndirectRelationship(Object instance, Indirect indirect, JAXBProperty property) {
+		boolean result = false;
+		if (indirect != null) {
+			IndirectRelationshipInfo relationshipInfo = (IndirectRelationshipInfo) metadataModel.getRelationshipById(indirect.id());
+			try {
+				List<IndirectRelationship> relationships = relationshipInfo.newRelationships(instance, owningEntity);
+				indirectRelationships.addAll(relationships);
+			} catch (NullFieldValueException e) {
+				// This indicates that the relationship is not properly formed
+				// do nothing, ignoring the relationship
+			}
+			result = true;
+		}
+		return result;
+	}
 }

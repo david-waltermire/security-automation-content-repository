@@ -36,11 +36,9 @@ public class DefaultModelVisitor implements ModelVisitor {
 
 	private static final Logger log = Logger.getLogger(DefaultInstanceVisitor.class);
 
-	private final JAXBClass jaxbClass;
 	private final JAXBModel model;
 
-	public DefaultModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		this.jaxbClass = jaxbClass;
+	public DefaultModelVisitor(JAXBModel model) {
 		this.model = model;
 	}
 
@@ -48,16 +46,21 @@ public class DefaultModelVisitor implements ModelVisitor {
 		return model;
 	}
 
-	public void visit() {
+	public void visit(JAXBClass jaxbClass) {
 		log.debug("visiting type: "+jaxbClass.getType().getName());
 		processNode(jaxbClass);
 	}
 
-	public boolean beforeNode(JAXBClass typeInfo) { return true; }
-	public void afterNode(JAXBClass typeInfo) { }
+	public void visit(JAXBProperty property) {
+		log.debug("visiting property: "+property.getName());
+		processJaxbProperty(property);
+	}
 
-	public boolean beforeJAXBClass(JAXBClass typeInfo) { return true; }
-	public void afterJAXBClass(JAXBClass typeInfo) { }
+	public boolean beforeNode(JAXBClass jaxbClass) { return true; }
+	public void afterNode(JAXBClass jaxbClass) { }
+
+	public boolean beforeJAXBClass(JAXBClass jaxbClass) { return true; }
+	public void afterJAXBClass(JAXBClass jaxbClass) { }
 
 	public boolean beforeJAXBProperty(JAXBProperty property) { return true; }
 	public void afterJAXBProperty(JAXBProperty property) {}

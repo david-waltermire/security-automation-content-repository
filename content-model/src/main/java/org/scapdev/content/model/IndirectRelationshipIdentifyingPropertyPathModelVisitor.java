@@ -32,7 +32,6 @@ import org.scapdev.content.annotation.ExternalIdentifierRef;
 import org.scapdev.content.annotation.Indirect;
 import org.scapdev.content.annotation.IndirectQualifier;
 import org.scapdev.content.annotation.IndirectValue;
-import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.visitor.PropertyPathModelVisitor;
@@ -42,15 +41,19 @@ class IndirectRelationshipIdentifyingPropertyPathModelVisitor extends PropertyPa
 	private List<JAXBProperty> valuePath;
 	private final Map<String, String> qualifierToExternalIdentifierIdMap;
 
-	public IndirectRelationshipIdentifyingPropertyPathModelVisitor(Indirect indirect, JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
+	public IndirectRelationshipIdentifyingPropertyPathModelVisitor(Indirect indirect, JAXBModel model) {
+		super(model);
 		this.qualifierToExternalIdentifierIdMap = parseExternalIdentifierRefs(indirect);
 	}
 
 	private Map<String, String> parseExternalIdentifierRefs(Indirect indirect) {
 		Map<String, String> result = new HashMap<String, String>();
 		for (ExternalIdentifierRef ref : indirect.externalIdentifiers()) {
-			result.put(ref.qualifier(), ref.idRef());
+			String qualifier = ref.qualifier();
+			if (qualifier.isEmpty()) {
+				qualifier = null;
+			}
+			result.put(qualifier, ref.idRef());
 		}
 		if (result.isEmpty()) {
 			result = Collections.emptyMap();

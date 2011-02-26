@@ -32,8 +32,8 @@ import org.scapdev.jaxb.reflection.model.JAXBModel;
 public class CyclePreventingModelVisitor extends DefaultModelVisitor {
 	private final Set<JAXBClass> cycleSet; 
 
-	public CyclePreventingModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
+	public CyclePreventingModelVisitor(JAXBModel model) {
+		super(model);
 		cycleSet = new HashSet<JAXBClass>();
 	}
 

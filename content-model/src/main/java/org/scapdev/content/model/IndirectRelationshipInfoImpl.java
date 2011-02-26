@@ -24,15 +24,19 @@
 package org.scapdev.content.model;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.scapdev.content.model.jaxb.IndirectRelationshipType;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.instance.PropertyPathEvaluator;
 
 class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements IndirectRelationshipInfo {
+	private static final Logger log = Logger.getLogger(IndirectRelationshipInfoImpl.class);
 	private final IndirectBindingInfo binding;
 	private final MetadataModel model;
 
@@ -43,16 +47,17 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 	}
 
 	@Override
-	public IndirectRelationship newRelationship(Object instance, Entity owningEntity) {
-		ExternalIdentifier externalIdentifier = getExternalIdentifier(instance);
-		IndirectRelationship result = null;
-		if (externalIdentifier != null) {
-			result = new IndirectRelationshipImpl(this, owningEntity, externalIdentifier);
+	public List<IndirectRelationship> newRelationships(Object instance, Entity owningEntity) {
+		List<ExternalIdentifier> externalIdentifiers = getExternalIdentifiers(instance, owningEntity);
+
+		List<IndirectRelationship> result = new ArrayList<IndirectRelationship>(externalIdentifiers.size());
+		for (ExternalIdentifier externalIdentifier : externalIdentifiers) {
+			result.add(new IndirectRelationshipImpl(this, owningEntity, externalIdentifier));
 		}
 		return result;
 	}
 
-	public ExternalIdentifier getExternalIdentifier(Object instance) {
+	private List<ExternalIdentifier> getExternalIdentifiers(Object instance, Entity owningEntity) {
 		String qualifier = null;
 		List<JAXBProperty> qualifierPath = binding.getQualifierPath();
 		if (qualifierPath != null) {
@@ -67,9 +72,9 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 			}
 		}
 
-		String value;
+		List<String> values;
 		try {
-			value = PropertyPathEvaluator.evaluate(instance, binding.getValuePath());
+			values = PropertyPathEvaluator.evaluateMultiple(instance, binding.getValuePath());
 		} catch (IllegalArgumentException e) {
 			throw new ModelInstanceException(e);
 		} catch (IllegalAccessException e) {
@@ -81,13 +86,19 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		Map<String, String> qualifierToExternalIdentifierMap = binding.getExternalIdentifierRefs();
 		String externalIdentifierId = qualifierToExternalIdentifierMap.get(qualifier);
 
-		ExternalIdentifier result = null;
-		if (externalIdentifierId != null) {
+		List<ExternalIdentifier> result;
+		if (externalIdentifierId == null) {
+			log.trace("Unable to find indirect qualifier '"+qualifier+"' for id '"+getId()+"' on entity:"+owningEntity.getKey());
+			result = Collections.emptyList();
+		} else {
 			ExternalIdentifierInfo externalIdentifierInfo = model.getExternalIdentifierById(externalIdentifierId);
 			if (externalIdentifierInfo == null) {
 				throw new ModelException("Invalid external identifier: "+externalIdentifierId);
 			}
-			result = new ExternalIdentifier(externalIdentifierInfo, value);
+			result = new ArrayList<ExternalIdentifier>(values.size());
+			for (String value : values) {
+				result.add(new ExternalIdentifier(externalIdentifierInfo, value));
+			}
 		}
 		return result;
 	}

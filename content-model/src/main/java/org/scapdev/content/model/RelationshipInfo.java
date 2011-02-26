@@ -23,9 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.List;
+
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
 public interface RelationshipInfo extends SchemaComponent {
 	JAXBClass getOwningJAXBClass();
-	Relationship newRelationship(Object instance, Entity owningEntity);
+	List<? extends Relationship> newRelationships(Object instance, Entity owningEntity);
 }

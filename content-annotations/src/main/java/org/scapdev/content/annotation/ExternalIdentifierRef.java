@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target({TYPE})
 public @interface ExternalIdentifierRef {
 	String idRef();
-	String qualifier();
+	String qualifier() default "";
 }

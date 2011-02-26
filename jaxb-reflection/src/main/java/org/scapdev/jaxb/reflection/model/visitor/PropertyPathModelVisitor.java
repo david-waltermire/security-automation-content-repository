@@ -34,8 +34,8 @@ import org.scapdev.jaxb.reflection.model.JAXBProperty;
 public class PropertyPathModelVisitor extends DefaultModelVisitor {
 	private final LinkedList<JAXBProperty> propertyPath = new LinkedList<JAXBProperty>();
 
-	public PropertyPathModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
-		super(jaxbClass, model);
+	public PropertyPathModelVisitor(JAXBModel model) {
+		super(model);
 	}
 
 	public List<JAXBProperty> getPropertyPath() {

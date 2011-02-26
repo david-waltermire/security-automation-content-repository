@@ -33,8 +33,8 @@ public interface InstanceVisitor {
 	boolean beforeDocument(Object document, JAXBClass jaxbClass);
 	void afterDocument(Object document, JAXBClass jaxbClass);
 
-	boolean beforeNode(Object instance, JAXBClass jaxbClass);
-	void afterNode(Object instance, JAXBClass jaxbClass);
+	boolean beforeNode(Object instance, JAXBClass jaxbClass, JAXBProperty parentProperty);
+	void afterNode(Object instance, JAXBClass jaxbClass, JAXBProperty parentProperty);
 
 	void beforeJAXBClass(Object instance, JAXBClass jaxbClass);
 	void afterJAXBClass(Object instance, JAXBClass jaxbClass);

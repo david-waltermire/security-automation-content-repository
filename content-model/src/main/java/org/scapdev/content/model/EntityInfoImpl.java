@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import javax.xml.namespace.QName;
+
 import org.scapdev.content.model.jaxb.EntityType;
 
 class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
@@ -75,6 +77,17 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 		String result = binding.getAnnotation().localPart();
 		if (result.isEmpty()) {
 			result = null;
+		}
+		return result;
+	}
+
+	@Override
+	public QName getQName() {
+		String localPart = getLocalPart();
+
+		QName result = null;
+		if (localPart != null) {
+			result = new QName(getSchemaInfo().getNamespace(), localPart);
 		}
 		return result;
 	}
