@@ -52,19 +52,18 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 			DocumentData documentData,
 			XMLStreamWriter writer,
 			Marshaller marshaller) {
-		super(documentData.getDocumentInfo().getType(), documentData.getDocumentInfo().getType().getJAXBPackage().getJAXBModel());
+		super(documentData.getDocumentInfo().getType().getJAXBPackage().getJAXBModel());
 		this.documentData = documentData;
 		this.writer = writer;
 		this.marshaller = marshaller;
 	}
 
-	@Override
 	public void visit() throws JAXBModelException {
 		QName qname = getDocumentQName();
 		try {
 			log.info("writeStartElement: "+qname.toString());
 			writer.writeStartElement(qname.getPrefix(), qname.getLocalPart(), qname.getNamespaceURI());
-			super.visit();
+			visit(documentData.getDocumentInfo().getType());
 			writer.writeEndElement();
 			log.info("writeEndElement: "+qname.toString());
 		} catch (XMLStreamException e) {

@@ -100,7 +100,7 @@
     </xs:key>
     
     <xs:key name="ExternalIdentifierKey">
-      <xs:selector xpath=".//tns:external-identifiers/tns:external-identifier"/>
+      <xs:selector xpath=".//tns:external-identifier"/>
       <xs:field xpath="@id"/>
     </xs:key>
     <xs:keyref name="ExternalIdentifierKeyRef" refer="ExternalIdentifierKey">
@@ -125,7 +125,7 @@
 
   <xs:simpleType name="ComponentIdType">
     <xs:restriction base="xs:anyURI">
-      <xs:pattern value="urn:scap-content:[a-z-]+:[a-z][a-z0-9.-_]+:[a-z][a-z0-9-]+"/>
+      <xs:pattern value="urn:scap-content:[a-z-]+:[a-z][a-z0-9.-_]+:[a-z][a-z0-9.\-_]+"/>
     </xs:restriction>
   </xs:simpleType>
   
@@ -262,6 +262,14 @@
 
   <xs:complexType name="SchemaReferenceType">
     <xs:attribute name="node" use="required"/>
+    <xs:attribute name="javaLocation" default="TYPE">
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:enumeration value="TYPE"/>
+          <xs:enumeration value="FIELD"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:element name="schema-node" type="SchemaReferenceType"/>
@@ -332,7 +340,7 @@
       <xs:extension base="DocumentModelType">
         <xs:sequence>
           <xs:element name="entity-container" type="EntityContainerType" maxOccurs="unbounded"/>
-          <xs:element ref="generated-property" maxOccurs="unbounded"/>
+          <xs:element ref="generated-property" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

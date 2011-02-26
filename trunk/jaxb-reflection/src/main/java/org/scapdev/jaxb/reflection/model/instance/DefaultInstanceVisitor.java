@@ -76,7 +76,7 @@ public class DefaultInstanceVisitor implements InstanceVisitor {
 		
 		JAXBClass jaxbClass = model.getClass(clazz);
 		if (beforeDocument(document, jaxbClass)) {
-			processNode(effectiveInstance);
+			processNode(effectiveInstance, null);
 		}
 		afterDocument(document, jaxbClass);
 	}
@@ -84,11 +84,11 @@ public class DefaultInstanceVisitor implements InstanceVisitor {
 	public boolean beforeDocument(Object document, JAXBClass jaxbClass) { return true; }
 	public void afterDocument(Object document, JAXBClass jaxbClass) {}
 
-	public boolean beforeNode(Object instance, JAXBClass jaxbClass) { return true; }
-	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass) { return true; }
+	public boolean beforeNode(Object instance, JAXBClass jaxbClass, JAXBProperty parentProperty) { return true; }
+	public boolean beforeNode(JAXBElement<?> instance, JAXBClass jaxbClass, JAXBProperty parentProperty) { return true; }
 	
-	public void afterNode(Object instance, JAXBClass jaxbClass) {}
-	public void afterNode(JAXBElement<?> instance, JAXBClass jaxbClass) {}
+	public void afterNode(Object instance, JAXBClass jaxbClass, JAXBProperty parentProperty) {}
+	public void afterNode(JAXBElement<?> instance, JAXBClass jaxbClass, JAXBProperty parentProperty) {}
 
 	public void beforeJAXBClass(Object instance, JAXBClass jaxbClass) {}
 	public void afterJAXBClass(Object instance, JAXBClass jaxbClass) {}
@@ -98,7 +98,7 @@ public class DefaultInstanceVisitor implements InstanceVisitor {
 
 	public void handleObject(Object instance, JAXBProperty property) {}
 
-	private void processNode(Object instance) {
+	private void processNode(Object instance, JAXBProperty parentProperty) {
 		log.trace("Walking node: "+(instance != null ? instance.getClass() : "(not set)"));
 		if (instance != null) {
 //			Object effectiveInstance = instance;
@@ -114,19 +114,19 @@ public class DefaultInstanceVisitor implements InstanceVisitor {
 			if (JAXBElement.class.isAssignableFrom(instance.getClass())) {
 				JAXBElement<?> element = (JAXBElement<?>)instance;
 				JAXBClass jaxbClass = model.getClass(element.getDeclaredType());
-				if (beforeNode(element, jaxbClass)) {
+				if (beforeNode(element, jaxbClass, parentProperty)) {
 					instance = element.getValue();
 					if (instance != null) {
 						processJAXBClass(instance, jaxbClass);
 					}
 				}
-				afterNode(element, jaxbClass);
+				afterNode(element, jaxbClass, parentProperty);
 			} else {
 				JAXBClass jaxbClass = model.getClass(instance.getClass());
-				if (beforeNode(instance, jaxbClass)) {
+				if (beforeNode(instance, jaxbClass, parentProperty)) {
 					processJAXBClass(instance, jaxbClass);
 				}
-				afterNode(instance, jaxbClass);
+				afterNode(instance, jaxbClass, parentProperty);
 			}
 		}
 
@@ -178,9 +178,9 @@ public class DefaultInstanceVisitor implements InstanceVisitor {
 				List<?> list = (List<?>)instance;
 				processList(list, property);
 			} else if (JAXBElement.class.isAssignableFrom(clazz)) {
-				processNode(instance);
+				processNode(instance, property);
 			} else if (instance.getClass().isAnnotationPresent(XmlType.class)) {
-				processNode(instance);
+				processNode(instance, property);
 			} else {
 				handleObject(instance, property);
 			}

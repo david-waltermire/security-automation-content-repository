@@ -28,7 +28,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
     jaxb:version="2.1">
-  
+  <jaxb:globalBindings generateElementClass="true"/>
   <jaxb:bindings schemaLocation="../../../src/main/xsd/oval-5.8/oval-definitions-schema.xsd" node="/xs:schema">
     
 

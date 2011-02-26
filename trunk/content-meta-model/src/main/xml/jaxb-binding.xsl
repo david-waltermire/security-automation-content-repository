@@ -30,10 +30,18 @@
   xmlns:meta="http://scapdev.org/schema/meta-model/0.1"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:saxon="http://saxon.sf.net/"
+  extension-element-prefixes="saxon"
   version="2.0">
+
   <xsl:output indent="yes" xml:space="default" method="xml" />
 
   <xsl:template match="meta:meta-model">
+    <xsl:comment>
+      XSLT Version = <xsl:copy-of select="system-property('xsl:version')"/>
+      XSLT Vendor = <xsl:copy-of select="system-property('xsl:vendor')"/>
+      XSLT Vendor URL = <xsl:copy-of select="system-property('xsl:vendor-url')"/>
+    </xsl:comment>
     <jaxb:bindings jaxb:extensionBindingPrefixes="annox" jaxb:version="2.1"
                    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd">
       <xsl:apply-templates/>
@@ -202,6 +210,9 @@
     <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>
     <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
       <annox:annotate>
+        <xsl:if test="meta:schema-node/@javaLocation = 'FIELD'">
+          <xsl:attribute name="target">field</xsl:attribute>
+        </xsl:if>
         <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}">
           <annox:annotate annox:field="externalIdentifiers">
             <xsl:for-each select="meta:external-identifier-ref">

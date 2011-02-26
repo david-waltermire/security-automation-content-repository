@@ -24,13 +24,14 @@
 package org.scapdev.content.annotation;
 
 import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({TYPE})
+@Target({TYPE,FIELD})
 public @interface Indirect {
 	String id();
 	ExternalIdentifierRef[] externalIdentifiers();

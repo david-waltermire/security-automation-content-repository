@@ -23,9 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.List;
+
 public interface KeyedRelationshipInfo extends RelationshipInfo {
 	KeyRefInfo getKeyRefInfo();
 	KeyInfo getKeyInfo();
 	Key getKey(Object instance) throws ModelInstanceException;
-	KeyedRelationship newRelationship(Object instance, Entity owningEntity);
+	List<? extends KeyedRelationship> newRelationships(Object instance, Entity owningEntity);
 }

@@ -37,15 +37,17 @@ import org.scapdev.jaxb.reflection.model.visitor.PropertyPathModelVisitor;
 
 abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION extends Annotation, FIELD extends Annotation> extends
 		PropertyPathModelVisitor {
+	private final JAXBClass jaxbClass;
 	private final ANNOTATION indexedAnnotation;
 	private final Map<String, List<JAXBProperty>> propertyMap;
 	private final Class<FIELD> fieldClass;
 
-	public AbstractIndexIdentifyingPropertyPathModelVisitor(ANNOTATION indexedAnnotation, JAXBClass typeInfo, JAXBModel model, Class<ANNOTATION> annotationClass, Class<FIELD> fieldClass) {
-		super(typeInfo, model);
-		if (typeInfo.getAnnotation(annotationClass, false) == null) {
-			throw new ModelException("Type '"+typeInfo.getType().getName()+"' does not contain a "+indexedAnnotation.getClass());
+	public AbstractIndexIdentifyingPropertyPathModelVisitor(ANNOTATION indexedAnnotation, JAXBClass jaxbClass, JAXBModel model, Class<ANNOTATION> annotationClass, Class<FIELD> fieldClass) {
+		super(model);
+		if (jaxbClass.getAnnotation(annotationClass, false) == null) {
+			throw new ModelException("Type '"+jaxbClass.getType().getName()+"' does not contain a "+indexedAnnotation.getClass());
 		}
+		this.jaxbClass = jaxbClass;
 		propertyMap = new LinkedHashMap<String, List<JAXBProperty>>();
 		this.indexedAnnotation = indexedAnnotation;
 		this.fieldClass = fieldClass;
@@ -66,9 +68,8 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 	protected abstract String getIndexedAnnotationId();
 	protected abstract String getIndexedFieldId(FIELD field);
 
-	@Override
 	public void visit() {
-		super.visit();
+		visit(jaxbClass);
 
 		Set<String> fields = new HashSet<String>(getIndexedFields());
 		Set<String> locatedFields = propertyMap.keySet();

@@ -23,7 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.List;
+
+
 public interface IndirectRelationshipInfo extends RelationshipInfo {
-	ExternalIdentifier getExternalIdentifier(Object instance);
-	IndirectRelationship newRelationship(Object instance, Entity owningEntity);
+	List<IndirectRelationship> newRelationships(Object instance, Entity owningEntity);
 }

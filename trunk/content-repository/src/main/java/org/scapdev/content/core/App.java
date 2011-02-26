@@ -67,38 +67,17 @@ public class App {
     	Importer importer = repository.getJaxbEntityProcessor().newImporter();
     	{
     		File file = new File("target/content/com.redhat.rhsa-all.xml");
-    		log.info("importing: "+file);
-	    	StopWatch watch = new StopWatch();
-	    	watch.start();
-	    	ImportData data = importer.read(file);
-	    	watch.stop();
-	    	log.info("Entities processed: "+data.getEntities().size());
-	    	int relationships = 0;
-	    	for (Entity entity : data.getEntities()) {
-	    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
-	    			++relationships;
-	    		}
-	    	}
-	    	log.info("Relationships processed: "+relationships);
-	    	log.info("Import timing: "+watch.toString());
+    		importFile(file, importer);
     	}
 
     	{
     		File file = new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
-    		log.info("importing: "+file);
-    		StopWatch watch = new StopWatch();
-	    	watch.start();
-	    	ImportData data = importer.read(file);
-	    	watch.stop();
-	    	log.info("Entities processed: "+data.getEntities().size());
-	    	int relationships = 0;
-	    	for (Entity entity : data.getEntities()) {
-	    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
-	    			++relationships;
-	    		}
-	    	}
-	    	log.info("Relationships processed: "+relationships);
-	    	log.info("Import timing: "+watch.toString());
+    		importFile(file, importer);
+    	}
+
+    	{
+    		File file = new File("target/content/nvdcve-2.0-2011.xml");
+    		importFile(file, importer);
     	}
 
     	InstanceWriter writer = repository.newInstanceWriter();
@@ -137,4 +116,21 @@ public class App {
     	}
     	repository.shutdown();
     }
+
+	private static void importFile(File file, Importer importer) {
+		log.info("importing: "+file);
+    	StopWatch watch = new StopWatch();
+    	watch.start();
+    	ImportData data = importer.read(file);
+    	watch.stop();
+    	log.info("Entities processed: "+data.getEntities().size());
+    	int relationships = 0;
+    	for (Entity entity : data.getEntities()) {
+    		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
+    			++relationships;
+    		}
+    	}
+    	log.info("Relationships processed: "+relationships);
+    	log.info("Import timing: "+watch.toString());
+	}
 }

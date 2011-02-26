@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import javax.xml.namespace.QName;
+
 /**
  * Represents information about a declared entity type within a schema metamodel.
  */
@@ -33,4 +35,6 @@ public interface EntityInfo extends SchemaComponent, Indexed {
 	 * @return a string representing the element name
 	 */
 	String getLocalPart();
+
+	QName getQName();
 }

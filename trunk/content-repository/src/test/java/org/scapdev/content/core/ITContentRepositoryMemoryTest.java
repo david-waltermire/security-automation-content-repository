@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model;
+package org.scapdev.content.core;
 
-import java.lang.annotation.Annotation;
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.core.persistence.hybrid.MemoryResidentHybridContentPersistenceManager;
 
-import org.scapdev.jaxb.reflection.model.JAXBClass;
+public class ITContentRepositoryMemoryTest extends ContentRepositoryTestBase {
+	private static final Logger log = Logger.getLogger(ITContentRepositoryMemoryTest.class);
 
-abstract class AbstractBindingInfo<X extends Annotation> implements BindingInfo<X> {
-	private final String id;
-	private final X annotation;
-	private final JAXBClass jaxbClass;
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+    	StopWatch watch = new StopWatch();
+    	watch.start();
+    	repository = new ContentRepository();
+		ContentPersistenceManager persistenceManager = new MemoryResidentHybridContentPersistenceManager(); 
+		repository.setContentPersistenceManager(persistenceManager);
+    	watch.stop();
+    	log.info("Repository startup: "+watch.toString());
 
-	AbstractBindingInfo(String id, X annotation, JAXBClass jaxbClass) {
-		this.id = id;
-		this.annotation = annotation;
-		this.jaxbClass = jaxbClass;
-	}
-
-	@Override
-	public String getId() {
-		return id;
-	}
-
-	@Override
-	public X getAnnotation() {
-		return annotation;
-	}
-
-	@Override
-	public JAXBClass getJaxbClass() {
-		return jaxbClass;
+    	importer = repository.getJaxbEntityProcessor().newImporter();
+    	writer = repository.newInstanceWriter();
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
+import org.scapdev.jaxb.reflection.model.visitor.DefaultModelVisitor;
 import org.scapdev.jaxb.reflection.model.visitor.JAXBClassVisitor;
 
 class InitializingJAXBClassVisitor implements JAXBClassVisitor {
@@ -102,12 +103,61 @@ class InitializingJAXBClassVisitor implements JAXBClassVisitor {
 		if (indirect != null) {
 			String id = indirect.id();
 
-			IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor = new IndirectRelationshipIdentifyingPropertyPathModelVisitor(indirect, jaxbClass, model);
-			visitor.visit();
+			IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor = new IndirectRelationshipIdentifyingPropertyPathModelVisitor(indirect, model);
+			visitor.visit(jaxbClass);
 
 			IndirectBindingInfo bindingInfo = new IndirectBindingInfoImpl(id, indirect, visitor, jaxbClass);
 			assert(!keyRefs.containsKey(id));
 			indirects.put(id, bindingInfo);
 		}
+
+		// Iterate over class properties to find additional annotations
+		InternalModelVisitor visitor = new InternalModelVisitor(jaxbClass, model);
+		visitor.visit(jaxbClass);
+	}
+
+	private class InternalModelVisitor extends DefaultModelVisitor {
+		private final JAXBClass jaxbClass;
+
+		public InternalModelVisitor(JAXBClass jaxbClass, JAXBModel model) {
+			super(model);
+			this.jaxbClass = jaxbClass;
+		}
+
+		/**
+		 * @return the jaxbClass
+		 */
+		public JAXBClass getJaxbClass() {
+			return jaxbClass;
+		}
+
+		@Override
+		public boolean beforeJAXBClass(JAXBClass jaxbClass) {
+			// Limit visitor to this class only
+			if (!getJaxbClass().equals(jaxbClass)) {
+				return false;
+			}
+			// Process properties on this JAXB class
+			return true;
+		}
+
+		@Override
+		public boolean beforeJAXBProperty(JAXBProperty property) {
+			org.scapdev.content.annotation.Indirect indirect = property.getAnnotation(org.scapdev.content.annotation.Indirect.class);
+			if (indirect != null) {
+				String id = indirect.id();
+
+				IndirectRelationshipIdentifyingPropertyPathModelVisitor visitor = new IndirectRelationshipIdentifyingPropertyPathModelVisitor(indirect, model);
+				visitor.visit(property);
+
+				IndirectBindingInfo bindingInfo = new IndirectBindingInfoImpl(id, indirect, visitor, property);
+				assert(!keyRefs.containsKey(id));
+				indirects.put(id, bindingInfo);
+			}
+
+			return false;
+		}
+
+		
 	}
 }

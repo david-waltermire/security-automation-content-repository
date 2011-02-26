@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.List;
+
 
 public interface LocalRelationshipInfo extends KeyedRelationshipInfo {
+	List<LocalRelationship> newRelationships(Object instance, Entity owningEntity);
 }
