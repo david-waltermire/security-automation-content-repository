@@ -203,6 +203,11 @@
       	  <artifactId>maven-site-plugin</artifactId>
       	  <version>2.2</version>
       	</plugin>
+      	<plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.7.2</version>
+      	</plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
@@ -235,38 +240,38 @@
       </plugins>
     </pluginManagement>
 
-	<plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>site</phase>
-          </execution>
-        </executions>
-      </plugin>
-	</plugins>
+<!--	<plugins>-->
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>aggregate</id>-->
+<!--            <goals>-->
+<!--              <goal>aggregate</goal>-->
+<!--            </goals>-->
+<!--            <phase>site</phase>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+<!--	</plugins>-->
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.7</version>
-        <reportSets>
-          <reportSet>
-            <id>aggregate</id>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
+<!---->
+<!--  <reporting>-->
+<!--    <plugins>-->
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--        <version>2.7</version>-->
+<!--        <reportSets>-->
+<!--          <reportSet>-->
+<!--            <id>aggregate</id>-->
+<!--            <reports>-->
+<!--              <report>aggregate</report>-->
+<!--            </reports>-->
+<!--          </reportSet>-->
+<!--        </reportSets>-->
+<!--      </plugin>-->
+<!--    </plugins>-->
+<!--  </reporting>-->
 </project>
