@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -47,4 +48,15 @@ public interface MetadataModel {
 	 * 		there is no match
 	 */
 	Key getKeyFromMappedIdentifier(String identifier);
+	
+	/**
+	 * Return a collection of all IndirectRelationship Ids.
+	 */
+	Collection<String> getIndirectRelationshipIds();
+	
+	/**
+	 * Return a collection of all KeyedRelationship Ids.
+	 */
+	Collection<String> getKeyedRelationshipIds();
+	
 }
