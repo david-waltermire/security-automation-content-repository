@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.log4j.Logger;
 import org.scapdev.content.annotation.EntityContainer;
 import org.scapdev.content.annotation.Generated;
 import org.scapdev.content.model.Entity;
@@ -42,7 +41,7 @@ import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.visitor.CyclePreventingModelVisitor;
 
 public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModelVisitor {
-	private static final Logger log = Logger.getLogger(XmlEventGeneratingDocumentModelVisitor.class);
+//	private static final Logger log = Logger.getLogger(XmlEventGeneratingDocumentModelVisitor.class);
 
 	private final DocumentData documentData;
 	private final XMLStreamWriter writer;
@@ -145,7 +144,7 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 			if (generated != null) {
 				switch (generated.type()) {
 				case INSTANCE:
-					QName qname = property.getQName();
+//					QName qname = property.getQName();
 					try {
 //						log.info("  writeEndElement: "+qname.toString());
 						writer.writeEndElement();

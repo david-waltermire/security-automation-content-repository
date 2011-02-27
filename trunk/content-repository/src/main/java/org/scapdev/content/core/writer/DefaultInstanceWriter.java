@@ -23,15 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -54,30 +52,64 @@ public class DefaultInstanceWriter implements InstanceWriter {
 		this.model = model;
 	}
 
-	@Override
-	public void write(QueryResult queryResult) throws IOException, XMLStreamException, FactoryConfigurationError {
+	public void write(QueryResult queryResult, OutputStream os) throws XMLStreamException {
+		write(queryResult, getXMLStreamWriter(os));
+	}
+
+	public void write(QueryResult queryResult, Writer writer) throws XMLStreamException {
+		write(queryResult, getXMLStreamWriter(writer));
+	}
+
+	public void write(QueryResult queryResult, XMLStreamWriter writer) throws XMLStreamException {
+		Map<DocumentInfo, DocumentData> documentDataMap = generateDocumentEntityMap(queryResult);
+		if (!documentDataMap.isEmpty()) {
+			writer.writeStartDocument();
+			writer.writeStartElement("repo", "repository-data", "http://scapdev.org/schema/meta-model-instance/0.1");
+
+			writer.writeStartElement("http://scapdev.org/schema/meta-model-instance/0.1", "documents");
+
+			XMLStreamWriter filteredWriter = new XmlStreamWriterNamespaceFilter(writer);
+			int i = 1;
+			for (Map.Entry<DocumentInfo, DocumentData> entry : documentDataMap.entrySet()) {
+				log.info("writing document: "+entry.getKey().getId());
+				writer.writeStartElement("http://scapdev.org/schema/meta-model-instance/0.1", "document");
+
+				DocumentData documentData = entry.getValue();
+				writer.writeAttribute("type", documentData.getDocumentInfo().getId());
+				String documentId = "document-"+Integer.toString(i++);
+				writer.writeAttribute("id", documentId);
+	
+				for (Map.Entry<String, String> namespaceEntry : model.getNamespaceToPrefixMap().entrySet()) {
+					writer.setPrefix(namespaceEntry.getValue(), namespaceEntry.getKey());
+				}
+				new DocumentWriter(documentData, filteredWriter, marshaller).write();
+
+				writer.writeEndElement();
+			}
+
+			writer.writeEndElement();
+
+			writer.writeEndElement();
+			writer.writeEndDocument();
+		}
+	}
+
+	private XMLOutputFactory2 getXMLOutputFactory2() {
 //		XMLOutputFactory factory = XMLOutputFactory.newFactory();
 		XMLOutputFactory2 factory = (XMLOutputFactory2)XMLOutputFactory2.newInstance();
 		factory.configureForRobustness();
 		factory.setProperty(XMLOutputFactory2.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		factory.setProperty(XMLOutputFactory2.P_AUTOMATIC_NS_PREFIX, Boolean.TRUE);
 		factory.setProperty(XMLOutputFactory2.XSP_NAMESPACE_AWARE, Boolean.TRUE);
+		return factory;
+	}
 
-		for (Map.Entry<DocumentInfo, DocumentData> entry : generateDocumentEntityMap(queryResult).entrySet()) {
-			log.info("writing document: "+entry.getKey().getId());
-			DocumentData documentData = entry.getValue();
+	private XMLStreamWriter getXMLStreamWriter(OutputStream os) throws XMLStreamException {
+		return getXMLOutputFactory2().createXMLStreamWriter(os);
+	}
 
-			//			XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(new File("test.xml")));
-			Writer stringWriter = new StringWriter();
-			XMLStreamWriter writer = factory.createXMLStreamWriter(stringWriter);
-			writer = new XmlStreamWriterNamespaceFilter(writer);
-			for (Map.Entry<String, String> namespaceEntry : model.getNamespaceToPrefixMap().entrySet()) {
-				writer.setPrefix(namespaceEntry.getValue(), namespaceEntry.getKey());
-			}
-			new DocumentWriter(documentData, writer, marshaller).write();
-			writer.flush();
-			log.info(stringWriter.toString());
-		}
+	private XMLStreamWriter getXMLStreamWriter(Writer writer) throws XMLStreamException {
+		return getXMLOutputFactory2().createXMLStreamWriter(writer);
 	}
 
 	private static Map<DocumentInfo, DocumentData> generateDocumentEntityMap(QueryResult queryResult) {

@@ -26,6 +26,8 @@ package org.scapdev.content.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -110,7 +112,10 @@ public class ContentRepositoryTestBase {
     	watch.stop();
     	log.info("Definition query: "+watch.toString());
 
-    	writer.write(result);
+		Writer stringWriter = new StringWriter();
+    	writer.write(result, stringWriter);
+    	stringWriter.flush();
+		log.info(stringWriter.toString());
 	}
 
 	@Test
@@ -129,6 +134,9 @@ public class ContentRepositoryTestBase {
     	watch.stop();
     	log.info("Definition query: "+watch.toString());
 
-    	writer.write(result);
+		Writer stringWriter = new StringWriter();
+    	writer.write(result, stringWriter);
+    	stringWriter.flush();
+		log.info(stringWriter.toString());
 	}
 }

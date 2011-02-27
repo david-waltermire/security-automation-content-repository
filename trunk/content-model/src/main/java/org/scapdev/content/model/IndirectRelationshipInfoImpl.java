@@ -64,11 +64,17 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 			try {
 				qualifier = PropertyPathEvaluator.evaluate(instance, qualifierPath);
 			} catch (IllegalArgumentException e) {
-				throw new ModelInstanceException(e);
+				ModelInstanceException e2 = new ModelInstanceException(e);
+				log.error("",e2);
+				throw e2;
 			} catch (IllegalAccessException e) {
-				throw new ModelInstanceException(e);
+				ModelInstanceException e2 = new ModelInstanceException(e);
+				log.error("",e2);
+				throw e2;
 			} catch (InvocationTargetException e) {
-				throw new ModelInstanceException(e);
+				ModelInstanceException e2 = new ModelInstanceException(e);
+				log.error("",e2);
+				throw e2;
 			}
 		}
 
@@ -76,11 +82,17 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		try {
 			values = PropertyPathEvaluator.evaluateMultiple(instance, binding.getValuePath());
 		} catch (IllegalArgumentException e) {
-			throw new ModelInstanceException(e);
+			ModelInstanceException e2 = new ModelInstanceException(e);
+			log.error("",e2);
+			throw e2;
 		} catch (IllegalAccessException e) {
-			throw new ModelInstanceException(e);
+			ModelInstanceException e2 = new ModelInstanceException(e);
+			log.error("",e2);
+			throw e2;
 		} catch (InvocationTargetException e) {
-			throw new ModelInstanceException(e);
+			ModelInstanceException e2 = new ModelInstanceException(e);
+			log.error("",e2);
+			throw e2;
 		}
 		
 		Map<String, String> qualifierToExternalIdentifierMap = binding.getExternalIdentifierRefs();
@@ -93,7 +105,9 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		} else {
 			ExternalIdentifierInfo externalIdentifierInfo = model.getExternalIdentifierById(externalIdentifierId);
 			if (externalIdentifierInfo == null) {
-				throw new ModelException("Invalid external identifier: "+externalIdentifierId);
+				ModelInstanceException e = new ModelInstanceException("Invalid external identifier: "+externalIdentifierId);
+				log.error("invalid external identifier",e);
+				throw e;
 			}
 			result = new ArrayList<ExternalIdentifier>(values.size());
 			for (String value : values) {

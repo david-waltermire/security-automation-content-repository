@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.scapdev.content.annotation.ExternalIdentifierRef;
 import org.scapdev.content.annotation.Indirect;
 import org.scapdev.content.annotation.IndirectQualifier;
@@ -37,6 +38,7 @@ import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.visitor.PropertyPathModelVisitor;
 
 class IndirectRelationshipIdentifyingPropertyPathModelVisitor extends PropertyPathModelVisitor {
+	private static final Logger log = Logger.getLogger(IndirectRelationshipIdentifyingPropertyPathModelVisitor.class);
 	private List<JAXBProperty> qualifierPath;
 	private List<JAXBProperty> valuePath;
 	private final Map<String, String> qualifierToExternalIdentifierIdMap;
@@ -90,14 +92,18 @@ class IndirectRelationshipIdentifyingPropertyPathModelVisitor extends PropertyPa
 			if (qualifierPath == null) {
 				qualifierPath = getPropertyPath();
 			} else {
-				throw new ModelException("Duplicate IndirectQualifier on field: "+property.toString());
+				ModelException e = new ModelException("Duplicate IndirectQualifier on field: "+property.toString());
+				log.error("duplicate qualifier", e);
+				throw e;
 			}
 		} else {
 			if (value != null) {
 				if (valuePath == null) {
 					valuePath = getPropertyPath();
 				} else {
-					throw new ModelException("Duplicate IndirectValue on field: "+property.toString());
+					ModelException e = new ModelException("Duplicate IndirectValue on field: "+property.toString());
+					log.error("duplicate value", e);
+					throw e;
 				}
 			}
 		}
