@@ -61,11 +61,11 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 	public void visit() throws JAXBModelException {
 		QName qname = getDocumentQName();
 		try {
-			log.info("writeStartElement: "+qname.toString());
+//			log.trace("writeStartElement: "+qname.toString());
 			writer.writeStartElement(qname.getPrefix(), qname.getLocalPart(), qname.getNamespaceURI());
 			visit(documentData.getDocumentInfo().getType());
 			writer.writeEndElement();
-			log.info("writeEndElement: "+qname.toString());
+//			log.trace("writeEndElement: "+qname.toString());
 		} catch (XMLStreamException e) {
 			throw new JAXBModelException(e);
 		}
@@ -103,10 +103,10 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 			// Write out matching entity
 			for (Entity entity : documentData.getEntities(container.id(), Arrays.asList(container.entityIds()))) {
 				try {
-					log.info("    writeStartElement: "+entity.getKey().toString());
+//					log.info("    writeStartElement: "+entity.getKey().toString());
 					marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 					marshaller.marshal(entity.getObject(), writer);
-					log.info("    writeEndElement: "+entity.getKey().toString());
+//					log.info("    writeEndElement: "+entity.getKey().toString());
 				} catch (JAXBException e) {
 					throw new ModelInstanceException(e);
 				}
@@ -119,7 +119,7 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 					processChild = true;
 					QName qname = property.getQName();
 					try {
-						log.info("  writeStartElement: "+qname.toString());
+//						log.info("  writeStartElement: "+qname.toString());
 						writer.writeStartElement(qname.getPrefix(), qname.getLocalPart(), qname.getNamespaceURI());
 					} catch (XMLStreamException e) {
 						throw new ModelInstanceException(e);
@@ -147,7 +147,7 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 				case INSTANCE:
 					QName qname = property.getQName();
 					try {
-						log.info("  writeEndElement: "+qname.toString());
+//						log.info("  writeEndElement: "+qname.toString());
 						writer.writeEndElement();
 					} catch (XMLStreamException e) {
 						throw new ModelInstanceException(e);

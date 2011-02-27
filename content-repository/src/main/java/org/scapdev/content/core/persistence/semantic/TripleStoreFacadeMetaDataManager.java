@@ -23,8 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
-import info.aduna.iteration.Iterations;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +35,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
