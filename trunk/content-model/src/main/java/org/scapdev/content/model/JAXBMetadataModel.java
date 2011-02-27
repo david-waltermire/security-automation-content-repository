@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -190,5 +191,28 @@ public class JAXBMetadataModel implements MetadataModel {
 			if (result != null) break;
 		}
 		return result;
+	}
+
+	@Override
+	public Collection<String> getIndirectRelationshipIds() {
+		List<String> relationshipIds = new LinkedList<String>();
+		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
+			if (entry.getValue() instanceof IndirectRelationshipInfo){
+				relationshipIds.add(entry.getKey());
+			}
+		}
+		return relationshipIds;
+		
+	}
+
+	@Override
+	public Collection<String> getKeyedRelationshipIds() {
+		List<String> relationshipIds = new LinkedList<String>();
+		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
+			if (entry.getValue() instanceof KeyedRelationshipInfo){
+				relationshipIds.add(entry.getKey());
+			}
+		}
+		return relationshipIds;
 	}
 }
