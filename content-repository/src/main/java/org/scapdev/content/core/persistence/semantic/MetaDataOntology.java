@@ -26,7 +26,6 @@ package org.scapdev.content.core.persistence.semantic;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.openrdf.model.BNode;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;

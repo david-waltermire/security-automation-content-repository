@@ -29,7 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 public class Key implements Comparable<Key> {
+	private static final Logger log = Logger.getLogger(Key.class);
 	private final String id;
 	private final LinkedHashMap<String, String> idToValueMap;
 
@@ -42,9 +45,13 @@ public class Key implements Comparable<Key> {
 		idToValueMap = new LinkedHashMap<String, String>();
 		for (int i = 0;i<typeIds.length;i++) {
 			if (typeIds[i] == null) {
-				throw new KeyException(id);
+				KeyException e = new KeyException(id);
+				log.error("illegal null field id", e);
+				throw e;
 			} else if (values[i] == null) {
-				throw new NullFieldValueException("null value for key '"+id+"' field: "+typeIds[i]);
+				KeyException e = new NullFieldValueException("null value for key '"+id+"' field: "+typeIds[i]);
+				log.error("illegal null field value", e);
+				throw e;
 			}
 			idToValueMap.put(typeIds[i], values[i]);
 		}

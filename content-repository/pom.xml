@@ -119,6 +119,18 @@
   </dependencies>
  
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>target/generated-sources/xjc</directory>
+        <includes>
+          <include>**/jaxb.index</include>
+        </includes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -156,8 +168,81 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <catalogs>
+            <catalog>catalog.xml</catalog>
+          </catalogs>
+          <validationSets>
+            <validationSet>
+              <dir>src/main/xsd</dir>
+            </validationSet>
+          </validationSets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <extension>true</extension>
+          <args>
+            <arg>-Xjaxbindex</arg>
+          </args>
+          <schemaDirectory>src/main/xsd</schemaDirectory>
+          <schemaIncludes>
+            <include>*/*.xsd</include>
+            <include>*.xsd</include>
+          </schemaIncludes>
+          <bindingDirectory>src/main/xsd</bindingDirectory>
+          <bindingIncludes>
+            <include>*.xjb</include>
+          </bindingIncludes>
+          <episode>false</episode>
+          <episodes>
+            <episode>
+              <groupId>scap-content</groupId>
+              <artifactId>content-model</artifactId>
+            </episode>
+          </episodes>
+          <catalog>src/main/xml/catalog.xml</catalog>
+          <plugins>
+            <plugin>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>jaxb2-basics</artifactId>
+              <version>0.6.0</version>
+            </plugin>
+          </plugins>
+        </configuration>
+        <dependencies>
+	  	  <dependency>
+		  	<groupId>commons-logging</groupId>
+		  	<artifactId>commons-logging</artifactId>
+		  	<version>1.1.1</version>
+		  	<type>jar</type>
+		  	<optional>false</optional>
+		  </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
+
   <reporting>
     <plugins>
       <plugin>

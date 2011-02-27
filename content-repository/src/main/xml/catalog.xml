@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:oasis:names:tc:entity:xmlns:xml:catalog http://www.oasis-open.org/committees/entity/release/1.0/catalog.xsd">
+  <system systemId="http://scapdev.org/schema/meta-model/0.1/meta-model.xsd" uri="../../../../content-model/src/main/xsd/MetaModel.xsd"/>
+</catalog>

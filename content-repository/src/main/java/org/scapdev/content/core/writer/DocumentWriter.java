@@ -45,12 +45,6 @@ public class DocumentWriter {
 	}
 
 	public void writeDocument(XMLEventFactory factory) throws XMLStreamException {
-		writer.writeStartDocument();
-		writeInstance(factory);
-		writer.writeEndDocument();
-	}
-
-	private void writeInstance(XMLEventFactory factory) {
 		XmlEventGeneratingDocumentModelVisitor visitor = new XmlEventGeneratingDocumentModelVisitor(
 				documentData,
 				writer,

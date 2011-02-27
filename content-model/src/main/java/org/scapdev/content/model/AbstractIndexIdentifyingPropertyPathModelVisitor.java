@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModel;
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
@@ -37,6 +38,7 @@ import org.scapdev.jaxb.reflection.model.visitor.PropertyPathModelVisitor;
 
 abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION extends Annotation, FIELD extends Annotation> extends
 		PropertyPathModelVisitor {
+	private static final Logger log = Logger.getLogger(AbstractIndexIdentifyingPropertyPathModelVisitor.class);
 	private final JAXBClass jaxbClass;
 	private final ANNOTATION indexedAnnotation;
 	private final Map<String, List<JAXBProperty>> propertyMap;
@@ -45,7 +47,9 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 	public AbstractIndexIdentifyingPropertyPathModelVisitor(ANNOTATION indexedAnnotation, JAXBClass jaxbClass, JAXBModel model, Class<ANNOTATION> annotationClass, Class<FIELD> fieldClass) {
 		super(model);
 		if (jaxbClass.getAnnotation(annotationClass, false) == null) {
-			throw new ModelException("Type '"+jaxbClass.getType().getName()+"' does not contain a "+indexedAnnotation.getClass());
+			ModelException e = new ModelException("Type '"+jaxbClass.getType().getName()+"' does not contain a "+indexedAnnotation.getClass());
+			log.error("Unable to find indexed annotation", e);
+			throw e;
 		}
 		this.jaxbClass = jaxbClass;
 		propertyMap = new LinkedHashMap<String, List<JAXBProperty>>();
@@ -76,7 +80,9 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 		if (!locatedFields.equals(fields)) {
 			fields.removeAll(locatedFields);
 			if (!fields.isEmpty()) {
-				throw new ModelException("Unable to identify fields for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+fields.toString());
+				ModelException e = new ModelException("Unable to identify fields for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+fields.toString());
+				log.error("unable to identify index field", e);
+				throw e;
 			}
 		}
 	}
@@ -87,7 +93,9 @@ abstract class AbstractIndexIdentifyingPropertyPathModelVisitor<ANNOTATION exten
 		if (field != null) {
 			String id = getIndexedFieldId(field);
 			if (propertyMap.containsKey(id)) {
-				throw new ModelException("Duplicate field found for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+id);
+				ModelException e = new ModelException("Duplicate field found for "+indexedAnnotation.getClass().getName()+" '"+getIndexedAnnotationId()+"': "+id);
+				log.error("duplicate index field", e);
+				throw e;
 			}
 			propertyMap.put(id, getPropertyPath());
 		}
