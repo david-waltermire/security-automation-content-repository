@@ -91,8 +91,8 @@
     </pluginRepository>
     <pluginRepository>
       <id>goldin.org-plugins-releases</id>
-<!--      <url>http://evgeny-goldin.org/artifactory/plugins-releases</url>-->
-      <url>http://evgeny-goldin.org/artifactory/plugins-snapshots-local</url>
+      <url>http://evgeny-goldin.org/artifactory/plugins-releases</url>
+<!--      <url>http://evgeny-goldin.org/artifactory/plugins-snapshots-local</url>-->
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -229,7 +229,7 @@
         <plugin>
           <groupId>com.goldin.plugins</groupId>
           <artifactId>maven-copy-plugin</artifactId>
-          <version>0.3-SNAPSHOT</version>
+          <version>0.2.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

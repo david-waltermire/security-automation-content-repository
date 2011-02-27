@@ -88,7 +88,7 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 
 		List<ExternalIdentifier> result;
 		if (externalIdentifierId == null) {
-			log.trace("Unable to find indirect qualifier '"+qualifier+"' for id '"+getId()+"' on entity:"+owningEntity.getKey());
+			log.warn("Unable to find indirect qualifier '"+qualifier+"' for id '"+getId()+"' on entity:"+owningEntity.getKey());
 			result = Collections.emptyList();
 		} else {
 			ExternalIdentifierInfo externalIdentifierInfo = model.getExternalIdentifierById(externalIdentifierId);
