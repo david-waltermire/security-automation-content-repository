@@ -155,12 +155,6 @@
                 </resource>
                 <resource>
                   <targetPath>${project.build.directory}/content</targetPath>
-                  <file>http://usgcb.nist.gov/usgcb/content/scap/USGCB-Major-Version-1.1.x.0.zip</file>
-                  <preservePath>true</preservePath>
-                  <unpack>true</unpack>
-                </resource>
-                <resource>
-                  <targetPath>${project.build.directory}/content</targetPath>
                   <file>http://static.nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2011.xml</file>
                 </resource>
               </resources>

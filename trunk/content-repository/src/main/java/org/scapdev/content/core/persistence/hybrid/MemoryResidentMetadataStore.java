@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.ExternalIdentifierInfo;
@@ -41,7 +40,7 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 
 public class MemoryResidentMetadataStore implements MetadataStore {
-	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
+//	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
 	private final Map<Key, Entity> descriptorMap;
 	private final Map<String, Map<String, List<Entity>>> externalIdentifierToValueMap;
 
@@ -110,9 +109,9 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 				externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
 			}
 			descriptorList.add(entity);
-			if (descriptorList.size() >= 2) {
-				log.info("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
-			}
+//			if (descriptorList.size() >= 2) {
+//				log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
+//			}
 		}
 	}
 }
