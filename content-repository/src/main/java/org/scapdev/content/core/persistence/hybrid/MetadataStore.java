@@ -35,6 +35,13 @@ import org.scapdev.content.model.MetadataModel;
 
 public interface MetadataStore {
 
+	/**
+	 * 
+	 * @param key
+	 * @param contentRetrieverFactory
+	 * @param model
+	 * @return the entity if the key exists or <code>null</code> if it was not found
+	 */
 	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);

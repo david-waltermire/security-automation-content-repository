@@ -87,7 +87,7 @@ public class ContentRepositoryTestBase {
 
 	@Test
 	public void importUSGCBWin7OVALContent() {
-		File file = new File("target/content/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
+		File file = new File("src/test/xml/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
 		importFile(file);
 	}
 
