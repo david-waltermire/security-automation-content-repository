@@ -25,7 +25,6 @@ package org.scapdev.jaxb.reflection.model;
 
 /**
  * Represents an exceptional condition that may occur in the XML schema meta model 
- * @author davidwal
  *
  */
 public class JAXBModelException extends RuntimeException {

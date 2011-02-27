@@ -172,15 +172,15 @@
     </jaxb:bindings>
   </xsl:template>
 
-  <xsl:template match="meta:indirect-relationship" mode="relationship">
-    <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>
-    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
-      <annox:annotate>
-        <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}"/>
-      </annox:annotate>
-    </jaxb:bindings>
-    <xsl:apply-templates mode="#current"/>
-  </xsl:template>
+<!--  <xsl:template match="meta:indirect-relationship" mode="relationship">-->
+<!--    <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>-->
+<!--    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">-->
+<!--      <annox:annotate>-->
+<!--        <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}"/>-->
+<!--      </annox:annotate>-->
+<!--    </jaxb:bindings>-->
+<!--    <xsl:apply-templates mode="#current"/>-->
+<!--  </xsl:template>-->
 
   <xsl:template match="meta:key-ref" mode="relationship">
     <annox:annotate>

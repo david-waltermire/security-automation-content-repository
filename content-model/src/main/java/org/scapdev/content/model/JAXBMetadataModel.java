@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -36,6 +38,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.scapdev.content.model.jaxb.ExternalIdentifierType;
+import org.scapdev.content.model.jaxb.IdentifierMappingType;
 import org.scapdev.content.model.jaxb.MetaModel;
 import org.scapdev.content.model.jaxb.SchemaType;
 import org.scapdev.jaxb.reflection.JAXBContextFactory;
@@ -59,6 +62,7 @@ public class JAXBMetadataModel implements MetadataModel {
 	private final Map<String, EntityInfo> entityIdToEntityMap;
 	private final Map<String, String> namespaceToPrefixMap;
 	private final Map<String, ExternalIdentifierInfo> externalIdentifierIdToExternalIdentifierMap;
+	private final List<EntityIdentifierMapping> entityIdentifierMappings;
 
 	JAXBMetadataModel() throws IOException, JAXBException, ClassNotFoundException {
 		// Initialize JAXB reflection model
@@ -81,6 +85,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		relationshipIdToRelationshipMap = new HashMap<String, RelationshipInfo>();
 		namespaceToPrefixMap = new HashMap<String, String>();
 		externalIdentifierIdToExternalIdentifierMap = new HashMap<String, ExternalIdentifierInfo>();
+		entityIdentifierMappings = new LinkedList<EntityIdentifierMapping>();
 
 		// Load metadata and associate with JAXB info
 		loadMetadata(init);
@@ -112,6 +117,12 @@ public class JAXBMetadataModel implements MetadataModel {
 
 			namespaceToPrefixMap.put(schema.getNamespace(), schema.getPrefix());
 		}
+
+		for (IdentifierMappingType type : metaModel.getEntityIdentifierMappings().getEntityIdentifierMapping()) {
+			EntityIdentifierMapping mapping = new EntityIdentifierMappingImpl(type, this);
+			entityIdentifierMappings.add(mapping);
+		}
+
 	}
 
 	void registerEntity(EntityInfoImpl entity) {
@@ -169,5 +180,15 @@ public class JAXBMetadataModel implements MetadataModel {
 	@Override
 	public ExternalIdentifierInfo getExternalIdentifierById(String id) {
 		return externalIdentifierIdToExternalIdentifierMap.get(id);
+	}
+
+	@Override
+	public Key getKeyFromMappedIdentifier(String identifier) {
+		Key result = null;
+		for (EntityIdentifierMapping mapping : entityIdentifierMappings) {
+			result = mapping.getKeyForIdentifier(identifier);
+			if (result != null) break;
+		}
+		return result;
 	}
 }
