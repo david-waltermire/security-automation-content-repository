@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -102,9 +101,8 @@ public class ContentRepositoryTestBase {
 	public void writeWin7Definition() throws IOException, XMLStreamException, FactoryConfigurationError {
     	StopWatch watch = new StopWatch();
     	watch.start();
-    	LinkedHashMap<String, String> fields = new LinkedHashMap<String, String>();
-    	fields.put("urn:scap-content:field:org.mitre.oval:definition", "oval:gov.nist.usgcb.windowsseven:def:2");
-    	Key key = new Key("urn:scap-content:key:org.mitre.oval:definition", fields);
+
+    	Key key = repository.getMetadataModel().getKeyFromMappedIdentifier("oval:gov.nist.usgcb.windowsseven:def:2");
     	QueryResult result = repository.query(key, true);
     	for (Entity entity : result.getEntities().values()) {
     		log.info("Retrieved entity: "+entity.getKey());

@@ -21,32 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core;
+package org.content.repository.war.rest.query;
 
-import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.MetadataModel;
+import java.io.IOException;
 
-public class DefaultPersistenceContext implements PersistenceContext {
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
-	private MetadataModel metadataModel;
-	private ContentPersistenceManager contentPersistenceManager;
+import org.content.repository.config.RepositoryConfiguration;
+import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.core.query.QueryResult;
+import org.scapdev.content.model.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	@Override
-	public MetadataModel getMetadataModel() {
-		return metadataModel;
-	}
+@Path("/content/query/")
+public class RepositoryRetrieverEndpointProvider {
 
-	public void setMetadataModel(MetadataModel metadataModel) {
-		this.metadataModel = metadataModel;
-		
-	}
-
-	@Override
-	public ContentPersistenceManager getContentPersistenceManager() {
-		return contentPersistenceManager;
-	}
-
-	public void setContentPersistenceManager(ContentPersistenceManager contentPersistenceManager) {
-		this.contentPersistenceManager = contentPersistenceManager;
+	private static Logger log = LoggerFactory.getLogger(RepositoryRetrieverEndpointProvider.class);
+	
+	@Path("/get/global/{id}")
+	@GET
+	@Produces("text/xml")
+	public QueryResult getQualifiedId(@PathParam("id") String identifier, @QueryParam("resolve-relationships") boolean resolveRelationships ) throws IOException {
+		// TODO: handle errors
+		ContentRepository repository = RepositoryConfiguration.INSTANCE.getRepo();
+		Key key = repository.getMetadataModel().getKeyFromMappedIdentifier(identifier);
+		QueryResult result = repository.query(key, resolveRelationships);
+		return result;
 	}
 }

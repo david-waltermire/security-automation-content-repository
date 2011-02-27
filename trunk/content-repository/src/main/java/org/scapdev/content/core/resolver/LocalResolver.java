@@ -87,9 +87,11 @@ public class LocalResolver implements Resolver {
 				unresolvableKeys.add(key);
 			} else {
 				retrievedFragments.put(key, handle);
-				Set<Key> relatedKeys = generateRelatedKeys(handle, parameters);
-				relatedKeys.removeAll(retrievedFragments.keySet());
-				unresolvedKeys.addAll(relatedKeys);
+				if (parameters.isResolveReferences()) {
+					Set<Key> relatedKeys = generateRelatedKeys(handle, parameters);
+					relatedKeys.removeAll(retrievedFragments.keySet());
+					unresolvedKeys.addAll(relatedKeys);
+				}
 			}
 		}
 		state.setUnresolvedKeys(unresolvedKeys);

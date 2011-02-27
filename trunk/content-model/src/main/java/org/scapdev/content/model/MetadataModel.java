@@ -38,4 +38,13 @@ public interface MetadataModel {
 	RelationshipInfo getRelationshipById(String id);
 	EntityInfo getEntityByKeyId(String idRef);
 	ExternalIdentifierInfo getExternalIdentifierById(String externalIdentifierId);
+	/**
+	 * Based on the metamodel definition of entity-identifier-mapping this
+	 * method must find a pattern that matches the provided identifier and build
+	 * the associated key.
+	 * @param string the identifier
+	 * @return a key corrisponding to the identifier or <code>null</code> if
+	 * 		there is no match
+	 */
+	Key getKeyFromMappedIdentifier(String identifier);
 }

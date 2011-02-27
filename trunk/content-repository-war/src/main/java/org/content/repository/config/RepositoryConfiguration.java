@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Properties;
 
 import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.core.persistence.hybrid.HybridContentPersistenceManager;
+import org.scapdev.content.core.persistence.hybrid.MemoryResidentHybridContentPersistenceManager;
 
 /**
  * A single place to access configuration settings for the repository and hold on to
@@ -52,7 +54,9 @@ public enum RepositoryConfiguration {
 	{
 		try
 		{
-			repo = new ContentRepository();			
+			repo = new ContentRepository();
+			HybridContentPersistenceManager manager = new MemoryResidentHybridContentPersistenceManager();
+			repo.setContentPersistenceManager(manager);
 		}
 		catch(Exception e)
 		{

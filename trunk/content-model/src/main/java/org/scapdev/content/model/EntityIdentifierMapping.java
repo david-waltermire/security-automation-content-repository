@@ -21,32 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core;
+package org.scapdev.content.model;
 
-import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.MetadataModel;
+interface EntityIdentifierMapping {
 
-public class DefaultPersistenceContext implements PersistenceContext {
+	Key getKeyForIdentifier(String identifier);
 
-	private MetadataModel metadataModel;
-	private ContentPersistenceManager contentPersistenceManager;
-
-	@Override
-	public MetadataModel getMetadataModel() {
-		return metadataModel;
-	}
-
-	public void setMetadataModel(MetadataModel metadataModel) {
-		this.metadataModel = metadataModel;
-		
-	}
-
-	@Override
-	public ContentPersistenceManager getContentPersistenceManager() {
-		return contentPersistenceManager;
-	}
-
-	public void setContentPersistenceManager(ContentPersistenceManager contentPersistenceManager) {
-		this.contentPersistenceManager = contentPersistenceManager;
-	}
 }

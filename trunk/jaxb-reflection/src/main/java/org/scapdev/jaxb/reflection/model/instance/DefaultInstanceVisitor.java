@@ -37,8 +37,6 @@ import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
 /**
  * 
- * @author davidwal
- *
  * @param <STATE> Visitor state type
  */
 public class DefaultInstanceVisitor implements InstanceVisitor {

@@ -28,9 +28,19 @@
   targetNamespace="http://scapdev.org/schema/meta-model/0.1" elementFormDefault="qualified"
   attributeFormDefault="unqualified" version="0.1">
 
+  <!-- ********************************************************************* -->
+  <!-- * Meta Model                                                        * -->
+  <!-- ********************************************************************* -->
   <xs:element name="meta-model">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="entity-identifier-mappings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="entity-identifier-mapping" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="external-identifiers" minOccurs="1">
           <xs:complexType>
             <xs:sequence>
@@ -47,7 +57,7 @@
         </xs:element>
       </xs:sequence>
     </xs:complexType>
-
+  
     <xs:key name="SchemaKey">
       <xs:selector xpath=".//tns:schema"/>
       <xs:field xpath="@id"/>
@@ -93,12 +103,12 @@
       <xs:selector xpath=".//tns:field-ref"/>
       <xs:field xpath="@id"/>
     </xs:unique>
-
+    
     <xs:key name="DocumentKey">
       <xs:selector xpath=".//tns:schema/tns:documents/tns:document"/>
       <xs:field xpath="@id"/>
     </xs:key>
-    
+
     <xs:key name="ExternalIdentifierKey">
       <xs:selector xpath=".//tns:external-identifier"/>
       <xs:field xpath="@id"/>
@@ -109,10 +119,9 @@
     </xs:keyref>
   </xs:element>
 
-  <xs:complexType name="ComponentType">
-    <xs:attribute name="id" type="ComponentIdType" use="required"/>
-  </xs:complexType>
-
+  <!-- ********************************************************************* -->
+  <!-- * Misc (common types, etc.)                                         * -->
+  <!-- ********************************************************************* -->
   <xs:complexType name="SchemaComponentType">
     <xs:complexContent>
       <xs:extension base="ComponentType">
@@ -122,6 +131,10 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  
+  <xs:complexType name="ComponentType">
+    <xs:attribute name="id" type="ComponentIdType" use="required"/>
+  </xs:complexType>
 
   <xs:simpleType name="ComponentIdType">
     <xs:restriction base="xs:anyURI">
@@ -129,40 +142,48 @@
     </xs:restriction>
   </xs:simpleType>
   
-  <!-- ********************************************************************** -->
-  <!-- * External Identifier                                                             * -->
-  <!-- ********************************************************************** -->
+  <!-- ********************************************************************* -->
+  <!-- * Identifier Mapping                                                * -->
+  <!-- ********************************************************************* -->
+  <xs:element name="entity-identifier-mapping" type="IdentifierMappingType"/>
+  <xs:complexType name="IdentifierMappingType">
+    <xs:sequence>
+      <xs:element name="pattern-operation" type="PatternOperationType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="key-id-ref" type="KeyComponentIdType" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="PatternOperationType">
+    <xs:sequence>
+      <xs:element name="key-field-mapping" type="KeyFieldMappingType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="pattern" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="KeyFieldMappingType">
+    <xs:sequence>
+      <xs:element name="field-value" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="field-id-ref" type="FieldComponentIdType" use="required"/>
+  </xs:complexType>
+
+  <!-- ********************************************************************* -->
+  <!-- * External Identifier                                               * -->
+  <!-- ********************************************************************* -->
+  <xs:element name="external-identifier" type="ExternalIdentifierType"/>
+  <xs:complexType name="ExternalIdentifierType">
+    <xs:attribute name="id" type="ExternalIdentifierComponentIdType" use="required"/>
+  </xs:complexType>
+
   <xs:simpleType name="ExternalIdentifierComponentIdType">
     <xs:restriction base="ComponentIdType">
       <xs:pattern value="urn:scap-content:external-identifier:.+"/>
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:complexType name="ExternalIdentifierType">
-    <xs:attribute name="id" type="ExternalIdentifierComponentIdType" use="required"/>
-  </xs:complexType>
-  <xs:element name="external-identifier" type="ExternalIdentifierType"/>
-  
-  <!-- ********************************************************************** -->
-  <!-- * Schema                                                             * -->
-  <!-- ********************************************************************** -->
-  <xs:simpleType name="SchemaComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:schema:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="SchemaSchemaComponentType">
-    <xs:complexContent>
-      <xs:restriction base="SchemaComponentType">
-        <xs:sequence>
-          <xs:element ref="schema-node"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="SchemaComponentIdType" use="required"/>
-      </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
+  <!-- ********************************************************************* -->
+  <!-- * Schema                                                            * -->
+  <!-- ********************************************************************* -->
   <xs:element name="schema" type="SchemaType"/>
   <xs:complexType name="SchemaType">
     <xs:complexContent>
@@ -196,27 +217,27 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <!-- ********************************************************************** -->
-  <!-- * Entity                                                             * -->
-  <!-- ********************************************************************** -->
-  <xs:simpleType name="EntityComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:entity:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="EntitySchemaComponentType">
+  
+  <xs:complexType name="SchemaSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
         <xs:sequence>
           <xs:element ref="schema-node"/>
         </xs:sequence>
-        <xs:attribute name="id" type="EntityComponentIdType" use="required"/>
+        <xs:attribute name="id" type="SchemaComponentIdType" use="required"/>
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
+  
+  <xs:simpleType name="SchemaComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:schema:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
 
+  <!-- ********************************************************************** -->
+  <!-- * Entity                                                             * -->
+  <!-- ********************************************************************** -->
   <xs:element name="entity" type="EntityType"/>
   <xs:complexType name="EntityType">
     <xs:complexContent>
@@ -228,27 +249,77 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <!-- ********************************************************************** -->
-  <!-- * Document Entity                                                    * -->
-  <!-- ********************************************************************** -->
-  <xs:simpleType name="DocumentComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:document:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="DocumentSchemaComponentType">
+  
+  <xs:complexType name="EntitySchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
         <xs:sequence>
           <xs:element ref="schema-node"/>
         </xs:sequence>
-        <xs:attribute name="id" type="DocumentComponentIdType" use="required"/>
+        <xs:attribute name="id" type="EntityComponentIdType" use="required"/>
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-
+  
+  <xs:simpleType name="EntityComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:entity:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!-- Keys -->
+  <xs:element name="key" type="KeyType"/>
+  <xs:complexType name="KeyType">
+    <xs:complexContent>
+      <xs:extension base="KeyComponentType">
+        <xs:sequence>
+          <xs:element name="field" type="FieldType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="KeyComponentType">
+    <xs:complexContent>
+      <xs:restriction base="ComponentType">
+        <xs:attribute name="id" type="KeyComponentIdType" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:simpleType name="KeyComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:key:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!-- Key Fields -->
+  <xs:complexType name="FieldType">
+    <xs:complexContent>
+      <xs:extension base="FieldSchemaComponentType"> </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="FieldSchemaComponentType">
+    <xs:complexContent>
+      <xs:restriction base="SchemaComponentType">
+        <xs:sequence>
+          <xs:element ref="schema-node"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="FieldComponentIdType" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:simpleType name="FieldComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:field:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!-- ********************************************************************* -->
+  <!-- * Document                                                          * -->
+  <!-- ********************************************************************* -->
   <xs:element name="document" type="DocumentType"/>
   <xs:complexType name="DocumentType">
     <xs:complexContent>
@@ -259,7 +330,25 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  
+  <xs:complexType name="DocumentSchemaComponentType">
+    <xs:complexContent>
+      <xs:restriction base="SchemaComponentType">
+        <xs:sequence>
+          <xs:element ref="schema-node"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="DocumentComponentIdType" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:simpleType name="DocumentComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:document:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
 
+  <xs:element name="schema-node" type="SchemaReferenceType"/>
   <xs:complexType name="SchemaReferenceType">
     <xs:attribute name="node" use="required"/>
     <xs:attribute name="javaLocation" default="TYPE">
@@ -272,67 +361,13 @@
     </xs:attribute>
   </xs:complexType>
 
-  <xs:element name="schema-node" type="SchemaReferenceType"/>
-
-  <xs:element name="entity-ref" type="EntityIdRefType"/>
-  <xs:complexType name="EntityIdRefType">
-    <xs:attribute name="id-ref" type="ComponentIdType"/>
-  </xs:complexType>
-
-  <!-- Keys -->
-  <xs:simpleType name="KeyComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:key:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="KeyComponentType">
-    <xs:complexContent>
-      <xs:restriction base="ComponentType">
-        <xs:attribute name="id" type="KeyComponentIdType" use="required"/>
-      </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:element name="key" type="KeyType"/>
-  <xs:complexType name="KeyType">
-    <xs:complexContent>
-      <xs:extension base="KeyComponentType">
-        <xs:sequence>
-          <xs:element name="field" type="FieldType" maxOccurs="unbounded"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <!-- Key Fields -->
-  <xs:simpleType name="FieldComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:field:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="FieldSchemaComponentType">
-    <xs:complexContent>
-      <xs:restriction base="SchemaComponentType">
-        <xs:sequence>
-          <xs:element ref="schema-node"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="FieldComponentIdType" use="required"/>
-      </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="FieldType">
-    <xs:complexContent>
-      <xs:extension base="FieldSchemaComponentType"> </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <!-- Document models -->
+  <!-- ********************************************************************* -->
+  <!-- * Document Model                                                    * -->
+  <!-- ********************************************************************* -->
   <xs:element name="document-model" type="DocumentModelType" abstract="true"/>
   <xs:complexType name="DocumentModelType"/>
 
+  <!-- Generated Documents -->
   <xs:element name="generated-document-model" type="GeneratedDocumentModelType"
     substitutionGroup="document-model"/>
   <xs:complexType name="GeneratedDocumentModelType">
@@ -345,13 +380,17 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <xs:simpleType name="ContainerComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:container:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
+  
+  <xs:complexType name="EntityContainerType">
+    <xs:complexContent>
+      <xs:extension base="ContainerSchemaComponentType">
+        <xs:sequence>
+          <xs:element ref="entity-schema-node"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
   <xs:complexType name="ContainerSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -362,17 +401,14 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-
-  <xs:complexType name="EntityContainerType">
-    <xs:complexContent>
-      <xs:extension base="ContainerSchemaComponentType">
-        <xs:sequence>
-          <xs:element ref="entity-schema-node"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
+  
+  <xs:simpleType name="ContainerComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:container:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="entity-schema-node" type="EntityNodeReferenceType"/>
   <xs:complexType name="EntityNodeReferenceType">
     <xs:complexContent>
       <xs:extension base="SchemaReferenceType">
@@ -382,24 +418,23 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="entity-schema-node" type="EntityNodeReferenceType"/>
+  
+  <xs:element name="entity-ref" type="EntityIdRefType"/>
+  <xs:complexType name="EntityIdRefType">
+    <xs:attribute name="id-ref" type="EntityComponentIdType"/>
+  </xs:complexType>
 
+  <xs:element name="generated-property" type="GeneratedPropertyType"/>
   <xs:complexType name="GeneratedPropertyType">
     <xs:sequence>
       <xs:element ref="schema-node"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="generated-property" type="GeneratedPropertyType"/>
 
   <!-- ********************************************************************** -->
   <!-- * Relationship                                                       * -->
   <!-- ********************************************************************** -->
-  <xs:simpleType name="RelationshipComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:relationship:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
+  <xs:element name="relationship" type="RelationshipType" abstract="true"/>
   <xs:complexType name="RelationshipType" abstract="true">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -410,23 +445,14 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="relationship" type="RelationshipType" abstract="true"/>
 
-  <!-- Key Refs -->
-  <xs:simpleType name="KeyRefComponentIdType">
+  <xs:simpleType name="RelationshipComponentIdType">
     <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:key-ref:.+"/>
+      <xs:pattern value="urn:scap-content:relationship:.+"/>
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:complexType name="KeyRefComponentType">
-    <xs:complexContent>
-      <xs:restriction base="ComponentType">
-        <xs:attribute name="id" type="KeyRefComponentIdType" use="required"/>
-      </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
+  <!-- Key Refs -->
   <xs:complexType name="KeyRefType">
     <xs:complexContent>
       <xs:extension base="KeyRefComponentType">
@@ -437,14 +463,30 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <!-- Key Fields -->
-  <xs:simpleType name="FieldRefComponentIdType">
+  
+  <xs:complexType name="KeyRefComponentType">
+    <xs:complexContent>
+      <xs:restriction base="ComponentType">
+        <xs:attribute name="id" type="KeyRefComponentIdType" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:simpleType name="KeyRefComponentIdType">
     <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:field-ref:.+"/>
+      <xs:pattern value="urn:scap-content:key-ref:.+"/>
     </xs:restriction>
   </xs:simpleType>
 
+  <!-- Key Fields -->
+  <xs:complexType name="FieldRefType">
+    <xs:complexContent>
+      <xs:extension base="FieldRefSchemaComponentType">
+        <xs:attribute name="id-ref" type="FieldComponentIdType" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
   <xs:complexType name="FieldRefSchemaComponentType">
     <xs:complexContent>
       <xs:restriction base="SchemaComponentType">
@@ -456,15 +498,14 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="FieldRefType">
-    <xs:complexContent>
-      <xs:extension base="FieldRefSchemaComponentType">
-        <xs:attribute name="id-ref" type="FieldComponentIdType" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+  <xs:simpleType name="FieldRefComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:field-ref:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
 
-
+  <!-- Local Relationship -->
+  <xs:element name="local-relationship" type="LocalRelationshipType" substitutionGroup="relationship"/>
   <xs:complexType name="LocalRelationshipType">
     <xs:complexContent>
       <xs:extension base="RelationshipType">
@@ -474,35 +515,35 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="local-relationship" type="LocalRelationshipType"
-    substitutionGroup="relationship"/>
 
+  <!-- External Relationship -->
+  <!-- TODO: implement -->
+  <xs:element name="external-relationship" type="ExternalRelationshipType"
+    substitutionGroup="relationship"/>
   <xs:complexType name="ExternalRelationshipType" abstract="true">
     <xs:complexContent>
       <xs:extension base="RelationshipType"> </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="external-relationship" type="ExternalRelationshipType"
-    substitutionGroup="relationship"/>
 
-  <!-- indirect relationship -->
-  <xs:complexType name="ExternalIdentifierReferenceType">
-    <!-- TODO: write a schematron rule requiring that qualifier-value is specified if qualifier is. -->
-    <xs:attribute name="id-ref" type="ExternalIdentifierComponentIdType" use="required"/>
-    <xs:attribute name="qualifier-value" type="xs:anyURI"/>
-  </xs:complexType>
-  
+  <!-- Indirect Relationship -->
+  <xs:element name="indirect-relationship" type="IndirectRelationshipType" substitutionGroup="relationship"/>
   <xs:complexType name="IndirectRelationshipType">
     <xs:complexContent>
       <xs:extension base="RelationshipType">
         <xs:sequence>
           <xs:element name="qualifier-node" type="SchemaReferenceType" minOccurs="0"/>
           <xs:element name="value-node" type="SchemaReferenceType"/>
-          <xs:element name="external-identifier-ref" type="ExternalIdentifierReferenceType" maxOccurs="unbounded"/>
+          <xs:element name="external-identifier-ref" type="ExternalIdentifierReferenceType"
+            maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="indirect-relationship" type="IndirectRelationshipType"
-    substitutionGroup="relationship"/>
+
+  <xs:complexType name="ExternalIdentifierReferenceType">
+    <!-- TODO: write a schematron rule requiring that qualifier-value is specified if qualifier is. -->
+    <xs:attribute name="id-ref" type="ExternalIdentifierComponentIdType" use="required"/>
+    <xs:attribute name="qualifier-value" type="xs:anyURI"/>
+  </xs:complexType>
 </xs:schema>
