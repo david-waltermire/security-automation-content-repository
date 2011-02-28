@@ -93,6 +93,11 @@ class RebuiltEntity implements Entity {
 	public Collection<KeyedRelationship> getKeyedRelationships() {
 		return Collections.unmodifiableCollection(keyedRelationships);
 	}
+	
+	
+	void addKeyedRelationship(KeyedRelationship rel){
+		keyedRelationships.add(rel);
+	}
 
 	@Override
 	public JAXBElement<Object> getObject() {

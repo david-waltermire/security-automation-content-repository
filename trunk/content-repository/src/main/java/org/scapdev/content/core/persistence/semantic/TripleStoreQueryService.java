@@ -60,7 +60,7 @@ public class TripleStoreQueryService {
 	}
 	
 	/**
-	 * Helper method to find an EntityURI from triple store based on given key.
+	 * method to find an EntityURI from triple store based on given key.
 	 * @param key - key to search on
 	 * @param conn - conn to use to execute query
 	 * @return URI of entity associated with key, or null if no entity is found
@@ -90,6 +90,53 @@ public class TripleStoreQueryService {
 	}
 	
 	/**
+	 * method to find and entityURI by contentID
+	 * @param contentId
+	 * @param conn
+	 * @return
+	 * @throws QueryEvaluationException
+	 * @throws RepositoryException
+	 * @throws MalformedQueryException
+	 */
+	URI findEntityURIbyContentId(String contentId, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
+		String entityURIVariableName = "_e";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateEntitySearchQuery(contentId, entityURIVariableName));
+	    TupleQueryResult result = tupleQuery.evaluate();
+	    BindingSet resultSet = null;
+	    int resultSize = 0;
+	    while (result.hasNext()){
+	    	if (resultSize > 1){
+	    		throw new NonUniqueResultException();
+	    	}
+	    	resultSet = result.next(); 
+	    	resultSize++;
+	    }
+	    if (resultSet != null){
+	    	Value entityURI = resultSet.getValue(entityURIVariableName);
+	    	return factory.createURI(entityURI.stringValue());
+	    }
+	    return null;
+	}
+	
+	/**
+	 * Helper method that will generate String query searching for entity by given contentId
+	 * @param key
+	 * @param entityURIVariableName - name to use for entity variable
+	 * @return - the query that will produce the entity URI
+	 *	TODO: change to sparql query?
+	 */
+	private String generateEntitySearchQuery(String contentId, String entityURIVariableName){
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
+		//_e hasContentId contentId
+		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
+		queryBuilder.append("<").append(ontology.HAS_CONTENT_ID.URI).append(">");
+		queryBuilder.append(" {\"").append(contentId).append("\"}").append(NEW_LINE);
+		//_key hasKeyType _keyType
+		return queryBuilder.toString();
+	}
+	
+	/**
 	 * Helper method that will generate String query searching for entity defined by given Key
 	 * @param key
 	 * @param entityURIVariableName - name to use for entity variable
@@ -100,7 +147,7 @@ public class TripleStoreQueryService {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
 		//_e hasKey _key
-		queryBuilder.append("FROM {_e} ");
+		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
 		queryBuilder.append("<").append(ontology.HAS_KEY.URI).append(">");
 		queryBuilder.append(" {_key},").append(NEW_LINE);
 		//_key hasKeyType _keyType

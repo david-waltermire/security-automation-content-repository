@@ -46,11 +46,10 @@ import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.MetadataModel;
 
 /**
- * Translates entities accross the different modeling languages.
+ * Translates entities across the different modeling languages.
  */
 public class EntityTranslator extends
-		AbstractSemanticTranslator<Entity> implements
-		SemanticTranslator<Entity> {
+		AbstractSemanticTranslator{
 	private static final Logger log = Logger.getLogger(EntityTranslator.class);
 
 	private MetaDataOntology ontology;
@@ -66,11 +65,12 @@ public class EntityTranslator extends
 		this.ontology = ontology;
 	}
 
-	@Override
 	public Entity translateToJava(List<Statement> statements, MetadataModel model, ContentRetrieverFactory contentRetrieverFactory) {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
 		managers.add(new IndirectRelationshipStatementManager(ontology, model));
+		managers.add(new KeyedRelationshipStatementManager(ontology, model));
 		managers.add(new KeyStatementManager(ontology));
+		
 		
 		RebuiltEntity target = new RebuiltEntity();
 		
@@ -99,37 +99,44 @@ public class EntityTranslator extends
 
 		return target;
 	}
-	
-	
 
-	@Override
-	public List<Statement> translateToRdf(Entity entity, String contentId) {
-		List<Statement> statements = new LinkedList<Statement>();
+	/**
+	 * <p>
+	 * Will return the partial graph of the RDF entity. Client will have to have
+	 * to complete all Incomplete Statements from the Partial Graph...which is
+	 * connecting the direct relationship from the passed in Entity to the
+	 * target entity.
+	 * </p>
+	 * 
+	 * @param entity
+	 * @param contentId
+	 * @return
+	 */
+	public PartialEntityGraph translateToRdf(Entity entity, String contentId) {
+		PartialEntityGraph target = new PartialEntityGraph();
 //		log.info("about to add triples");
 		
 		// first handle the basic entity assertion
 		URI entityUri = genInstanceURI(contentId);
-		statements.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
-		statements.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(contentId)));
-		statements.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
-		statements.add(factory.createStatement(entityUri, ontology.HAS_ENTITY_TYPE.URI, factory.createLiteral(entity.getEntityInfo().getId())));
+		target.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
+		target.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(contentId)));
+		target.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
+		target.add(factory.createStatement(entityUri, ontology.HAS_ENTITY_TYPE.URI, factory.createLiteral(entity.getEntityInfo().getId())));
 		
 		
 		// now handle the key of the entity, right now I see no reason to not use bnodes....that may change
 		BNode key = factory.createBNode();
 		
-		statements.add(factory.createStatement(key, RDF.TYPE, ontology.KEY_CLASS.URI));
-		statements.add(factory.createStatement(entityUri, ontology.HAS_KEY.URI, key));
-		statements.add(factory.createStatement(key, ontology.HAS_KEY_TYPE.URI, factory.createLiteral(entity.getKey().getId())));
+		target.add(factory.createStatement(key, RDF.TYPE, ontology.KEY_CLASS.URI));
+		target.add(factory.createStatement(entityUri, ontology.HAS_KEY.URI, key));
+		target.add(factory.createStatement(key, ontology.HAS_KEY_TYPE.URI, factory.createLiteral(entity.getKey().getId())));
 		for (Map.Entry<String, String> keyFieldEntry : entity.getKey().getIdToValueMap().entrySet()){
 			BNode keyField = factory.createBNode();
-			statements.add(factory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
-			statements.add(factory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
-			statements.add(factory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, factory.createLiteral(keyFieldEntry.getKey())));
-			statements.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFieldEntry.getValue())));
+			target.add(factory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
+			target.add(factory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
+			target.add(factory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, factory.createLiteral(keyFieldEntry.getKey())));
+			target.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFieldEntry.getValue())));
 		}
-		
-		
 		// now handle all relationship information
 		
 		// handle indirect relationships first
@@ -138,25 +145,20 @@ public class EntityTranslator extends
 			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
 			String boundaryObjectValue = externalIdentifier.getValue();
 			URI boundaryObjectURI = genInstanceURI(boundaryObjectValue);
-			statements.add(factory.createStatement(boundaryObjectURI, RDF.TYPE, ontology.BOUNDARY_OBJECT_CLASS.URI));
-			statements.add(factory.createStatement(boundaryObjectURI, RDFS.LABEL, factory.createLiteral(externalIdentifier.getValue())));
-			statements.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_TYPE.URI, factory.createLiteral(externalIdentifier.getId())));
-			statements.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_VALUE.URI, factory.createLiteral(boundaryObjectValue)));
-			statements.add(factory.createStatement(entityUri, ontology.findIndirectRelationshipURI(relationshipId), boundaryObjectURI));
+			target.add(factory.createStatement(boundaryObjectURI, RDF.TYPE, ontology.BOUNDARY_OBJECT_CLASS.URI));
+			target.add(factory.createStatement(boundaryObjectURI, RDFS.LABEL, factory.createLiteral(externalIdentifier.getValue())));
+			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_TYPE.URI, factory.createLiteral(externalIdentifier.getId())));
+			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_VALUE.URI, factory.createLiteral(boundaryObjectValue)));
+			target.add(factory.createStatement(entityUri, ontology.findIndirectRelationshipURI(relationshipId), boundaryObjectURI));
 		}
 		
 		// handle keyed relationships
 		for (KeyedRelationship relationship : entity.getKeyedRelationships()){
-//			URI relatedEntityURI = genInstanceURI(relationship.getRelatedEntity())
-//			if (relatedEntityURI == null){
-//				//TODO: need to callback to caller to get actual entity... or queue for later
-//			}
-//			statements.add(factory.createStatement(entityUri, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, relatedEntityURI));
-//			add symmetric side of this as well until inferencing is hooked up
-//			statements.add(factory.createStatement(relatedEntityURI, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, entityUri));
+			String relationshipId = relationship.getRelationshipInfo().getId();
+			// adding incomplete statement to be completed later
+			target.add(entityUri, ontology.findDirectRelationshipURI(relationshipId), relationship.getKey());
 		}
-		
-		return statements;
+		return target;
 	}
 	
 

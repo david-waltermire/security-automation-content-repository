@@ -55,7 +55,8 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
 import org.scapdev.content.core.persistence.semantic.translation.EntityTranslator;
-import org.scapdev.content.core.persistence.semantic.translation.SemanticTranslator;
+import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
+import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.ExternalIdentifierInfo;
@@ -83,7 +84,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	
 	private TripleStoreQueryService queryService;
 	
-	SemanticTranslator<Entity> entityTranslator;
+	EntityTranslator entityTranslator;
 	
 	private boolean modelLoaded = false;
 	
@@ -108,15 +109,15 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			RepositoryConnection conn = repository.getConnection();
 			try {
 				URI entityURI = queryService.findEntityURI(key, conn);
-				if (entityURI != null){
-					Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
-					//no need to run inferencing here
-					return entityTranslator.translateToJava(
-							Iterations.addAll(conn.getStatements(null, null, null,
-									false, entityContextURI),
-									new LinkedList<Statement>()), model,
-							contentRetrieverFactory);
-				}
+//				if (entityURI != null){
+//					Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
+//					//no need to run inferencing here
+//					return entityTranslator.translateToJava(
+//							Iterations.addAll(conn.getStatements(null, null, null,
+//									false, entityContextURI),
+//									new LinkedList<Statement>()), model,
+//							contentRetrieverFactory);
+//				}
 			} catch (MalformedQueryException e){
 				log.error(e);
 				throw new RuntimeException(e);
@@ -130,7 +131,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
-		return null;
+		return descriptorMap.get(key);
 	}
 	
 	@Override
@@ -176,15 +177,20 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					ontology.loadModel(conn, model);
 					modelLoaded = true;
 				}
+				Map<Key, String> keyToContentIdMap = new HashMap<Key, String>(); //need reverse map for resolving direct dependencies at cleanup
+				Map<BNode, List<IncompleteStatement>> incompleteStatements = new HashMap<BNode, List<IncompleteStatement>>();
 				for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
 					String contentId = entry.getKey();
 					Entity entity = entry.getValue();
+					keyToContentIdMap.put(entity.getKey(), contentId);  
 					
 					BNode context = factory.createBNode();
-					conn.add(entityTranslator.translateToRdf(entity, contentId), context);
-					
-					//TODO: need to reverse map to connect keyedRelationships
+					PartialEntityGraph entityGraph = entityTranslator.translateToRdf(entity, contentId);
+					incompleteStatements.put(context, entityGraph.getIncompleteStatements());
+					conn.add(entityGraph.getCompleteStatements(), context);
 				}
+				//resolve incomplete statements
+				persistIncompleteStatements(incompleteStatements, keyToContentIdMap, conn);
 			} finally {
 				conn.close();
 			}
@@ -218,7 +224,62 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 		
 	}
+	
+	/**
+	 * Helper method to clean up after the incomplete statements that connect the direct relationships between entities
+	 * @param incompleteStatements
+	 * @param keyToContentIdMap
+	 * @param conn
+	 * @throws RepositoryException 
+	 */
+	private void persistIncompleteStatements(
+			Map<BNode, List<IncompleteStatement>> incompleteStatements,
+			Map<Key, String> keyToContentIdMap, RepositoryConnection conn) throws RepositoryException{
+		for (Map.Entry<BNode, List<IncompleteStatement>> entry : incompleteStatements.entrySet()) {
+			BNode context = entry.getKey();
+			for (IncompleteStatement incompleteStatement : entry.getValue()) {
+				Key relatedEntityKey = incompleteStatement.getRelatedEntityKey();
+				String relatedEntityContentId = keyToContentIdMap.get(relatedEntityKey);
+				URI relatedEntityURI = findEntityURI(relatedEntityKey, relatedEntityContentId, conn);
+				if (relatedEntityURI != null) {
+					conn.add(factory.createStatement(
+							incompleteStatement.getSubject(),
+							incompleteStatement.getPredicate(),
+							relatedEntityURI), context);
+				}
+			}
+		}
+	}
 
+
+	/**
+	 * Helper method to find entityURI by contentID. If it cannot find it by
+	 * contentId it will search by Key.
+	 * 
+	 * @param key
+	 * @param value
+	 * @param conn
+	 * @return null if nothing is found
+	 */
+	private URI findEntityURI(Key key, String contentId, RepositoryConnection conn) {
+		try {
+			URI entityURI = null;
+			if (contentId != null){
+				 entityURI = queryService.findEntityURIbyContentId(contentId, conn);
+			}
+			if (entityURI == null){
+				entityURI = queryService.findEntityURI(key, conn);
+			}
+			return entityURI;
+		} catch (QueryEvaluationException e) {
+			log.error(e);
+		} catch (RepositoryException e) {
+			log.error(e);
+		} catch (MalformedQueryException e) {
+			log.error(e);
+		}
+		return null;
+	}
 
 	// for testing
 	private void outputContents(){
