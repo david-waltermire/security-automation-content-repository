@@ -1,0 +1,2 @@
+org.scapdev.content.core.persistence.hybrid.MemoryResidentMetadataStoreFactory
+org.scapdev.content.core.persistence.semantic.TripleStoreMetadataStoreFactory
