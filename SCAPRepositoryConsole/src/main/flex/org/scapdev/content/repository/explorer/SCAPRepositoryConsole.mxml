@@ -7,6 +7,11 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			
+//			[Embed(source="relfinder/RelFinder.swf")]
+//			[Bindable]
+//			public var relfinder:Class;
+			
 			import flashx.textLayout.events.SelectionEvent;
 			
 			import mx.collections.ArrayCollection;
@@ -35,10 +40,20 @@
 			protected function initBrowsePageListeners() : void{
 			}
 
-			protected function initQueryPageListeners() : void{
+			protected function initQueryPageListeners() : void
+			{
 			}
 
-			protected function initStatisticsPageListeners() : void{
+			protected function initStatisticsPageListeners() : void
+			{
+				var pnl:Panel = new Panel();
+				pnl.setActualSize(400, 300);
+				pnl.title = "Random Panel";
+				pnl.includeInLayout = true;
+				pnl.autoLayout = true;
+				
+				statisticsContentContainer.addChild(pnl);
+				pnl.visible = true;
 			}
 
 			protected function fileReferenceUploadCompleteListener(event:DataEvent) :void
@@ -187,7 +202,14 @@
 				currentState = "ContentStatisticsState";
 			}
 
-		]]>
+// 			protected function initRelFinder() :void
+//			{
+//				loader1.trustContent = true;
+//				loader1.load("RelFinder.swf");
+//								<mx:SWFLoader id="loader1" source="RelFinder.swf" creationComplete="initRelFinder()"/>
+
+//			}
+ 		]]>
 		
 	</fx:Script>
 	<s:states>

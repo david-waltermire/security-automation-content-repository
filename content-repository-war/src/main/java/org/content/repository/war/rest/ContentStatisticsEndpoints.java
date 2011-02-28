@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.content.repository.config.RepositoryConfiguration;
 import org.content.repository.war.rest.response.RepositoryStatisticsXMLResponse;
 import org.scapdev.content.core.ContentRepository;
-import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 
 @Path("/statistics")
 public class ContentStatisticsEndpoints {
@@ -27,8 +27,8 @@ public class ContentStatisticsEndpoints {
 		try 
 		{
 			ContentRepository cr = RepositoryConfiguration.INSTANCE.getRepo();
-			
-
+			MetadataModel mm = cr.getMetadataModel();
+			ret.setNamespaceToPrefixMap(mm.getNamespaceToPrefixMap());
 		} 
 		finally
 		{
