@@ -70,10 +70,7 @@ public class EntityTranslator extends
 		managers.add(new IndirectRelationshipStatementManager(ontology, model));
 		managers.add(new KeyedRelationshipStatementManager(ontology, model));
 		managers.add(new KeyStatementManager(ontology));
-		
-		
 		RebuiltEntity target = new RebuiltEntity();
-		
 		for (Statement statement : statements){
 			URI predicate = statement.getPredicate();
 			//first handle entity specific predicates
@@ -96,7 +93,6 @@ public class EntityTranslator extends
 		for (RegenerationStatementManager statementManager : managers){
 			statementManager.populateEntity(target);
 		}
-
 		return target;
 	}
 
