@@ -27,12 +27,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -64,6 +64,8 @@ public class JAXBMetadataModel implements MetadataModel {
 	private final Map<String, String> namespaceToPrefixMap;
 	private final Map<String, ExternalIdentifierInfo> externalIdentifierIdToExternalIdentifierMap;
 	private final List<EntityIdentifierMapping> entityIdentifierMappings;
+	private final Map<String, IndirectRelationshipInfo> indirectRelationshipIdToInfoMap;
+	private final Map<String, KeyedRelationshipInfo> keyedRelationshipIdToInfoMap;
 
 	JAXBMetadataModel() throws IOException, JAXBException, ClassNotFoundException {
 		// Initialize JAXB reflection model
@@ -87,6 +89,8 @@ public class JAXBMetadataModel implements MetadataModel {
 		namespaceToPrefixMap = new HashMap<String, String>();
 		externalIdentifierIdToExternalIdentifierMap = new HashMap<String, ExternalIdentifierInfo>();
 		entityIdentifierMappings = new LinkedList<EntityIdentifierMapping>();
+		indirectRelationshipIdToInfoMap = new HashMap<String, IndirectRelationshipInfo>();
+		keyedRelationshipIdToInfoMap = new HashMap<String, KeyedRelationshipInfo>();
 
 		// Load metadata and associate with JAXB info
 		loadMetadata(init);
@@ -104,6 +108,8 @@ public class JAXBMetadataModel implements MetadataModel {
 			MetaModel model = (MetaModel) unmarshaller.unmarshal(this.getClass().getResourceAsStream(resource));
 			processModel(model, init);
 		}
+
+		
 	}
 
 	private void processModel(MetaModel metaModel, InitializingJAXBClassVisitor init) {
@@ -124,6 +130,15 @@ public class JAXBMetadataModel implements MetadataModel {
 			entityIdentifierMappings.add(mapping);
 		}
 
+		// Get maps of individual relationship types
+		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
+			RelationshipInfo value = entry.getValue();
+			if (value instanceof IndirectRelationshipInfo){
+				indirectRelationshipIdToInfoMap.put(entry.getKey(), (IndirectRelationshipInfo) entry.getValue());
+			} else if (value instanceof KeyedRelationshipInfo) {
+				keyedRelationshipIdToInfoMap.put(entry.getKey(), (KeyedRelationshipInfo) entry.getValue());
+			}
+		}
 	}
 
 	void registerEntity(EntityInfoImpl entity) {
@@ -194,25 +209,12 @@ public class JAXBMetadataModel implements MetadataModel {
 	}
 
 	@Override
-	public Collection<String> getIndirectRelationshipIds() {
-		List<String> relationshipIds = new LinkedList<String>();
-		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
-			if (entry.getValue() instanceof IndirectRelationshipInfo){
-				relationshipIds.add(entry.getKey());
-			}
-		}
-		return relationshipIds;
-		
+	public Set<String> getIndirectRelationshipIds() {
+		return indirectRelationshipIdToInfoMap.keySet();
 	}
 
 	@Override
-	public Collection<String> getKeyedRelationshipIds() {
-		List<String> relationshipIds = new LinkedList<String>();
-		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
-			if (entry.getValue() instanceof KeyedRelationshipInfo){
-				relationshipIds.add(entry.getKey());
-			}
-		}
-		return relationshipIds;
+	public Set<String> getKeyedRelationshipIds() {
+		return keyedRelationshipIdToInfoMap.keySet();
 	}
 }
