@@ -30,8 +30,7 @@ import org.openrdf.model.ValueFactory;
  * Provides common functionality for all translators.
  *
  */
-public abstract class AbstractSemanticTranslator<T> implements
-		SemanticTranslator<T> {
+public abstract class AbstractSemanticTranslator {
 	
 	private final String baseURI;
 	

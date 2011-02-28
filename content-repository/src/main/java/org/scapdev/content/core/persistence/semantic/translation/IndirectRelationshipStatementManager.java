@@ -49,10 +49,10 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	private MetadataModel model;
 	
 	//all IDs of indirectRelationships
-	Collection<String> indirectRelationshipIds;
+	private Collection<String> indirectRelationshipIds;
 	
 	// key = boundary_boject_id....this map is what this class builds
-	Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
+	private Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
 	
 	
 	IndirectRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model) {
