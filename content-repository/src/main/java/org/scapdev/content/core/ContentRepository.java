@@ -31,7 +31,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager;
+import org.scapdev.content.core.persistence.ContentPersistenceManagerFactory;
+import org.scapdev.content.core.persistence.hybrid.HybridContentPersistenceManagerFactory;
 import org.scapdev.content.core.query.DefaultQueryProcessor;
 import org.scapdev.content.core.query.Query;
 import org.scapdev.content.core.query.QueryProcessor;
@@ -46,9 +47,10 @@ import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.MetadataModelFactory;
 import org.scapdev.content.model.processor.JAXBEntityProcessor;
+import org.scapdev.content.util.ServiceLoaderUtil;
 
 /**
- * This class encapsolates all content repository functionality.  It has methods
+ * This class encapsulates all content repository functionality.  It has methods
  * that enable importing and retrieving content from the repository.
  */
 public class ContentRepository {
@@ -57,11 +59,14 @@ public class ContentRepository {
 	private final QueryProcessor queryProcessor;
 	private final DefaultPersistenceContext persistenceContext;
 
+	public static final String CONTENT_PERSISTENCE_MANAGER_FACTORY = "repository.content.persistence-manager-factory";
+
 	public ContentRepository() throws IOException, JAXBException, ClassNotFoundException {
 		persistenceContext = new DefaultPersistenceContext();
 		persistenceContext.setMetadataModel(MetadataModelFactory.newInstance());
 //		persistenceContext.setContentPersistenceManager(new MemoryResidentPersistenceManager()());
-		persistenceContext.setContentPersistenceManager(new DefaultHybridContentPersistenceManager());
+		ContentPersistenceManagerFactory contentPersistenceManagerFactory = ServiceLoaderUtil.load(ContentPersistenceManagerFactory.class, CONTENT_PERSISTENCE_MANAGER_FACTORY, HybridContentPersistenceManagerFactory.class, this.getClass().getClassLoader());
+		persistenceContext.setContentPersistenceManager(contentPersistenceManagerFactory.newContentPersistenceManager());
 		jaxbEntityProcessor = new JAXBEntityProcessor(persistenceContext);
 		resolver = new LocalResolver(persistenceContext);
 		queryProcessor = new DefaultQueryProcessor();

@@ -21,43 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.util;
+package org.scapdev.content.core.persistence.hybrid;
 
-import java.util.ServiceLoader;
+public class MemoryResidentMetadataStoreFactory implements MetadataStoreFactory {
 
-import org.apache.log4j.Logger;
-
-public class ServiceLoaderUtil {
-	private static final Logger log = Logger.getLogger(ServiceLoaderUtil.class);
-
-	public static <FACTORY> FACTORY load(Class<FACTORY> serviceClass, String property, Class<? extends FACTORY> defaultInstance) {
-		return load(serviceClass, property, defaultInstance, null);
-	}
-
-	public static <FACTORY> FACTORY load(Class<FACTORY> serviceClass, String property, Class<? extends FACTORY> defaultInstance, ClassLoader classLoader) {
-		ServiceLoader<? extends FACTORY> loader = ServiceLoader.load(serviceClass, classLoader);
-
-		FACTORY result = null;
-		FACTORY defaultFactory = null;
-		for (FACTORY service : loader) {
-			if (service.getClass().equals(defaultInstance)) {
-				defaultFactory = service;
-			}
-			
-			if (property.equals(service.getClass().getName())) {
-				result = service;
-				break;
-			}
-		}
-		if (result == null) {
-			if (defaultFactory == null) {
-				UnsupportedOperationException e = new UnsupportedOperationException("Default service is not registered: "+defaultInstance);
-				log.error("Unable to load service", e);
-				throw e;
-			}
-			result = defaultFactory;
-		}
-		log.info("Using service instance: "+result.getClass());
-		return result;
+	@Override
+	public MetadataStore newMetadataStore() {
+		return new MemoryResidentMetadataStore();
 	}
 }
