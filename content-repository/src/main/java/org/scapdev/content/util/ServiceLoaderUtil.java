@@ -36,6 +36,7 @@ public class ServiceLoaderUtil {
 
 	public static <FACTORY> FACTORY load(Class<FACTORY> serviceClass, String property, Class<? extends FACTORY> defaultInstance, ClassLoader classLoader) {
 		ServiceLoader<? extends FACTORY> loader = ServiceLoader.load(serviceClass, classLoader);
+		String propertyValue = System.getProperty(property);
 
 		FACTORY result = null;
 		FACTORY defaultFactory = null;
@@ -44,7 +45,7 @@ public class ServiceLoaderUtil {
 				defaultFactory = service;
 			}
 			
-			if (property.equals(service.getClass().getName())) {
+			if (service.getClass().getName().equals(propertyValue)) {
 				result = service;
 				break;
 			}
