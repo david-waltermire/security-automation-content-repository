@@ -23,8 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -33,10 +36,12 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.scapdev.content.model.MetadataModel;
 
 /**
  * Contains necessary assertions to model and build meta-data model in RDFS.
  * 
+ * TODO: Everything in this class should eventually be put into an RDFS ontology file
  * TODO: figure out way to make model constructs final static; 
  * currently can't do this because valueFactory instance is required to create them.
  */
@@ -56,6 +61,8 @@ public class MetaDataOntology {
 	//** relationships in model **
 	/** persistence ID of an entity*/
 	public final Construct HAS_CONTENT_ID; 
+	/** type of entity.  TODO: this should be refactored into type hiearchy */
+	public final Construct HAS_ENTITY_TYPE;
 	/** key of an entity*/
 	public final Construct HAS_KEY; 
 	/** type of key.....this should be refactored into a class heiarch??? */
@@ -72,6 +79,13 @@ public class MetaDataOntology {
 	public final Construct HAS_DIRECT_RELATIONSHIP_TO; 
 	/** the type of the boundaryObject (or externalId in terms of java model)...TODO: this type relationship should be turned into a class heiarchy.  */
 	public final Construct HAS_BOUNDARY_OBJECT_TYPE; 
+	/** the actual value of the boundary object (e.g., CCE-XXXX, CPE:/XXX:XXX */
+	public final Construct HAS_BOUNDARY_OBJECT_VALUE; 
+	
+	
+	//dynamic predicates
+	private Map<String, Construct> indirectRelationships = new HashMap<String, Construct>();
+	private Map<String, Construct> directRelationships = new HashMap<String, Construct>();
 	
 	MetaDataOntology(ValueFactory factory) {
 		this.factory = factory;
@@ -85,6 +99,7 @@ public class MetaDataOntology {
 		
 		// define relationships
 		HAS_CONTENT_ID = new Construct(genModelURI("hasContentId"), "hasContentId");
+		HAS_ENTITY_TYPE = new Construct(genModelURI("hasEntityType"), "hasEntityType");
 		HAS_KEY = new Construct(genModelURI("hasKey"), "hasKey");
 		HAS_KEY_TYPE = new Construct(genModelURI("hasKeyType"), "hasKeyType");
 		HAS_FIELD_DATA = new Construct(genModelURI("hasFieldData"), "hasFieldData");
@@ -93,10 +108,11 @@ public class MetaDataOntology {
 		HAS_INDIRECT_RELATIONSHIP_TO = new Construct(genModelURI("hasIndirectRelationshipTo"), "hasIndirectRelationshipTo");
 		HAS_DIRECT_RELATIONSHIP_TO = new Construct(genModelURI("hasDirectRelationshipTo"), "hasDirectRelationshipTo");
 		HAS_BOUNDARY_OBJECT_TYPE = new Construct(genModelURI("hasBoundaryObjectType"), "hasBoundaryObjectType");
+		HAS_BOUNDARY_OBJECT_VALUE = new Construct(genModelURI("hasBoundaryObjectValue"), "hasBoundaryObjectValue");
 	}
 	
 	/** helper method to load all model triples into triple store using given connection */
-	void loadModel(RepositoryConnection conn) throws RepositoryException {
+	void loadModel(RepositoryConnection conn, MetadataModel javaModel) throws RepositoryException {
 		// add statements
 		List<Statement> statements = new LinkedList<Statement>();
 		
@@ -108,6 +124,7 @@ public class MetaDataOntology {
 		
 		// assert Predicates
 		statements.addAll(createPredicate(HAS_CONTENT_ID.URI, HAS_CONTENT_ID.LABEL));
+		statements.addAll(createPredicate(HAS_ENTITY_TYPE.URI, HAS_ENTITY_TYPE.LABEL));
 		statements.addAll(createPredicate(HAS_KEY.URI, HAS_KEY.LABEL));
 		statements.addAll(createPredicate(HAS_KEY_TYPE.URI, HAS_KEY_TYPE.LABEL));
 		statements.addAll(createPredicate(HAS_FIELD_DATA.URI, HAS_FIELD_DATA.LABEL));
@@ -116,8 +133,65 @@ public class MetaDataOntology {
 		statements.addAll(createPredicate(HAS_INDIRECT_RELATIONSHIP_TO.URI, HAS_INDIRECT_RELATIONSHIP_TO.LABEL));
 		statements.addAll(createPredicate(HAS_DIRECT_RELATIONSHIP_TO.URI, HAS_DIRECT_RELATIONSHIP_TO.LABEL));
 		statements.addAll(createPredicate(HAS_BOUNDARY_OBJECT_TYPE.URI, HAS_BOUNDARY_OBJECT_TYPE.LABEL));
+		statements.addAll(createPredicate(HAS_BOUNDARY_OBJECT_VALUE.URI, HAS_BOUNDARY_OBJECT_VALUE.LABEL));
+		
+		//assert dynamic predicates
+		statements.addAll(loadIndirectRelationships(javaModel.getIndirectRelationshipIds()));
+		statements.addAll(loadDirectRelationships(javaModel.getKeyedRelationshipIds()));
 		
 		conn.add(statements);
+	}
+	
+
+	
+	/**
+	 * Returns the model construct representing the predicate associated with the given relationship ID.
+	 * @param relId
+	 * @return
+	 */
+	public URI findIndirectRelationshipURI(String relId){
+		return indirectRelationships.get(relId).URI;
+	}
+	
+	/**
+	 * Returns the model construct representing the predicate associated with the given relationship ID.
+	 * @param relId
+	 * @return
+	 */
+	public URI findDirectRelationshipURI(String relId){
+		return directRelationships.get(relId).URI;
+	}
+	
+	/**
+	 * Populates map of all indirectRelationship types.  Assumes each ID is a valid URN
+	 * @param indirectRelationshipIds
+	 */
+	private List<Statement> loadIndirectRelationships(Collection<String> indirectRelationshipIds){
+		List<Statement> statements = new LinkedList<Statement>();
+		for (String id : indirectRelationshipIds){
+			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
+			Construct relationshipConstruct = new Construct(factory.createURI(id), id);
+			indirectRelationships.put(id, relationshipConstruct);
+			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_INDIRECT_RELATIONSHIP_TO.URI));
+			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.LABEL, factory.createLiteral(relationshipConstruct.LABEL)));
+		}
+		return statements;
+	}
+	
+	/**
+	 * Populates map of all indirectRelationship types.  Assumes each ID is a valid URN
+	 * @param indirectRelationshipIds
+	 */
+	private List<Statement> loadDirectRelationships(Collection<String> directRelationshipIds){
+		List<Statement> statements = new LinkedList<Statement>();
+		for (String id : directRelationshipIds){
+			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
+			Construct relationshipConstruct = new Construct(factory.createURI(id), id);
+			directRelationships.put(id, relationshipConstruct);
+			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_DIRECT_RELATIONSHIP_TO.URI));
+			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.LABEL, factory.createLiteral(relationshipConstruct.LABEL)));
+		}
+		return statements;
 	}
 	
 	private List<Statement> createClass(URI classUri, String label){

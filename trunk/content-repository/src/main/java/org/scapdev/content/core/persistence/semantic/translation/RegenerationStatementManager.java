@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 Paul Cichonski
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.core.persistence.semantic.translation;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.ExternalIdentifierInfo;
-import org.scapdev.content.model.Key;
+import org.openrdf.model.Statement;
 import org.scapdev.content.model.MetadataModel;
 
-public interface MetadataStore {
-
+/**
+ * 
+ * <p>
+ * Manages all triples associated with a given type, with the objective of
+ * both processing those triples, and eventually rebuilding an instance of the type out
+ * of them.
+ * </p>
+ * 
+ * 
+ * @see MetadataModel
+ */
+interface RegenerationStatementManager {
 	/**
+	 * Scans triple and processes it if it is relevant to indirectRelationships
 	 * 
-	 * @param key
-	 * @param contentRetrieverFactory
-	 * @param model
-	 * @return the entity if the key exists or <code>null</code> if it was not found
+	 * @param statement
+	 * @return true if triple was processed in some way, false if it was just
+	 *         ignored.
 	 */
-	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
-	void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model);
+	boolean scan(Statement statement);
+	
+	/**
+	 * <p>
+	 * Called after all triples are processed to populate re-constituted entity
+	 * with the built instance (or instances depending on relationship) of type
+	 * found in the graph.
+	 * </p>
+	 * 
+	 * @param entity
+	 *            - to populate.
+	 */
+	void populateEntity(RebuiltEntity entity);
 }

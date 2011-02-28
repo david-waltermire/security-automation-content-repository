@@ -26,13 +26,9 @@
  */
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBElement;
 
 import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
@@ -41,20 +37,16 @@ import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
-import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.Key;
 import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.Relationship;
 
 /**
- * Translates between Entitys
+ * Translates entities accross the different modeling languages.
  */
 public class EntityTranslator extends
 		AbstractSemanticTranslator<Entity> implements
@@ -62,8 +54,6 @@ public class EntityTranslator extends
 	private static final Logger log = Logger.getLogger(EntityTranslator.class);
 
 	private MetaDataOntology ontology;
-	
-	
 	
 	/**
 	 * 
@@ -78,35 +68,39 @@ public class EntityTranslator extends
 
 	@Override
 	public Entity translateToJava(List<Statement> statements, MetadataModel model, ContentRetrieverFactory contentRetrieverFactory) {
-		InternalEntity descriptor = new InternalEntity();
+		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
+		managers.add(new IndirectRelationshipStatementManager(ontology, model));
+		managers.add(new KeyStatementManager(ontology));
 		
-		// key = boundary_boject_id
-		Map<String, IndirectRelationship> indirectRelationships = new HashMap<String, IndirectRelationship>();
+		RebuiltEntity target = new RebuiltEntity();
 		
 		for (Statement statement : statements){
 			URI predicate = statement.getPredicate();
+			//first handle entity specific predicates
 			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
 				String contentId = statement.getObject().stringValue();
-				descriptor.setRetriever((contentRetrieverFactory.newContentRetriever(contentId, model)));
+				target.setRetriever((contentRetrieverFactory.newContentRetriever(contentId, model)));
+				continue;
 			}
-			if (predicate.equals(ontology.HAS_INDIRECT_RELATIONSHIP_TO)){
-				String boundaryObjectURI = statement.getObject().stringValue();
-				IndirectRelationship indirectRel = indirectRelationships.get(boundaryObjectURI);
-				if (indirectRel == null){
-//					indirectRel = new 
+			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
+				String entityType = statement.getObject().stringValue();
+				target.setEntityInfo(model.getEntityById(entityType));
+			}
+			//now handle rest of graph
+			for (RegenerationStatementManager statementManager : managers){
+				if (statementManager.scan(statement)){
+					continue;
 				}
-				
-				
-				
-				
-				
-			}
-			if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI)){
-				
 			}
 		}
-		return null;
+		for (RegenerationStatementManager statementManager : managers){
+			statementManager.populateEntity(target);
+		}
+
+		return target;
 	}
+	
+	
 
 	@Override
 	public List<Statement> translateToRdf(Entity entity, String contentId) {
@@ -118,6 +112,8 @@ public class EntityTranslator extends
 		statements.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
 		statements.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(contentId)));
 		statements.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
+		statements.add(factory.createStatement(entityUri, ontology.HAS_ENTITY_TYPE.URI, factory.createLiteral(entity.getEntityInfo().getId())));
+		
 		
 		// now handle the key of the entity, right now I see no reason to not use bnodes....that may change
 		BNode key = factory.createBNode();
@@ -138,85 +134,32 @@ public class EntityTranslator extends
 		
 		// handle indirect relationships first
 		for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
+			String relationshipId = relationship.getRelationshipInfo().getId();
 			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
-			URI boundaryObjectURI = genInstanceURI(externalIdentifier.getValue());
+			String boundaryObjectValue = externalIdentifier.getValue();
+			URI boundaryObjectURI = genInstanceURI(boundaryObjectValue);
 			statements.add(factory.createStatement(boundaryObjectURI, RDF.TYPE, ontology.BOUNDARY_OBJECT_CLASS.URI));
 			statements.add(factory.createStatement(boundaryObjectURI, RDFS.LABEL, factory.createLiteral(externalIdentifier.getValue())));
 			statements.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_TYPE.URI, factory.createLiteral(externalIdentifier.getId())));
-			statements.add(factory.createStatement(entityUri, ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI, boundaryObjectURI));
+			statements.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_VALUE.URI, factory.createLiteral(boundaryObjectValue)));
+			statements.add(factory.createStatement(entityUri, ontology.findIndirectRelationshipURI(relationshipId), boundaryObjectURI));
 		}
 		
 		// handle keyed relationships
 		for (KeyedRelationship relationship : entity.getKeyedRelationships()){
-//			URI relatedEntityURI = findEntityURI(relationship.getKey());
+//			URI relatedEntityURI = genInstanceURI(relationship.getRelatedEntity())
 //			if (relatedEntityURI == null){
 //				//TODO: need to callback to caller to get actual entity... or queue for later
 //			}
 //			statements.add(factory.createStatement(entityUri, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, relatedEntityURI));
-			//add symmetric side of this as well until inferencing is hooked up
+//			add symmetric side of this as well until inferencing is hooked up
 //			statements.add(factory.createStatement(relatedEntityURI, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, entityUri));
 		}
 		
 		return statements;
 	}
 	
-	private static class IndirectRelationshipBuilder{
-		// this is used to find the IndirectRelationshipInfo type
-		private String externalIdType;
-		private String externalIdValue;
-		
-		public IndirectRelationshipBuilder() {
-			// TODO Auto-generated constructor stub
-		}
-	}
 
-	private static class InternalEntity implements Entity {
-		private Key key;
-		private EntityInfo entityInfo;
-		private Collection<Relationship> relationships;
-		private Collection<KeyedRelationship> keyedRelationships;
-		private Collection<IndirectRelationship> indirectRelationships;
-		private ContentRetriever retriever;
 
-		public InternalEntity() {
-		}
-
-		@Override
-		public Key getKey() {
-			return key;
-		}
-
-		/**
-		 * @return the entityInfo
-		 */
-		public EntityInfo getEntityInfo() {
-			return entityInfo;
-		}
-
-		@Override
-		public Collection<Relationship> getRelationships() {
-			return relationships;
-		}
-
-		@Override
-		public Collection<IndirectRelationship> getIndirectRelationships() {
-			return indirectRelationships;
-		}
-
-		@Override
-		public Collection<KeyedRelationship> getKeyedRelationships() {
-			return keyedRelationships;
-		}
-
-		@Override
-		public JAXBElement<Object> getObject() {
-			return retriever.getContent();
-		}
-		
-		void setRetriever(ContentRetriever retriever) {
-			this.retriever = retriever;
-		}
-
-	}
 
 }
