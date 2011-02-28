@@ -1,8 +1,8 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
- * 
+ * Copyright (c) 2011 Paul Cichonski
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -21,29 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.core.persistence.semantic.translation;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+/**
+ * Exception thrown by builders if the build() method is called without all required data.
+ */
+public class IncompleteBuildStateException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+	
+	IncompleteBuildStateException(String arg) {
+		super(arg);
+	}
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.ExternalIdentifierInfo;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
-
-public interface MetadataStore {
-
-	/**
-	 * 
-	 * @param key
-	 * @param contentRetrieverFactory
-	 * @param model
-	 * @return the entity if the key exists or <code>null</code> if it was not found
-	 */
-	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
-	void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model);
 }

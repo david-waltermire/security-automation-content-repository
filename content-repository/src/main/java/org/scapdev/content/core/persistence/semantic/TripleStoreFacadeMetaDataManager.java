@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import info.aduna.iteration.Iterations;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -105,13 +108,15 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			RepositoryConnection conn = repository.getConnection();
 			try {
 				URI entityURI = queryService.findEntityURI(key, conn);
-				Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
-				//no need to run inferencing here
-//				return entityTranslator.translateToJava(
-//						Iterations.addAll(conn.getStatements(null, null, null,
-//								false, entityContextURI),
-//								new LinkedList<Statement>()), model,
-//						contentRetrieverFactory);
+				if (entityURI != null){
+					Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
+					//no need to run inferencing here
+					return entityTranslator.translateToJava(
+							Iterations.addAll(conn.getStatements(null, null, null,
+									false, entityContextURI),
+									new LinkedList<Statement>()), model,
+							contentRetrieverFactory);
+				}
 			} catch (MalformedQueryException e){
 				log.error(e);
 				throw new RuntimeException(e);
@@ -125,9 +130,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
-		
-		return descriptorMap.get(key);
-		
+		return null;
 	}
 	
 	@Override
@@ -165,12 +168,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 	
 	@Override
-	public void persist(Map<String, Entity> contentIdToEntityMap) {
+	public void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {
 				if (!modelLoaded){
-					ontology.loadModel(conn);
+					ontology.loadModel(conn, model);
 					modelLoaded = true;
 				}
 				for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
@@ -179,6 +182,8 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					
 					BNode context = factory.createBNode();
 					conn.add(entityTranslator.translateToRdf(entity, contentId), context);
+					
+					//TODO: need to reverse map to connect keyedRelationships
 				}
 			} finally {
 				conn.close();
@@ -216,7 +221,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
 
 	// for testing
-	public void outputContents(){
+	private void outputContents(){
 		try {
 			   RepositoryConnection con = repository.getConnection();
 			   try {
@@ -250,13 +255,4 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 
 
-
-
-
-	
-
-	
-
-	
-	
 }

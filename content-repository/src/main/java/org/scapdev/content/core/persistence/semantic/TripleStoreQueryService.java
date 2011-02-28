@@ -119,11 +119,11 @@ public class TripleStoreQueryService {
 			queryBuilder.append(" ").append(fieldNameDeclaration).append(",").append(NEW_LINE);
 			//_fieldx hasFieldType type
 			queryBuilder.append(fieldNameDeclaration);
-			queryBuilder.append("<").append(ontology.HAS_FIELD_TYPE.URI).append(">");
+			queryBuilder.append(" <").append(ontology.HAS_FIELD_TYPE.URI).append(">");
 			queryBuilder.append(" {\"").append(keyFieldEntry.getKey()).append("\"},").append(NEW_LINE);
 			//_fieldx hasFieldValue value
 			queryBuilder.append(fieldNameDeclaration);
-			queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append(">");
+			queryBuilder.append(" <").append(ontology.HAS_FIELD_VALUE.URI).append(">");
 			queryBuilder.append(" {\"").append(keyFieldEntry.getValue()).append("\"}");
 			fieldNumber++;
 		}

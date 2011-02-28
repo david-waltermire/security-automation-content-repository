@@ -87,7 +87,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	@Override
-	public void persist(Map<String, Entity> contentIdToEntityMap) {
+	public void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model) {
 		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()) {
 			persist(entry.getValue(), entry.getKey());
 		}
