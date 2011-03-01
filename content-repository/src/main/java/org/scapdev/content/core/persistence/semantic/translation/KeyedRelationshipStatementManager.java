@@ -54,9 +54,17 @@ class KeyedRelationshipStatementManager implements
 	
 	// key = relatedEntityURI....this map is what this class builds
 	private Map<URI, KeyedRelationshipBuilder> keyedRelationships = new HashMap<URI, KeyedRelationshipBuilder>();
-	
-	
-	
+
+	/**
+	 * 
+	 * @param ontology
+	 * @param model
+	 * @param factory
+	 * @param relatedEntityKeys
+	 *            - need these in order to create KeyedRelationships with the
+	 *            relatedKey (TODO: determine if there is another way to build
+	 *            out this part of the graph).
+	 */
 	KeyedRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model, ValueFactory factory, Map<URI, Key> relatedEntityKeys) {
 		this.ontology = ontology;
 		this.model = model;
