@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 Paul Cichonski
+ * Copyright (c) 2011 paul
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,41 +23,47 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import org.openrdf.model.Statement;
-import org.scapdev.content.model.MetadataModel;
+import java.util.Set;
 
-/**
- * 
- * <p>
- * Manages all triples associated with a given type, with the objective of
- * both processing those triples, and eventually rebuilding an instance of the type out
- * of them.
- * </p>
- * 
- * 
- * @see MetadataModel
- */
-interface RegenerationStatementManager {
-	/**
-	 * Scans triple and processes it if it is relevant to indirectRelationships
-	 * 
-	 * @param statement
-	 * @return true if triple was processed in some way, false if it was just
-	 *         ignored.
-	 */
-	boolean scan(Statement statement);
+import org.apache.log4j.Logger;
+import org.openrdf.model.Statement;
+import org.openrdf.model.ValueFactory;
+import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.model.Key;
+
+public class KeyTranslator extends AbstractSemanticTranslator {
+	private static final Logger log = Logger.getLogger(EntityTranslator.class);
+
+	private MetaDataOntology ontology;
 	
 	/**
-	 * <p>
-	 * Called after all triples are processed to populate re-constituted entity
-	 * with the built instance (or instances depending on relationship) of type
-	 * found in the graph.
-	 * </p>
 	 * 
-	 * @param entity
-	 *            - to populate.
+	 * @param baseURI - - the base URI to use for all RDF individuals produced by this translator
+	 * @param ontology
+	 * @param factory
 	 */
-	void populateEntity(RebuiltEntity entity);
+	public KeyTranslator(String baseURI, MetaDataOntology ontology, ValueFactory factory) {
+		super(baseURI, factory);
+		this.ontology = ontology;
+	}
 	
+	/**
+	 * 
+	 * @param statements - RDF statements representing at least a single key (may be more, but duplicate statements should not exist)
+	 * @param model
+	 * @param contentRetrieverFactory
+	 * @return
+	 */
+	public Key translateToJava(Set<Statement> statements) {
+		KeyStatementManager statementManager = new KeyStatementManager(ontology);
+		
+		for (Statement statement : statements){
+			if (statementManager.scan(statement)){
+				continue;
+			}
+		}
+		
+		return statementManager.produceKey();
+	}
 	
 }

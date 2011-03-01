@@ -55,6 +55,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
 import org.scapdev.content.core.persistence.semantic.translation.EntityTranslator;
+import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
 import org.scapdev.content.model.Entity;
@@ -73,7 +74,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	private static final String BASE_URI = "http://scap.nist.gov/cms/individuals#";
 
 	//HACK, REMOVE ONCE TRIPLE STORE HANDLES
-	private final Map<Key, Entity> descriptorMap = new HashMap<Key, Entity>();
 	private final Map<String, Map<String, List<Entity>>> externalIdentifierToValueMap = new HashMap<String, Map<String, List<Entity>>>();;
 
 	private Repository repository;
@@ -101,6 +101,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e){
 			log.error("Exception iniitalizing triple store", e);
 		}
+		
 	}
 	
 	@Override
@@ -109,15 +110,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			RepositoryConnection conn = repository.getConnection();
 			try {
 				URI entityURI = queryService.findEntityURI(key, conn);
-//				if (entityURI != null){
-//					Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
-//					//no need to run inferencing here
-//					return entityTranslator.translateToJava(
-//							Iterations.addAll(conn.getStatements(null, null, null,
-//									false, entityContextURI),
-//									new LinkedList<Statement>()), model,
-//							contentRetrieverFactory);
-//				}
+				if (entityURI != null){
+					Set<Statement> entityStatements = getEntityStatements(entityURI, conn);
+					// need to find the entityKeys from the KeyedRelationship...these are not included in owningEntityContext on persist
+					Map<URI, Key> relatedEntityKeys = findEntityKeys(queryService.findAllRelatedEntityURIs(entityURI, conn), conn);
+					return entityTranslator.translateToJava(entityStatements, relatedEntityKeys,
+							model, contentRetrieverFactory);
+				}
 			} catch (MalformedQueryException e){
 				log.error(e);
 				throw new RuntimeException(e);
@@ -131,8 +130,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
-		return descriptorMap.get(key);
+		return null;
 	}
+	
+
 	
 	@Override
 	public List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
@@ -201,7 +202,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		//all below code is a HACK, REMOVE ONCE TRIPLE STORE HANDLES
 		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
 			Entity entity = entry.getValue();
-			descriptorMap.put(entity.getKey(), entity);
 		
 			for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
 	
@@ -235,12 +235,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	private void persistIncompleteStatements(
 			Map<BNode, List<IncompleteStatement>> incompleteStatements,
 			Map<Key, String> keyToContentIdMap, RepositoryConnection conn) throws RepositoryException{
+		Map<Key, URI> keyToEntityURICache = new HashMap<Key, URI>(); 
 		for (Map.Entry<BNode, List<IncompleteStatement>> entry : incompleteStatements.entrySet()) {
 			BNode context = entry.getKey();
 			for (IncompleteStatement incompleteStatement : entry.getValue()) {
 				Key relatedEntityKey = incompleteStatement.getRelatedEntityKey();
 				String relatedEntityContentId = keyToContentIdMap.get(relatedEntityKey);
-				URI relatedEntityURI = findEntityURI(relatedEntityKey, relatedEntityContentId, conn);
+				URI relatedEntityURI = keyToEntityURICache.get(relatedEntityKey);
+				if (relatedEntityURI == null){
+					relatedEntityURI = findEntityURI(relatedEntityKey, relatedEntityContentId, conn);
+					keyToEntityURICache.put(relatedEntityKey, relatedEntityURI);
+				}
 				if (relatedEntityURI != null) {
 					conn.add(factory.createStatement(
 							incompleteStatement.getSubject(),
@@ -249,6 +254,44 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Helper method to generate keys for all entities 
+	 * @param entityURIs
+	 * @param conn
+	 * @return
+	 * @throws MalformedQueryException 
+	 * @throws QueryEvaluationException 
+	 * @throws RepositoryException 
+	 */
+	private Map<URI, Key> findEntityKeys(List<URI> entityURIs, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
+		KeyTranslator keyTranslator = new KeyTranslator(BASE_URI, ontology, factory);
+		Map<URI, Key> entityURIToKeyMap= new HashMap<URI, Key>();
+		for (URI entityURI : entityURIs){
+			Set<Statement> entityStatements = getEntityStatements(entityURI, conn);
+			//TODO: may want to refactor to only pass translator key statements, but this will work
+			Key entityKey = keyTranslator.translateToJava(entityStatements);
+			entityURIToKeyMap.put(entityURI, entityKey);
+		}
+		return entityURIToKeyMap;
+	}
+	
+	/**
+	 * Uses context to get all triples associated with entityURI
+	 * @param entityUri
+	 * @return
+	 * @throws RepositoryException 
+	 * @throws MalformedQueryException 
+	 * @throws QueryEvaluationException 
+	 */
+	private Set<Statement> getEntityStatements(URI entityURI, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
+		Resource entityContextURI = queryService.findEntityContext(entityURI, conn);
+		//no need to run inferencing here
+		return Iterations.addAll(conn
+				.getStatements(null, null, null, false,
+						entityContextURI),
+				new HashSet<Statement>());
 	}
 
 

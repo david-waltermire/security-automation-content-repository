@@ -85,12 +85,29 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 *            - to populate.
 	 */
 	public void populateEntity(RebuiltEntity entity){
-		for (Field field : fieldUriToFieldMap.values()){
-			builder.addKeyField(field.getFieldId(), field.getFieldValue());
-		}
+		populateFields();
 		Key key = builder.build();
 		entity.setKey(key);
 	}
+
+	/**
+	 * Call to produce the key without populating any entity. TOOD: if this is a
+	 * normal behavior pattern it should be added to interface.
+	 * 
+	 * @return
+	 */
+	Key produceKey(){
+		populateFields();
+		return builder.build();
+	}
+	
+	
+	private void populateFields(){
+		for (Field field : fieldUriToFieldMap.values()){
+			builder.addKeyField(field.getFieldId(), field.getFieldValue());
+		}
+	}
+
 	
 	/**
 	 * <p>

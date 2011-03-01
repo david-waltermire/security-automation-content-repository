@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.model.AbstractRelationship;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
@@ -34,13 +35,21 @@ import org.scapdev.content.model.MetadataModel;
 class KeyedRelationshipBuilder {
 	private KeyedRelationshipInfo keyedRelationshipInfo;
 	
-	KeyedRelationshipBuilder() {
-		// TODO Auto-generated constructor stub
+	private Key relatedEntityKey;
+	
+	
+	KeyedRelationshipBuilder(MetaDataOntology ontology) {
 	}
 	
 	void setKeyedRelationshipInfo(KeyedRelationshipInfo keyedRelationshipInfo) {
 		this.keyedRelationshipInfo = keyedRelationshipInfo;
 	}
+	
+	void setRelatedEntityKey(Key relatedEntityKey) {
+		this.relatedEntityKey = relatedEntityKey;
+	}
+
+
 	
 	
 	/**
@@ -54,11 +63,10 @@ class KeyedRelationshipBuilder {
 	 * @return
 	 */
 	KeyedRelationship build(MetadataModel model, RebuiltEntity entity){
-		if (keyedRelationshipInfo == null){
+		if (keyedRelationshipInfo == null || relatedEntityKey == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-
-		KeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, entity);
+		KeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, entity, relatedEntityKey);
 		
 		return rel;
 	}
@@ -66,23 +74,20 @@ class KeyedRelationshipBuilder {
 	private static class InternalKeyedRelationship extends
 			AbstractRelationship<KeyedRelationshipInfo> implements
 			KeyedRelationship {
-
+		//key of related entity
+		private Key key;
+		
 		InternalKeyedRelationship(KeyedRelationshipInfo relationshipInfo,
-				Entity owningEntity) {
+				Entity owningEntity, Key key) {
 			super(relationshipInfo, owningEntity);
+			this.key = key;
 		}
 
 		@Override
 		public Key getKey() {
-			// TODO Auto-generated method stub
-			return null;
+			return key;
 		}
 
-		@Override
-		public Entity getRelatedEntity() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
+		
 	}
 }

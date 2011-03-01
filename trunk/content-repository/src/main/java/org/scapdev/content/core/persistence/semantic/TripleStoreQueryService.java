@@ -23,13 +23,19 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -46,6 +52,7 @@ import org.scapdev.content.model.Key;
  */
 public class TripleStoreQueryService {
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final Logger log = Logger.getLogger(TripleStoreQueryService.class);
 	
 	private Repository repository;
 	
@@ -73,19 +80,23 @@ public class TripleStoreQueryService {
 		String entityURIVariableName = "_e";
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateEntitySearchQuery(key, entityURIVariableName));
 	    TupleQueryResult result = tupleQuery.evaluate();
-	    BindingSet resultSet = null;
-	    int resultSize = 0;
-	    while (result.hasNext()){
-	    	if (resultSize > 1){
-	    		throw new NonUniqueResultException();
-	    	}
-	    	resultSet = result.next(); 
-	    	resultSize++;
-	    }
-	    if (resultSet != null){
-	    	Value entityURI = resultSet.getValue(entityURIVariableName);
-	    	return factory.createURI(entityURI.stringValue());
-	    }
+		try {
+			BindingSet resultSet = null;
+			int resultSize = 0;
+			while (result.hasNext()) {
+				if (resultSize > 1) {
+					throw new NonUniqueResultException();
+				}
+				resultSet = result.next();
+				resultSize++;
+			}
+			if (resultSet != null) {
+				Value entityURI = resultSet.getValue(entityURIVariableName);
+				return factory.createURI(entityURI.stringValue());
+			}
+		} finally {
+			result.close();
+		}
 	    return null;
 	}
 	
@@ -102,20 +113,109 @@ public class TripleStoreQueryService {
 		String entityURIVariableName = "_e";
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateEntitySearchQuery(contentId, entityURIVariableName));
 	    TupleQueryResult result = tupleQuery.evaluate();
-	    BindingSet resultSet = null;
-	    int resultSize = 0;
-	    while (result.hasNext()){
-	    	if (resultSize > 1){
-	    		throw new NonUniqueResultException();
-	    	}
-	    	resultSet = result.next(); 
-	    	resultSize++;
-	    }
-	    if (resultSet != null){
-	    	Value entityURI = resultSet.getValue(entityURIVariableName);
-	    	return factory.createURI(entityURI.stringValue());
-	    }
+		try {
+			BindingSet resultSet = null;
+			int resultSize = 0;
+			while (result.hasNext()) {
+				if (resultSize > 1) {
+					throw new NonUniqueResultException();
+				}
+				resultSet = result.next();
+				resultSize++;
+			}
+			if (resultSet != null) {
+				Value entityURI = resultSet.getValue(entityURIVariableName);
+				return factory.createURI(entityURI.stringValue());
+			}
+		} finally {
+			result.close();
+		}
 	    return null;
+	}
+
+	/**
+	 * <p>
+	 * method that will generate list of all entityURIs of
+	 * entities related to owningEntityURI through a HAS_DIRECT_RELATIONSHIP
+	 * predicate.
+	 * </p>
+	 * @param owningEntityURI
+	 * @param relatedEntityVariableName
+	 * @return
+	 * @throws QueryEvaluationException 
+	 * @throws MalformedQueryException 
+	 * @throws RepositoryException 
+	 */
+	public List<URI> findAllRelatedEntityURIs(URI owningEntityURI,
+			RepositoryConnection conn) throws QueryEvaluationException,
+			RepositoryException, MalformedQueryException {
+		String relatedEntityVariableName = "_e";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelatedEntitySearchQuery(owningEntityURI, relatedEntityVariableName));
+	    TupleQueryResult result = tupleQuery.evaluate();
+	    List<URI> relatedEntityURIs = new LinkedList<URI>();
+	    try {
+		    BindingSet resultSet = null;
+		    while (result.hasNext()){
+		    	resultSet = result.next(); 
+		    	Value entityURI = resultSet.getValue(relatedEntityVariableName);
+		    	relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
+		    }
+	    } finally {
+	    	result.close();
+	    }
+	    return relatedEntityURIs;
+	}
+	
+	/**
+	 * <p>
+	 * helper method that will generate query to search for all entityURIs of
+	 * entities related to owningEntityURI through a HAS_DIRECT_RELATIONSHIP
+	 * predicate.
+	 * </p>
+	 * 
+	 * @param entityURI
+	 * @param relatedEntityVariableName
+	 * @return
+	 */
+	private String generateRelatedEntitySearchQuery(URI owningEntityURI, String relatedEntityVariableName){
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT ").append(relatedEntityVariableName).append(" ").append(NEW_LINE);
+		//_e hasDirectRelationshipTo relatedEntityURI
+		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} ");
+		queryBuilder.append("<").append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append(">");
+		queryBuilder.append(" {").append(relatedEntityVariableName).append("}").append(NEW_LINE);
+		return queryBuilder.toString();
+	}
+	
+
+	/**
+	 * <p>
+	 * Produces the list of all triples required to rebuild all entity keys
+	 * related to owningEntityURI through a HAS_DIRECT_RELATIONSHIP predicate.
+	 * </p>
+	 * 
+	 * @param entityURI
+	 * @param conn
+	 * @return
+	 * @throws QueryEvaluationException
+	 * @throws RepositoryException
+	 * @throws MalformedQueryException
+	 */
+	List<Statement> findRelatedEntityKeyStatements(URI owningEntityURI, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
+		GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SERQL, generateRelatedEntityKeyConstructQuery(owningEntityURI));
+	    GraphQueryResult result = graphQuery.evaluate();
+	    List<Statement> statements = new LinkedList<Statement>();
+		try { 
+			while (result.hasNext()) {
+				Statement statement = result.next();
+				log.info(statement.getSubject() + " " +statement.getPredicate() + " " + statement.getObject());
+				statements.add(statement);
+				
+			}
+		} finally {
+			result.close();
+		}
+	    return statements;
 	}
 	
 	/**
@@ -132,9 +232,125 @@ public class TripleStoreQueryService {
 		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
 		queryBuilder.append("<").append(ontology.HAS_CONTENT_ID.URI).append(">");
 		queryBuilder.append(" {\"").append(contentId).append("\"}").append(NEW_LINE);
-		//_key hasKeyType _keyType
 		return queryBuilder.toString();
 	}
+
+	/**
+	 * <p>
+	 * helper method that will generate query to construct the graph of
+	 * statements for the keys of all entities related to owningEntityURI
+	 * through a HAS_DIRECT_RELATIONSHIP predicate.
+	 * </p>
+	 * 
+	 * @param owningEntityURIs - owningEntityURIs to search by
+	 * @return
+	 */
+	private String generateRelatedEntityKeyConstructQuery(URI owningEntityURI){
+		StringBuilder queryBuilder = new StringBuilder();
+		String relatedEntityVariable = "{relEntity}";
+		String relatedKeyVariable = "{relKey}";
+		String relatedKeyTypeVariable = "{relKeyType}";
+		String relatedKeyFieldVariable = "{keyField}";
+		String relatedKeyFieldIdVariable = "{fieldId}";
+		String relatedKeyFieldValueVariable = "{fieldValue}";	
+		//CONSTRUCT {relEntity} hasKey {relKey}
+		queryBuilder.append("CONSTRUCT ").append(relatedEntityVariable)
+				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
+				.append(relatedKeyVariable).append(",").append(NEW_LINE);
+		//{relKey} hasKeyType {keyType};
+		queryBuilder.append(relatedKeyVariable).append(" <")
+				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
+				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
+		// hasKeyField {keyField},
+		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
+				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
+		// {keyField} hasFieldId {fieldId};
+		queryBuilder.append(relatedKeyFieldVariable).append(" <")
+				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
+		// hasFieldValue {fieldVAlue}
+		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
+				.append(relatedKeyFieldValueVariable).append(NEW_LINE);
+		// FROM {owningEntity hasDirectRelationshipTo {relEntity},
+		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} <")
+				.append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append("> ")
+				.append(relatedEntityVariable).append(",").append(NEW_LINE);
+		// {relEntity} hasKey {relKey}
+		queryBuilder.append(relatedEntityVariable)
+				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
+				.append(relatedKeyVariable).append(",").append(NEW_LINE);
+		//{relKey} hasKeyType {keyType};
+		queryBuilder.append(relatedKeyVariable).append(" <")
+				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
+				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
+		// hasKeyField {keyField},
+		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
+				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
+		// {keyField} hasFieldId {fieldId};
+		queryBuilder.append(relatedKeyFieldVariable).append(" <")
+				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
+		// hasFieldValue {fieldVAlue}
+		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
+				.append(relatedKeyFieldValueVariable);
+		return queryBuilder.toString();
+	}
+
+	private String test(URI owningEntityURI){
+		StringBuilder queryBuilder = new StringBuilder();
+		String relatedEntityVariable = "{relEntity}";
+		String relatedKeyVariable = "{relKey}";
+		String relatedKeyTypeVariable = "{relKeyType}";
+		String relatedKeyFieldVariable = "{keyField}";
+		String relatedKeyFieldIdVariable = "{fieldId}";
+		String relatedKeyFieldValueVariable = "{fieldValue}";	
+		//CONSTRUCT {relEntity} hasKey {relKey}
+//		queryBuilder.append("CONSTRUCT ").append(relatedEntityVariable)
+//				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
+//				.append(relatedKeyVariable).append(",").append(NEW_LINE);
+//		//{relKey} hasKeyType {keyType};
+//		queryBuilder.append(relatedKeyVariable).append(" <")
+//				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
+//				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
+//		// hasKeyField {keyField},
+//		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
+//				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
+//		// {keyField} hasFieldId {fieldId};
+//		queryBuilder.append(relatedKeyFieldVariable).append(" <")
+//				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+//				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
+//		// hasFieldValue {fieldVAlue}
+//		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
+//				.append(relatedKeyFieldValueVariable).append(NEW_LINE);
+		
+		queryBuilder.append("CONSTRUCT *").append(NEW_LINE);
+		
+		
+		// FROM {owningEntity hasDirectRelationshipTo {relEntity},
+		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} <")
+				.append(ontology.HAS_KEY.URI).append("> ")
+				.append(relatedEntityVariable).append("").append(NEW_LINE);
+		// {relEntity} hasKey {relKey}
+//		queryBuilder.append(relatedEntityVariable)
+//				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
+//				.append(relatedKeyVariable).append(",").append(NEW_LINE);
+//		//{relKey} hasKeyType {keyType};
+//		queryBuilder.append(relatedKeyVariable).append(" <")
+//				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
+//				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
+//		// hasKeyField {keyField},
+//		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
+//				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
+//		// {keyField} hasFieldId {fieldId};
+//		queryBuilder.append(relatedKeyFieldVariable).append(" <")
+//				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+//				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
+//		// hasFieldValue {fieldVAlue}
+//		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
+//				.append(relatedKeyFieldValueVariable);
+		return queryBuilder.toString();
+	}
+	
 	
 	/**
 	 * Helper method that will generate String query searching for entity defined by given Key

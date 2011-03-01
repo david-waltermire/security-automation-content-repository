@@ -29,7 +29,9 @@ import java.util.Map;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.model.Key;
 import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.KeyedRelationshipInfo;
 import org.scapdev.content.model.MetadataModel;
@@ -45,12 +47,21 @@ class KeyedRelationshipStatementManager implements
 	//all IDs of directRelationships
 	private Collection<String> directRelationshipIds;
 	
-	// key = relatedEntity_id....this map is what this class builds
-	private Map<String, KeyedRelationshipBuilder> keyedRelationships = new HashMap<String, KeyedRelationshipBuilder>();
+	// keys of all relatedEntities
+	private Map<URI, Key> relatedEntityKeys;
 	
-	KeyedRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model) {
+	private ValueFactory factory;
+	
+	// key = relatedEntityURI....this map is what this class builds
+	private Map<URI, KeyedRelationshipBuilder> keyedRelationships = new HashMap<URI, KeyedRelationshipBuilder>();
+	
+	
+	
+	KeyedRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model, ValueFactory factory, Map<URI, Key> relatedEntityKeys) {
 		this.ontology = ontology;
 		this.model = model;
+		this.factory = factory;
+		this.relatedEntityKeys = relatedEntityKeys;
 		this.directRelationshipIds = model.getKeyedRelationshipIds();
 	}
 	
@@ -65,9 +76,14 @@ class KeyedRelationshipStatementManager implements
 		return false;
 	}
 	
+
+	
 	@Override
 	public void populateEntity(RebuiltEntity entity) {
-		for (KeyedRelationshipBuilder keyedRelBuilder : keyedRelationships.values()){
+		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
+			URI relatedEntityURI = entry.getKey();
+			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
+			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
 			KeyedRelationship keyedRelationship = keyedRelBuilder.build(model, entity);
 			entity.addKeyedRelationship(keyedRelationship);
 		}
@@ -89,10 +105,10 @@ class KeyedRelationshipStatementManager implements
 			Statement statement) {
 		// hit on an keyedRelationship (called directRelationship in ontology) of some type
 		String keyedRelationshipId = statement.getPredicate().stringValue();
-		String relatedEntityURI = statement.getObject().stringValue();
+		URI relatedEntityURI = factory.createURI(statement.getObject().stringValue());
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
-			keyedRelBuilder = new KeyedRelationshipBuilder();
+			keyedRelBuilder = new KeyedRelationshipBuilder(ontology);
 			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		} else {
