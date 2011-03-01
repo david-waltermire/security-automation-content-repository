@@ -29,6 +29,7 @@ package org.scapdev.content.core.persistence.semantic.translation;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
@@ -42,6 +43,7 @@ import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.IndirectRelationship;
+import org.scapdev.content.model.Key;
 import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.MetadataModel;
 
@@ -65,10 +67,21 @@ public class EntityTranslator extends
 		this.ontology = ontology;
 	}
 
-	public Entity translateToJava(List<Statement> statements, MetadataModel model, ContentRetrieverFactory contentRetrieverFactory) {
+	/**
+	 * 
+	 * @param statements
+	 *            - all statements to constitute entity
+	 * @param relatedEntityStatements
+	 *            - all statement to constitute relatedEntityKeys from
+	 *            KeyedRelationships
+	 * @param model
+	 * @param contentRetrieverFactory
+	 * @return
+	 */
+	public Entity translateToJava(Set<Statement> statements, Map<URI, Key> relatedEntityKeys, MetadataModel model, ContentRetrieverFactory contentRetrieverFactory) {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
 		managers.add(new IndirectRelationshipStatementManager(ontology, model));
-		managers.add(new KeyedRelationshipStatementManager(ontology, model));
+		managers.add(new KeyedRelationshipStatementManager(ontology, model, factory, relatedEntityKeys));
 		managers.add(new KeyStatementManager(ontology));
 		RebuiltEntity target = new RebuiltEntity();
 		for (Statement statement : statements){
@@ -96,6 +109,7 @@ public class EntityTranslator extends
 		}
 		return target;
 	}
+	
 
 	/**
 	 * <p>
@@ -146,12 +160,16 @@ public class EntityTranslator extends
 			target.add(factory.createStatement(boundaryObjectURI, RDFS.LABEL, factory.createLiteral(externalIdentifier.getValue())));
 			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_TYPE.URI, factory.createLiteral(externalIdentifier.getId())));
 			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_VALUE.URI, factory.createLiteral(boundaryObjectValue)));
+			//assert this since inference may not be turned on
+			target.add(factory.createStatement(entityUri, ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI, boundaryObjectURI));
 			target.add(factory.createStatement(entityUri, ontology.findIndirectRelationshipURI(relationshipId), boundaryObjectURI));
 		}
 		
 		// handle keyed relationships
 		for (KeyedRelationship relationship : entity.getKeyedRelationships()){
 			String relationshipId = relationship.getRelationshipInfo().getId();
+			//assert this since inference may not be turned on
+			target.add(entityUri, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, relationship.getKey());
 			// adding incomplete statement to be completed later
 			target.add(entityUri, ontology.findDirectRelationshipURI(relationshipId), relationship.getKey());
 		}
