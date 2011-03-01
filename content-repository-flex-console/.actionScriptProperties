@@ -13,9 +13,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <theme themeIsDefault="false" themeIsSDK="true" themeLocation="${SDK_THEMES_DIR}/samples/themes/cobalt"/>
-  <applications>
-    <application path="org/scapdev/content/repository/explorer/SCAPRepositoryConsole.mxml"/>
-  </applications>
+  <applications/>
   <modules/>
   <buildCSSFiles/>
 </actionScriptProperties>
