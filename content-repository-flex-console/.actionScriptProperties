@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="Main.mxml" projectUUID="ce1e9b51-49e1-43b4-8ad8-003eb44024dd" version="6">
+<actionScriptProperties analytics="false" mainApplicationPath="org/scapdev/content/repository/explorer/SCAPRepositoryConsole.mxml" projectUUID="ce1e9b51-49e1-43b4-8ad8-003eb44024dd" version="6">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src/main/flex" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="0">
@@ -12,9 +12,12 @@
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
+  <theme themeIsDefault="false" themeIsSDK="true" themeLocation="${SDK_THEMES_DIR}/samples/themes/cobalt"/>
   <applications>
     <application path="org/scapdev/content/repository/explorer/SCAPRepositoryConsole.mxml"/>
   </applications>
-  <modules/>
+  <modules>
+    <module application="src/main/flex/org/scapdev/content/repository/explorer/SCAPRepositoryConsole.mxml" destPath="org/scapdev/content/repository/explorer/ContentQueryComponent.swf" optimize="true" sourcePath="src/main/flex/org/scapdev/content/repository/explorer/ContentQueryComponent.mxml"/>
+  </modules>
   <buildCSSFiles/>
 </actionScriptProperties>

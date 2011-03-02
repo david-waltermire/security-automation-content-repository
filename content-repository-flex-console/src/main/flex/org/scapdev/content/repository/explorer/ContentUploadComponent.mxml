@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="660"
+		 creationComplete="initUploadPageListeners()"
+		 >
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="justify" paddingRight="0" columnWidth="400" variableColumnWidth="false" gap="5" requestedColumnCount="1"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[			
+			import flashx.textLayout.events.SelectionEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			
+			import org.scapdev.content.repository.explorer.FileUploadStatus;
+			import org.scapdev.content.repository.explorer.item.renderers.FileUploadStatusItemRenderer;
+			import org.scapdev.content.repository.explorer.item.renderers.FilesToBeUploadedItemRenderer;
+			
+			import spark.events.IndexChangeEvent;
+				
+			public const UPLOAD_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/upload/content";
+
+			protected var fileRefList:FileReferenceList = new FileReferenceList();
+			
+			[Bindable]
+			protected var backingCollectionFilesToBeUploaded:ArrayCollection = new ArrayCollection();
+
+			[Bindable]
+			protected var backingCollectionFilesUploadedStatuses:ArrayCollection = new ArrayCollection();
+			
+			protected function initLists() : void {				
+				listFilesToUpload.dataProvider = backingCollectionFilesToBeUploaded;
+				listFileUploadStatus.dataProvider = backingCollectionFilesUploadedStatuses;
+			}
+			
+			protected function initUploadPageListeners() : void{
+				fileRefList.addEventListener(Event.SELECT, fileChooserSelectListener);
+			}
+						
+			protected function fileReferenceUploadCompleteListener(event:DataEvent) :void
+			{
+				var file:FileReference = event.currentTarget as FileReference;
+				var status:FileUploadStatus = new FileUploadStatus();
+
+				status.setReference(file);
+				
+				var foo:String = "";
+				var response:XML;
+
+				try
+				{					
+					response = XML(event.data);
+					status.setResponseXML(response);
+					
+					foo += file.name;
+					var entryElements:XMLList = response.child("fileEntry");
+					for each(var item:XML in entryElements)
+					{
+						var entitiesProcessed:int = int(item.attribute("entitiesProcessed"));
+						var relationshipsProcessed:int = int(item.attribute("relationshipsProcessed"));
+						
+						status.setEntitiesProcessed(entitiesProcessed);
+						status.setRelationshipsProcessed(relationshipsProcessed);						
+					}
+				}
+				catch(err:Error)
+				{
+					status.setErrorText(err.message);
+				}
+				
+				var index:int = listFilesToUpload.dataProvider.getItemIndex(file);
+				listFilesToUpload.dataProvider.removeItemAt(index);
+
+				listFileUploadStatus.dataProvider.addItem(status);				
+			}
+						
+			protected function fileReferenceUploadErrorListener(event:DataEvent) :void
+			{
+				var fref:FileReference = event.currentTarget as FileReference;
+				var status:FileUploadStatus = new FileUploadStatus();
+
+				status.setReference(fref);
+				status.setEntitiesProcessed(0);
+				status.setRelationshipsProcessed(0);
+				status.setErrorText(String(event.data));
+				
+				var index:int = listFilesToUpload.dataProvider.getItemIndex(fref);
+				listFilesToUpload.dataProvider.removeItemAt(index);
+				
+				listFileUploadStatus.dataProvider.addItem(status);				
+			}
+			
+			protected function fileChooserSelectListener(event:Event) :void{
+				
+				for each( var file:FileReference in fileRefList.fileList)
+				{
+					file.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceUploadErrorListener);
+					file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA , fileReferenceUploadCompleteListener);
+					
+					listFilesToUpload.dataProvider.addItem(file);
+				}
+				
+				if(backingCollectionFilesToBeUploaded.length > 0)
+				{
+					btnUpload.enabled = true;
+				}
+				else
+				{
+					btnUpload.enabled = false;
+				}
+			}
+			
+			protected function btnBrowse_clickListener(event:Event):void
+			{
+				fileRefList.browse();				
+			}
+
+			protected function btnReset_clickListener(event:Event):void
+			{
+				listFilesToUpload.dataProvider.removeAll();
+				listFileUploadStatus.dataProvider.removeAll();
+				btnUpload.enabled = false;
+				btnRemove.enabled = false;
+			}
+			
+			protected function btnUpload_clickListener(event:Event):void
+			{	
+				btnUpload.enabled = false;
+				btnBrowse.enabled = false;
+				
+				for each( var file:FileReference in listFilesToUpload.dataProvider)
+				{
+					try
+					{
+						file.upload(new URLRequest(UPLOAD_URL));
+					}
+					catch(err:Error)
+					{
+						var status:FileUploadStatus = new FileUploadStatus();
+						
+						status.setReference(file);
+						status.setEntitiesProcessed(0);
+						status.setRelationshipsProcessed(0);
+						status.setErrorText("Upload Error");
+						
+						var index:int = listFilesToUpload.dataProvider.getItemIndex(file);
+						listFilesToUpload.dataProvider.removeItemAt(index);
+						
+						listFileUploadStatus.dataProvider.addItem(status);				
+					}					
+				}
+				
+				btnUpload.enabled = true;
+				btnBrowse.enabled = true;
+			}
+			
+			protected function btnRemove_clickListener(event:Event):void
+			{
+				var selectedIndex:int = listFilesToUpload.selectedIndex;
+				backingCollectionFilesToBeUploaded.removeItemAt(selectedIndex);		
+			}
+			
+			protected function listFilesToUpload_changeListener(event:Event):void
+			{
+				if(listFilesToUpload.selectedIndex < 0)
+				{
+					btnRemove.enabled = false;
+				}
+				else
+				{
+					btnRemove.enabled = true;
+				}
+				
+				if(backingCollectionFilesToBeUploaded.length > 0)
+				{
+					btnUpload.enabled = true;
+				}
+				else
+				{
+					btnUpload.enabled = false;
+				}				
+			}
+		]]>
+		
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Panel x="79" y="543" width="400" height="660" textAlign="left" title="Content Upload">
+		<s:layout>
+			<s:TileLayout orientation="columns" horizontalAlign="justify"/>
+		</s:layout>
+		<s:SkinnableContainer x="40" y="538" id="listAndButtonsContainer">
+			<s:layout>
+				<s:HorizontalLayout gap="5" paddingTop="5" paddingLeft="5" columnWidth="300" variableColumnWidth="false"/>
+			</s:layout>
+			<s:SkinnableContainer width="200" height="200">
+				<s:layout>
+					<s:VerticalLayout horizontalAlign="justify" paddingTop="5"/>
+				</s:layout>
+				<s:Label text="Files to upload" id="uploadListCaption"/>
+				<s:List id="listFilesToUpload" itemRenderer="org.scapdev.content.repository.explorer.item.renderers.FilesToBeUploadedItemRenderer" creationComplete="initLists()" change="listFilesToUpload_changeListener(event)" height="175">
+				</s:List>
+			</s:SkinnableContainer>
+			<s:SkinnableContainer width="200" height="200">
+				<s:layout>
+					<s:VerticalLayout paddingTop="20"/>
+				</s:layout>
+				<s:Button x="211" y="10" label="Browse" id="btnBrowse" width="79" click="btnBrowse_clickListener(event)"/>
+				<s:Button x="211" y="36" label="Remove" id="btnRemove" enabled="false" width="78" click="btnRemove_clickListener(event)"/>
+			</s:SkinnableContainer>
+		</s:SkinnableContainer>
+		<s:SkinnableContainer width="401" height="200" id="uploadButonAndStatusContainer">
+			<s:layout>
+				<s:VerticalLayout horizontalAlign="left" paddingLeft="5" paddingTop="5" requestedRowCount="2"/>
+			</s:layout>
+			<s:SkinnableContainer width="200" height="33">
+				<s:layout>
+					<s:HorizontalLayout paddingTop="5"/>
+				</s:layout>
+				<s:Button x="-31" y="10" label="Upload" id="btnUpload" enabled="false" click="btnUpload_clickListener(event)"/>
+				<s:Button x="-31" y="10" label="Reset" id="btnReset" enabled="true" click="btnReset_clickListener(event)"/>
+			</s:SkinnableContainer>
+			<s:Label x="-28" y="44" text="Status" id="lblStatusCaption"/>
+			<s:SkinnableContainer width="200" height="200">
+				<s:SkinnableContainer width="200" height="200">
+					<s:List id="listFileUploadStatus" itemRenderer="org.scapdev.content.repository.explorer.item.renderers.FileUploadStatusItemRenderer" width="321" height="134"></s:List>
+				</s:SkinnableContainer>
+				<s:SkinnableContainer width="200" height="200">
+				</s:SkinnableContainer>
+			</s:SkinnableContainer>
+		</s:SkinnableContainer>
+	</s:Panel>
+
+</s:Group>

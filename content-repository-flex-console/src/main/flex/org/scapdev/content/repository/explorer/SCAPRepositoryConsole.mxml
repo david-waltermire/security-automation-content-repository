@@ -1,41 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" textAlign="left" currentState="ContentStatisticsState" width.ContentStatisticsState="962" height.ContentStatisticsState="620" textAlign.ContentStatisticsState="left">
-	<s:layout>
-		<s:HorizontalLayout verticalAlign="top"/>
-	</s:layout>
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" textAlign="left" currentState="ContentStatisticsState" xmlns:explorer="org.scapdev.content.repository.explorer.*" pageTitle="Content Repository Console">
 	<fx:Script>
-		<![CDATA[
-			
-			//			[Embed(source="relfinder/RelFinder.swf")]
-			//			[Bindable]
-			//			public var relfinder:Class;
-			
+		<![CDATA[			
 			import flashx.textLayout.events.SelectionEvent;
 			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			
-			import org.scapdev.content.repository.explorer.MyFileReference;
+			import org.scapdev.content.repository.explorer.FileUploadStatus;
 			
 			import spark.events.IndexChangeEvent;
-			
-			public const UPLOAD_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/upload/content";
-			public const GLOBAL_STATS_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/statistics/global";
-			
-			protected var fileRefList:FileReferenceList = new FileReferenceList();
-			
-			[Bindable]
-			protected var backingCollection:ArrayCollection = new ArrayCollection();
-			
-			protected function initList() : void {
-				listCUFilesToUpload.dataProvider = backingCollection;
-			}
-			
-			protected function initUploadPageListeners() : void{
-				fileRefList.addEventListener(Event.SELECT, fileChooserSelectListener);
-			}
 			
 			protected function initBrowsePageListeners() : void{
 			}
@@ -46,138 +22,8 @@
 			
 			protected function initStatisticsPageListeners() : void
 			{
-				var pnl:Panel = new Panel();
-				pnl.setActualSize(400, 300);
-				pnl.title = "Random Panel";
-				pnl.includeInLayout = true;
-				pnl.autoLayout = true;
-				
-				statisticsContentContainer.addChild(pnl);
-				pnl.visible = true;
 			}
-			
-			protected function fileReferenceUploadCompleteListener(event:DataEvent) :void
-			{
-				var foo:String = "";
-				try
-				{
-					var file:FileReference = event.currentTarget as FileReference;
-					foo += file.name;
-					var response:XML = XML(event.data);
-					var entryElements:XMLList = response.child("fileEntry");
-					for each(var item:XML in entryElements)
-					{
-						foo += "entitiesProcessed = " 
-							+ item.attribute("entitiesProcessed") 
-							+ " relationshipsProcessed = " 
-							+ item.attribute("relationshipsProcessed");
-					}
-				}
-				catch(err:Error)
-				{
-					Alert.show(err.message);
-				}
-				
-				lblCUStatus.text = "COMPLETE " + foo;
-			}
-			
-			protected function processFileXmlResponse(response:XML) :String
-			{
-				var ret:String = "";
-				
-				if(response != null)
-				{
-					var elements:XMLList = response.elements();
-					for each (var element:XMLList in elements)
-					{
-						var eName:String = String(element.name().toString());
-						ret += " " + eName;
-					}
-				}
-				
-				return ret;
-			}
-			
-			protected function fileReferenceUploadErrorListener(event:Event) :void
-			{
-				var fref:FileReference = event.currentTarget as FileReference;
-				
-				lblCUStatus.text = "ERROR " + event.toString();
-			}
-			
-			protected function fileChooserSelectListener(event:Event) :void{
-				
-				for each( var file:FileReference in fileRefList.fileList)
-				{
-					file.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceUploadErrorListener);
-					file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA , fileReferenceUploadCompleteListener);
-					var myRef:MyFileReference = new MyFileReference(file);
-					listCUFilesToUpload.dataProvider.addItem(myRef);
-				}
-				
-				if(backingCollection.length > 0)
-				{
-					btnCUUpload.enabled = true;
-				}
-				else
-				{
-					btnCUUpload.enabled = false;
-				}
-			}
-			
-			protected function btnBrowse_clickListener(event:Event):void
-			{
-				fileRefList.browse();				
-			}
-			
-			protected function btnUpload_clickListener(event:Event):void
-			{	
-				btnCUUpload.enabled = false;
-				btnCUBrowse.enabled = false;
-				
-				for each( var file:MyFileReference in listCUFilesToUpload.dataProvider)
-				{
-					try
-					{
-						file.getReference().upload(new URLRequest(UPLOAD_URL));
-					}
-					catch(err:Error)
-					{
-						lblCUStatus.text += "ERROR uploading file " + file.getReference().name;
-					}					
-				}
-				
-				btnCUUpload.enabled = true;
-				btnCUBrowse.enabled = true;
-			}
-			
-			protected function btnRemove_clickListener(event:Event):void
-			{
-				var selectedIndex:int = listCUFilesToUpload.selectedIndex;
-				backingCollection.removeItemAt(selectedIndex);		
-			}
-			
-			protected function listFilesToUpload_changeListener(event:Event):void
-			{
-				if(listCUFilesToUpload.selectedIndex < 0)
-				{
-					btnCURemove.enabled = false;
-				}
-				else
-				{
-					btnCURemove.enabled = true;
-				}
-				
-				if(backingCollection.length > 0)
-				{
-					btnCUUpload.enabled = true;
-				}
-				else
-				{
-					btnCUUpload.enabled = false;
-				}				
-			}
-			
+						
 			protected function btnNavUpload_clickHandler(event:MouseEvent):void
 			{
 				// switch state to UploadContent
@@ -200,70 +46,38 @@
 			protected function btnNavStatistics_clickHandler(event:MouseEvent):void
 			{
 				currentState = "ContentStatisticsState";
-			}
-			
-			// 			protected function initRelFinder() :void
-			//			{
-			//				loader1.trustContent = true;
-			//				loader1.load("RelFinder.swf");
-			//								<mx:SWFLoader id="loader1" source="RelFinder.swf" creationComplete="initRelFinder()"/>
-			
-			//			}
+			}			
 		]]>
 		
 	</fx:Script>
 	<s:states>
 		<s:State name="UploadContentState"/>
+		<s:State name="ContentStatisticsState"/>
 		<s:State name="BrowseContentState"/>
 		<s:State name="QueryContentState"/>
-		<s:State name="ContentStatisticsState"/>
 	</s:states>
 	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:Panel x="0" y="66" width="250" height="200" height.UploadContentState="185" width.UploadContentState="138" id="navPanel" title.UploadContentState="Navigation" textAlign.UploadContentState="center" height.BrowseContentState="185" width.BrowseContentState="138" title.BrowseContentState="Navigation" textAlign.BrowseContentState="center" height.QueryContentState="185" width.QueryContentState="138" title.QueryContentState="Navigation" textAlign.QueryContentState="center" title.ContentStatisticsState="Navigation" textAlign.ContentStatisticsState="center" width.ContentStatisticsState="138" height.ContentStatisticsState="185">
-		<s:layout.QueryContentState>
+	<s:layout>
+		<s:HorizontalLayout paddingTop="5" paddingLeft="5" requestedColumnCount="2" gap="5" verticalAlign="justify" paddingBottom="5" paddingRight="5"/>
+	</s:layout>
+	<s:Panel x="0" y="66" id="navPanel" title="Navigation" textAlign="center">
+		<s:layout>
 			<s:VerticalLayout gap="10" horizontalAlign="center" paddingTop="10"/>
-		</s:layout.QueryContentState>
-		<s:layout.BrowseContentState>
-			<s:VerticalLayout gap="10" horizontalAlign="center" paddingTop="10"/>
-		</s:layout.BrowseContentState>
-		<s:layout.UploadContentState>
-			<s:VerticalLayout gap="10" horizontalAlign="center" paddingTop="10"/>
-		</s:layout.UploadContentState>
-		<s:layout.ContentStatisticsState>
-			<s:VerticalLayout gap="10" horizontalAlign="center" paddingTop="10"/>
-		</s:layout.ContentStatisticsState>
-		<s:Button width="118" id="btnNavStatistics" label="Repository Statistics" click.BrowseContentState="btnNavStatistics_clickHandler(event)" click.QueryContentState="btnNavStatistics_clickHandler(event)" click.UploadContentState="btnNavStatistics_clickHandler(event)" x.ContentStatisticsState="10" y.ContentStatisticsState="10" x.BrowseContentState="10" x.UploadContentState="10" y.BrowseContentState="10" y.UploadContentState="10"/>
-		<s:Button x="10" y="10" label="UploadContent" id="btnNavUpload" width="119" click.BrowseContentState="btnNavUpload_clickHandler(event)" click.QueryContentState="btnNavUpload_clickHandler(event)" x.UploadContentState="9" y.UploadContentState="42" x.ContentStatisticsState="9" y.ContentStatisticsState="44" label.ContentStatisticsState="Upload Content" x.QueryContentState="9" y.QueryContentState="41" x.BrowseContentState="9" y.BrowseContentState="44" click.ContentStatisticsState="btnNavUpload_clickHandler(event)"/>
-		<s:Button x="10" y="42" label="Button" width="118" id="btnNavBrowse" label.UploadContentState="Browse Content" click.UploadContentState="btnNavBrowse_clickHandler(event)" label.BrowseContentState="Browse Content" label.QueryContentState="Browse Content" click.QueryContentState="btnNavBrowse_clickHandler(event)" x.UploadContentState="10" y.UploadContentState="74" label.ContentStatisticsState="Browse Content" x.ContentStatisticsState="10" y.ContentStatisticsState="76" x.QueryContentState="10" y.QueryContentState="73" x.BrowseContentState="10" y.BrowseContentState="76" click.ContentStatisticsState="btnNavBrowse_clickHandler(event)"/>
-		<s:Button x="10" y="74" label="Query" width="118" id="btnNavQuery" click.UploadContentState="btnNavQuery_clickHandler(event)" click.BrowseContentState="btnNavQuery_clickHandler(event)" x.UploadContentState="10" y.UploadContentState="106" x.ContentStatisticsState="10" y.ContentStatisticsState="108" x.QueryContentState="10" y.QueryContentState="105" x.BrowseContentState="10" y.BrowseContentState="108" click.ContentStatisticsState="btnNavQuery_clickHandler(event)"/>
+		</s:layout>
+		<s:Button width="118" id="btnNavStatistics" label="Repository Statistics" x="10" y="10" click.BrowseContentState="btnNavStatistics_clickHandler(event)" click.UploadContentState="btnNavStatistics_clickHandler(event)" click.QueryContentState="btnNavStatistics_clickHandler(event)" click.ContentStatisticsState="btnNavStatistics_clickHandler(event)"/>
+		<s:Button label="UploadContent" id="btnNavUpload" width="119" x="9" y="42" click.ContentStatisticsState="btnNavUpload_clickHandler(event)" click.BrowseContentState="btnNavUpload_clickHandler(event)" click.QueryContentState="btnNavUpload_clickHandler(event)"/>
+		<s:Button width="118" id="btnNavBrowse" label="Browse Content" x="10" y="74" click.ContentStatisticsState="btnNavBrowse_clickHandler(event)" click.UploadContentState="btnNavBrowse_clickHandler(event)" click.QueryContentState="btnNavBrowse_clickHandler(event)" click.BrowseContentState="btnNavBrowse_clickHandler(event)"/>
+		<s:Button label="Query" width="118" id="btnNavQuery" click="btnNavQuery_clickHandler(event)" x="10" y="106"/>
 	</s:Panel>
-	<s:Panel width="800" height="600" id="statisticsPageContent" title="Repository Statistics" includeIn="ContentStatisticsState">
-		<s:SkinnableContainer x="10" y="10" width="780" height="546" id="statisticsContentContainer" creationComplete="initStatisticsPageListeners()">
-			<s:layout>
-				<s:BasicLayout/>
-			</s:layout>
-		</s:SkinnableContainer>
-	</s:Panel>
-	<s:Panel width="800" height="600" id="uploadPageContent" title="Content Upload" includeIn="UploadContentState">
-		<s:SkinnableContainer x="10" y="10" width="780" height="546" id="loadContentContainer" creationComplete="initUploadPageListeners()">
-			<s:Label x="10" y="10" text="Files to upload" id="uploadListCaption"/>
-			<s:List x="10" y="24" width="296" height="157" id="listCUFilesToUpload" creationComplete="initList()" change="listFilesToUpload_changeListener(event)"></s:List>
-			<s:Button x="310" y="24" label="Browse" id="btnCUBrowse" width="79" click="btnBrowse_clickListener(event)"/>
-			<s:Button x="310" y="50" label="Remove" id="btnCURemove" enabled="false" width="78" click="btnRemove_clickListener(event)"/>
-			<s:Button x="10" y="189" label="Upload" id="btnCUUpload" enabled="false" click="btnUpload_clickListener(event)"/>
-			<s:Label x="13" y="223" text="Status" id="lblStatusCaption"/>
-			<s:Label x="50" y="221" id="lblCUStatus" width="257" height="273"/>
-		</s:SkinnableContainer>
-	</s:Panel>
-	<s:Panel width="800" height="600" id="browsePageContent" title="Browse Content" includeIn="BrowseContentState">
-		<s:SkinnableContainer x="10" y="10" width="780" height="546" id="browseContentContainer" creationComplete="initBrowsePageListeners()">
-		</s:SkinnableContainer>
-	</s:Panel>
-	<s:Panel width="800" height="600" id="queryPageContent" title="Query Content" includeIn="QueryContentState">
-		<s:SkinnableContainer x="10" y="10" width="780" height="546" id="queryContentContainer" creationComplete="initQueryPageListeners()">
-		</s:SkinnableContainer>
-	</s:Panel>
+	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="-93" right="194" id="contentUploadPage" includeIn="UploadContentState">
+	</explorer:ContentUploadComponent>
+	<explorer:BrowseRepositoryComponent includeIn="BrowseContentState">
+	</explorer:BrowseRepositoryComponent>
+	<explorer:ContentStatisticsComponent includeIn="ContentStatisticsState">
+	</explorer:ContentStatisticsComponent>
+	<explorer:ContentQueryComponent includeIn="QueryContentState">
+	</explorer:ContentQueryComponent>
 </s:Application>

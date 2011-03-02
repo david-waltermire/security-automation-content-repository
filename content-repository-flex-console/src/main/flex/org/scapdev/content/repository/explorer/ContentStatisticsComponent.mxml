@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="660">
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="justify" paddingRight="0" columnWidth="400" variableColumnWidth="false" gap="5" requestedColumnCount="1"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			
+			public const GLOBAL_STATS_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/statistics/global";
+
+		]]>
+		
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Panel x="79" y="543" width="400" height="660" textAlign="left" title="Repository Statistics">
+	</s:Panel>
+
+</s:Group>
