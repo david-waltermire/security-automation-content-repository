@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.core.PersistenceContext;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.MetadataModel;
 
@@ -66,13 +67,13 @@ public class JAXBEntityProcessor implements EntityProcessor {
 		return persistenceContext.getMetadataModel();
 	}
 
-	public Future<MutableEntity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
+	public Future<Entity> processEntity(EntityImpl entity, JAXBElement<Object> obj) {
 		RelationshipExtractingTask task = new RelationshipExtractingTask(entity, obj, getMetadataModel());
-		Future<MutableEntity> future = service.submit(task);
+		Future<Entity> future = service.submit(task);
 		return future;
 	}
 
-	private static class RelationshipExtractingTask implements Callable<MutableEntity> {
+	private static class RelationshipExtractingTask implements Callable<Entity> {
 		private final EntityImpl entity;
 		private final JAXBRelationshipIdentifyingImportVisitor visitor;
 

@@ -23,6 +23,26 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Collection;
+import java.util.regex.Pattern;
+
+/**
+ * This interface represents information about an external identifier defined
+ * within the meta model.
+ */
 public interface ExternalIdentifierInfo {
+	/**
+	 * Retrieves the id of the external identifier within the metadata model
+	 * 
+	 * @return the id of the external identifier
+	 */
 	String getId();
+
+	/**
+	 * Retrieves an unordered collection of identifier patterns that can be used
+	 * to verify that a string is an instance of the external identifier.
+	 * 
+	 * @return
+	 */
+	Collection<Pattern> getPattern();
 }

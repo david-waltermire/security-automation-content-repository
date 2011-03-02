@@ -23,11 +23,19 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+/**
+ * Instances of this interface represent a specific indirect relationship which
+ * is a link between an Entity and an ExternalIdentifier.
+ * @see ExternalIdentifier
+ * @see Entity
+ */
 public interface IndirectRelationship extends Relationship {
+	/**
+	 * @return the meta model definition or type of this relationship
+	 */
 	IndirectRelationshipInfo getRelationshipInfo();
 	/**
-	 * @return the externalIdentifier
+	 * @return the externalIdentifier that this relationship points to
 	 */
 	ExternalIdentifier getExternalIdentifier();
-
 }

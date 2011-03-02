@@ -23,6 +23,18 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface MutableKeyedRelationship extends KeyedRelationship {
-	void setRelatedEntity(Entity entity);
+import org.scapdev.jaxb.reflection.model.JAXBClass;
+
+/**
+ * Represents a component within the XML schema meta model that is directly
+ * associated with an XML schema type.
+ */
+public interface SchemaTypeComponent extends SchemaComponent {
+	/**
+	 * Retrieves the JAXB reflection class instance associated with this
+	 * document type.
+	 * 
+	 * @return a JAXB reflection class instance
+	 */
+	JAXBClass getType();
 }

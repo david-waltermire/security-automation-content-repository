@@ -26,16 +26,31 @@ package org.scapdev.content.model;
 import javax.xml.namespace.QName;
 
 import org.scapdev.content.model.jaxb.EntityType;
+import org.scapdev.content.model.jaxb.IdentifierMappingType;
+import org.scapdev.jaxb.reflection.model.JAXBClass;
 
 class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 
 	private final KeyInfo key;
+	private final EntityIdentifierMapping identifierMapping;
 	private final BindingInfo<org.scapdev.content.annotation.Entity> binding;
 
 	EntityInfoImpl(EntityType entity, SchemaInfoImpl schema, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
 		super(entity.getId(), schema, entity.getSchemaNode().getNode());
 		binding = init.getEntityBindingInfo(getId());
 		key = new KeyInfoImpl(entity.getKey(), this, loader, init);
+
+		IdentifierMappingType mapping = entity.getIdentifierMapping();
+		if (mapping != null) {
+			identifierMapping = new EntityIdentifierMappingImpl(mapping, this);
+		} else {
+			identifierMapping = null;
+		}
+	}
+
+	@Override
+	public EntityIdentifierMapping getEntityIdentifierMapping() {
+		return identifierMapping;
 	}
 
 	@Override
@@ -72,8 +87,7 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 		return result;
 	}
 
-	@Override
-	public String getLocalPart() {
+	private String getLocalPart() {
 		String result = binding.getAnnotation().localPart();
 		if (result.isEmpty()) {
 			result = null;
@@ -90,5 +104,10 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 			result = new QName(getSchemaInfo().getNamespace(), localPart);
 		}
 		return result;
+	}
+
+	@Override
+	public JAXBClass getType() {
+		return binding.getJaxbClass();
 	}
 }

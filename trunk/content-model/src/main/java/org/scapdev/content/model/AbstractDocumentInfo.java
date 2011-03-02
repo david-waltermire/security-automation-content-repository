@@ -23,16 +23,20 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Set;
+
 import org.scapdev.content.model.jaxb.DocumentType;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-abstract class AbstractDocumentBase extends AbstractDocument {
+public abstract class AbstractDocumentInfo<MODEL extends DocumentModel> extends AbstractSchemaComponent implements DocumentInfo {
 	private final BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding;
 
-	AbstractDocumentBase(DocumentType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
-		super(entity, schema);
+	protected AbstractDocumentInfo(DocumentType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
+		super(entity.getId(), schema, entity.getSchemaNode().getNode());
 		binding = init.getDocumentBindingInfo(entity.getId());
 	}
+
+	protected abstract MODEL getDocumentModel();
 
 	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
 		return binding;
@@ -44,14 +48,19 @@ abstract class AbstractDocumentBase extends AbstractDocument {
 	}
 
 	@Override
+	public Set<EntityInfo> getSupportedEntityInfos() {
+		return getDocumentModel().getSupportedEntityInfos(getSchemaInfo().getMetadataModel());
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof AbstractDocumentBase))
+		if (!(obj instanceof AbstractDocumentInfo<?>))
 			return false;
-		AbstractDocumentBase other = (AbstractDocumentBase) obj;
+		AbstractDocumentInfo<?> other = (AbstractDocumentInfo<?>) obj;
 		if (!getId().equals(other.getId())) {
 			return false;
 		}

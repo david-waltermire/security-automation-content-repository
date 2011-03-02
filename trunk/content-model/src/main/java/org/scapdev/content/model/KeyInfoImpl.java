@@ -23,7 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -53,51 +52,42 @@ class KeyInfoImpl implements KeyInfo {
 		this.fields = Collections.unmodifiableMap(fields);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getId() {
 		return id;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public Collection<FieldInfo> getFieldInfos() {
 		return fields.values();
 	}
 
-	@Override
-	public EntityInfo getEntity() {
+	/** {@inheritDoc} */
+	public EntityInfo getEntityInfo() {
 		return parent;
 	}
 
-	@Override
-	public Key getKey(Object instance) throws KeyException {
+	/** {@inheritDoc} */
+	public Key newKey(Object instance) throws KeyException {
 		Key key = new Key(getId(), getFieldMap(instance));
 		return key;
 	}
 
-	private LinkedHashMap<String, String> getFieldMap(Object instance) throws KeyException {
+	private LinkedHashMap<String, String> getFieldMap(Object instance) throws ModelInstanceException {
 		LinkedHashMap<String, String> fieldIdToValueMap = new LinkedHashMap<String, String>();
 		for (FieldInfo fieldInfo : getFieldInfos()) {
-			String value;
-			try {
-				value = fieldInfo.getValue(instance);
-			} catch (IllegalArgumentException e) {
-				throw new KeyException(getId(),e);
-			} catch (IllegalAccessException e) {
-				throw new KeyException(getId(),e);
-			} catch (InvocationTargetException e) {
-				throw new KeyException(getId(),e);
-			}
+			String value = fieldInfo.getValue(instance);
 			fieldIdToValueMap.put(fieldInfo.getId(), value);
 		}
 		return fieldIdToValueMap;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public SchemaInfo getSchemaInfo() {
 		return parent.getSchemaInfo();
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public FieldInfo getFieldInfo(String id) {
 		return fields.get(id);
 	}

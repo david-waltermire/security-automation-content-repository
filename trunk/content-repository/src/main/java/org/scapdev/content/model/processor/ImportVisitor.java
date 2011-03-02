@@ -63,7 +63,7 @@ class ImportVisitor extends DefaultInstanceVisitor {
 		
 		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
 		if (entity != null) {
-			EntityInfo entityInfo = metadataModel.getEntityById(entity.id());
+			EntityInfo entityInfo = metadataModel.getEntityInfoById(entity.id());
 
 			@SuppressWarnings("unchecked")
 			JAXBElement<Object> element = (JAXBElement<Object>)instance;
@@ -79,7 +79,7 @@ class ImportVisitor extends DefaultInstanceVisitor {
 		
 		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
 		if (entity != null) {
-			EntityInfo entityInfo = metadataModel.getEntityById(entity.id());
+			EntityInfo entityInfo = metadataModel.getEntityInfoById(entity.id());
 			QName qname = entityInfo.getQName();
 			if (qname == null) {
 				parentProperty.getQName();

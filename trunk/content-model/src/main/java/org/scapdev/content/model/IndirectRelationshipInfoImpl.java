@@ -46,7 +46,7 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		this.model = model;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public List<IndirectRelationship> newRelationships(Object instance, Entity owningEntity) {
 		List<ExternalIdentifier> externalIdentifiers = getExternalIdentifiers(instance, owningEntity);
 
@@ -103,7 +103,7 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 			log.warn("Unable to find indirect qualifier '"+qualifier+"' for id '"+getId()+"' on entity:"+owningEntity.getKey());
 			result = Collections.emptyList();
 		} else {
-			ExternalIdentifierInfo externalIdentifierInfo = model.getExternalIdentifierById(externalIdentifierId);
+			ExternalIdentifierInfo externalIdentifierInfo = model.getExternalIdentifierInfoById(externalIdentifierId);
 			if (externalIdentifierInfo == null) {
 				ModelInstanceException e = new ModelInstanceException("Invalid external identifier: "+externalIdentifierId);
 				log.error("invalid external identifier",e);
@@ -117,11 +117,12 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		return result;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public JAXBClass getOwningJAXBClass() {
 		return binding.getJaxbClass();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -137,6 +138,7 @@ class IndirectRelationshipInfoImpl extends AbstractRelationshipInfo implements I
 		return true;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		int result = 13;

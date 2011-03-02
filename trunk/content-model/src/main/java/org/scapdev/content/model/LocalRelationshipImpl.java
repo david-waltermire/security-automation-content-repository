@@ -24,7 +24,7 @@
 package org.scapdev.content.model;
 
 
-class LocalRelationshipImpl extends AbstractKeyedRelationship<LocalRelationshipInfo> implements MutableLocalRelationship {
+class LocalRelationshipImpl extends AbstractKeyedRelationship<LocalRelationshipInfo> implements LocalRelationship {
 	private final Key key;
 	
 	LocalRelationshipImpl(LocalRelationshipInfo relationshipInfo, Entity owningEntity, Key key) {

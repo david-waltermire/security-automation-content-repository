@@ -34,7 +34,9 @@ import javax.ws.rs.QueryParam;
 import org.content.repository.config.RepositoryConfiguration;
 import org.scapdev.content.core.ContentRepository;
 import org.scapdev.content.core.query.QueryResult;
+import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.MetadataModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +51,19 @@ public class RepositoryRetrieverEndpointProvider {
 	public QueryResult getQualifiedId(@PathParam("id") String identifier, @QueryParam("resolve-relationships") boolean resolveRelationships ) throws IOException {
 		// TODO: handle errors
 		ContentRepository repository = RepositoryConfiguration.INSTANCE.getRepo();
-		Key key = repository.getMetadataModel().getKeyFromMappedIdentifier(identifier);
-		QueryResult result = repository.query(key, resolveRelationships);
+		MetadataModel model = repository.getMetadataModel();
+
+		QueryResult result = null;
+
+		Key key = model.getKeyFromMappedIdentifier(identifier);
+		if (key != null) {
+			result = repository.query(key, resolveRelationships);
+		} else {
+			ExternalIdentifier externalIdentifier = model.getExternalIdentifierById(identifier);
+			if (externalIdentifier != null) {
+				result = repository.query(externalIdentifier, resolveRelationships);
+			}
+		}
 		return result;
 	}
 }

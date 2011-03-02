@@ -27,52 +27,23 @@
   xmlns:nvd-vuln="http://scap.nist.gov/schema/feed/vulnerability/2.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://scapdev.org/schema/meta-model/0.1 ../../../../content-model/src/main/xsd/MetaModel.xsd">
-
-  <entity-identifier-mappings>
-    <entity-identifier-mapping key-id-ref="urn:scap-content:key:org.mitre.oval:definition">
-      <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:def:[1-9][0-9]*)">
-        <key-field-mapping field-id-ref="urn:scap-content:field:org.mitre.oval:definition">
-          <field-value>$1</field-value>
-        </key-field-mapping>
-      </pattern-operation>
-    </entity-identifier-mapping>
-    <entity-identifier-mapping key-id-ref="urn:scap-content:key:org.mitre.oval:test">
-      <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:tst:[1-9][0-9]*)">
-        <key-field-mapping field-id-ref="urn:scap-content:field:org.mitre.oval:test">
-          <field-value>$1</field-value>
-        </key-field-mapping>
-      </pattern-operation>
-    </entity-identifier-mapping>
-    <entity-identifier-mapping key-id-ref="urn:scap-content:key:org.mitre.oval:object">
-      <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:obj:[1-9][0-9]*)">
-        <key-field-mapping field-id-ref="urn:scap-content:field:org.mitre.oval:object">
-          <field-value>$1</field-value>
-        </key-field-mapping>
-      </pattern-operation>
-    </entity-identifier-mapping>
-    <entity-identifier-mapping key-id-ref="urn:scap-content:key:org.mitre.oval:state">
-      <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:ste:[1-9][0-9]*)">
-        <key-field-mapping field-id-ref="urn:scap-content:field:org.mitre.oval:state">
-          <field-value>$1</field-value>
-        </key-field-mapping>
-      </pattern-operation>
-    </entity-identifier-mapping>
-    <entity-identifier-mapping key-id-ref="urn:scap-content:key:org.mitre.oval:variable">
-      <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:var:[1-9][0-9]*)">
-        <key-field-mapping field-id-ref="urn:scap-content:field:org.mitre.oval:variable">
-          <field-value>$1</field-value>
-        </key-field-mapping>
-      </pattern-operation>
-    </entity-identifier-mapping>
-    
-  </entity-identifier-mappings>
   
   <external-identifiers>
-    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cve"/>
-    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-4"/>
-    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-5"/>
-    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cwe"/>
-    <external-identifier id="urn:scap-content:external-identifier:gov.nist:cpe-2-x"/>
+    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cve">
+      <pattern>CVE-\d{4}-\d{4}</pattern>
+    </external-identifier>
+    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-4">
+      <pattern>CCE-\d+</pattern>
+    </external-identifier>
+    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-5">
+      <pattern>CCE-\d+-\d</pattern>
+    </external-identifier>
+    <external-identifier id="urn:scap-content:external-identifier:org.mitre:cwe">
+      <pattern>CWE-\d+</pattern>
+    </external-identifier>
+    <external-identifier id="urn:scap-content:external-identifier:gov.nist:cpe-2-x">
+      <pattern>[c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9\._\-~%]*){0,6}</pattern>
+    </external-identifier>
   </external-identifiers>
 
   <schemas>
@@ -93,6 +64,11 @@
               <schema-node node="xs:attribute[@name='id']"/>
             </field>
           </key>
+          <identifier-mapping>
+            <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:def:[1-9][0-9]*)">
+              <field-value id-ref="urn:scap-content:field:org.mitre.oval:definition">$1</field-value>
+            </pattern-operation>
+          </identifier-mapping>
         </entity>
         <entity id="urn:scap-content:entity:org.mitre.oval:test">
           <schema-node node="//xs:complexType[@name='TestType']"/>
@@ -101,6 +77,11 @@
               <schema-node node="xs:attribute[@name='id']"/>
             </field>
           </key>
+          <identifier-mapping>
+            <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:tst:[1-9][0-9]*)">
+              <field-value id-ref="urn:scap-content:field:org.mitre.oval:test">$1</field-value>
+            </pattern-operation>
+          </identifier-mapping>
         </entity>
         <entity id="urn:scap-content:entity:org.mitre.oval:object">
           <schema-node node="//xs:complexType[@name='ObjectType']"/>
@@ -109,6 +90,11 @@
               <schema-node node="xs:attribute[@name='id']"/>
             </field>
           </key>
+          <identifier-mapping>
+            <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:obj:[1-9][0-9]*)">
+              <field-value id-ref="urn:scap-content:field:org.mitre.oval:object">$1</field-value>
+            </pattern-operation>
+          </identifier-mapping>
         </entity>
         <entity id="urn:scap-content:entity:org.mitre.oval:state">
           <schema-node node="//xs:complexType[@name='StateType']"/>
@@ -117,6 +103,11 @@
               <schema-node node="xs:attribute[@name='id']"/>
             </field>
           </key>
+          <identifier-mapping>
+            <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:ste:[1-9][0-9]*)">
+              <field-value id-ref="urn:scap-content:field:org.mitre.oval:state">$1</field-value>
+            </pattern-operation>
+          </identifier-mapping>
         </entity>
         <entity id="urn:scap-content:entity:org.mitre.oval:variable">
           <schema-node node="//xs:complexType[@name='VariableType']"/>
@@ -125,6 +116,11 @@
               <schema-node node="xs:attribute[@name='id']"/>
             </field>
           </key>
+          <identifier-mapping>
+            <pattern-operation pattern="(oval:[A-Za-z0-9_\-\.]+:var:[1-9][0-9]*)">
+              <field-value id-ref="urn:scap-content:field:org.mitre.oval:variable">$1</field-value>
+            </pattern-operation>
+          </identifier-mapping>
         </entity>
       </entities>
 

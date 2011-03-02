@@ -38,9 +38,8 @@ class EntityIdentifierMappingImpl implements EntityIdentifierMapping {
 	private final EntityInfo entity;
 	private final List<PatternOperation> operations;
 
-	public EntityIdentifierMappingImpl(IdentifierMappingType type, JAXBMetadataModel model) {
-		String keyId = type.getKeyIdRef();
-		entity = model.getEntityByKeyId(keyId);
+	public EntityIdentifierMappingImpl(IdentifierMappingType type, EntityInfo entity) {
+		this.entity = entity;
 
 		List<PatternOperationType> opTypes = type.getPatternOperation();
 		operations = new ArrayList<PatternOperation>(opTypes.size());
@@ -69,10 +68,10 @@ class EntityIdentifierMappingImpl implements EntityIdentifierMapping {
 			pattern = Pattern.compile(p);
 			KeyInfo keyInfo = entity.getKeyInfo();
 			keyFieldIdToValueMap = new LinkedHashMap<String, String>();
-			for (KeyFieldMappingType fieldType : opType.getKeyFieldMapping()) {
-				String fieldId = fieldType.getFieldIdRef();
+			for (KeyFieldMappingType fieldType : opType.getFieldValue()) {
+				String fieldId = fieldType.getIdRef();
 				FieldInfo fieldInfo = keyInfo.getFieldInfo(fieldId);
-				String value = fieldType.getFieldValue();
+				String value = fieldType.getValue();
 
 				keyFieldIdToValueMap.put(fieldInfo.getId(), value);
 			}

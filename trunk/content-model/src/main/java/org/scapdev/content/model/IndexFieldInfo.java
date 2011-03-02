@@ -23,19 +23,33 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.scapdev.jaxb.reflection.model.JAXBProperty;
 
+/**
+ * Represents an index field that is associated with an index key or key
+ * reference within the XML schema meta model.
+ */
 public interface IndexFieldInfo extends SchemaComponent {
 
 	/**
+	 * Retrieves the sequence of properties, XML elements or attributes, that
+	 * need to be traversed to retrieve the value associated with an instance of
+	 * this field.
+	 * 
 	 * @return the propertyPath
 	 */
 	List<JAXBProperty> getPropertyPath();
 
-	String getValue(Object instance) throws IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException;
-
+	/**
+	 * Retrieves the field value for an instance of XML bound data using the
+	 * property path associated with this field.
+	 * 
+	 * @param instance the bound instance of the XML graph
+	 * @return the value at the tail of the property path or <code>null</code>
+	 *         if no value exists.
+	 * @throws ModelInstanceException if there is a problem accessing the underlying field or method
+	 */
+	String getValue(Object instance) throws ModelInstanceException;
 }

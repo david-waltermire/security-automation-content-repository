@@ -23,11 +23,35 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
+/**
+ * Represents the definition of a relationship type within the XML schema meta model
+ * that is directly associated with an {@link Entity}.
+ * 
+ * @see Relationship
+ * @see org.scapdev.content.model.jaxb.RelationshipType
+ */
 public interface RelationshipInfo extends SchemaComponent {
+	/**
+	 * Retrieves the XML bound type that contains the relationship
+	 * 
+	 * @return a JAXB bound type
+	 */
 	JAXBClass getOwningJAXBClass();
-	List<? extends Relationship> newRelationships(Object instance, Entity owningEntity);
+
+	/**
+	 * Generates an unordered collection of new relationships based on the XML
+	 * node indicated by the <code>instance</code>. A collection is necessary to
+	 * allow for a series of references to be captured within a single XML
+	 * element or property.
+	 * 
+	 * @param instance an XML bound node
+	 * @param owningEntity the entity containing the relationship
+	 * @return an unordered collection of relationships
+	 */
+	Collection<? extends Relationship> newRelationships(Object instance,
+			Entity owningEntity);
 }

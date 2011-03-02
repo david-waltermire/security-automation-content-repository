@@ -70,7 +70,7 @@ class IndirectRelationshipBuilder {
 		if (relationshipInfo == null || externalIdValue == null || externalIdType == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-		ExternalIdentifierInfo externalIdInfo = model.getExternalIdentifierById(externalIdType);
+		ExternalIdentifierInfo externalIdInfo = model.getExternalIdentifierInfoById(externalIdType);
 		ExternalIdentifier externalIdentifier = new InternalExternalIdentifier(externalIdInfo, externalIdValue);
 		IndirectRelationship rel = new InternalIndirectRelationship(relationshipInfo, entity, externalIdentifier);
 		

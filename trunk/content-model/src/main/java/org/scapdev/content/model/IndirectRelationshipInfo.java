@@ -23,9 +23,27 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collection;
 
-
+/**
+ * Represents definition of an indirect relationship type within the XML schema
+ * meta model that is directly associated with an {@link Entity}.
+ * 
+ * @see IndirectRelationship
+ * @see org.scapdev.content.model.jaxb.IndirectRelationshipType
+ * @see org.scapdev.content.annotation.Indirect
+ */
 public interface IndirectRelationshipInfo extends RelationshipInfo {
-	List<IndirectRelationship> newRelationships(Object instance, Entity owningEntity);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @param instance the XML bound object that holds one or more indirect
+	 *            relationships.
+	 * @param owningEntity the Entity instance that contains the new
+	 *            relationships
+	 * @return an unordered collection of indirect relationships that appear in the XML bound
+	 *         object graph at the current instance
+	 */
+	Collection<IndirectRelationship> newRelationships(Object instance,
+			Entity owningEntity);
 }

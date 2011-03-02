@@ -24,8 +24,8 @@
 package org.scapdev.content.model;
 
 /**
- * Represents an identifiable component within a schema model. 
- * @see ComponentType
+ * Represents an identifiable component within the XML schema meta model. 
+ * @see org.scapdev.content.model.jaxb.ComponentType
  */
 public interface Component {
 	/**
@@ -35,7 +35,7 @@ public interface Component {
 	SchemaInfo getSchemaInfo();
 	/**
 	 * Retrieves the unique identifier for the schema component 
-	 * @return
+	 * @return the component's id
 	 */
 	String getId();
 }

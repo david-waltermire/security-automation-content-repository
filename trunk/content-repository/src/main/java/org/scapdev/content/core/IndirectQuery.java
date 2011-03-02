@@ -24,6 +24,7 @@
 package org.scapdev.content.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
@@ -31,6 +32,7 @@ import org.scapdev.content.core.query.Query;
 import org.scapdev.content.core.query.SimpleQueryResult;
 import org.scapdev.content.core.resolver.ResolutionParameters;
 import org.scapdev.content.core.resolver.Resolver;
+import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.Key;
 
 public class IndirectQuery implements Query<SimpleQueryResult> {
@@ -40,11 +42,16 @@ public class IndirectQuery implements Query<SimpleQueryResult> {
 	private final ContentPersistenceManager persistenceManager;
 	private boolean resolveReferences = false;
 
-	public IndirectQuery(String indirectType, Collection<String> indirectIds, Set<String> requestedEntityIds, ContentPersistenceManager persistenceManager) {
+	public IndirectQuery(String indirectType, Collection<String> indirectIds, Set<String> requestedEntityIds, ContentPersistenceManager contentPersistenceManager) {
 		this.indirectType = indirectType;
 		this.indirectIds = indirectIds;
 		this.requestedEntityIds = requestedEntityIds;
-		this.persistenceManager = persistenceManager;
+		this.persistenceManager = contentPersistenceManager;
+	}
+
+	public IndirectQuery(ExternalIdentifier externalIdentifier,
+			ContentPersistenceManager contentPersistenceManager) {
+		this(externalIdentifier.getId(), Collections.singleton(externalIdentifier.getValue()), Collections.<String>emptySet(), contentPersistenceManager);
 	}
 
 	/**

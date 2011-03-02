@@ -86,15 +86,15 @@ public class XmlStreamWriterNamespaceFilter implements XMLStreamWriter {
 	@Override
 	public void writeAttribute(String namespaceURI, String localName,
 			String value) throws XMLStreamException {
-		throw new UnsupportedOperationException();
-//		delegate.writeAttribute(namespaceURI, localName, value);
+//		throw new UnsupportedOperationException();
+		delegate.writeAttribute(namespaceURI, localName, value);
 	}
 
 	@Override
 	public void writeAttribute(String prefix, String namespaceURI,
 			String localName, String value) throws XMLStreamException {
-		throw new UnsupportedOperationException();
-//		delegate.writeAttribute(prefix, namespaceURI, localName, value);
+//		throw new UnsupportedOperationException();
+		delegate.writeAttribute(prefix, namespaceURI, localName, value);
 	}
 
 	@Override

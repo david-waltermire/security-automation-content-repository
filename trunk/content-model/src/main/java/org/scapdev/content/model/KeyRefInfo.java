@@ -23,10 +23,37 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.lang.reflect.InvocationTargetException;
+import org.scapdev.content.model.jaxb.KeyRefType;
 
-
+/**
+ * Represents a key reference type within the XML schema meta model. A key
+ * reference type has a collection of identification field reference types that
+ * form a compound index reference. This type cannot be instantiated; however,
+ * it can be used to generate the key of the referenced {@link Entity}.
+ * 
+ * @see KeyRefType
+ * @see org.scapdev.content.annotation.KeyRef
+ */
 public interface KeyRefInfo extends Component {
+	/**
+	 * Retrieves the key type associated with this reference
+	 * 
+	 * @return the key information associated with this reference
+	 */
 	KeyInfo getKeyInfo();
-	Key getKey(Object instance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
+
+	/**
+	 * Generates a new key based on the XML bound node provided by the
+	 * <code>instance</code> parameter.
+	 * 
+	 * @param instance an XML bound node
+	 * @return a new Key instance
+	 * @throws NullFieldValueException if one of the fields was not provided or
+	 *             <code>null</code>
+	 * @throws KeyException if the key is malformed or incomplete
+	 * @throws ModelInstanceException if the XML bound node is malformed or
+	 *             incomplete
+	 */
+	Key newKey(Object instance) throws NullFieldValueException, KeyException,
+			ModelInstanceException;
 }

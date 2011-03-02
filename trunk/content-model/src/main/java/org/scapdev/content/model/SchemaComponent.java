@@ -23,6 +23,16 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+/**
+ * Represents a component that is directly associated with an XML schema
+ * element, attribute or type as described within the XML schema meta model.
+ */
 public interface SchemaComponent extends Component {
+	/**
+	 * Retrieves the XPath expression for the referenced XML schema element,
+	 * attribute or type
+	 * 
+	 * @return an XPath expression
+	 */
 	String getSchemaNode();
 }
