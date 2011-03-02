@@ -48,6 +48,7 @@ class SchemaInfoImpl implements SchemaInfo {
 	private Map<JAXBClass, EntityInfoImpl> entityMap;
 	private Map<JAXBClass, DocumentInfo> documentMap;
 	private Map<JAXBClass, RelationshipInfo> relationshipMap;
+	private final MetadataModel metadataModel;
 
 	SchemaInfoImpl(SchemaType type, JAXBMetadataModel metadataModel, InitializingJAXBClassVisitor init) {
 		this.id = type.getId();
@@ -55,6 +56,7 @@ class SchemaInfoImpl implements SchemaInfo {
 		this.schemaLocation = type.getSchemaLocation();
 		this.prefix = type.getPrefix();
 		this.schemaNode = type.getSchemaNode().getNode();
+		this.metadataModel = metadataModel;
 
 		SchemaType.Documents documents = type.getDocuments();
 		if (documents != null) {
@@ -62,7 +64,7 @@ class SchemaInfoImpl implements SchemaInfo {
 			for (DocumentType node : documents.getDocument()) {
 				BindingInfo<org.scapdev.content.annotation.SchemaDocument> binding = init.getDocumentBindingInfo(node.getId());
 				org.scapdev.content.annotation.SchemaDocument annotation = binding.getAnnotation();
-				AbstractDocumentBase document;
+				AbstractDocumentInfo<?> document;
 				switch (annotation.type()) {
 				case GENERATED:
 					document = new GeneratedDocumentInfoImpl(node, this, metadataModel, init);
@@ -70,7 +72,6 @@ class SchemaInfoImpl implements SchemaInfo {
 				default:
 					throw new UnsupportedOperationException("Document Type: "+annotation.type().toString());
 				}
-	
 				metadataModel.registerDocument(document);
 				documentMap.put(binding.getJaxbClass(), document);
 				
@@ -121,38 +122,43 @@ class SchemaInfoImpl implements SchemaInfo {
 		}
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getId() {
 		return id;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getNamespace() {
 		return namespace;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getPrefix() {
 		return prefix;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getSchemaNode() {
 		return schemaNode;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getSchemaLocation() {
 		return schemaLocation;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public SchemaInfo getSchemaInfo() {
 		return this;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public Collection<DocumentInfo> getDocumentInfos() {
 		return documentMap.values();
+	}
+
+	@Override
+	public MetadataModel getMetadataModel() {
+		return metadataModel;
 	}
 }

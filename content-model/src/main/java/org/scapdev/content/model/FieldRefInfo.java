@@ -23,9 +23,27 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-
-
+/**
+ * Represents an index field that is associated with an index key reference
+ * within the XML schema meta model.
+ * @see FieldRefType
+ * @see org.scapdev.content.annotation.FieldRef
+ */
 public interface FieldRefInfo extends IndexFieldInfo {
+	/**
+	 * Retrieves the key reference type associated with this field reference
+	 * type
+	 * 
+	 * @return the key reference information associated with this field
+	 *         reference type
+	 */
 	KeyRefInfo getKeyRefInfo();
+
+	/**
+	 * Retrieves information about the index field that is associated with this
+	 * field reference type.
+	 * 
+	 * @return the field information referenced by this field reference type
+	 */
 	FieldInfo getReferencedFieldInfo();
 }

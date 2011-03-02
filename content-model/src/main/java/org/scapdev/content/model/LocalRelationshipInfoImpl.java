@@ -29,40 +29,42 @@ import java.util.List;
 import org.scapdev.content.model.jaxb.LocalRelationshipType;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 
-class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements LocalRelationshipInfo {
+class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements
+		LocalRelationshipInfo {
 
 	private final KeyRefInfoImpl keyRefInfo;
 
-	public LocalRelationshipInfoImpl(LocalRelationshipType type, SchemaInfo schemaInfo, MetadataModel loader, InitializingJAXBClassVisitor init) {
+	public LocalRelationshipInfoImpl(LocalRelationshipType type,
+			SchemaInfo schemaInfo, MetadataModel loader,
+			InitializingJAXBClassVisitor init) {
 		super(type, schemaInfo);
 		keyRefInfo = new KeyRefInfoImpl(type.getKeyRef(), this, loader, init);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public KeyRefInfoImpl getKeyRefInfo() {
 		return keyRefInfo;
 	}
 
-	@Override
-	public KeyInfo getKeyInfo() {
-		return keyRefInfo.getKeyInfo();
+	/** {@inheritDoc} */
+	public Key newKey(Object instance) throws ModelInstanceException {
+		return keyRefInfo.newKey(instance);
 	}
 
-	@Override
-	public Key getKey(Object instance) throws ModelInstanceException {
-		return keyRefInfo.getKey(instance);
+	/** {@inheritDoc} */
+	public List<? extends LocalRelationship> newRelationships(Object instance,
+			Entity owningEntity) {
+		return Collections
+				.<LocalRelationship> singletonList(new LocalRelationshipImpl(
+						this, owningEntity, newKey(instance)));
 	}
 
-	@Override
-	public List<MutableLocalRelationship> newRelationships(Object instance, Entity owningEntity) {
-		return Collections.<MutableLocalRelationship>singletonList(new LocalRelationshipImpl(this, owningEntity, getKey(instance)));
-	}
-
-	@Override
+	/** {@inheritDoc} */
 	public JAXBClass getOwningJAXBClass() {
 		return getKeyRefInfo().getBinding().getJaxbClass();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -78,10 +80,11 @@ class LocalRelationshipInfoImpl extends AbstractKeyedRelationshipInfo implements
 		return true;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		int result = 13;
-		result = 37 * result +  getId().hashCode();
+		result = 37 * result + getId().hashCode();
 		return result;
 	}
 }

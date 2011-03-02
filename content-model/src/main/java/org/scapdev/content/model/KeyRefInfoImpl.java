@@ -23,7 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -43,7 +42,7 @@ class KeyRefInfoImpl implements KeyRefInfo {
 		this.id = keyRef.getId();
 		this.parent = parent;
 		binding = init.getKeyRefBindingInfo(id);
-		referencedKey = loader.getEntityByKeyId(keyRef.getIdRef()).getKeyInfo();
+		referencedKey = loader.getEntityInfoByKeyId(keyRef.getIdRef()).getKeyInfo();
 
 		List<FieldRefInfo> fields = new ArrayList<FieldRefInfo>(keyRef.getFieldRef().size());
 		for (FieldRefType field : keyRef.getFieldRef()) {
@@ -52,7 +51,7 @@ class KeyRefInfoImpl implements KeyRefInfo {
 		this.fields = Collections.unmodifiableList(fields);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getId() {
 		return id;
 	}
@@ -61,12 +60,12 @@ class KeyRefInfoImpl implements KeyRefInfo {
 		return binding;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public SchemaInfo getSchemaInfo() {
 		return parent.getSchemaInfo();
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public KeyInfo getKeyInfo() {
 		return referencedKey;
 	}
@@ -74,23 +73,14 @@ class KeyRefInfoImpl implements KeyRefInfo {
 	private LinkedHashMap<String, String> getKeyValues(Object instance) throws ModelInstanceException {
 		LinkedHashMap<String, String> fieldRefIdToValueMap = new LinkedHashMap<String, String>();
 		for (FieldRefInfo fieldRefInfo : fields) {
-			String value;
-			try {
-				value = fieldRefInfo.getValue(instance);
-			} catch (IllegalArgumentException e) {
-				throw new ModelInstanceException(e);
-			} catch (IllegalAccessException e) {
-				throw new ModelInstanceException(e);
-			} catch (InvocationTargetException e) {
-				throw new ModelInstanceException(e);
-			}
+			String value = fieldRefInfo.getValue(instance);
 			fieldRefIdToValueMap.put(fieldRefInfo.getReferencedFieldInfo().getId(), value);
 		}
 		return fieldRefIdToValueMap;
 	}
 
-	@Override
-	public Key getKey(Object instance) throws ModelInstanceException {
+	/** {@inheritDoc} */
+	public Key newKey(Object instance) throws ModelInstanceException {
 		// TODO: Handle key collections
 		return new Key(getKeyInfo().getId(), getKeyValues(instance));
 	}

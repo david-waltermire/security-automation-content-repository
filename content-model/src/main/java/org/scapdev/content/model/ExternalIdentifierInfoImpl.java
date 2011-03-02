@@ -23,19 +23,40 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.scapdev.content.model.jaxb.ExternalIdentifierType;
 
 class ExternalIdentifierInfoImpl implements ExternalIdentifierInfo {
 	private final String id;
+	private final Collection<Pattern> patterns;
 
 	public ExternalIdentifierInfoImpl(ExternalIdentifierType externalIdentifierType) {
 		this.id = externalIdentifierType.getId();
+		List<String> patternStrings = externalIdentifierType.getPattern();
+		if (patternStrings != null) {
+			Collection<Pattern> compiledPatterns = new ArrayList<Pattern>(patternStrings.size());
+			for (String pattern : patternStrings) {
+				compiledPatterns.add(Pattern.compile(pattern));
+			}
+			patterns = Collections.unmodifiableCollection(compiledPatterns);
+		} else {
+			patterns = Collections.emptyList();
+		}
 	}
-
 	
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public Collection<Pattern> getPattern() {
+		return patterns;
 	}
 
 }

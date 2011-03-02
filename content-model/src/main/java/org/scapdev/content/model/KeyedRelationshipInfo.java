@@ -23,11 +23,48 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collection;
 
+/**
+ * Represents definition of an relationship type within the XML schema meta
+ * model that is described by a key reference that is directly associated with
+ * an {@link Entity}.
+ * 
+ * @see AbstractKeyedRelationship
+ * @see org.scapdev.content.annotation.KeyRef
+ */
 public interface KeyedRelationshipInfo extends RelationshipInfo {
+	/**
+	 * Retrieves the key reference type associated with this relationship
+	 * definition.
+	 * 
+	 * @return the key reference information associated with this field
+	 *         reference type
+	 */
 	KeyRefInfo getKeyRefInfo();
-	KeyInfo getKeyInfo();
-	Key getKey(Object instance) throws ModelInstanceException;
-	List<? extends MutableKeyedRelationship> newRelationships(Object instance, Entity owningEntity);
+
+	/**
+	 * Generates a new key based on the XML bound node provided by the
+	 * <code>instance</code> parameter.
+	 * 
+	 * @param instance an XML bound node
+	 * @return a new Key instance
+	 * @throws NullFieldValueException if one of the fields was not provided or
+	 *             <code>null</code>
+	 * @throws KeyException if the key is malformed or incomplete
+	 * @throws ModelInstanceException if the XML bound node is malformed or
+	 *             incomplete
+	 */
+	Key newKey(Object instance) throws NullFieldValueException, KeyException,
+			ModelInstanceException;
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @param instance an XML bound node
+	 * @param owningEntity the entity containing the relationship
+	 * @return an unordered collection of keyed relationships
+	 */
+	Collection<? extends KeyedRelationship> newRelationships(Object instance,
+			Entity owningEntity);
 }

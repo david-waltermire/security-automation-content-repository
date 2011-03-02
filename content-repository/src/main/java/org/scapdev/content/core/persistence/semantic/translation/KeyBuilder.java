@@ -31,6 +31,10 @@ import org.scapdev.content.model.Key;
  * A class to handle building a Key instance.
  *
  */
+// TODO: move KeyBuilder into content-model
+// TODO: Use KeyInfo to do some validation on fields.
+// TODO: Implement KeyBuilder in place of current Key constructor
+// TODO: Make the Key constructor package private 
 class KeyBuilder {
 	private String id;
 	private LinkedHashMap<String, String> idToValueMap = new LinkedHashMap<String, String>();
@@ -43,6 +47,7 @@ class KeyBuilder {
 		this.id = id;
 	}
 	
+	// TODO: Check KeyInfo while adding fields to check if a valid field is associated
 	void addKeyField(String fieldId, String fieldValue){
 		idToValueMap.put(fieldId, fieldValue);
 	}
@@ -52,6 +57,7 @@ class KeyBuilder {
 	 * @return
 	 */
 	Key build(){
+		// TODO: Check with KeyInfo if all required fields are present
 		if (id == null || id.isEmpty() || idToValueMap.isEmpty()){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}

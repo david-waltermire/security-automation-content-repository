@@ -67,7 +67,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	@Override
-	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
+	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes) {
 		Set<Key> result = Collections.emptySet();
 		Map<String, List<Entity>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
 		if (indirectValueToDescriptorsMap != null) {
@@ -76,7 +76,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 				List<Entity> entities = indirectValueToDescriptorsMap.get(indirectId);
 				if (entities != null) {
 					for (Entity entity : entities) {
-						if (entityType.contains(entity.getEntityInfo().getId())) {
+						if (entityTypes.isEmpty() || entityTypes.contains(entity.getEntityInfo().getId())) {
 							result.add(entity.getKey());
 						}
 					}

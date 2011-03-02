@@ -23,11 +23,24 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import org.scapdev.content.model.jaxb.DocumentType;
+import javax.xml.bind.JAXBElement;
 
-class GeneratedDocumentInfoImpl extends AbstractDocumentBase {
+import org.scapdev.content.model.jaxb.DocumentType;
+import org.scapdev.content.model.jaxb.GeneratedDocumentModelType;
+
+class GeneratedDocumentInfoImpl extends AbstractDocumentInfo<GeneratedDocumentModel> {
+	private final GeneratedDocumentModel documentModel;
 
 	GeneratedDocumentInfoImpl(DocumentType entity, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
 		super(entity, schema, model, init);
+
+		@SuppressWarnings("unchecked")
+		JAXBElement<GeneratedDocumentModelType> modelType = (JAXBElement<GeneratedDocumentModelType>) entity.getDocumentModel();
+		this.documentModel = new GeneratedDocumentModelImpl(modelType, this);
+	}
+
+	@Override
+	protected GeneratedDocumentModel getDocumentModel() {
+		return documentModel;
 	}
 }

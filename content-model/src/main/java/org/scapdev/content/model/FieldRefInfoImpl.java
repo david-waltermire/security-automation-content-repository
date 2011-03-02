@@ -38,12 +38,12 @@ class FieldRefInfoImpl extends AbstractFieldInfo<FieldRefType, KeyRefInfo> imple
 		referencedFieldInfo = keyInfo.getFieldInfo(fieldRef);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public KeyRefInfo getKeyRefInfo() {
 		return getParent();
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public FieldInfo getReferencedFieldInfo() {
 		return referencedFieldInfo;
 	}

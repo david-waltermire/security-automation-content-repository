@@ -23,9 +23,16 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collection;
 
 
 public interface LocalRelationshipInfo extends KeyedRelationshipInfo {
-	List<MutableLocalRelationship> newRelationships(Object instance, Entity owningEntity);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @param instance an XML bound node
+	 * @param owningEntity the entity containing the relationship
+	 * @return an unordered collection of keyed relationships
+	 */
+	Collection<? extends LocalRelationship> newRelationships(Object instance, Entity owningEntity);
 }

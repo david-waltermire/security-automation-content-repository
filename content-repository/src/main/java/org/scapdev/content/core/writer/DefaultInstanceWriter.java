@@ -61,7 +61,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 	}
 
 	public void write(QueryResult queryResult, XMLStreamWriter writer) throws XMLStreamException {
-		Map<DocumentInfo, DocumentData> documentDataMap = generateDocumentEntityMap(queryResult);
+		Map<DocumentInfo, DocumentData> documentDataMap = generateDocumentEntityMap(queryResult, model);
 		if (!documentDataMap.isEmpty()) {
 			writer.writeStartDocument();
 			writer.writeStartElement("repo", "repository-data", "http://scapdev.org/schema/meta-model-instance/0.1");
@@ -71,7 +71,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 			XMLStreamWriter filteredWriter = new XmlStreamWriterNamespaceFilter(writer);
 			int i = 1;
 			for (Map.Entry<DocumentInfo, DocumentData> entry : documentDataMap.entrySet()) {
-				log.info("writing document: "+entry.getKey().getId());
+				log.debug("writing document: "+entry.getKey().getId());
 				writer.writeStartElement("http://scapdev.org/schema/meta-model-instance/0.1", "document");
 
 				DocumentData documentData = entry.getValue();
@@ -112,12 +112,12 @@ public class DefaultInstanceWriter implements InstanceWriter {
 		return getXMLOutputFactory2().createXMLStreamWriter(writer);
 	}
 
-	private static Map<DocumentInfo, DocumentData> generateDocumentEntityMap(QueryResult queryResult) {
+	private static Map<DocumentInfo, DocumentData> generateDocumentEntityMap(QueryResult queryResult, MetadataModel model) {
 		Map<DocumentInfo, DocumentData> result = new HashMap<DocumentInfo, DocumentData>();
 
 		for (Map.Entry<Key, Entity> entry : queryResult.getEntities().entrySet()) {
 			Entity entity = entry.getValue();
-			Collection<DocumentInfo> documentInfos = entity.getEntityInfo().getSchemaInfo().getDocumentInfos();
+			Collection<DocumentInfo> documentInfos = model.getDocumentInfosContaining(entity.getEntityInfo());
 
 			if (documentInfos.size() == 1) {
 				DocumentInfo documentInfo = documentInfos.iterator().next();

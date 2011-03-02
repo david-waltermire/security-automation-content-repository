@@ -11,7 +11,7 @@
   <modules>
     <module>jaxb-reflection</module>
     <module>content-annotations</module>
-<!--    <module>content-meta-model</module> -->
+    <module>content-meta-model</module>
     <module>content-model</module>
     <module>content-repository</module>
     <module>content-repository-flex-console</module>
@@ -226,7 +226,7 @@
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.7.4</version>
+          <version>0.7.5</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -275,4 +275,13 @@
 <!--      </plugin>-->
 <!--    </plugins>-->
 <!--  </reporting>-->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

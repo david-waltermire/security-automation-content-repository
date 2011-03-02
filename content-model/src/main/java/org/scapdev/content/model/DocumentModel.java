@@ -23,5 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface MutableLocalRelationship extends LocalRelationship, MutableKeyedRelationship {
+import java.util.Set;
+
+interface DocumentModel {
+
+//	protected abstract Collection<EntityContainerInfo> getEntityContainers();
+	Set<EntityInfo> getSupportedEntityInfos(MetadataModel model);
 }

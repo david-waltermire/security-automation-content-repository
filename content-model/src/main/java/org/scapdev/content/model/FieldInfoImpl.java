@@ -36,7 +36,7 @@ class FieldInfoImpl extends AbstractFieldInfo<FieldType, KeyInfo> implements Fie
 		super(field, parent, propertyPath, loader);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public KeyInfo getKeyInfo() {
 		return getParent();
 	}

@@ -44,6 +44,13 @@ public interface MetadataStore {
 	 */
 	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
+	/**
+	 * 
+	 * @param indirectType
+	 * @param indirectIds
+	 * @param entityTypes filter results to only these entity types or no filtering if empty
+	 * @return
+	 */
+	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
 	void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model);
 }

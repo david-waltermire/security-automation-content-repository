@@ -33,7 +33,6 @@ import org.scapdev.jaxb.reflection.model.JAXBProperty;
 import org.scapdev.jaxb.reflection.model.instance.PropertyPathEvaluator;
 
 abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT extends Component> implements IndexFieldInfo {
-
 	private final PARENT parent;
 	private final String id;
 	private final String schemaNode;
@@ -47,7 +46,7 @@ abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT e
 //		binding = loader.getFieldBindingInfo(id);
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getId() {
 		return id;
 	}
@@ -56,23 +55,32 @@ abstract class AbstractFieldInfo<JAXB_TYPE extends SchemaComponentType, PARENT e
 		return parent;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public String getSchemaNode() {
 		return schemaNode;
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public SchemaInfo getSchemaInfo() {
 		return getParent().getSchemaInfo();
 	}
 
+	/** {@inheritDoc} */
 	public List<JAXBProperty> getPropertyPath() {
 		return propertyPath;
 	}
 
-	@Override
-	public String getValue(Object instance) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		return PropertyPathEvaluator.evaluate(instance, getPropertyPath());
+	/** {@inheritDoc} */
+	public String getValue(Object instance) throws ModelInstanceException {
+		try {
+			return PropertyPathEvaluator.evaluate(instance, getPropertyPath());
+		} catch (IllegalArgumentException e) {
+			throw new ModelInstanceException(e);
+		} catch (IllegalAccessException e) {
+			throw new ModelInstanceException(e);
+		} catch (InvocationTargetException e) {
+			throw new ModelInstanceException(e);
+		}
 	}
 
 

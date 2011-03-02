@@ -28,13 +28,12 @@ import javax.xml.namespace.QName;
 /**
  * Represents information about a declared entity type within a schema metamodel.
  */
-public interface EntityInfo extends SchemaComponent, Indexed {
+public interface EntityInfo extends SchemaTypeComponent, Indexed {
 	/**
-	 * Retrieves the element name (without the namespace) within the XML schema
-	 * schema model associated with this entity type.
-	 * @return a string representing the element name
+	 * Retrieves the qualified name of the XML element associated with the meta
+	 * model entity.
+	 * @return the XML qualified name
 	 */
-	String getLocalPart();
-
 	QName getQName();
+	EntityIdentifierMapping getEntityIdentifierMapping();
 }

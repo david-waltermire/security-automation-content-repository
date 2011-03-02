@@ -30,18 +30,19 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.AbstractEntity;
+import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.MutableKeyedRelationship;
+import org.scapdev.content.model.KeyedRelationship;
 import org.scapdev.content.model.Relationship;
 
-class EntityImpl extends AbstractEntity implements MutableEntity {
+class EntityImpl extends AbstractEntity implements Entity {
 	private List<Relationship> relationships;
-	private List<MutableKeyedRelationship> keyedRelationships;
+	private List<KeyedRelationship> keyedRelationships;
 	private List<IndirectRelationship> indirectRelationships;
 
 	public EntityImpl(EntityInfo entityInfo, JAXBElement<Object> object) {
-		super(entityInfo.getKeyInfo().getKey(object.getValue()), entityInfo, object);
+		super(entityInfo.getKeyInfo().newKey(object.getValue()), entityInfo, object);
 		relationships = Collections.emptyList();
 		keyedRelationships = Collections.emptyList();
 		indirectRelationships = Collections.emptyList();
@@ -64,7 +65,7 @@ class EntityImpl extends AbstractEntity implements MutableEntity {
 	}
 
 	@Override
-	public List<MutableKeyedRelationship> getKeyedRelationships() {
+	public List<KeyedRelationship> getKeyedRelationships() {
 		synchronized (this) {
 			return keyedRelationships;
 		}
@@ -73,7 +74,7 @@ class EntityImpl extends AbstractEntity implements MutableEntity {
 	/**
 	 * @param relationships the relationships to set
 	 */
-	public void setRelationships(List<MutableKeyedRelationship> keyedRelationships, List<IndirectRelationship> indirectRelationships) {
+	public void setRelationships(List<KeyedRelationship> keyedRelationships, List<IndirectRelationship> indirectRelationships) {
 		synchronized (this) {
 			this.keyedRelationships = Collections.unmodifiableList(keyedRelationships);
 			this.indirectRelationships = Collections.unmodifiableList(indirectRelationships);

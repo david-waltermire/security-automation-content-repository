@@ -21,14 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.model.processor;
+package org.scapdev.content.model;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.MutableKeyedRelationship;
+import javax.xml.bind.JAXBElement;
 
-interface MutableEntity extends Entity {
-	List<MutableKeyedRelationship> getKeyedRelationships();
+import org.scapdev.content.model.jaxb.EntityContainerType;
+import org.scapdev.content.model.jaxb.EntityIdRefType;
+import org.scapdev.content.model.jaxb.GeneratedDocumentModelType;
 
+class GeneratedDocumentModelImpl implements GeneratedDocumentModel {
+	private final GeneratedDocumentModelType type;
+	private Set<EntityInfo> entityIdRefs = null;
+
+	public GeneratedDocumentModelImpl(
+			JAXBElement<GeneratedDocumentModelType> modelType,
+			DocumentInfo documentInfo) {
+		this.type = modelType.getValue();
+	}
+
+	@Override
+	public Set<EntityInfo> getSupportedEntityInfos(MetadataModel model) {
+		Set<EntityInfo> result;
+		if (entityIdRefs == null) {
+			result = new HashSet<EntityInfo>();
+			for (EntityContainerType entityContainerType : type.getEntityContainer()) {
+				for (EntityIdRefType idRefType : entityContainerType.getEntitySchemaNode().getEntityRef()) {
+					String idRef = idRefType.getIdRef();
+					EntityInfo entityInfo = model.getEntityInfoById(idRef);
+					result.add(entityInfo);
+				}
+			}
+			entityIdRefs = Collections.unmodifiableSet(result);
+		}
+		return entityIdRefs;
+	}
 }

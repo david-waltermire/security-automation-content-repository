@@ -25,6 +25,7 @@ package org.scapdev.content.model;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 
@@ -34,17 +35,19 @@ public interface MetadataModel {
 	Map<String, String> getNamespaceToPrefixMap();
 	JAXBModel getModel();
 	JAXBContext getJAXBContext();
-	RelationshipInfo getRelationshipByKeyRefId(String id);
-	EntityInfo getEntityById(String id);
-	RelationshipInfo getRelationshipById(String id);
-	EntityInfo getEntityByKeyId(String idRef);
-	ExternalIdentifierInfo getExternalIdentifierById(String externalIdentifierId);
+	RelationshipInfo getRelationshipInfoByKeyRefId(String id);
+	EntityInfo getEntityInfoById(String id);
+	RelationshipInfo getRelationshipInfoById(String id);
+	EntityInfo getEntityInfoByKeyId(String idRef);
+	ExternalIdentifierInfo getExternalIdentifierInfoById(String externalIdentifierId);
+	ExternalIdentifier getExternalIdentifierById(String identifier);
+	Set<DocumentInfo> getDocumentInfosContaining(EntityInfo info);
 	/**
 	 * Based on the metamodel definition of entity-identifier-mapping this
 	 * method must find a pattern that matches the provided identifier and build
 	 * the associated key.
-	 * @param string the identifier
-	 * @return a key corrisponding to the identifier or <code>null</code> if
+	 * @param identifier the identifier
+	 * @return a key corresponding to the identifier or <code>null</code> if
 	 * 		there is no match
 	 */
 	Key getKeyFromMappedIdentifier(String identifier);

@@ -117,11 +117,11 @@ class KeyedRelationshipStatementManager implements
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
 			keyedRelBuilder = new KeyedRelationshipBuilder(ontology);
-			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipInfoById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		} else {
 			// can't be sure this was set before
-			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipInfoById(keyedRelationshipId));
 		}
 		
 	}

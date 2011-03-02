@@ -25,10 +25,16 @@ package org.scapdev.content.model;
 
 import java.util.Collection;
 
+/**
+ * Represents the definition of a schema within the XML schema meta model.
+ * 
+ * @see org.scapdev.content.model.jaxb.SchemaType
+ */
 public interface SchemaInfo extends SchemaComponent {
 	String getId();
 	String getNamespace();
 	String getPrefix();
 	String getSchemaLocation();
 	Collection<DocumentInfo> getDocumentInfos();
+	MetadataModel getMetadataModel();
 }

@@ -34,13 +34,6 @@
   <xs:element name="meta-model">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="entity-identifier-mappings">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element ref="entity-identifier-mapping" maxOccurs="unbounded"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="external-identifiers" minOccurs="1">
           <xs:complexType>
             <xs:sequence>
@@ -141,37 +134,19 @@
       <xs:pattern value="urn:scap-content:[a-z-]+:[a-z][a-z0-9.-_]+:[a-z][a-z0-9.\-_]+"/>
     </xs:restriction>
   </xs:simpleType>
-  
-  <!-- ********************************************************************* -->
-  <!-- * Identifier Mapping                                                * -->
-  <!-- ********************************************************************* -->
-  <xs:element name="entity-identifier-mapping" type="IdentifierMappingType"/>
-  <xs:complexType name="IdentifierMappingType">
-    <xs:sequence>
-      <xs:element name="pattern-operation" type="PatternOperationType" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:attribute name="key-id-ref" type="KeyComponentIdType" use="required"/>
-  </xs:complexType>
 
-  <xs:complexType name="PatternOperationType">
-    <xs:sequence>
-      <xs:element name="key-field-mapping" type="KeyFieldMappingType" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:attribute name="pattern" type="xs:string" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="KeyFieldMappingType">
-    <xs:sequence>
-      <xs:element name="field-value" type="xs:string"/>
-    </xs:sequence>
-    <xs:attribute name="field-id-ref" type="FieldComponentIdType" use="required"/>
-  </xs:complexType>
+  <xs:simpleType name="PatternType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
 
   <!-- ********************************************************************* -->
   <!-- * External Identifier                                               * -->
   <!-- ********************************************************************* -->
   <xs:element name="external-identifier" type="ExternalIdentifierType"/>
   <xs:complexType name="ExternalIdentifierType">
+    <xs:sequence>
+      <xs:element name="pattern" type="PatternType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
     <xs:attribute name="id" type="ExternalIdentifierComponentIdType" use="required"/>
   </xs:complexType>
 
@@ -238,12 +213,24 @@
   <!-- ********************************************************************** -->
   <!-- * Entity                                                             * -->
   <!-- ********************************************************************** -->
-  <xs:element name="entity" type="EntityType"/>
+  <xs:element name="entity" type="EntityType">
+    <xs:key name="KeyFieldKey">
+      <xs:selector xpath="tns:key/tns:field"></xs:selector>
+      <xs:field xpath="@id"></xs:field>
+    </xs:key>
+    <xs:keyref name="IdentifierFieldKeyRef" refer="KeyFieldKey">
+      <xs:selector xpath=".//tns:field-value"/>
+      <xs:field xpath="@id-ref"/>
+    </xs:keyref>
+    <!-- TODO: make sure fields are proeprly used using schematron -->
+    
+  </xs:element>
   <xs:complexType name="EntityType">
     <xs:complexContent>
       <xs:extension base="EntitySchemaComponentType">
         <xs:sequence>
           <xs:element ref="key"/>
+          <xs:element ref="identifier-mapping" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="local-part" type="xs:NCName"/>
       </xs:extension>
@@ -316,6 +303,29 @@
       <xs:pattern value="urn:scap-content:field:.+"/>
     </xs:restriction>
   </xs:simpleType>
+
+  <!-- identifier mapping -->
+  <xs:element name="identifier-mapping" type="IdentifierMappingType"/>
+  <xs:complexType name="IdentifierMappingType">
+    <xs:sequence>
+      <xs:element name="pattern-operation" type="PatternOperationType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="PatternOperationType">
+    <xs:sequence>
+      <xs:element name="field-value" type="KeyFieldMappingType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="pattern" type="PatternType" use="required"/>
+  </xs:complexType>
+  
+  <xs:complexType name="KeyFieldMappingType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id-ref" type="FieldComponentIdType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
   
   <!-- ********************************************************************* -->
   <!-- * Document                                                          * -->
@@ -429,6 +439,7 @@
     <xs:sequence>
       <xs:element ref="schema-node"/>
     </xs:sequence>
+    <xs:attribute name="when-child-is-present" default="false"/>
   </xs:complexType>
 
   <!-- ********************************************************************** -->

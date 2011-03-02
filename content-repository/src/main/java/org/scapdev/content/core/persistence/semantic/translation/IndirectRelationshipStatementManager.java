@@ -119,11 +119,11 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
 		if (indirectRelBuilder == null){
 			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipInfoById(indirectRelationshipId));
 			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipInfoById(indirectRelationshipId));
 		}
 	}
 	

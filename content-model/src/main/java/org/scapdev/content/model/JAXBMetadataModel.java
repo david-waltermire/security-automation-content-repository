@@ -29,17 +29,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.scapdev.content.model.jaxb.ExternalIdentifierType;
-import org.scapdev.content.model.jaxb.IdentifierMappingType;
 import org.scapdev.content.model.jaxb.MetaModel;
 import org.scapdev.content.model.jaxb.SchemaType;
 import org.scapdev.jaxb.reflection.JAXBContextFactory;
@@ -66,6 +67,7 @@ public class JAXBMetadataModel implements MetadataModel {
 	private final List<EntityIdentifierMapping> entityIdentifierMappings;
 	private final Map<String, IndirectRelationshipInfo> indirectRelationshipIdToInfoMap;
 	private final Map<String, KeyedRelationshipInfo> keyedRelationshipIdToInfoMap;
+	private final Map<String, Set<DocumentInfo>> entityIdToDocumentInfoMap;
 
 	JAXBMetadataModel() throws IOException, JAXBException, ClassNotFoundException {
 		// Initialize JAXB reflection model
@@ -91,6 +93,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		entityIdentifierMappings = new LinkedList<EntityIdentifierMapping>();
 		indirectRelationshipIdToInfoMap = new HashMap<String, IndirectRelationshipInfo>();
 		keyedRelationshipIdToInfoMap = new HashMap<String, KeyedRelationshipInfo>();
+		entityIdToDocumentInfoMap = new HashMap<String, Set<DocumentInfo>>();
 
 		// Load metadata and associate with JAXB info
 		loadMetadata(init);
@@ -109,7 +112,34 @@ public class JAXBMetadataModel implements MetadataModel {
 			processModel(model, init);
 		}
 
-		
+		// Get maps of individual relationship types
+		for (Map.Entry<String, RelationshipInfo> entry : relationshipIdToRelationshipMap.entrySet()){
+			RelationshipInfo value = entry.getValue();
+			if (value instanceof IndirectRelationshipInfo){
+				indirectRelationshipIdToInfoMap.put(entry.getKey(), (IndirectRelationshipInfo) entry.getValue());
+			} else if (value instanceof KeyedRelationshipInfo) {
+				keyedRelationshipIdToInfoMap.put(entry.getKey(), (KeyedRelationshipInfo) entry.getValue());
+			}
+		}
+
+		for (EntityInfo entityInfo : entityMap.values()) {
+			EntityIdentifierMapping mapping = entityInfo.getEntityIdentifierMapping();
+			if (mapping != null) {
+				entityIdentifierMappings.add(mapping);
+			}
+		}
+
+		for (DocumentInfo documentInfo : documentMap.values()) {
+			for (EntityInfo entityInfo : documentInfo.getSupportedEntityInfos()) {
+				String entityId = entityInfo.getId();
+				Set<DocumentInfo> documentInfos = entityIdToDocumentInfoMap.get(entityId);
+				if (documentInfos == null) {
+					documentInfos = new HashSet<DocumentInfo>();
+					entityIdToDocumentInfoMap.put(entityId, documentInfos);
+				}
+				documentInfos.add(documentInfo);
+			}
+		}
 	}
 
 	private void processModel(MetaModel metaModel, InitializingJAXBClassVisitor init) {
@@ -123,21 +153,6 @@ public class JAXBMetadataModel implements MetadataModel {
 			schemaMap.put(schema.getId(), schema);
 
 			namespaceToPrefixMap.put(schema.getNamespace(), schema.getPrefix());
-		}
-
-		for (IdentifierMappingType type : metaModel.getEntityIdentifierMappings().getEntityIdentifierMapping()) {
-			EntityIdentifierMapping mapping = new EntityIdentifierMappingImpl(type, this);
-			entityIdentifierMappings.add(mapping);
-		}
-
-		// Get maps of individual relationship types
-		for (Map.Entry<String, RelationshipInfo> entry: relationshipIdToRelationshipMap.entrySet()){
-			RelationshipInfo value = entry.getValue();
-			if (value instanceof IndirectRelationshipInfo){
-				indirectRelationshipIdToInfoMap.put(entry.getKey(), (IndirectRelationshipInfo) entry.getValue());
-			} else if (value instanceof KeyedRelationshipInfo) {
-				keyedRelationshipIdToInfoMap.put(entry.getKey(), (KeyedRelationshipInfo) entry.getValue());
-			}
 		}
 	}
 
@@ -159,7 +174,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		relationshipIdToRelationshipMap.put(relationship.getId(), relationship);
 	}
 
-	public void registerDocument(AbstractDocumentBase document) {
+	public void registerDocument(AbstractDocumentInfo<?> document) {
 		documentMap.put(document.getBinding().getJaxbClass(), document);
 	}
 
@@ -171,20 +186,20 @@ public class JAXBMetadataModel implements MetadataModel {
 		return model;
 	}
 
-	public EntityInfo getEntityByKeyId(String keyId) {
+	public EntityInfo getEntityInfoByKeyId(String keyId) {
 		return keyIdToEntityMap.get(keyId);
 	}
 
-	public RelationshipInfo getRelationshipByKeyRefId(String keyRefId) {
+	public RelationshipInfo getRelationshipInfoByKeyRefId(String keyRefId) {
 		return keyRefIdToRelationshipMap.get(keyRefId);
 	}
 
 	@Override
-	public RelationshipInfo getRelationshipById(String id) {
+	public RelationshipInfo getRelationshipInfoById(String id) {
 		return relationshipIdToRelationshipMap.get(id);
 	}
 
-	public EntityInfo getEntityById(String id) {
+	public EntityInfo getEntityInfoById(String id) {
 		return entityIdToEntityMap.get(id);
 	}
 
@@ -194,7 +209,7 @@ public class JAXBMetadataModel implements MetadataModel {
 	}
 
 	@Override
-	public ExternalIdentifierInfo getExternalIdentifierById(String id) {
+	public ExternalIdentifierInfo getExternalIdentifierInfoById(String id) {
 		return externalIdentifierIdToExternalIdentifierMap.get(id);
 	}
 
@@ -208,6 +223,19 @@ public class JAXBMetadataModel implements MetadataModel {
 		return result;
 	}
 
+	public ExternalIdentifier getExternalIdentifierById(String identifier) {
+		ExternalIdentifier result = null;
+		top: for (ExternalIdentifierInfo info : externalIdentifierIdToExternalIdentifierMap.values()) {
+			for (Pattern pattern : info.getPattern()) {
+				if (pattern.matcher(identifier).matches()) {
+					result = new ExternalIdentifier(info, identifier);
+					break top;
+				}
+			}
+		}
+		return result;
+	}
+
 	@Override
 	public Set<String> getIndirectRelationshipIds() {
 		return indirectRelationshipIdToInfoMap.keySet();
@@ -216,5 +244,10 @@ public class JAXBMetadataModel implements MetadataModel {
 	@Override
 	public Set<String> getKeyedRelationshipIds() {
 		return keyedRelationshipIdToInfoMap.keySet();
+	}
+
+	@Override
+	public Set<DocumentInfo> getDocumentInfosContaining(EntityInfo info) {
+		return entityIdToDocumentInfoMap.get(info.getId());
 	}
 }

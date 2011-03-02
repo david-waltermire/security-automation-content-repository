@@ -43,6 +43,7 @@ import org.scapdev.content.core.resolver.Resolver;
 import org.scapdev.content.core.writer.DefaultInstanceWriter;
 import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.core.writer.NamespaceMapper;
+import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.MetadataModelFactory;
@@ -154,6 +155,13 @@ public class ContentRepository {
 	public QueryResult query(String externalIdType, Collection<String> externalIds, Set<String> requestedEntityTypes, boolean resolveReferences) throws IOException {
 		IndirectQuery query = new IndirectQuery(externalIdType, externalIds, requestedEntityTypes, getContentPersistenceManager());
 		query.setResolveReferences(resolveReferences);
+		return query(query);
+	}
+
+	public QueryResult query(ExternalIdentifier externalIdentifier,
+			boolean resolveRelationships) {
+		IndirectQuery query = new IndirectQuery(externalIdentifier, getContentPersistenceManager());
+		query.setResolveReferences(resolveRelationships);
 		return query(query);
 	}
 

@@ -31,25 +31,35 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+/**
+ * A key is a collection of identification fields that form a compound index. In
+ * most simple cases this index may consist of a single field. Keys are used to
+ * identify an {@link Entity} within the meta model.
+ * 
+ * @see KeyInfo
+ * @see Entity
+ */
 public class Key implements Comparable<Key> {
 	private static final Logger log = Logger.getLogger(Key.class);
 	private final String id;
 	private final LinkedHashMap<String, String> idToValueMap;
 
-	public Key(String id, List<String> typeIds, List<String> values) {
-		this(id, typeIds.toArray(new String[typeIds.size()]), values.toArray(new String[typeIds.size()]));
+	public Key(String id, List<String> typeIds, List<String> values) throws NullFieldValueException, KeyException {
+		this(id, typeIds.toArray(new String[typeIds.size()]), values
+				.toArray(new String[typeIds.size()]));
 	}
 
-	public Key(String id, String[] typeIds, String[] values) {
+	public Key(String id, String[] typeIds, String[] values) throws NullFieldValueException, KeyException {
 		this.id = id;
 		idToValueMap = new LinkedHashMap<String, String>();
-		for (int i = 0;i<typeIds.length;i++) {
+		for (int i = 0; i < typeIds.length; i++) {
 			if (typeIds[i] == null) {
 				KeyException e = new KeyException(id);
 				log.error("illegal null field id", e);
 				throw e;
 			} else if (values[i] == null) {
-				KeyException e = new NullFieldValueException("null value for key '"+id+"' field: "+typeIds[i]);
+				KeyException e = new NullFieldValueException(
+						"null value for key '" + id + "' field: " + typeIds[i]);
 				log.error("illegal null field value", e);
 				throw e;
 			}
@@ -57,14 +67,15 @@ public class Key implements Comparable<Key> {
 		}
 	}
 
-	public Key(String id, LinkedHashMap<String, String> idToValueMap) {
+	public Key(String id, LinkedHashMap<String, String> idToValueMap) throws NullFieldValueException, KeyException {
 		this.id = id;
 		this.idToValueMap = idToValueMap;
 		for (Map.Entry<String, String> entry : idToValueMap.entrySet()) {
 			if (entry.getKey() == null) {
 				throw new KeyException(id);
 			} else if (entry.getValue() == null) {
-				throw new NullFieldValueException("null value for key '"+id+"' field: "+entry.getKey());
+				throw new NullFieldValueException("null value for key '" + id
+						+ "' field: " + entry.getKey());
 			}
 		}
 	}
@@ -80,21 +91,19 @@ public class Key implements Comparable<Key> {
 	public Collection<String> getValues() {
 		return idToValueMap.values();
 	}
-	
+
 	/**
 	 * Returns back the mapping between key fieldsIds and values
-	 * @return
+	 * 
+	 * @return a map
 	 */
 	public LinkedHashMap<String, String> getIdToValueMap() {
 		return idToValueMap;
 	}
 
 	public String toString() {
-		return new StringBuilder()
-				.append(id)
-				.append("=")
-				.append(idToValueMap.toString())
-				.toString();
+		return new StringBuilder().append(id).append("=").append(
+				idToValueMap.toString()).toString();
 	}
 
 	@Override
@@ -116,20 +125,23 @@ public class Key implements Comparable<Key> {
 	@Override
 	public int hashCode() {
 		int result = 1;
-		result = 37 * result +  id.hashCode();
+		result = 37 * result + id.hashCode();
 		result = 37 * result + idToValueMap.hashCode();
 		return result;
 	}
 
 	@Override
 	public int compareTo(Key that) {
-		if ( this == that ) return 0;
+		if (this == that)
+			return 0;
 
 		int result = this.id.compareTo(that.id);
 		if (result == 0) {
 			for (String id : idToValueMap.keySet()) {
-				result = idToValueMap.get(id).compareTo(that.idToValueMap.get(id));
-				if (result != 0) break;
+				result = idToValueMap.get(id).compareTo(
+						that.idToValueMap.get(id));
+				if (result != 0)
+					break;
 			}
 		}
 		return result;

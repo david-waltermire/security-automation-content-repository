@@ -23,8 +23,18 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-
-
+/**
+ * Represents an index field that is associated with an index key within the XML
+ * schema meta model.
+ * 
+ * @see FieldType
+ * @see org.scapdev.content.annotation.Field
+ */
 public interface FieldInfo extends IndexFieldInfo {
+	/**
+	 * Retrieves the key type associated with this field type
+	 * 
+	 * @return the key information associated with this field type
+	 */
 	KeyInfo getKeyInfo();
 }
