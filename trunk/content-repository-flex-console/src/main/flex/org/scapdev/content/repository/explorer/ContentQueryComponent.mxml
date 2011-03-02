@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="426" height="574">
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+
+	<fx:Script>
+		<![CDATA[
+			
+			public const ID_QUERY_URL_BASE:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/content/query/get/global/";
+
+			protected function btnSearch_clickHandler(event:MouseEvent):void
+			{
+			}
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Panel x="-23" y="598" title="Query Content" width="424" height="571">
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+		<s:SkinnableContainer width="288" height="44">
+			<s:Label x="10" y="17" text="Entity Id"/>
+			<s:TextInput x="58" y="10" width="141" id="txtId"/>
+			<s:Button x="207" y="7" label="Search" id="btnSearch" click="btnSearch_clickHandler(event)"/>
+		</s:SkinnableContainer>
+		<s:SkinnableContainer width="413" height="200" x="0" y="91">
+			<s:layout>
+				<s:VerticalLayout paddingTop="5" paddingLeft="5" horizontalAlign="justify" paddingRight="5"/>
+			</s:layout>
+			<s:Label x="12" y="41" text="Result"/>
+			<s:TextArea id="txtAreaResult" verticalAlign="justify" bottom="10" verticalCenter="25" top="61" left="11" horizontalCenter="-1" right="7"/>
+		</s:SkinnableContainer>
+	</s:Panel>
+</s:Group>
