@@ -24,5 +24,5 @@
 package org.scapdev.content.model;
 
 public interface GeneratedDocumentInfo extends DocumentInfo {
-
+	GeneratedDocumentModel getDocumentModel();
 }

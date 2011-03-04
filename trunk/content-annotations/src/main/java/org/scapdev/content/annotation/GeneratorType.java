@@ -23,19 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.annotation;
 
+// TODO; Move to content-model
 public enum GeneratorType {
-	/**
-	 * Represents a generated value that is an instantiation of another type
-	 */
-	INSTANCE,
 	/**
 	 * Represents a generated value based on a static value defined by the
 	 * <code>value</code> property
 	 */
 	STATIC,
-	/**
-	 * Represents a generated value based on a pre-defined variable defined by
-	 * the <code>value</code> property
-	 */
-	VALUE;
+	APP,
+	TIME;
 }

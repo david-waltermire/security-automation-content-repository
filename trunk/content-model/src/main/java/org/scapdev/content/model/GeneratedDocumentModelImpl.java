@@ -24,7 +24,9 @@
 package org.scapdev.content.model;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
@@ -32,10 +34,12 @@ import javax.xml.bind.JAXBElement;
 import org.scapdev.content.model.jaxb.EntityContainerType;
 import org.scapdev.content.model.jaxb.EntityIdRefType;
 import org.scapdev.content.model.jaxb.GeneratedDocumentModelType;
+import org.scapdev.content.model.jaxb.GeneratedPropertyRefType;
 
 class GeneratedDocumentModelImpl implements GeneratedDocumentModel {
 	private final GeneratedDocumentModelType type;
 	private Set<EntityInfo> entityIdRefs = null;
+	private Map<String, GeneratedPropertyRefInfo> generatedPropertyToRefMap = null;
 
 	public GeneratedDocumentModelImpl(
 			JAXBElement<GeneratedDocumentModelType> modelType,
@@ -48,8 +52,8 @@ class GeneratedDocumentModelImpl implements GeneratedDocumentModel {
 		Set<EntityInfo> result;
 		if (entityIdRefs == null) {
 			result = new HashSet<EntityInfo>();
-			for (EntityContainerType entityContainerType : type.getEntityContainer()) {
-				for (EntityIdRefType idRefType : entityContainerType.getEntitySchemaNode().getEntityRef()) {
+			for (EntityContainerType entityContainerType : type.getEntityContainers().getEntityContainer()) {
+				for (EntityIdRefType idRefType : entityContainerType.getEntityRef()) {
 					String idRef = idRefType.getIdRef();
 					EntityInfo entityInfo = model.getEntityInfoById(idRef);
 					result.add(entityInfo);
@@ -58,5 +62,21 @@ class GeneratedDocumentModelImpl implements GeneratedDocumentModel {
 			entityIdRefs = Collections.unmodifiableSet(result);
 		}
 		return entityIdRefs;
+	}
+
+	@Override
+	public GeneratedPropertyRefInfo getGeneratedPropertyRefInfo(String generatedId) {
+		if (generatedPropertyToRefMap == null) {
+			GeneratedDocumentModelType.GeneratedPropertyRefs refs = type.getGeneratedPropertyRefs();
+			if (refs != null) {
+				generatedPropertyToRefMap = new HashMap<String, GeneratedPropertyRefInfo>();
+				for (GeneratedPropertyRefType ref : refs.getGeneratedPropertyRef()) {
+					generatedPropertyToRefMap.put(ref.getIdRef(), new GeneratedPropertyRefInfoImpl(ref));
+				}
+			} else {
+				generatedPropertyToRefMap = Collections.emptyMap();
+			}
+		}
+		return generatedPropertyToRefMap.get(generatedId);
 	}
 }

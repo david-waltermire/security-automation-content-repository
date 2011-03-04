@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,31 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.stream.XMLStreamException;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+public class ContextBeanFactory {
+	public enum Context {
+		APP,
+		TIME;
+	}
+
+	private static final Map<Context, ContextBean> contextMap;
+
+	static {
+		contextMap = new HashMap<Context, ContextBean>();
+
+		ContextBean bean = new AppContextBean();
+		contextMap.put(bean.getContext(), bean);
+
+		bean = new TimeContextBean();
+		contextMap.put(bean.getContext(), bean);
+	}
+
+	// Disable construction
+	private ContextBeanFactory() {}
+
+	public static ContextBean getContextBean(Context context) {
+		return contextMap.get(context);
+	}
 }

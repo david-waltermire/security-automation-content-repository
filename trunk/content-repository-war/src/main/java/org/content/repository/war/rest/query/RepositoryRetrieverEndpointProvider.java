@@ -37,13 +37,11 @@ import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/content/query/")
 public class RepositoryRetrieverEndpointProvider {
 
-	private static Logger log = LoggerFactory.getLogger(RepositoryRetrieverEndpointProvider.class);
+//	private static Logger log = LoggerFactory.getLogger(RepositoryRetrieverEndpointProvider.class);
 	
 	@Path("/get/global/{id}")
 	@GET

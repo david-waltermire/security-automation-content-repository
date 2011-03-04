@@ -38,6 +38,7 @@ import org.codehaus.stax2.XMLOutputFactory2;
 import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.GeneratedDocumentInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.util.XmlStreamWriterNamespaceFilter;
@@ -61,7 +62,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 	}
 
 	public void write(QueryResult queryResult, XMLStreamWriter writer) throws XMLStreamException {
-		Map<DocumentInfo, DocumentData> documentDataMap = generateDocumentEntityMap(queryResult, model);
+		Map<DocumentInfo, DocumentData<?>> documentDataMap = generateDocumentEntityMap(queryResult, model);
 		if (!documentDataMap.isEmpty()) {
 			writer.writeStartDocument();
 			writer.writeStartElement("repo", "repository-data", "http://scapdev.org/schema/meta-model-instance/0.1");
@@ -70,11 +71,11 @@ public class DefaultInstanceWriter implements InstanceWriter {
 
 			XMLStreamWriter filteredWriter = new XmlStreamWriterNamespaceFilter(writer);
 			int i = 1;
-			for (Map.Entry<DocumentInfo, DocumentData> entry : documentDataMap.entrySet()) {
+			for (Map.Entry<DocumentInfo, DocumentData<?>> entry : documentDataMap.entrySet()) {
 				log.debug("writing document: "+entry.getKey().getId());
 				writer.writeStartElement("http://scapdev.org/schema/meta-model-instance/0.1", "document");
 
-				DocumentData documentData = entry.getValue();
+				DocumentData<?> documentData = entry.getValue();
 				writer.writeAttribute("type", documentData.getDocumentInfo().getId());
 				String documentId = "document-"+Integer.toString(i++);
 				writer.writeAttribute("id", documentId);
@@ -82,7 +83,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 				for (Map.Entry<String, String> namespaceEntry : model.getNamespaceToPrefixMap().entrySet()) {
 					writer.setPrefix(namespaceEntry.getValue(), namespaceEntry.getKey());
 				}
-				new DocumentWriter(documentData, filteredWriter, marshaller).write();
+				documentData.newDocumentWriter(filteredWriter, marshaller).write();
 
 				writer.writeEndElement();
 			}
@@ -112,8 +113,8 @@ public class DefaultInstanceWriter implements InstanceWriter {
 		return getXMLOutputFactory2().createXMLStreamWriter(writer);
 	}
 
-	private static Map<DocumentInfo, DocumentData> generateDocumentEntityMap(QueryResult queryResult, MetadataModel model) {
-		Map<DocumentInfo, DocumentData> result = new HashMap<DocumentInfo, DocumentData>();
+	private static Map<DocumentInfo, DocumentData<?>> generateDocumentEntityMap(QueryResult queryResult, MetadataModel model) {
+		Map<DocumentInfo, DocumentData<?>> result = new HashMap<DocumentInfo, DocumentData<?>>();
 
 		for (Map.Entry<Key, Entity> entry : queryResult.getEntities().entrySet()) {
 			Entity entity = entry.getValue();
@@ -122,11 +123,11 @@ public class DefaultInstanceWriter implements InstanceWriter {
 			if (documentInfos.size() == 1) {
 				DocumentInfo documentInfo = documentInfos.iterator().next();
 
-				DocumentData documentData;
+				DocumentData<?> documentData;
 				if (result.containsKey(documentInfo)) {
 					documentData = result.get(documentInfo);
 				} else {
-					documentData = new DocumentData(documentInfo);
+					documentData = newDocumentData(documentInfo);
 					result.put(documentInfo, documentData);
 				}
 				documentData.addEntity(entity);
@@ -135,6 +136,16 @@ public class DefaultInstanceWriter implements InstanceWriter {
 				// TODO: perhaps provide a hint as to what to produce
 				throw new UnsupportedOperationException();
 			}
+		}
+		return result;
+	}
+
+	private static DocumentData<?> newDocumentData(DocumentInfo documentInfo) {
+		DocumentData<?> result;
+		if (GeneratedDocumentInfo.class.isAssignableFrom(documentInfo.getClass())) {
+			result = new GeneratedDocumentData((GeneratedDocumentInfo)documentInfo);
+		} else {
+			throw new UnsupportedOperationException(documentInfo.getClass().getName());
 		}
 		return result;
 	}
