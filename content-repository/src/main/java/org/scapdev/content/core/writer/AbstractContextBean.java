@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,27 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.stream.XMLStreamException;
+import java.util.Map;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+import org.scapdev.content.core.writer.ContextBeanFactory.Context;
+
+public class AbstractContextBean implements ContextBean {
+	private final Context context;
+	private final Map<String, PropertyHandler> propertyToHandlerMap;
+
+	protected AbstractContextBean(Context context, Map<String, PropertyHandler> propertyToHandlerMap) {
+		this.context = context;
+		this.propertyToHandlerMap = propertyToHandlerMap;
+	}
+
+	@Override
+	public Context getContext() {
+		return context;
+	}
+
+	@Override
+	public PropertyHandler getPropertyHandler(String property) {
+		return propertyToHandlerMap.get(property);
+	}
+
 }

@@ -25,7 +25,7 @@ package org.scapdev.content.model;
 
 import java.util.Set;
 
-interface DocumentModel {
+public interface DocumentModel {
 
 //	protected abstract Collection<EntityContainerInfo> getEntityContainers();
 	Set<EntityInfo> getSupportedEntityInfos(MetadataModel model);

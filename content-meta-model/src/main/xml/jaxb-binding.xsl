@@ -54,12 +54,17 @@
       <xsl:for-each select="meta:documents/meta:document">
         <xsl:apply-templates mode="document" select="."/>
       </xsl:for-each>
+
       <xsl:comment> == Document Containers == </xsl:comment>
       <xsl:for-each select="meta:documents/meta:document">
         <xsl:apply-templates mode="container" select="."/>
       </xsl:for-each>
+      <xsl:comment> == Generated Properties == </xsl:comment>
+      <xsl:apply-templates mode="generated-properties" select="meta:generated-properties"/>
+
       <xsl:comment> == Entities == </xsl:comment>
       <xsl:apply-templates mode="entity" select="meta:entities"/>
+
       <xsl:comment> == Relationships == </xsl:comment>
       <xsl:apply-templates mode="relationship" select="meta:relationships"/>
     </jaxb:bindings>
@@ -92,37 +97,30 @@
 
   <xsl:template match="meta:entity-container" mode="container">
     <xsl:param name="document-id" tunnel="yes">unset</xsl:param>
-    <xsl:comment>entity-container <xsl:value-of select="$document-id"/></xsl:comment>
-    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
-      <jaxb:bindings node="{meta:entity-schema-node/@node}">
-        <xsl:apply-templates mode="#current"/>
-      </jaxb:bindings>
-    </jaxb:bindings>
-  </xsl:template>
-
-  <xsl:template match="meta:generated-property" mode="container">
-    <xsl:param name="document-id" tunnel="yes">unset</xsl:param>
-    <xsl:comment>generated-property <xsl:value-of select="$document-id"/></xsl:comment>
+    <xsl:comment>entity-container <xsl:value-of select="@id"/></xsl:comment>
     <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
       <annox:annotate target="field">
-        <annox:annotate annox:class="org.scapdev.content.annotation.Generated"/>
+        <annox:annotate annox:class="org.scapdev.content.annotation.EntityContainer" id="{@id}">
+          <annox:annotate annox:field="entityIds">
+            <xsl:for-each select="meta:entity-ref/@id-ref">
+              <xsl:value-of select="."/>
+              <xsl:if test="position() != last()">
+                <xsl:text>,</xsl:text>
+              </xsl:if>
+            </xsl:for-each>
+          </annox:annotate>
+        </annox:annotate>
       </annox:annotate>
     </jaxb:bindings>
   </xsl:template>
 
-  <xsl:template match="meta:entity-schema-node" mode="container">
-    <annox:annotate target="field">
-      <annox:annotate annox:class="org.scapdev.content.annotation.EntityContainer" id="urn:scap-content:container:org.mitre.oval:definitions">
-        <annox:annotate annox:field="entityIds">
-          <xsl:for-each select="meta:entity-ref/@id-ref">
-            <xsl:value-of select="."/>
-            <xsl:if test="position() != last()">
-              <xsl:text>,</xsl:text>
-            </xsl:if>
-          </xsl:for-each>
-        </annox:annotate>
+  <xsl:template match="meta:generated-property" mode="generated-properties">
+    <xsl:comment>generated-property <xsl:value-of select="@id"/></xsl:comment>
+    <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
+      <annox:annotate target="field">
+        <annox:annotate annox:class="org.scapdev.content.annotation.Generated" id="{@id}"/>
       </annox:annotate>
-    </annox:annotate>
+    </jaxb:bindings>
   </xsl:template>
 
   <xsl:template match="meta:entity" mode="entity">
@@ -210,7 +208,7 @@
     <xsl:comment>indirect-relationship <xsl:value-of select="@id"/></xsl:comment>
     <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
       <annox:annotate>
-        <xsl:if test="meta:schema-node/@javaLocation = 'FIELD'">
+        <xsl:if test="meta:schema-node/@location = 'PROPERTY'">
           <xsl:attribute name="target">field</xsl:attribute>
         </xsl:if>
         <annox:annotate annox:class="org.scapdev.content.annotation.Indirect" id="{@id}">

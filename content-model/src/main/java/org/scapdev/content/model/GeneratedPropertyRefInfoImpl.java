@@ -23,24 +23,59 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import javax.xml.bind.JAXBElement;
+import org.scapdev.content.annotation.GeneratorType;
+import org.scapdev.content.model.jaxb.GeneratedPropertyRefType;
+import org.scapdev.content.model.jaxb.GeneratedValueType;
 
-import org.scapdev.content.model.jaxb.DocumentType;
-import org.scapdev.content.model.jaxb.GeneratedDocumentModelType;
+public class GeneratedPropertyRefInfoImpl implements GeneratedPropertyRefInfo {
+	private final Value value;
+	private final String idRef;
 
-class GeneratedDocumentInfoImpl extends AbstractDocumentInfo<GeneratedDocumentModel> implements GeneratedDocumentInfo {
-	private final GeneratedDocumentModel documentModel;
-
-	GeneratedDocumentInfoImpl(DocumentType documentType, SchemaInfoImpl schema, JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
-		super(documentType, schema, model, init);
-
-		@SuppressWarnings("unchecked")
-		JAXBElement<GeneratedDocumentModelType> modelType = (JAXBElement<GeneratedDocumentModelType>) documentType.getDocumentModel();
-		this.documentModel = new GeneratedDocumentModelImpl(modelType, this);
+	public GeneratedPropertyRefInfoImpl(GeneratedPropertyRefType ref) {
+		this.idRef = ref.getIdRef();
+		GeneratedValueType valueType = ref.getValue();
+		if (valueType != null) {
+			this.value = new InternalValue(valueType);
+		} else {
+			this.value = null;
+		}
 	}
 
 	@Override
-	public GeneratedDocumentModel getDocumentModel() {
-		return documentModel;
+	public String getIdRef() {
+		return idRef;
+	}
+
+	@Override
+	public Value getValue() {
+		return value;
+	}
+
+	private class InternalValue implements GeneratedPropertyRefInfo.Value {
+		private final GeneratorType type;
+		private final String value;
+		private final String format;
+
+		public InternalValue(GeneratedValueType valueType) {
+			this.type = GeneratorType.valueOf(valueType.getType());
+			this.value = valueType.getValue();
+			this.format = valueType.getFormat();
+		}
+
+		@Override
+		public GeneratorType getType() {
+			return type;
+		}
+
+		@Override
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public String getFormat() {
+			return format;
+		}
+		
 	}
 }

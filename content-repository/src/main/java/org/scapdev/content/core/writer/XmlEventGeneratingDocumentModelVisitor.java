@@ -33,7 +33,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.scapdev.content.annotation.EntityContainer;
 import org.scapdev.content.annotation.Generated;
+import org.scapdev.content.annotation.GeneratorType;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.GeneratedPropertyRefInfo;
 import org.scapdev.content.model.ModelInstanceException;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
 import org.scapdev.jaxb.reflection.model.JAXBModelException;
@@ -43,12 +45,12 @@ import org.scapdev.jaxb.reflection.model.visitor.CyclePreventingModelVisitor;
 public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModelVisitor {
 //	private static final Logger log = Logger.getLogger(XmlEventGeneratingDocumentModelVisitor.class);
 
-	private final DocumentData documentData;
+	private final GeneratedDocumentData documentData;
 	private final XMLStreamWriter writer;
 	private final Marshaller marshaller;
 
 	public XmlEventGeneratingDocumentModelVisitor(
-			DocumentData documentData,
+			GeneratedDocumentData documentData,
 			XMLStreamWriter writer,
 			Marshaller marshaller) {
 		super(documentData.getDocumentInfo().getType().getJAXBPackage().getJAXBModel());
@@ -113,49 +115,77 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 		} else {
 			Generated generated = property.getAnnotation(Generated.class);
 			if (generated != null) {
-				switch (generated.type()) {
-				case INSTANCE:
-					processChild = true;
-					QName qname = property.getQName();
-					try {
-//						log.info("  writeStartElement: "+qname.toString());
+				String generatedId = generated.id();
+
+				// Write the element or attribute
+				QName qname = property.getQName();
+				try {
+//					log.info("  writeStartElement: "+qname.toString());
+					if (property.isElement()) {
 						writer.writeStartElement(qname.getPrefix(), qname.getLocalPart(), qname.getNamespaceURI());
-					} catch (XMLStreamException e) {
-						throw new ModelInstanceException(e);
+						String value = getValue(generatedId, property);
+						if (value != null) {
+							writer.writeCharacters(value);
+						} else {
+							processChild = true;
+						}
+					} else if (property.isAttribute()) {
+						writer.writeAttribute(qname.getPrefix(), qname.getNamespaceURI(), qname.getLocalPart(), getValue(generatedId, property));
+					} else {
+						throw new UnsupportedOperationException();
 					}
-					break;
-				case STATIC:
-				case VALUE:
-				default:
-					throw new UnsupportedOperationException();
+				} catch (XMLStreamException e) {
+					throw new ModelInstanceException(e);
 				}
 			}
 		}
 		return processChild;
 	}
 
+	private String getValue(String generatedId, JAXBProperty property) {
+		GeneratedPropertyRefInfo generatedPropertyRefInfo = documentData.getDocumentInfo().getDocumentModel().getGeneratedPropertyRefInfo(generatedId);
+		if (generatedPropertyRefInfo == null) {
+			throw new ModelInstanceException("Unable to locate generated property info '"+generatedId+"' for property: "+property.toString());
+		}
+		GeneratedPropertyRefInfo.Value value = generatedPropertyRefInfo.getValue();
+
+		String result = null;
+		if (value != null) {
+			GeneratorType type = value.getType();
+			switch (type) {
+			case STATIC:
+				result = value.getValue();
+				break;
+			default:
+				boolean match = false;
+				ContextBean contextBean = ContextBeanFactory.getContextBean(ContextBeanFactory.Context.valueOf(type.toString()));
+				if (contextBean != null) {
+					PropertyHandler handler = contextBean.getPropertyHandler(value.getValue());
+					if (handler != null) {
+						result = handler.getValue(value, documentData);
+						match = true;
+					}
+				}
+				if (!match) {
+					throw new UnsupportedOperationException(value.toString());
+				}
+			}
+		}
+		return result;
+	}
+
 	@Override
 	public void afterJAXBProperty(JAXBProperty property) {
 		EntityContainer container = property.getAnnotation(EntityContainer.class);
-		if (container != null) {
-			// Write out matching entity
-		} else {
+		if (container == null) {
 			Generated generated = property.getAnnotation(Generated.class);
 			if (generated != null) {
-				switch (generated.type()) {
-				case INSTANCE:
-//					QName qname = property.getQName();
+				if (property.isElement()) {
 					try {
-//						log.info("  writeEndElement: "+qname.toString());
 						writer.writeEndElement();
 					} catch (XMLStreamException e) {
 						throw new ModelInstanceException(e);
 					}
-					break;
-				case STATIC:
-				case VALUE:
-				default:
-					throw new UnsupportedOperationException();
 				}
 			}
 		}

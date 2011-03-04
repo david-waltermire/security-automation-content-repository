@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,38 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.stream.XMLStreamException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+import org.scapdev.content.core.writer.ContextBeanFactory.Context;
+import org.scapdev.content.model.GeneratedPropertyRefInfo.Value;
+
+public class TimeContextBean extends AbstractContextBean {
+
+	public TimeContextBean() {
+		super(Context.TIME, generatePropertyHandlers());
+	}
+
+	private static Map<String, PropertyHandler> generatePropertyHandlers() {
+		Map<String, PropertyHandler> result = new HashMap<String, PropertyHandler>();
+
+		result.put("now", new DateTimePropertyHander());
+
+		return result;
+	}
+
+	private static class DateTimePropertyHander implements PropertyHandler {
+
+		@Override
+		public String getValue(Value value, DocumentData<?> documentData) {
+			Calendar now = Calendar.getInstance();
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			format.setCalendar(now);
+			StringBuilder sb = new StringBuilder(format.format(now.getTime()));
+	        sb.insert(26, ':');
+	        return sb.toString();
+		}
+	}
 }

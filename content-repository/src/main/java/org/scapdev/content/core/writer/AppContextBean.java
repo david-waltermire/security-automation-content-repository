@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,32 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.stream.XMLStreamException;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+import org.scapdev.content.core.writer.ContextBeanFactory.Context;
+import org.scapdev.content.model.GeneratedPropertyRefInfo.Value;
+
+public class AppContextBean extends AbstractContextBean {
+
+	public AppContextBean() {
+		super(Context.APP, generatePropertyHandlers());
+	}
+
+	private static Map<String, PropertyHandler> generatePropertyHandlers() {
+		Map<String, PropertyHandler> result = new HashMap<String, PropertyHandler>();
+
+		result.put("product.cpe", new CPEPropertyHander());
+
+		return result;
+	}
+
+	private static class CPEPropertyHander implements PropertyHandler {
+
+		@Override
+		public String getValue(Value value, DocumentData<?> documentData) {
+			return "cpe:/a:org.scapdev:content-repository:0.1";
+		}
+		
+	}
 }

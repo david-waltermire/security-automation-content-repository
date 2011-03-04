@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.writer;
+package org.scapdev.content.model;
 
-import javax.xml.stream.XMLStreamException;
+import org.scapdev.content.annotation.GeneratorType;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+public interface GeneratedPropertyRefInfo {
+	String getIdRef();
+	Value getValue();
+
+	public interface Value {
+		GeneratorType getType();
+		String getValue();
+		String getFormat();
+	}
 }

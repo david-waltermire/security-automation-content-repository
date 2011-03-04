@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,29 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+public class GeneratedDocumentWriter extends AbstractDocumentWriter {
+	private final GeneratedDocumentData documentData;
+
+	protected GeneratedDocumentWriter(GeneratedDocumentData documentData, XMLStreamWriter writer, Marshaller marshaller) {
+		super(writer, marshaller);
+		this.documentData = documentData;
+	}
+
+	public void write() throws XMLStreamException {
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		writeDocument(factory);
+	}
+
+	public void writeDocument(XMLEventFactory factory) throws XMLStreamException {
+		XmlEventGeneratingDocumentModelVisitor visitor = new XmlEventGeneratingDocumentModelVisitor(
+				documentData,
+				getWriter(),
+				getMarshaller());
+		visitor.visit();
+	}
 }

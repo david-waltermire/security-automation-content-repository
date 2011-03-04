@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-interface GeneratedDocumentModel extends DocumentModel {
+public interface GeneratedDocumentModel extends DocumentModel {
 
+	GeneratedPropertyRefInfo getGeneratedPropertyRefInfo(
+			String generatedId);
 }

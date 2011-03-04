@@ -24,21 +24,50 @@
 package org.scapdev.content.core.writer;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-
-import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.Map;
 
 import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.Key;
 
-interface DocumentData<DOCUMENT extends DocumentInfo> {
-	void addEntity(Entity entity);
+abstract class AbstractDocumentData<DOCUMENT extends DocumentInfo> implements DocumentData<DOCUMENT> {
+	private final DOCUMENT documentInfo;
+	private final Map<String, Map<Key, Entity>> entityTypeToEntityMap;
+
+	public AbstractDocumentData(DOCUMENT info) {
+		this.documentInfo = info;
+		this.entityTypeToEntityMap = new HashMap<String, Map<Key, Entity>>();
+	}
+
+	public void addEntity(Entity entity) {
+		String entityTypeId = entity.getEntityInfo().getId();
+		Map<Key, Entity> entityMap = entityTypeToEntityMap.get(entityTypeId);
+		if (entityMap == null) {
+			entityMap = new LinkedHashMap<Key, Entity>();
+			entityTypeToEntityMap.put(entityTypeId, entityMap);
+		}
+		entityMap.put(entity.getKey(), entity);
+	}
 
 	/**
 	 * @return the info
 	 */
-	DOCUMENT getDocumentInfo();
-	Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds);
-	DocumentWriter newDocumentWriter(XMLStreamWriter writer, Marshaller marshaller);
+	public DOCUMENT getDocumentInfo() {
+		return documentInfo;
+	}
+
+	public Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds) {
+		Collection<Entity> result = new LinkedList<Entity>();
+		for (String entityTypeId : entityTypeIds) {
+			Map<Key, Entity> entityMap = entityTypeToEntityMap.get(entityTypeId);
+			if (entityMap != null) {
+				result.addAll(entityMap.values());
+			}
+		}
+		return result;
+	}
 }

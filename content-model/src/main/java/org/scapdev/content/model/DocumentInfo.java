@@ -35,4 +35,5 @@ import java.util.Set;
  */
 public interface DocumentInfo extends SchemaTypeComponent {
 	Set<EntityInfo> getSupportedEntityInfos();
+	DocumentModel getDocumentModel();
 }

@@ -56,6 +56,75 @@
         prefix="oval-def">
       <schema-node node="/xs:schema"/>
       
+      <documents>
+        <document id="urn:scap-content:document:org.mitre.oval:oval-document">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType"/>
+          <generated-document-model>
+            <entity-containers>
+              <entity-container id="urn:scap-content:container:org.mitre.oval:definitions">
+                <schema-node node="//xs:complexType[@name='DefinitionsType']/xs:sequence/xs:element[@ref='oval-def:definition']"/>
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:definition"/>
+              </entity-container>
+              <entity-container id="urn:scap-content:container:org.mitre.oval:tests">
+                <schema-node node="//xs:complexType[@name='TestsType']/xs:sequence/xs:element[@ref='oval-def:test']"/>
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:test"/>
+              </entity-container>
+              <entity-container id="urn:scap-content:container:org.mitre.oval:objects">
+                <schema-node node="//xs:complexType[@name='ObjectsType']/xs:sequence/xs:element[@ref='oval-def:object']"/>
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:object"/>
+              </entity-container>
+              <entity-container id="urn:scap-content:container:org.mitre.oval:states">
+                <schema-node node="//xs:complexType[@name='StatesType']/xs:sequence/xs:element[@ref='oval-def:state']"/>
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:state"/>
+              </entity-container>
+              <entity-container id="urn:scap-content:container:org.mitre.oval:variables">
+                <schema-node node="//xs:complexType[@name='VariablesType']/xs:sequence/xs:element[@ref='oval-def:variable']"/>
+                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:variable"/>
+              </entity-container>
+            </entity-containers>
+
+            <generated-property-refs>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-generator"/>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-generator-schema-version">
+                <value type="STATIC">5.8</value>
+              </generated-property-ref>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-generator-timestamp">
+                <value type="TIME">now</value>
+              </generated-property-ref>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-generator-product-name">
+                <value type="APP">product.cpe</value>
+              </generated-property-ref>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-defintions"/>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-tests"/>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-objects"/>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-states"/>
+              <generated-property-ref id-ref="urn:scap-content:generated:org.mitre.oval:oval-variables"/>
+            </generated-property-refs>
+          </generated-document-model>
+        </document>
+      </documents>
+      
+      <generated-properties>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-generator">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='generator']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-defintions">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='definitions']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-tests">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='tests']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-objects">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='objects']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-states">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='states']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-variables">
+          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='variables']"/>
+        </generated-property>
+      </generated-properties>
+
       <entities>
         <entity id="urn:scap-content:entity:org.mitre.oval:definition" local-part="definition">
           <schema-node node="//xs:complexType[@name='DefinitionType']"/>
@@ -226,59 +295,6 @@
           <external-identifier-ref id-ref="urn:scap-content:external-identifier:gov.nist:cpe-2-x" qualifier-value="CPE"/>
         </indirect-relationship>
       </relationships>
-
-      <documents>
-        <document id="urn:scap-content:document:org.mitre.oval:oval-document">
-          <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType"/>
-          <generated-document-model>
-            <entity-container id="urn:scap-content:container:org.mitre.oval:definitions">
-              <schema-node node="//xs:complexType[@name='DefinitionsType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:definition']">
-                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:definition"/>
-              </entity-schema-node>
-            </entity-container>
-            <entity-container id="urn:scap-content:container:org.mitre.oval:tests">
-              <schema-node node="//xs:complexType[@name='TestsType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:test']">
-                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:test"/>
-              </entity-schema-node>
-            </entity-container>
-            <entity-container id="urn:scap-content:container:org.mitre.oval:objects">
-              <schema-node node="//xs:complexType[@name='ObjectsType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:object']">
-                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:object"/>
-              </entity-schema-node>
-            </entity-container>
-            <entity-container id="urn:scap-content:container:org.mitre.oval:states">
-              <schema-node node="//xs:complexType[@name='StatesType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:state']">
-                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:state"/>
-              </entity-schema-node>
-            </entity-container>
-            <entity-container id="urn:scap-content:container:org.mitre.oval:variables">
-              <schema-node node="//xs:complexType[@name='VariablesType']"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='oval-def:variable']">
-                <entity-ref id-ref="urn:scap-content:entity:org.mitre.oval:variable"/>
-              </entity-schema-node>
-            </entity-container>
-            <generated-property>
-              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='definitions']"/>
-            </generated-property>
-            <generated-property>
-              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='tests']"/>
-            </generated-property>
-            <generated-property>
-              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='objects']"/>
-            </generated-property>
-            <generated-property>
-              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='states']"/>
-            </generated-property>
-            <generated-property>
-              <schema-node node="//xs:element[@name='oval_definitions']/xs:complexType/xs:sequence/xs:element[@name='variables']"/>
-            </generated-property>
-          </generated-document-model>
-        </document>
-      </documents>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-aix"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix"
@@ -351,6 +367,20 @@
       schemaLocation="../../../src/main/xsd/oval-5.8/oval-common-schema.xsd"
       prefix="oval-common">
       <schema-node node="/xs:schema"/>
+
+      <generated-properties>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-generator-schema-version">
+          <schema-node node="//xs:complexType[@name='GeneratorType']/xs:sequence/xs:element[@name='schema_version']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-generator-timestamp">
+          <schema-node node="//xs:complexType[@name='GeneratorType']/xs:sequence/xs:element[@name='timestamp']"/>
+        </generated-property>
+        <generated-property id="urn:scap-content:generated:org.mitre.oval:oval-generator-product-name">
+          <schema-node node="//xs:complexType[@name='GeneratorType']/xs:sequence/xs:element[@name='product_name']"/>
+        </generated-property>
+      </generated-properties>
+      
+      <!-- TODO: add support for the GeneratorType -->
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-pixos"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#pixos"
@@ -402,12 +432,12 @@
         <document id="urn:scap-content:document:gov.nist.nvd:vuln-2.0">
           <schema-node node="//xs:element[@name='nvd']/xs:complexType"/>
           <generated-document-model>
-            <entity-container id="urn:scap-content:container:gov.nist.nvd:vuln-2.0-entry">
-              <schema-node node="//xs:element[@name='nvd']/xs:complexType"/>
-              <entity-schema-node node="xs:sequence/xs:element[@ref='entry']">
+            <entity-containers>
+              <entity-container id="urn:scap-content:container:gov.nist.nvd:vuln-2.0-entry">
+                <schema-node node="//xs:element[@name='nvd']/xs:complexType/xs:sequence/xs:element[@ref='entry']"/>
                 <entity-ref id-ref="urn:scap-content:entity:gov.nist.scap:vulnerability-0.4-vuln"/>
-              </entity-schema-node>
-            </entity-container>
+              </entity-container>
+            </entity-containers>
           </generated-document-model>
         </document>
       </documents>
@@ -433,7 +463,7 @@
       <relationships>
         <!-- add external to oval -->
         <indirect-relationship id="urn:scap-content:relationship:gov.nist.nvd:vuln-cve-reference">
-          <schema-node node="//xs:complexType[@name='vulnerabilityType']/xs:sequence/xs:choice/xs:element[@name='cve-id']" javaLocation="FIELD"/>
+          <schema-node node="//xs:complexType[@name='vulnerabilityType']/xs:sequence/xs:choice/xs:element[@name='cve-id']" location="PROPERTY"/>
           <value-node node="//xs:complexType[@name='vulnerabilityType']/xs:sequence/xs:choice/xs:element[@name='cve-id']"/>
           <external-identifier-ref id-ref="urn:scap-content:external-identifier:org.mitre:cve"/>
         </indirect-relationship>

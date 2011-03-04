@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 davidwal
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.stream.XMLStreamException;
-
-public interface DocumentWriter {
-	void write() throws XMLStreamException;
+public interface ContextBean {
+	ContextBeanFactory.Context getContext();
+	PropertyHandler getPropertyHandler(String property);
 }
