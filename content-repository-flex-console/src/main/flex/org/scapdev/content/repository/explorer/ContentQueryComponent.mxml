@@ -11,8 +11,14 @@
 			
 			public const ID_QUERY_URL_BASE:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/content/query/get/global/";
 
+			protected function txtId_changeHandler(event:Event):void
+			{
+				
+			}
+			
 			protected function btnSearch_clickHandler(event:MouseEvent):void
 			{
+				
 			}
 		]]>
 	</fx:Script>

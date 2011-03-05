@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="660"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="910" height="660"
 		 creationComplete="initUploadPageListeners()"
 		 >
 	<s:layout>
-		<s:HorizontalLayout verticalAlign="justify" paddingRight="0" columnWidth="400" variableColumnWidth="false" gap="5" requestedColumnCount="1"/>
+		<s:HorizontalLayout verticalAlign="justify" paddingRight="0" columnWidth="450" variableColumnWidth="false" gap="5" requestedColumnCount="1"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[			
@@ -23,6 +23,8 @@
 				
 			public const UPLOAD_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/upload/content";
 
+			protected var EOL:String;
+			
 			protected var fileRefList:FileReferenceList = new FileReferenceList();
 			
 			[Bindable]
@@ -37,6 +39,16 @@
 			}
 			
 			protected function initUploadPageListeners() : void{
+				var os:String = flash.system.Capabilities.os.substr(0, 3);
+				if (os == "Win") 
+				{
+					EOL = "\r\n";
+				}
+				else
+				{
+					EOL = "\n";
+				}
+				
 				fileRefList.addEventListener(Event.SELECT, fileChooserSelectListener);
 			}
 						
@@ -65,6 +77,11 @@
 						status.setEntitiesProcessed(entitiesProcessed);
 						status.setRelationshipsProcessed(relationshipsProcessed);						
 					}
+					
+					var logMessage:String = new Date().toDateString() + 
+						" Successfully Uploaded file  " + file.name + EOL;
+					log(logMessage);
+
 				}
 				catch(err:Error)
 				{
@@ -87,6 +104,10 @@
 				status.setRelationshipsProcessed(0);
 				status.setErrorText(String(event.data));
 				
+				var logMessage:String = new Date().toDateString() + 
+					" Error uploading file  " + fref.name + ": " + status.getErrorText() + EOL;
+				log(logMessage);
+
 				var index:int = listFilesToUpload.dataProvider.getItemIndex(fref);
 				listFilesToUpload.dataProvider.removeItemAt(index);
 				
@@ -124,17 +145,32 @@
 				listFileUploadStatus.dataProvider.removeAll();
 				btnUpload.enabled = false;
 				btnRemove.enabled = false;
+				txtAreaLog.text = "";
+			}
+			
+			protected function log(logMessage:String):void{
+				txtAreaLog.text += logMessage;
 			}
 			
 			protected function btnUpload_clickListener(event:Event):void
 			{	
+				var logMessage:String = null;
+				
 				btnUpload.enabled = false;
 				btnBrowse.enabled = false;
 				
 				for each( var file:FileReference in listFilesToUpload.dataProvider)
 				{
+					logMessage = "";
+					
 					try
 					{
+						
+						logMessage = new Date().toDateString() + 
+							" Uploading " + file.name + EOL;
+						
+						log(logMessage);
+						
 						file.upload(new URLRequest(UPLOAD_URL));
 					}
 					catch(err:Error)
@@ -144,14 +180,19 @@
 						status.setReference(file);
 						status.setEntitiesProcessed(0);
 						status.setRelationshipsProcessed(0);
-						status.setErrorText("Upload Error");
+						status.setErrorText("Upload Error: " + err.message);
+						
+						logMessage = new Date().toDateString() + 
+							" Error uploading file  " + file.name + ": " + err.message + EOL;
+						log(logMessage);
 						
 						var index:int = listFilesToUpload.dataProvider.getItemIndex(file);
 						listFilesToUpload.dataProvider.removeItemAt(index);
 						
 						listFileUploadStatus.dataProvider.addItem(status);				
-					}					
+					}
 				}
+				
 				
 				btnUpload.enabled = true;
 				btnBrowse.enabled = true;
@@ -191,11 +232,11 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:Panel x="79" y="543" width="400" height="660" textAlign="left" title="Content Upload">
+	<s:Panel x="79" y="543" width="556" height="660" textAlign="left" title="Content Upload">
 		<s:layout>
 			<s:TileLayout orientation="columns" horizontalAlign="justify"/>
 		</s:layout>
-		<s:SkinnableContainer x="40" y="538" id="listAndButtonsContainer">
+		<s:SkinnableContainer x="40" y="538" id="listAndButtonsContainer" width="399">
 			<s:layout>
 				<s:HorizontalLayout gap="5" paddingTop="5" paddingLeft="5" columnWidth="300" variableColumnWidth="false"/>
 			</s:layout>
@@ -227,12 +268,19 @@
 				<s:Button x="-31" y="10" label="Reset" id="btnReset" enabled="true" click="btnReset_clickListener(event)"/>
 			</s:SkinnableContainer>
 			<s:Label x="-28" y="44" text="Status" id="lblStatusCaption"/>
-			<s:SkinnableContainer width="200" height="200">
+			<s:SkinnableContainer width="386" height="161">
 				<s:SkinnableContainer width="200" height="200">
 					<s:List id="listFileUploadStatus" itemRenderer="org.scapdev.content.repository.explorer.item.renderers.FileUploadStatusItemRenderer" width="321" height="134"></s:List>
 				</s:SkinnableContainer>
 				<s:SkinnableContainer width="200" height="200">
 				</s:SkinnableContainer>
+			</s:SkinnableContainer>
+			<s:SkinnableContainer height="143" width="392">
+				<s:layout>
+					<s:VerticalLayout/>
+				</s:layout>
+				<s:Label text="Log"/>
+				<s:TextArea id="txtAreaLog" width="434" height="154"/>
 			</s:SkinnableContainer>
 		</s:SkinnableContainer>
 	</s:Panel>
