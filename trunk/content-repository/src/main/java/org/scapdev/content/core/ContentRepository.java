@@ -25,6 +25,8 @@ package org.scapdev.content.core;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
@@ -165,6 +167,17 @@ public class ContentRepository {
 		return query(query);
 	}
 
+	/**
+	 * Get entity and relationship statistics for a given set of entity info ids.
+	 * 
+	 * @param entityInfoIds
+	 * @return Map<String, EntityStatistic> Map of entity info ids with their statistics.
+	 */
+	public Map<String, EntityStatistic> queryStatistics(Set<String> entityInfoIds)
+	{
+		// TODO: implement this
+		return Collections.emptyMap();
+	}
 	/**
 	 * 
 	 * @param <RESULT> the type of the query result that will be produced by the

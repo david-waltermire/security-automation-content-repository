@@ -42,6 +42,7 @@ public interface MetadataModel {
 	ExternalIdentifierInfo getExternalIdentifierInfoById(String externalIdentifierId);
 	ExternalIdentifier getExternalIdentifierById(String identifier);
 	Set<DocumentInfo> getDocumentInfosContaining(EntityInfo info);
+	
 	/**
 	 * Based on the metamodel definition of entity-identifier-mapping this
 	 * method must find a pattern that matches the provided identifier and build
@@ -54,11 +55,15 @@ public interface MetadataModel {
 	
 	/**
 	 * Return a collection of all IndirectRelationship Ids.
+	 * 
+	 * @return Collection<String> containing indirect relationship ids.
 	 */
 	Collection<String> getIndirectRelationshipIds();
 	
 	/**
 	 * Return a collection of all KeyedRelationship Ids.
+	 * 
+	 * @return Collection<String> containing keyed relationship ids.
 	 */
 	Collection<String> getKeyedRelationshipIds();
 	

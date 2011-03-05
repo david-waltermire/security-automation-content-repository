@@ -99,6 +99,18 @@ public class JAXBMetadataModel implements MetadataModel {
 		loadMetadata(init);
 	}
 
+	public Set<String> getEntityInfoIds() {
+		return entityIdToEntityMap.keySet();
+	}
+
+	public Set<String> getRelationshipInfoIds() {
+		return relationshipIdToRelationshipMap.keySet();
+	}
+
+	public Set<String> getExternalIdentifierInfoIds() {
+		return externalIdentifierIdToExternalIdentifierMap.keySet();
+	}
+
 	private void loadMetadata(InitializingJAXBClassVisitor init) throws IOException, JAXBException {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 
