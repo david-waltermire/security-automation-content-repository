@@ -34,7 +34,6 @@ import java.util.Set;
 
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.ExternalIdentifierInfo;
 import org.scapdev.content.model.IndirectRelationship;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
@@ -54,17 +53,6 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 		return descriptorMap.get(key);
 	}
 
-	@Override
-	public List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
-		Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifierInfo.getId());
-		List<Entity> result;
-		if (externalIdentifierValueToEntityMap.containsKey(value)) {
-			result = Collections.unmodifiableList(externalIdentifierValueToEntityMap.get(value));
-		} else {
-			result = Collections.emptyList();
-		}
-		return result;
-	}
 
 	@Override
 	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes) {
