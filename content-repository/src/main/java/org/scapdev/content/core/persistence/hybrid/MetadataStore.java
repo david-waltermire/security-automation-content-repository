@@ -24,12 +24,10 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.ExternalIdentifierInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 
@@ -43,7 +41,6 @@ public interface MetadataStore {
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 */
 	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
-	List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
 	/**
 	 * 
 	 * @param indirectType

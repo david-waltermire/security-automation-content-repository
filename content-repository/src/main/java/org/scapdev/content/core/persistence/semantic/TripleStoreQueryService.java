@@ -23,9 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openrdf.model.Resource;
@@ -54,14 +56,11 @@ public class TripleStoreQueryService {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final Logger log = Logger.getLogger(TripleStoreQueryService.class);
 	
-	private Repository repository;
-	
 	private ValueFactory factory;
 	
 	private MetaDataOntology ontology;
 	
 	public TripleStoreQueryService(Repository repository, MetaDataOntology ontology) {
-		this.repository = repository;
 		this.factory = repository.getValueFactory();
 		this.ontology = ontology;
 	}
@@ -146,7 +145,7 @@ public class TripleStoreQueryService {
 	 * @throws MalformedQueryException 
 	 * @throws RepositoryException 
 	 */
-	public List<URI> findAllRelatedEntityURIs(URI owningEntityURI,
+	List<URI> findAllRelatedEntityURIs(URI owningEntityURI,
 			RepositoryConnection conn) throws QueryEvaluationException,
 			RepositoryException, MalformedQueryException {
 		String relatedEntityVariableName = "_e";
@@ -166,6 +165,100 @@ public class TripleStoreQueryService {
 	    return relatedEntityURIs;
 	}
 	
+	/**
+	 * Find all entityURIs associated with the specific boundary objects,
+	 * filtered based on entity type.
+	 * 
+	 * @param boudaryObjectType
+	 *            - type of boundary object to find on the graph
+	 * @param boundaryObjectValues
+	 *            - value of boundary object (e.g, CCE-XXX, CVE-XXXX-XXXX, CPE).
+	 * @param entityTypes
+	 *            - classes of entity to filter query by
+	 * @param conn
+	 * @return
+	 * @throws RepositoryException
+	 * @throws MalformedQueryException
+	 * @throws QueryEvaluationException
+	 */
+	List<URI> findEntityUrisFromBoundaryObjectIds(String boudaryObjectType, Collection<String> boundaryObjectValues, Set<String> entityTypes, RepositoryConnection conn) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+		String entityURIVariableName = "_e";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelatedBoundaryObjectSearchString(boudaryObjectType, boundaryObjectValues, entityTypes, entityURIVariableName));
+	    TupleQueryResult result = tupleQuery.evaluate();
+	    List<URI> relatedEntityURIs = new LinkedList<URI>();
+	    try {
+		    BindingSet resultSet = null;
+		    while (result.hasNext()){
+		    	resultSet = result.next(); 
+		    	Value entityURI = resultSet.getValue(entityURIVariableName);
+		    	relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
+		    }
+	    } finally {
+	    	result.close();
+	    }
+	    return relatedEntityURIs;
+	}
+	
+	/**
+	 * Generate query to Find all entityURIs associated with the specific
+	 * boundary objects, filtered based on entity type.
+	 * 
+	 * @param boudaryObjectType
+	 *            - type of boundary object to find on the graph
+	 * @param boundaryObjectValues
+	 *            - value of boundary object (e.g, CCE-XXX, CVE-XXXX-XXXX, CPE).
+	 * @param entityTypes
+	 *            - classes of entity to filter query by
+	 * @return
+	 */
+	private String generateRelatedBoundaryObjectSearchString(
+			String boudaryObjectType, Collection<String> boundaryObjectValues,
+			Set<String> entityTypes, String entityURIVariableName) {
+		String entityTypeVariable = "entityType";
+		String boundaryObjectVariable = "boundaryObject";
+		String boundaryObjectValueVariable = "boundaryObjectValue";
+		
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
+		//_e hasEntityType {entityType};
+		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
+		queryBuilder.append("<").append(ontology.HAS_ENTITY_TYPE.URI).append("> ");
+		queryBuilder.append("{").append(entityTypeVariable).append("}").append(";").append(NEW_LINE);
+		// hasIndirectRelationship {boundaryObject},
+		queryBuilder.append("<").append(ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI).append("> ");
+		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(",").append(NEW_LINE);
+		// {boundaryObject} hasType {boundaryObjectType};
+		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(" ").append(NEW_LINE);
+		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI).append("> ");
+		queryBuilder.append("{\"").append(boudaryObjectType).append("\"};").append(NEW_LINE);
+		// hasValue {boundaryObjectValue} 
+		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI).append("> ");
+		queryBuilder.append("{").append(boundaryObjectValueVariable).append("}").append(" ").append(NEW_LINE);
+		// WHERE
+		queryBuilder.append("WHERE").append(NEW_LINE);
+		queryBuilder.append(entityTypeVariable).append(" IN ").append(convertStringSetForInClause(entityTypes)).append(NEW_LINE);
+		queryBuilder.append(" AND ").append(NEW_LINE);
+		queryBuilder.append(boundaryObjectValueVariable).append(" IN ").append(convertStringSetForInClause(boundaryObjectValues)).append(NEW_LINE);
+		
+		return queryBuilder.toString();
+	}
+	
+	private String convertStringSetForInClause(Collection<String> target){
+		StringBuilder inClauseBuilder = new StringBuilder();
+		inClauseBuilder.append("(");
+		boolean beginning = true;
+		for (String atom : target){
+			if (beginning){
+				beginning = false;
+			} else {
+				inClauseBuilder.append(", ");
+			}
+			inClauseBuilder.append("\"").append(atom).append("\"");
+		}
+		inClauseBuilder.append(")");
+		return inClauseBuilder.toString();
+	}
+
 	/**
 	 * <p>
 	 * helper method that will generate query to search for all entityURIs of
@@ -296,61 +389,6 @@ public class TripleStoreQueryService {
 		return queryBuilder.toString();
 	}
 
-	private String test(URI owningEntityURI){
-		StringBuilder queryBuilder = new StringBuilder();
-		String relatedEntityVariable = "{relEntity}";
-		String relatedKeyVariable = "{relKey}";
-		String relatedKeyTypeVariable = "{relKeyType}";
-		String relatedKeyFieldVariable = "{keyField}";
-		String relatedKeyFieldIdVariable = "{fieldId}";
-		String relatedKeyFieldValueVariable = "{fieldValue}";	
-		//CONSTRUCT {relEntity} hasKey {relKey}
-//		queryBuilder.append("CONSTRUCT ").append(relatedEntityVariable)
-//				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
-//				.append(relatedKeyVariable).append(",").append(NEW_LINE);
-//		//{relKey} hasKeyType {keyType};
-//		queryBuilder.append(relatedKeyVariable).append(" <")
-//				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
-//				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
-//		// hasKeyField {keyField},
-//		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
-//				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
-//		// {keyField} hasFieldId {fieldId};
-//		queryBuilder.append(relatedKeyFieldVariable).append(" <")
-//				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
-//				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
-//		// hasFieldValue {fieldVAlue}
-//		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
-//				.append(relatedKeyFieldValueVariable).append(NEW_LINE);
-		
-		queryBuilder.append("CONSTRUCT *").append(NEW_LINE);
-		
-		
-		// FROM {owningEntity hasDirectRelationshipTo {relEntity},
-		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} <")
-				.append(ontology.HAS_KEY.URI).append("> ")
-				.append(relatedEntityVariable).append("").append(NEW_LINE);
-		// {relEntity} hasKey {relKey}
-//		queryBuilder.append(relatedEntityVariable)
-//				.append(" <").append(ontology.HAS_KEY.URI).append("> ")
-//				.append(relatedKeyVariable).append(",").append(NEW_LINE);
-//		//{relKey} hasKeyType {keyType};
-//		queryBuilder.append(relatedKeyVariable).append(" <")
-//				.append(ontology.HAS_KEY_TYPE.URI).append("> ")
-//				.append(relatedKeyTypeVariable).append(";").append(NEW_LINE);
-//		// hasKeyField {keyField},
-//		queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append("> ")
-//				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
-//		// {keyField} hasFieldId {fieldId};
-//		queryBuilder.append(relatedKeyFieldVariable).append(" <")
-//				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
-//				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
-//		// hasFieldValue {fieldVAlue}
-//		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
-//				.append(relatedKeyFieldValueVariable);
-		return queryBuilder.toString();
-	}
-	
 	
 	/**
 	 * Helper method that will generate String query searching for entity defined by given Key

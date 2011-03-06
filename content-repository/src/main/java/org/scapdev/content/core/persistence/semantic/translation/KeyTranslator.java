@@ -25,15 +25,12 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.model.Key;
 
 public class KeyTranslator extends AbstractSemanticTranslator {
-	private static final Logger log = Logger.getLogger(EntityTranslator.class);
-
 	private MetaDataOntology ontology;
 	
 	/**

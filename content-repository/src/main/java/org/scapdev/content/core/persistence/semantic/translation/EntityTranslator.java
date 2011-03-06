@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -52,8 +51,6 @@ import org.scapdev.content.model.MetadataModel;
  */
 public class EntityTranslator extends
 		AbstractSemanticTranslator{
-	private static final Logger log = Logger.getLogger(EntityTranslator.class);
-
 	private MetaDataOntology ontology;
 	
 	/**

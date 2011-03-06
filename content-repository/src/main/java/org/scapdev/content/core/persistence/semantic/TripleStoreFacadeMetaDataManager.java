@@ -26,10 +26,8 @@ package org.scapdev.content.core.persistence.semantic;
 import info.aduna.iteration.Iterations;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,9 +57,6 @@ import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.ExternalIdentifierInfo;
-import org.scapdev.content.model.IndirectRelationship;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
 
@@ -72,9 +67,6 @@ import org.scapdev.content.model.MetadataModel;
 public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	private static final Logger log = Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
 	private static final String BASE_URI = "http://scap.nist.gov/cms/individuals#";
-
-	//HACK, REMOVE ONCE TRIPLE STORE HANDLES
-	private final Map<String, Map<String, List<Entity>>> externalIdentifierToValueMap = new HashMap<String, Map<String, List<Entity>>>();;
 
 	private Repository repository;
 	
@@ -134,39 +126,32 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 	
 
-	
 	@Override
-	public List<Entity> getEntity(ExternalIdentifierInfo externalIdentifierInfo, String value, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
-		//HACK, REMOVE ONCE TRIPLE STORE HANDLES
-		Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifierInfo.getId());
-		List<Entity> result;
-		if (externalIdentifierValueToEntityMap.containsKey(value)) {
-			result = Collections.unmodifiableList(externalIdentifierValueToEntityMap.get(value));
-		} else {
-			result = Collections.emptyList();
-		}
-		return result;
-	}
+	public Set<Key> getKeysForIndirectIds(String indirectType,
+			Collection<String> indirectIds, Set<String> entityType) {
+		try {
+			RepositoryConnection conn = repository.getConnection();
+			try {
+				List<URI> entityURIs = queryService
+						.findEntityUrisFromBoundaryObjectIds(indirectType,
+								indirectIds, entityType, conn);
+				return new HashSet<Key>(findEntityKeys(entityURIs, conn)
+						.values());
 
-	@Override
-	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
-		//HACK, REMOVE ONCE TRIPLE STORE HANDLES
-		Set<Key> result = Collections.emptySet();
-		Map<String, List<Entity>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
-		if (indirectValueToDescriptorsMap != null) {
-			result = new HashSet<Key>();
-			for (String indirectId : indirectIds) {
-				List<Entity> descs = indirectValueToDescriptorsMap.get(indirectId);
-				if (descs != null) {
-					for (Entity desc : descs) {
-						if (entityType.contains(desc.getEntityInfo().getId())) {
-							result.add(desc.getKey());
-						}
-					}
-				}
+			} catch (MalformedQueryException e) {
+				log.error(e);
+				throw new RuntimeException(e);
+			} catch (QueryEvaluationException e2) {
+				log.error(e2);
+				throw new RuntimeException(e2);
+			} finally {
+				conn.close();
 			}
+
+		} catch (RepositoryException e) {
+			log.error(e);
 		}
-		return result;
+		return null;
 	}
 	
 	@Override
@@ -198,31 +183,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		} catch (RepositoryException e) {
 			log.error(e);
 		}
-		
-		//all below code is a HACK, REMOVE ONCE TRIPLE STORE HANDLES
-		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
-			Entity entity = entry.getValue();
-		
-			for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
-	
-					ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
-					Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
-					if (externalIdentifierValueToEntityMap == null) {
-						externalIdentifierValueToEntityMap = new HashMap<String, List<Entity>>();
-						externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityMap);
-					}
-					List<Entity> descriptorList = externalIdentifierValueToEntityMap.get(externalIdentifier.getValue());
-					if (descriptorList == null) {
-						descriptorList = new LinkedList<Entity>();
-						externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
-					}
-					descriptorList.add(entity);
-					if (descriptorList.size() >= 2) {
-						log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
-					}
-				}
-		}
-		
 	}
 	
 	/**
@@ -325,6 +285,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 
 	// for testing
+	@SuppressWarnings("unused")
 	private void outputContents(){
 		try {
 			   RepositoryConnection con = repository.getConnection();
