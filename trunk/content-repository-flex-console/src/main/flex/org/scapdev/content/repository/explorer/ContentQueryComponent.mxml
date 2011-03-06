@@ -35,7 +35,6 @@
 			{
 				var id:String = txtId.text;
 				var finalUrl:String = ID_QUERY_URL + "/" + id;
-				Alert.show(finalUrl);
 				var urlReq:URLRequest = new URLRequest(finalUrl);
 				urlReq.method = URLRequestMethod.GET;
 				
