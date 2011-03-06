@@ -5,14 +5,14 @@
 	<fx:Script>
 		<![CDATA[			
 			import flashx.textLayout.events.SelectionEvent;
-			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
-			
 			import org.scapdev.content.repository.explorer.FileUploadStatus;
-			
 			import spark.events.IndexChangeEvent;
+			import mx.rpc.http.HTTPService;
 			
+			public const REST_URL_BASE:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest";
+
 			protected function initBrowsePageListeners() : void{
 			}
 			
@@ -72,12 +72,12 @@
 		<s:Button width="118" id="btnNavBrowse" label="Browse Content" x="10" y="74" click.ContentStatisticsState="btnNavBrowse_clickHandler(event)" click.UploadContentState="btnNavBrowse_clickHandler(event)" click.QueryContentState="btnNavBrowse_clickHandler(event)" click.BrowseContentState="btnNavBrowse_clickHandler(event)"/>
 		<s:Button label="Query" width="118" id="btnNavQuery" click="btnNavQuery_clickHandler(event)" x="10" y="106"/>
 	</s:Panel>
-	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="-93" right="194" id="contentUploadPage" includeIn="UploadContentState">
+	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="68" right="5" id="contentUploadPage" includeIn="UploadContentState">
 	</explorer:ContentUploadComponent>
-	<explorer:BrowseRepositoryComponent includeIn="BrowseContentState">
+	<explorer:BrowseRepositoryComponent includeIn="BrowseContentState" width="1022">
 	</explorer:BrowseRepositoryComponent>
-	<explorer:ContentStatisticsComponent includeIn="ContentStatisticsState">
+	<explorer:ContentStatisticsComponent includeIn="ContentStatisticsState" width="1015">
 	</explorer:ContentStatisticsComponent>
-	<explorer:ContentQueryComponent includeIn="QueryContentState">
+	<explorer:ContentQueryComponent includeIn="QueryContentState" width="1025">
 	</explorer:ContentQueryComponent>
 </s:Application>

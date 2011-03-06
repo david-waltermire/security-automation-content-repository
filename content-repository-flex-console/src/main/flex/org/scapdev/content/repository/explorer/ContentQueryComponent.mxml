@@ -8,17 +8,89 @@
 
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.rpc.http.HTTPService;
 			
-			public const ID_QUERY_URL_BASE:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/content/query/get/global/";
+			import spark.components.Application;
+						
+			public const ID_QUERY_URL:String = FlexGlobals.topLevelApplication.REST_URL_BASE + "/content/query/get/global";
+
+			private var loader:URLLoader;
 
 			protected function txtId_changeHandler(event:Event):void
 			{
-				
+				var userEnteredText:String = txtId.text;
+				if(userEnteredText.length == 0)
+				{
+					btnSearch.enabled = false;
+				}
+				else
+				{
+					btnSearch.enabled = true;
+				}
 			}
 			
 			protected function btnSearch_clickHandler(event:MouseEvent):void
 			{
+				var id:String = txtId.text;
+				var finalUrl:String = ID_QUERY_URL + "/" + id;
+				Alert.show(finalUrl);
+				var urlReq:URLRequest = new URLRequest(finalUrl);
+				urlReq.method = URLRequestMethod.GET;
 				
+				loader = new URLLoader();
+				addLoaderListeners(loader);
+				
+				try
+				{
+					loader.load(urlReq);
+				}
+				catch (error:Error)
+				{
+					txtAreaResult.text = "Error: " + error.message;
+				}
+			}
+			
+			private function addLoaderListeners(dispatcher:IEventDispatcher):void
+			{
+				dispatcher.addEventListener(Event.COMPLETE, completeHandler);
+				dispatcher.addEventListener(Event.OPEN, openHandler);
+				dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+				dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+				dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
+				dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+			}
+			
+			private function completeHandler(event:Event):void 
+			{
+				var data:XML = XML(loader.data);
+				btnSearch.enabled = true;
+				
+				txtAreaResult.text = data.toXMLString();
+			}
+			
+			private function openHandler(event:Event):void 
+			{
+			}
+			
+			private function progressHandler(event:ProgressEvent):void {
+			}
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void {
+				btnSearch.enabled = true;
+				txtAreaResult.text = event.text;
+			}
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				btnSearch.enabled = true;
+				lblHttpReturnCode.text = String(event.status);
+			}
+			
+			private function ioErrorHandler(event:IOErrorEvent):void {
+				btnSearch.enabled = true;
+				txtAreaResult.text = event.text;
 			}
 		]]>
 	</fx:Script>
@@ -26,14 +98,18 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	
 	<s:Panel x="-23" y="598" title="Query Content" width="424" height="571">
 		<s:layout>
-			<s:VerticalLayout/>
+			<s:VerticalLayout paddingLeft="5"/>
 		</s:layout>
 		<s:SkinnableContainer width="288" height="44">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle"/>
+			</s:layout>
 			<s:Label x="10" y="17" text="Entity Id"/>
-			<s:TextInput x="58" y="10" width="141" id="txtId"/>
-			<s:Button x="207" y="7" label="Search" id="btnSearch" click="btnSearch_clickHandler(event)"/>
+			<s:TextInput x="58" y="10" width="141" id="txtId" change="txtId_changeHandler(event)"/>
+			<s:Button x="207" y="7" label="Search" id="btnSearch" click="btnSearch_clickHandler(event)" enabled="false"/>
 		</s:SkinnableContainer>
 		<s:SkinnableContainer width="413" height="200" x="0" y="91">
 			<s:layout>
@@ -42,5 +118,7 @@
 			<s:Label x="12" y="41" text="Result"/>
 			<s:TextArea id="txtAreaResult" verticalAlign="justify" bottom="10" verticalCenter="25" top="61" left="11" horizontalCenter="-1" right="7"/>
 		</s:SkinnableContainer>
+		<s:Label text="HTTP return code"/>
+		<s:Label id="lblHttpReturnCode"/>
 	</s:Panel>
 </s:Group>

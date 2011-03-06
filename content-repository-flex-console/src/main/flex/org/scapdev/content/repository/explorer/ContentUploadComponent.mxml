@@ -14,14 +14,15 @@
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.Application;
+			import mx.core.FlexGlobals;
 			
 			import org.scapdev.content.repository.explorer.FileUploadStatus;
 			import org.scapdev.content.repository.explorer.item.renderers.FileUploadStatusItemRenderer;
 			import org.scapdev.content.repository.explorer.item.renderers.FilesToBeUploadedItemRenderer;
 			
 			import spark.events.IndexChangeEvent;
-				
-			public const UPLOAD_URL:String = "http://localhost:8080/content-repository-war-1.0-SNAPSHOT/rest/upload/content";
+			
+			public const UPLOAD_URL:String = FlexGlobals.topLevelApplication.REST_URL_BASE +  "/upload/content";
 
 			protected var EOL:String;
 			
