@@ -21,21 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.model;
 
-import java.util.Collection;
+import javax.xml.bind.JAXBElement;
 
-import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.jaxb.StaticDocumentModelType;
 
-public interface EntityDescriptor {
-	EntityInfo getEntityInfo();
-	Key getKey();
-	String getContentId();
-	Collection<Relationship> getRelationships();
-	Collection<KeyedRelationship> getKeyedRelationships();
-	Collection<IndirectRelationship> getIndirectRelationships();
+class StaticDocumentModelImpl extends AbstractDocumentModel<StaticDocumentModelType> implements StaticDocumentModel {
+
+	public StaticDocumentModelImpl(
+			JAXBElement<StaticDocumentModelType> modelType,
+			StaticDocumentInfoImpl keyedDocumentInfoImpl) {
+		super(modelType.getValue());
+	}
 }

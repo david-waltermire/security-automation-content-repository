@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
@@ -50,4 +51,5 @@ public interface MetadataStore {
 	 */
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
 	void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model);
+	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, MetadataModel model);
 }

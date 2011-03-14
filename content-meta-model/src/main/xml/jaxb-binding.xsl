@@ -47,7 +47,9 @@
       <xsl:apply-templates/>
     </jaxb:bindings>
   </xsl:template>
-  
+
+  <xsl:template match="meta:external-identifiers"/> 
+ 
   <xsl:template match="meta:schema">
     <jaxb:bindings schemaLocation="{@schemaLocation}" node="{meta:schema-node/@node}">
       <xsl:comment> == Documents == </xsl:comment>
@@ -86,6 +88,30 @@
       <annox:annotate annox:class="org.scapdev.content.annotation.SchemaDocument" id="{$document-id}" type="GENERATED"/>
     </annox:annotate>
     <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="meta:generated-property-refs"/>
+  <xsl:template match="meta:generated-property-refs" mode="document"/>
+  <xsl:template match="meta:generated-property-refs" mode="container"/>
+
+  <xsl:template match="meta:static-document-model" mode="document">
+    <xsl:param name="document-id" tunnel="yes">unset</xsl:param>
+    <xsl:comment>static-document-model {$document-id}</xsl:comment>
+    <annox:annotate>
+      <annox:annotate annox:class="org.scapdev.content.annotation.SchemaDocument" id="{$document-id}" type="STATIC"/>
+    </annox:annotate>
+    <annox:annotate>
+      <annox:annotate annox:class="org.scapdev.content.annotation.Entity"
+        id="{$document-id}"
+        keyId="{meta:key/@id}">
+<!-- 
+        <xsl:if test="@local-part">
+          <annox:annotate annox:field="localPart"><xsl:value-of select="@local-part"/></annox:annotate>
+        </xsl:if>
+ -->
+       </annox:annotate>
+    </annox:annotate>
+    <xsl:apply-templates mode="key"/>
   </xsl:template>
 
   <xsl:template match="meta:document" mode="container">
@@ -135,11 +161,12 @@
 	      </xsl:if>
         </annox:annotate>
       </annox:annotate>
+      <xsl:apply-templates mode="key"/>
       <xsl:apply-templates mode="#current"/>
     </jaxb:bindings>
   </xsl:template>
 
-  <xsl:template match="meta:key" mode="entity">
+  <xsl:template match="meta:key" mode="key">
     <annox:annotate>
       <annox:annotate annox:class="org.scapdev.content.annotation.Key" id="{@id}">
         <annox:annotate annox:field="keyIds">
@@ -152,16 +179,18 @@
         </annox:annotate>
       </annox:annotate>
     </annox:annotate>
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates mode="field"/>
   </xsl:template>
 
-  <xsl:template match="meta:field" mode="entity">
+  <xsl:template match="meta:field" mode="field">
     <jaxb:bindings xsl:use-attribute-sets="node-attribute-set">
       <annox:annotate target="field">
         <annox:annotate annox:class="org.scapdev.content.annotation.Field" id="{@id}"/>
       </annox:annotate>
     </jaxb:bindings>
   </xsl:template>
+
+  <xsl:template match="meta:identifier-mapping" mode="entity"/>
 
   <xsl:template match="meta:local-relationship" mode="relationship">
     <xsl:comment>local-relationship <xsl:value-of select="@id"/></xsl:comment>

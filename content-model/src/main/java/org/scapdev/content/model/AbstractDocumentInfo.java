@@ -36,6 +36,8 @@ public abstract class AbstractDocumentInfo<MODEL extends DocumentModel> extends 
 		binding = init.getDocumentBindingInfo(entity.getId());
 	}
 
+	public abstract MODEL getDocumentModel();
+
 	BindingInfo<org.scapdev.content.annotation.SchemaDocument> getBinding() {
 		return binding;
 	}

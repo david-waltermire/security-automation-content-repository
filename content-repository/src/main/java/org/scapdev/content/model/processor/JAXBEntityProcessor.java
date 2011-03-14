@@ -35,6 +35,7 @@ import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.JAXBRelationshipIdentifyingImportVisitor;
 import org.scapdev.content.model.MetadataModel;
+import org.scapdev.content.model.MutableEntity;
 
 public class JAXBEntityProcessor implements EntityProcessor {
 	private final PersistenceContext persistenceContext;
@@ -74,18 +75,17 @@ public class JAXBEntityProcessor implements EntityProcessor {
 	}
 
 	private static class RelationshipExtractingTask implements Callable<Entity> {
-		private final EntityImpl entity;
+		private final MutableEntity entity;
 		private final JAXBRelationshipIdentifyingImportVisitor visitor;
 
-		RelationshipExtractingTask(EntityImpl entity, JAXBElement<Object> node, MetadataModel model) {
+		RelationshipExtractingTask(MutableEntity entity, JAXBElement<Object> node, MetadataModel model) {
 			this.entity = entity;
 			this.visitor = new JAXBRelationshipIdentifyingImportVisitor(entity, node, model);
 		}
 
 		@Override
-		public EntityImpl call() throws Exception {
+		public Entity call() throws Exception {
 			visitor.visit();
-			entity.setRelationships(visitor.getKeyedRelationships(), visitor.getIndirectRelationships());
 			return entity;
 		}
 		

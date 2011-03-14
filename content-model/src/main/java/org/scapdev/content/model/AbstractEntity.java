@@ -23,17 +23,30 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.bind.JAXBElement;
 
-public abstract class AbstractEntity implements Entity {
+public abstract class AbstractEntity implements MutableEntity {
 	private final Key key;
 	private final EntityInfo entityInfo;
 	private final JAXBElement<Object> object;
 
-	public AbstractEntity(Key key, EntityInfo entityInfo, JAXBElement<Object> object) {
+	private final List<Relationship> relationships;
+	private final List<KeyedRelationship> keyedRelationships;
+	private final List<IndirectRelationship> indirectRelationships;
+
+	protected AbstractEntity(Key key, EntityInfo entityInfo, JAXBElement<Object> object) {
 		this.key = key;
 		this.entityInfo = entityInfo;
 		this.object = object;
+
+		this.relationships = new LinkedList<Relationship>();
+		this.keyedRelationships = new LinkedList<KeyedRelationship>();
+		this.indirectRelationships = new LinkedList<IndirectRelationship>();
 	}
 
 	@Override
@@ -53,5 +66,32 @@ public abstract class AbstractEntity implements Entity {
 	 */
 	public JAXBElement<Object> getObject() {
 		return object;
+	}
+
+	@Override
+	public void addRelationship(IndirectRelationship relationship) {
+		relationships.add(relationship);
+		indirectRelationships.add(relationship);
+	}
+
+	@Override
+	public void addRelationship(KeyedRelationship relationship) {
+		relationships.add(relationship);
+		keyedRelationships.add(relationship);
+	}
+
+	@Override
+	public Collection<IndirectRelationship> getIndirectRelationships() {
+		return Collections.unmodifiableCollection(indirectRelationships);
+	}
+
+	@Override
+	public Collection<KeyedRelationship> getKeyedRelationships() {
+		return Collections.unmodifiableCollection(keyedRelationships);
+	}
+
+	@Override
+	public Collection<Relationship> getRelationships() {
+		return Collections.unmodifiableCollection(relationships);
 	}
 }

@@ -23,17 +23,16 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import javax.xml.namespace.QName;
 
 /**
  * Represents information about a declared entity type within a schema metamodel.
  */
 public interface EntityInfo extends SchemaTypeComponent, Indexed {
-	/**
-	 * Retrieves the qualified name of the XML element associated with the meta
-	 * model entity.
-	 * @return the XML qualified name
-	 */
-	QName getQName();
+//	/**
+//	 * Retrieves the qualified name of the XML element associated with the meta
+//	 * model entity.
+//	 * @return the XML qualified name
+//	 */
+//	QName getQName();
 	EntityIdentifierMapping getEntityIdentifierMapping();
 }

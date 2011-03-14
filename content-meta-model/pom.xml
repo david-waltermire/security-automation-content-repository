@@ -141,6 +141,7 @@
                   <filtering>false</filtering>
                   <includes>
                     <include>*.xjb</include>
+                    <include>**/*.xjb</include>
                   </includes>
                 </resource>
               </resources>              
@@ -159,6 +160,10 @@
           </execution>
         </executions>
         <configuration>
+          <specVersion>2.1</specVersion>
+          <debug>true</debug>
+          <verbose>true</verbose>
+          <catalog>src/main/xsd/catalog.xml</catalog>
           <extension>true</extension>
           <args>
             <arg>-Xannotate</arg>
@@ -166,11 +171,13 @@
           </args>
           <schemaDirectory>src/main/xsd</schemaDirectory>
           <schemaIncludes>
-            <include>*/*.xsd</include>
-            <include>*.xsd</include>
+            <include>org\mitre\oval\XMLSchema\*.xsd</include>
+            <include>gov\nist\checklists\xccdf\1.1\*.xsd</include>
+            <include>gov\nist\scap\schema\feed\vulnerability\2.0\*.xsd</include>
           </schemaIncludes>
           <bindingDirectory>${project.build.directory}/generated-resources/binding</bindingDirectory>
           <bindingIncludes>
+            <include>**/*.xjb</include>
             <include>*.xjb</include>
           </bindingIncludes>
           <episode>false</episode>

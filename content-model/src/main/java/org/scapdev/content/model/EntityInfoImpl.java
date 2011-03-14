@@ -23,8 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-import javax.xml.namespace.QName;
-
 import org.scapdev.content.model.jaxb.EntityType;
 import org.scapdev.content.model.jaxb.IdentifierMappingType;
 import org.scapdev.jaxb.reflection.model.JAXBClass;
@@ -35,12 +33,12 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 	private final EntityIdentifierMapping identifierMapping;
 	private final BindingInfo<org.scapdev.content.annotation.Entity> binding;
 
-	EntityInfoImpl(EntityType entity, SchemaInfoImpl schema, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
-		super(entity.getId(), schema, entity.getSchemaNode().getNode());
+	EntityInfoImpl(EntityType entityType, SchemaInfoImpl schema, JAXBMetadataModel loader, InitializingJAXBClassVisitor init) {
+		super(entityType.getId(), schema, entityType.getSchemaNode().getNode());
 		binding = init.getEntityBindingInfo(getId());
-		key = new KeyInfoImpl(entity.getKey(), this, loader, init);
+		key = new KeyInfoImpl(entityType.getKey(), this, loader, init);
 
-		IdentifierMappingType mapping = entity.getIdentifierMapping();
+		IdentifierMappingType mapping = entityType.getIdentifierMapping();
 		if (mapping != null) {
 			identifierMapping = new EntityIdentifierMappingImpl(mapping, this);
 		} else {
@@ -86,25 +84,25 @@ class EntityInfoImpl extends AbstractSchemaComponent implements EntityInfo {
 		result = 37 * result +  key.hashCode();
 		return result;
 	}
-
-	private String getLocalPart() {
-		String result = binding.getAnnotation().localPart();
-		if (result.isEmpty()) {
-			result = null;
-		}
-		return result;
-	}
-
-	@Override
-	public QName getQName() {
-		String localPart = getLocalPart();
-
-		QName result = null;
-		if (localPart != null) {
-			result = new QName(getSchemaInfo().getNamespace(), localPart);
-		}
-		return result;
-	}
+//
+//	private String getLocalPart() {
+//		String result = binding.getAnnotation().localPart();
+//		if (result.isEmpty()) {
+//			result = null;
+//		}
+//		return result;
+//	}
+//
+//	@Override
+//	public QName getQName() {
+//		String localPart = getLocalPart();
+//
+//		QName result = null;
+//		if (localPart != null) {
+//			result = new QName(getSchemaInfo().getNamespace(), localPart);
+//		}
+//		return result;
+//	}
 
 	@Override
 	public JAXBClass getType() {

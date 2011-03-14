@@ -28,5 +28,5 @@ public enum DocumentModelType {
 	/** An anonymous document that can be generated */
 	GENERATED,
 	/** An identifiable document */
-	ENTITY;
+	STATIC;
 }
