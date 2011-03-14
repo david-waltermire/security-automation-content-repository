@@ -32,11 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.query.EntityStatistic;
+import org.scapdev.content.core.query.RelationshipStatistic;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.ExternalIdentifier;
 import org.scapdev.content.model.IndirectRelationship;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
+import org.scapdev.content.model.Relationship;
+import org.scapdev.content.model.RelationshipInfo;
 
 public class MemoryResidentMetadataStore implements MetadataStore {
 //	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
@@ -100,6 +105,92 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 //			if (descriptorList.size() >= 2) {
 //				log.trace("Found '"+descriptorList.size()+"' instances of : "+externalIdentifier.getId()+" "+externalIdentifier.getValue());
 //			}
+		}
+	}
+
+	@Override
+	public Map<String, ? extends EntityStatistic> getEntityStatistics(
+			Set<String> entityInfoIds, MetadataModel model) {
+
+		Map<String, InternalEntityStatistic> results = new HashMap<String, InternalEntityStatistic>();
+		for (Entity entity : descriptorMap.values()) {
+			String entityInfoId = entity.getEntityInfo().getId();
+			if (entityInfoIds.contains(entityInfoId)) {
+				InternalEntityStatistic stat = results.get(entityInfoId);
+				if (stat == null) {
+					stat = new InternalEntityStatistic(entity.getEntityInfo());
+					results.put(entityInfoId, stat);
+				}
+				stat.incrementCount();
+				stat.handleRelationships(entity.getRelationships());
+			}
+		}
+		return results;
+	}
+
+	private class InternalEntityStatistic implements EntityStatistic {
+		private final EntityInfo entityInfo;
+		private int count = 0;
+		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
+
+		public InternalEntityStatistic(EntityInfo entityInfo) {
+			this.entityInfo = entityInfo;
+		}
+
+		public void handleRelationships(Collection<Relationship> relationships) {
+			for (Relationship relationship : relationships) {
+				RelationshipInfo relationshipInfo = relationship.getRelationshipInfo();
+				String relationshipId = relationshipInfo.getId();
+				InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
+				if (stat == null) {
+					stat = new InternalRelationshipStatistic(relationshipInfo);
+					relationshipStats.put(relationshipId, stat);
+				}
+				stat.incrementCount();
+			}
+		}
+
+		public void incrementCount() {
+			++count;
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public EntityInfo getEntityInfo() {
+			return entityInfo;
+		}
+
+		@Override
+		public Map<String, ? extends RelationshipStatistic> getRelationshipInfoStatistics() {
+			return Collections.unmodifiableMap(relationshipStats);
+		}
+		
+	}
+
+	private class InternalRelationshipStatistic implements RelationshipStatistic {
+		private final RelationshipInfo relationshipInfo;
+		private int count = 0;
+
+		public InternalRelationshipStatistic(RelationshipInfo relationshipInfo) {
+			this.relationshipInfo = relationshipInfo;
+		}
+
+		public void incrementCount() {
+			++count;
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public RelationshipInfo getRelationshipInfo() {
+			return relationshipInfo;
 		}
 	}
 }

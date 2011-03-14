@@ -25,49 +25,26 @@ package org.scapdev.content.model;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
 
-import org.scapdev.content.model.jaxb.EntityContainerType;
-import org.scapdev.content.model.jaxb.EntityIdRefType;
 import org.scapdev.content.model.jaxb.GeneratedDocumentModelType;
 import org.scapdev.content.model.jaxb.GeneratedPropertyRefType;
 
-class GeneratedDocumentModelImpl implements GeneratedDocumentModel {
-	private final GeneratedDocumentModelType type;
-	private Set<EntityInfo> entityIdRefs = null;
+class GeneratedDocumentModelImpl extends AbstractDocumentModel<GeneratedDocumentModelType> implements GeneratedDocumentModel {
 	private Map<String, GeneratedPropertyRefInfo> generatedPropertyToRefMap = null;
 
 	public GeneratedDocumentModelImpl(
 			JAXBElement<GeneratedDocumentModelType> modelType,
 			DocumentInfo documentInfo) {
-		this.type = modelType.getValue();
-	}
-
-	@Override
-	public Set<EntityInfo> getSupportedEntityInfos(MetadataModel model) {
-		Set<EntityInfo> result;
-		if (entityIdRefs == null) {
-			result = new HashSet<EntityInfo>();
-			for (EntityContainerType entityContainerType : type.getEntityContainers().getEntityContainer()) {
-				for (EntityIdRefType idRefType : entityContainerType.getEntityRef()) {
-					String idRef = idRefType.getIdRef();
-					EntityInfo entityInfo = model.getEntityInfoById(idRef);
-					result.add(entityInfo);
-				}
-			}
-			entityIdRefs = Collections.unmodifiableSet(result);
-		}
-		return entityIdRefs;
+		super(modelType.getValue());
 	}
 
 	@Override
 	public GeneratedPropertyRefInfo getGeneratedPropertyRefInfo(String generatedId) {
 		if (generatedPropertyToRefMap == null) {
-			GeneratedDocumentModelType.GeneratedPropertyRefs refs = type.getGeneratedPropertyRefs();
+			GeneratedDocumentModelType.GeneratedPropertyRefs refs = getDocumentModelType().getGeneratedPropertyRefs();
 			if (refs != null) {
 				generatedPropertyToRefMap = new HashMap<String, GeneratedPropertyRefInfo>();
 				for (GeneratedPropertyRefType ref : refs.getGeneratedPropertyRef()) {

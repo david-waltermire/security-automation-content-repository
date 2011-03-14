@@ -81,7 +81,10 @@ public class DefaultInstanceWriter implements InstanceWriter {
 				writer.writeAttribute("id", documentId);
 	
 				for (Map.Entry<String, String> namespaceEntry : model.getNamespaceToPrefixMap().entrySet()) {
-					writer.setPrefix(namespaceEntry.getValue(), namespaceEntry.getKey());
+					String prefix = namespaceEntry.getValue();
+					if (prefix != null) {
+						writer.setPrefix(prefix, namespaceEntry.getKey());
+					}
 				}
 				documentData.newDocumentWriter(filteredWriter, marshaller).write();
 

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
@@ -66,6 +67,12 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	@Override
 	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
 		return metadataStore.getKeysForIndirectIds(indirectType, indirectIds, entityType);
+	}
+
+	@Override
+	public Map<String, ? extends EntityStatistic> getEntityStatistics(
+			Set<String> entityInfoIds, MetadataModel model) {
+		return metadataStore.getEntityStatistics(entityInfoIds, model);
 	}
 
 }

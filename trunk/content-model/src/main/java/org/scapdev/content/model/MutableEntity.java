@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 ssill2
+ * Copyright (c) 2011 David Waltermire
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,32 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core;
+package org.scapdev.content.model;
 
-import java.util.Map;
-
-import org.scapdev.content.model.EntityInfo;
-
-public interface EntityStatistic 
-{
-	/**
-	 * Get the EntityInfo object this statistic is for.
-	 * 
-	 * @return EntityInfo
-	 */
-	EntityInfo getEntityInfo();
-	
-	/**
-	 * Get the detailed relationship statistics for each entity instance of this
-	 * EntityInfo object.
-	 * 
-	 * @return Map<String, RelationshipStatistic>
-	 */
-	Map<String, RelationshipStatistic> getRelationshipInfoStatistics();
-	
-	/**
-	 * Get the number of Entity instances for this EntityInfo object.
-	 * @return int
-	 */
-	int getCount();
+public interface MutableEntity extends Entity {
+	void addRelationship(IndirectRelationship relationship);
+	void addRelationship(KeyedRelationship relationship);
 }

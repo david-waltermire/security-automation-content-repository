@@ -52,7 +52,7 @@
     <!-- =================================================================== -->
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5"
         namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5"
-        schemaLocation="../../../src/main/xsd/oval-5.8/oval-definitions-schema.xsd"
+        schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/oval-definitions-schema.xsd"
         prefix="oval-def">
       <schema-node node="/xs:schema"/>
       
@@ -298,73 +298,73 @@
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-aix"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix"
-      schemaLocation="../../../src/main/xsd/oval-5.8/aix-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/aix-definitions-schema.xsd"
       prefix="oval-def-aix">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-apache"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#apache"
-      schemaLocation="../../../src/main/xsd/oval-5.8/apache-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/apache-definitions-schema.xsd"
       prefix="oval-def-apache">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-catos"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos"
-      schemaLocation="../../../src/main/xsd/oval-5.8/catos-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/catos-definitions-schema.xsd"
       prefix="oval-def-catos">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-debian"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#debian"
-      schemaLocation="../../../src/main/xsd/oval-5.8/debian-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/debian-definitions-schema.xsd"
       prefix="oval-def-debian">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-esx"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx"
-      schemaLocation="../../../src/main/xsd/oval-5.8/esx-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/esx-definitions-schema.xsd"
       prefix="oval-def-esx">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-freebsd"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#freebsd"
-      schemaLocation="../../../src/main/xsd/oval-5.8/freebsd-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/freebsd-definitions-schema.xsd"
       prefix="oval-def-freebsd">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-hpux"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux"
-      schemaLocation="../../../src/main/xsd/oval-5.8/hpux-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/hpux-definitions-schema.xsd"
       prefix="oval-def-hpux">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-independent"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-      schemaLocation="../../../src/main/xsd/oval-5.8/independent-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/independent-definitions-schema.xsd"
       prefix="oval-def-ind">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-ios"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"
-      schemaLocation="../../../src/main/xsd/oval-5.8/ios-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/ios-definitions-schema.xsd"
       prefix="oval-def-ios">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-linux"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
-      schemaLocation="../../../src/main/xsd/oval-5.8/linux-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/linux-definitions-schema.xsd"
       prefix="oval-def-linux">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-macos"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos"
-      schemaLocation="../../../src/main/xsd/oval-5.8/macos-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/macos-definitions-schema.xsd"
       prefix="oval-def-macos">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-common-5"
       namespace="http://oval.mitre.org/XMLSchema/oval-common-5"
-      schemaLocation="../../../src/main/xsd/oval-5.8/oval-common-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/oval-common-schema.xsd"
       prefix="oval-common">
       <schema-node node="/xs:schema"/>
 
@@ -384,37 +384,37 @@
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-pixos"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#pixos"
-      schemaLocation="../../../src/main/xsd/oval-5.8/pixos-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/pixos-definitions-schema.xsd"
       prefix="oval-def-pixos">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-redhat"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#redhat"
-      schemaLocation="../../../src/main/xsd/oval-5.8/redhat-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/redhat-definitions-schema.xsd"
       prefix="oval-def-redhat">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-sharepoint"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"
-      schemaLocation="../../../src/main/xsd/oval-5.8/linux-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/linux-definitions-schema.xsd"
       prefix="oval-def-sharepoint">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-solaris"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"
-      schemaLocation="../../../src/main/xsd/oval-5.8/solaris-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/solaris-definitions-schema.xsd"
       prefix="oval-def-solaris">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-unix"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-      schemaLocation="../../../src/main/xsd/oval-5.8/unix-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/unix-definitions-schema.xsd"
       prefix="oval-def-unix">
       <schema-node node="/xs:schema"/>
     </schema>
     <schema id="urn:scap-content:schema:org.mitre:oval-definitions-5-windows"
       namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-      schemaLocation="../../../src/main/xsd/oval-5.8/windows-definitions-schema.xsd"
+      schemaLocation="../../../src/main/xsd/org/mitre/oval/XMLSchema/windows-definitions-schema.xsd"
       prefix="oval-def-windows">
       <schema-node node="/xs:schema"/>
     </schema>
@@ -424,7 +424,7 @@
     <!-- =================================================================== -->
     <schema id="urn:scap-content:schema:gov.nist.nvd:vuln-2.0"
       namespace="http://scap.nist.gov/schema/feed/vulnerability/2.0"
-      schemaLocation="../../../src/main/xsd/nvd-cve-feed_2.0.xsd"
+      schemaLocation="../../../src/main/xsd/gov/nist/scap/schema/feed/vulnerability/2.0/nvd-cve-feed_2.0.xsd"
       prefix="nvd-vuln">
       <schema-node node="/xs:schema"/>
       
@@ -442,7 +442,8 @@
         </document>
       </documents>
     </schema>
-
+    <!--         schemaLocation="http://nvd.nist.gov/schema/vulnerability_0.4.xsd" -->
+    <!--         schemaLocation="../../../src/main/xsd/gov/nist/scap/vulnerability/0.4/vulnerability_0.4.xsd" -->
     <schema id="urn:scap-content:schema:gov.nist.scap:vulnerability-0.4"
         namespace="http://scap.nist.gov/schema/vulnerability/0.4"
         schemaLocation="http://nvd.nist.gov/schema/vulnerability_0.4.xsd"
@@ -461,7 +462,7 @@
       </entities>
 
       <relationships>
-        <!-- add external to oval -->
+        <!-- TODO: add external to oval -->
         <indirect-relationship id="urn:scap-content:relationship:gov.nist.nvd:vuln-cve-reference">
           <schema-node node="//xs:complexType[@name='vulnerabilityType']/xs:sequence/xs:choice/xs:element[@name='cve-id']" location="PROPERTY"/>
           <value-node node="//xs:complexType[@name='vulnerabilityType']/xs:sequence/xs:choice/xs:element[@name='cve-id']"/>
@@ -481,6 +482,28 @@
           <external-identifier-ref id-ref="urn:scap-content:external-identifier:gov.nist:cpe-2-x"/>
         </indirect-relationship>
       </relationships>
+    </schema>
+
+    <!-- =================================================================== -->
+    <!-- = XCCDF 1.1.4                                                     = -->
+    <!-- =================================================================== -->
+    <schema id="urn:scap-content:schema:gov.nist.checklists:xccdf-1.1"
+      namespace="http://checklists.nist.gov/xccdf/1.1"
+      schemaLocation="../../../src/main/xsd/gov/nist/checklists/xccdf/1.1/xccdf-1.1.4.xsd"
+      prefix="xccdf">
+      <schema-node node="/xs:schema"/>
+      <documents>
+        <document id="urn:scap-content:document:gov.nist.checklists:xccdf-1.1">
+          <schema-node node="//xs:element[@name='Benchmark']/xs:complexType"/>
+          <static-document-model>
+            <key id="urn:scap-content:key:gov.nist.checklists:xccdf-1.1-benchmark">
+              <field id="urn:scap-content:field:gov.nist.checklists:xccdf-1.1-benchmark">
+                <schema-node node="//xs:element[@name='Benchmark']/xs:complexType/xs:attribute[@name='id']"/>
+              </field>
+            </key>
+          </static-document-model>
+        </document>
+      </documents>
     </schema>
   </schemas>
 </meta-model>

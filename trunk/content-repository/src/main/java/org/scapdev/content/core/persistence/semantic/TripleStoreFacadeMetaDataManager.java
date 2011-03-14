@@ -56,6 +56,7 @@ import org.scapdev.content.core.persistence.semantic.translation.EntityTranslato
 import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
+import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
@@ -319,5 +320,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 	}
 
-
+	@Override
+	public Map<String, ? extends EntityStatistic> getEntityStatistics(
+			Set<String> entityInfoIds, MetadataModel model) {
+		// TODO: implement this
+		throw new UnsupportedOperationException();
+	}
 }

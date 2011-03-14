@@ -69,6 +69,9 @@ class SchemaInfoImpl implements SchemaInfo {
 				case GENERATED:
 					document = new GeneratedDocumentInfoImpl(node, this, metadataModel, init);
 					break;
+				case STATIC:
+					document = new StaticDocumentInfoImpl(node, this, metadataModel, init);
+					break;
 				default:
 					throw new UnsupportedOperationException("Document Type: "+annotation.type().toString());
 				}

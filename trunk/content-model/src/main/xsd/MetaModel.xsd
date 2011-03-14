@@ -287,23 +287,74 @@
   <!-- * Document Model                                                    * -->
   <!-- ********************************************************************* -->
   <xs:element name="document-model" type="DocumentModelType" abstract="true"/>
-  <xs:complexType name="DocumentModelType"/>
+  <xs:complexType name="DocumentModelType">
+    <xs:sequence>
+      <xs:element name="entity-containers">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entity-container" type="EntityContainerType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
 
+  <xs:complexType name="RequiredContainerDocumentModelType">
+    <xs:complexContent>
+      <xs:restriction base="DocumentModelType">
+        <xs:sequence>
+          <xs:element name="entity-containers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="entity-container" type="EntityContainerType" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+
+  <xs:complexType name="EntityContainerType">
+    <xs:complexContent>
+      <xs:extension base="ContainerSchemaComponentType">
+        <xs:sequence>
+          <xs:element ref="entity-ref" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ContainerSchemaComponentType">
+    <xs:complexContent>
+      <xs:restriction base="SchemaComponentType">
+        <xs:sequence>
+          <xs:element ref="schema-node"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="ContainerComponentIdType" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:simpleType name="ContainerComponentIdType">
+    <xs:restriction base="ComponentIdType">
+      <xs:pattern value="urn:scap-content:container:.+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="entity-ref" type="EntityIdRefType"/>
+  <xs:complexType name="EntityIdRefType">
+    <xs:attribute name="id-ref" type="EntityComponentIdType" use="required"/>
+  </xs:complexType>
+  
   <!-- Generated Documents -->
   <xs:element name="generated-document-model" type="GeneratedDocumentModelType"
     substitutionGroup="document-model"/>
   <xs:complexType name="GeneratedDocumentModelType">
     <xs:complexContent>
-      <xs:extension base="DocumentModelType">
+      <xs:extension base="RequiredContainerDocumentModelType">
         <xs:sequence>
-          <xs:element name="entity-containers">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="entity-container" type="EntityContainerType" maxOccurs="unbounded"
-                />
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
           <xs:element name="generated-property-refs" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
@@ -315,38 +366,6 @@
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="EntityContainerType">
-    <xs:complexContent>
-      <xs:extension base="ContainerSchemaComponentType">
-        <xs:sequence>
-          <xs:element ref="entity-ref" maxOccurs="unbounded"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ContainerSchemaComponentType">
-    <xs:complexContent>
-      <xs:restriction base="SchemaComponentType">
-        <xs:sequence>
-          <xs:element ref="schema-node"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="ContainerComponentIdType" use="required"/>
-      </xs:restriction>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="ContainerComponentIdType">
-    <xs:restriction base="ComponentIdType">
-      <xs:pattern value="urn:scap-content:container:.+"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:element name="entity-ref" type="EntityIdRefType"/>
-  <xs:complexType name="EntityIdRefType">
-    <xs:attribute name="id-ref" type="EntityComponentIdType" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="GeneratedPropertyRefType">
@@ -373,6 +392,20 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <!-- Static Documents -->
+  <xs:element name="static-document-model" type="StaticDocumentModelType"
+    substitutionGroup="document-model"/>
+  <xs:complexType name="StaticDocumentModelType">
+    <xs:complexContent>
+      <xs:extension base="DocumentModelType">
+        <xs:sequence>
+          <xs:element ref="key"/>
+          <xs:element ref="identifier-mapping" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <!-- ********************************************************************** -->
   <!-- * Entity                                                             * -->
   <!-- ********************************************************************** -->
@@ -386,8 +419,8 @@
       <xs:field xpath="@id-ref"/>
     </xs:keyref>
     <!-- TODO: make sure fields are proeprly used using schematron -->
-
   </xs:element>
+
   <xs:complexType name="EntityType">
     <xs:complexContent>
       <xs:extension base="EntitySchemaComponentType">
