@@ -26,8 +26,10 @@ package org.scapdev.content.core.persistence.semantic;
 import info.aduna.iteration.Iterations;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,9 +59,12 @@ import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
 import org.scapdev.content.core.query.EntityStatistic;
+import org.scapdev.content.core.query.RelationshipStatistic;
 import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.EntityInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
+import org.scapdev.content.model.RelationshipInfo;
 
 /**
  * At this point this is just going to be a facade into the triple store REST interfaces
@@ -85,6 +90,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		//NOTE: this type is non-inferencing, see http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more detail
 		try {
 			repository = new SailRepository(new MemoryStore());
+			
+//			repository = new HTTPRepository("http://localhost:8080/openrdf-sesame", "scapCmsTest");
+			
+			
 			repository.initialize();
 			factory = repository.getValueFactory();
 			ontology = new MetaDataOntology(factory);
@@ -117,7 +126,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				log.error(e2);
 				throw new RuntimeException(e2);
 			} finally {
-				conn.close();
+				conn.close();	
 			}
 
 		} catch (RepositoryException e) {
@@ -153,6 +162,36 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			log.error(e);
 		}
 		return null;
+	}
+	
+	@Override
+	public Map<String, ? extends EntityStatistic> getEntityStatistics(
+			Set<String> entityInfoIds, MetadataModel model) {
+		Map<String, InternalEntityStatistic> entityStats = new HashMap<String, InternalEntityStatistic>();
+		try {
+			RepositoryConnection conn = repository.getConnection();
+			try {
+				for (String entityTypeId : entityInfoIds) {
+					List<URI> existingEntities = findEntitybyEntityTypeId(entityTypeId, conn);
+					InternalEntityStatistic stat = new InternalEntityStatistic(model.getEntityInfoById(entityTypeId));
+					// 4. loop through this list, incrementing count of entityStatistic for every iteration
+					for (URI entityURI : existingEntities){
+						stat.incrementCount();
+						List<String> relationshipIds = findAllRelationshipsFromEntity(entityURI, conn);
+						for (String relationshipId : relationshipIds){
+							stat.handleRelationships(relationshipId, model.getRelationshipInfoById(relationshipId));
+						}
+					}
+					entityStats.put(entityTypeId, stat);
+				}
+				
+			} finally {
+				conn.close();
+			}
+		} catch (RepositoryException e) {
+			log.error(e);
+		}
+		return entityStats;
 	}
 	
 	@Override
@@ -284,8 +323,57 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 		return null;
 	}
+	
+	/**
+	 * Find all entities of a given type
+	 * @param entityTypeId - note: this is the same as the EntityInfo.getId();
+	 * @return
+	 */
+	private List<URI> findEntitybyEntityTypeId(String entityTypeId, RepositoryConnection conn){
+		List<URI> entityURIs = new LinkedList<URI>();
+		try {
+			if (entityTypeId != null && !entityTypeId.isEmpty()){
+				entityURIs.addAll(queryService.findEntityURIsByEntityType(entityTypeId, conn));
+			}
+		} catch (QueryEvaluationException e) {
+			log.error(e);
+		} catch (RepositoryException e) {
+			log.error(e);
+		} catch (MalformedQueryException e) {
+			log.error(e);
+		}
+		return entityURIs;
+	}
 
-	// for testing
+	/**
+	 * Find all relationships (i.e. anything that is a subProperty of
+	 * HAS_DIRECT_RELATIONSHIP or HAS_INDIRECT_RELATIONSHIP) associated with the
+	 * specific entity. NOTE: does not include the higher level relationships in
+	 * the returned list of relationship IDs.
+	 * 
+	 * @param entityTypeId
+	 *            - note: this is the same as the EntityInfo.getId();
+	 * @return
+	 */
+	private List<String> findAllRelationshipsFromEntity(URI entityUri, RepositoryConnection conn){
+		List<String> relationshipIds = new LinkedList<String>();
+		try {
+			if (entityUri != null){
+				relationshipIds.addAll(queryService.findAllRelationshipsFromEntity(entityUri, conn));
+			}
+		} catch (QueryEvaluationException e) {
+			log.error(e);
+		} catch (RepositoryException e) {
+			log.error(e);
+		} catch (MalformedQueryException e) {
+			log.error(e);
+		}
+		return relationshipIds;
+	}
+
+	/**
+	 * For testing only
+	 */
 	@SuppressWarnings("unused")
 	private void outputContents(){
 		try {
@@ -320,10 +408,67 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 	}
 
-	@Override
-	public Map<String, ? extends EntityStatistic> getEntityStatistics(
-			Set<String> entityInfoIds, MetadataModel model) {
-		// TODO: implement this
-		throw new UnsupportedOperationException();
+
+	
+	private class InternalEntityStatistic implements EntityStatistic {
+		private final EntityInfo entityInfo;
+		private int count = 0;
+		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
+
+		public InternalEntityStatistic(EntityInfo entityInfo) {
+			this.entityInfo = entityInfo;
+		}
+
+		public void handleRelationships(String relationshipId, RelationshipInfo info) {
+			InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
+			if (stat == null) {
+				stat = new InternalRelationshipStatistic(info);
+				relationshipStats.put(relationshipId, stat);
+			}
+			stat.incrementCount();
+		}
+
+		public void incrementCount() {
+			++count;
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public EntityInfo getEntityInfo() {
+			return entityInfo;
+		}
+
+		@Override
+		public Map<String, ? extends RelationshipStatistic> getRelationshipInfoStatistics() {
+			return Collections.unmodifiableMap(relationshipStats);
+		}
+		
+	}
+
+	private class InternalRelationshipStatistic implements RelationshipStatistic {
+		private final RelationshipInfo relationshipInfo;
+		private int count = 0;
+
+		public InternalRelationshipStatistic(RelationshipInfo relationshipInfo) {
+			this.relationshipInfo = relationshipInfo;
+		}
+
+		public void incrementCount() {
+			++count;
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public RelationshipInfo getRelationshipInfo() {
+			return relationshipInfo;
+		}
 	}
 }

@@ -88,6 +88,10 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
+    <dependency> <!-- needed by sesame HTTPRepository, TODO: remove if not using -->
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+    </dependency> 
     <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>wstx-asl</artifactId>
@@ -110,6 +114,21 @@
 		<artifactId>sesame-sail-memory</artifactId>
 		<type>jar</type>
    	</dependency>
+   	<dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-repository-http</artifactId>
+		<type>jar</type>
+   	</dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-queryresultio-binary</artifactId>
+		<type>jar</type>
+   	  </dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-runtime</artifactId>
+		<type>jar</type>
+   	  </dependency>
  	<dependency>
      	<!--  bridge to log4j from sesame log infrastructure -->
    		<groupId>org.slf4j</groupId>
