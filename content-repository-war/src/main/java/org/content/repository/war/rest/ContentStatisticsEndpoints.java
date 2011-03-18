@@ -46,10 +46,9 @@ public class ContentStatisticsEndpoints {
 	@GET
 	@Produces("text/xml")
 	@Path("/global")
-	public RepositoryStatisticsXMLResponse uploadContent() 
+	public RepositoryStatisticsXMLResponse getGlobalStatistics() 
 	{
 		LOG.info("Processing request for uploadContent()");
-
 		RepositoryStatisticsXMLResponse ret = new RepositoryStatisticsXMLResponse();
 
 		try 
@@ -65,8 +64,10 @@ public class ContentStatisticsEndpoints {
 			Iterator<String> keyItr = stats.keySet().iterator();
 			while(keyItr.hasNext())
 			{
-				EntityStatistic stat = stats.get(keyItr.next());
+				String key = keyItr.next();
+				EntityStatistic stat = stats.get(key);
 				
+				ret.setCount(key, stat);
 			}			
 		} 
 		finally
