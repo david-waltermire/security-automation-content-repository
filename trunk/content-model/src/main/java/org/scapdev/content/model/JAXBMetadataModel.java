@@ -99,6 +99,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		loadMetadata(init);
 	}
 
+	@Override
 	public Set<String> getEntityInfoIds() {
 		return entityIdToEntityMap.keySet();
 	}
