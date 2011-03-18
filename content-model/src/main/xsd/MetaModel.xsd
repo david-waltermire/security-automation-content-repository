@@ -289,27 +289,22 @@
   <xs:element name="document-model" type="DocumentModelType" abstract="true"/>
   <xs:complexType name="DocumentModelType">
     <xs:sequence>
-      <xs:element name="entity-containers">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="entity-container" type="EntityContainerType" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
+      <xs:element name="entity-containers" type="EntityContainersType">
       </xs:element>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="RequiredContainerDocumentModelType">
+  <xs:complexType name="EntityContainersType">
+    <xs:sequence>
+      <xs:element name="entity-container" type="EntityContainerType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="RequiredContainerDocumentModelType" abstract="true">
     <xs:complexContent>
       <xs:restriction base="DocumentModelType">
         <xs:sequence>
-          <xs:element name="entity-containers">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="entity-container" type="EntityContainerType" maxOccurs="unbounded"/>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="entity-containers" type="EntityContainersType"/>
         </xs:sequence>
       </xs:restriction>
     </xs:complexContent>

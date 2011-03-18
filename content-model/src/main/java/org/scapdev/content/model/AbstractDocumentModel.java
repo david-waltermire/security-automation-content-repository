@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.scapdev.content.model.jaxb.DocumentModelType;
 import org.scapdev.content.model.jaxb.EntityContainerType;
+import org.scapdev.content.model.jaxb.EntityContainersType;
 import org.scapdev.content.model.jaxb.EntityIdRefType;
 
 public abstract class AbstractDocumentModel<MODEL_TYPE extends DocumentModelType> implements DocumentModel {
@@ -48,7 +49,7 @@ public abstract class AbstractDocumentModel<MODEL_TYPE extends DocumentModelType
 	public Set<EntityInfo> getSupportedEntityInfos(MetadataModel model) {
 		Set<EntityInfo> result;
 		if (entityIdRefs == null) {
-			DocumentModelType.EntityContainers entityContainers = type.getEntityContainers();
+			EntityContainersType entityContainers = type.getEntityContainers();
 			if (entityContainers != null) {
 				result = new HashSet<EntityInfo>();
 				for (EntityContainerType entityContainerType : type.getEntityContainers().getEntityContainer()) {
