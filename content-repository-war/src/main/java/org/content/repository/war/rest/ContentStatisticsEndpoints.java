@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.content.repository.war.rest;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.content.repository.config.RepositoryConfiguration;
 import org.content.repository.war.rest.response.RepositoryStatisticsXMLResponse;
 import org.scapdev.content.core.ContentRepository;
+import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.model.MetadataModel;
 
 @Path("/statistics")
@@ -51,7 +56,18 @@ public class ContentStatisticsEndpoints {
 		{
 			ContentRepository cr = RepositoryConfiguration.INSTANCE.getRepo();
 			MetadataModel mm = cr.getMetadataModel();
-			ret.setNamespaceToPrefixMap(mm.getNamespaceToPrefixMap());
+			
+			Set<String> entityInfoIds = mm.getEntityInfoIds();
+			Map<String, ? extends EntityStatistic> stats = cr.queryStatistics(entityInfoIds);
+
+			// TODO: build response
+
+			Iterator<String> keyItr = stats.keySet().iterator();
+			while(keyItr.hasNext())
+			{
+				EntityStatistic stat = stats.get(keyItr.next());
+				
+			}			
 		} 
 		finally
 		{
