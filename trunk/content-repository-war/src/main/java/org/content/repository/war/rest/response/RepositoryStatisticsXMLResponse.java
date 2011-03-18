@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.log4j.Logger;
+import org.scapdev.content.core.query.EntityStatistic;
 
 @XmlType
 @XmlRootElement(name = "repositoryStatistics")
@@ -47,6 +48,7 @@ public class RepositoryStatisticsXMLResponse
 	private int ovalObjects;
 	private int ovalStates;
 	private int ovalVariables;
+	private int other;
 		
 	private HashMap<String, String> namespaceToPrefixMap = new HashMap<String, String>();
 	
@@ -56,15 +58,34 @@ public class RepositoryStatisticsXMLResponse
 		
 	}
 	
-	public void setNamespaceToPrefixMap(Map<String, String> namespaceToPrefixMap) {
-		
-		if(namespaceToPrefixMap == null)
+	public void setCount(String key, EntityStatistic stat)
+	{
+		if(key.equals("urn:scap-content:entity:org.mitre.oval:test"))
 		{
-			return;
+			ovalTests = stat.getCount();
 		}
-		
-		this.namespaceToPrefixMap.putAll(namespaceToPrefixMap);
-	}	
+		else if(key.equals("urn:scap-content:entity:org.mitre.oval:definition"))
+		{
+			ovalDefinitions = stat.getCount();
+		}
+		else if(key.equals("urn:scap-content:entity:org.mitre.oval:object"))
+		{
+			ovalObjects = stat.getCount();
+		}
+		else if(key.equals("urn:scap-content:entity:org.mitre.oval:state"))
+		{
+			ovalObjects = stat.getCount();
+		}
+		else if(key.equals("urn:scap-content:entity:org.mitre.oval:variable"))
+		{
+			ovalObjects = stat.getCount();
+		}
+		else
+		{
+			LOG.info("Adding unhandled count for key " + key);
+			other += stat.getCount();
+		}
 
+	}
 	
 }
