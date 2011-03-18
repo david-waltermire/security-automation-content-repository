@@ -35,6 +35,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -200,6 +201,99 @@ public class TripleStoreQueryService {
 	}
 	
 	/**
+	 * Find all entities of a given type
+	 * @param entityTypeId - note: this is the same as the EntityInfo.getId();
+	 * @param conn
+	 * @return
+	 * @throws QueryEvaluationException 
+	 * @throws MalformedQueryException 
+	 * @throws RepositoryException 
+	 */
+	List<URI> findEntityURIsByEntityType(String entityTypeId, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
+		String entityURIVariableName = "_e";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateEntitiesFromEntityTypeSearchString(entityTypeId, entityURIVariableName));
+	    TupleQueryResult result = tupleQuery.evaluate();
+	    List<URI> relatedEntityURIs = new LinkedList<URI>();
+	    try {
+		    BindingSet resultSet = null;
+		    while (result.hasNext()){
+		    	resultSet = result.next(); 
+		    	Value entityURI = resultSet.getValue(entityURIVariableName);
+		    	relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
+		    }
+	    } finally {
+	    	result.close();
+	    }
+	    return relatedEntityURIs;
+	}
+	
+	/**
+	 * Find all relationships (i.e. anything that is a subProperty of
+	 * HAS_DIRECT_RELATIONSHIP or HAS_INDIRECT_RELATIONSHIP) associated with the
+	 * specific entity. NOTE: does not include the higher level relationships in
+	 * the returned list of relationship IDs.
+	 * @param entityUri
+	 * @param conn
+	 * @return the string values of the predicate URI (should map to URN ID of Relationship)
+	 * @throws MalformedQueryException 
+	 * @throws RepositoryException 
+	 * @throws QueryEvaluationException 
+	 */
+	List<String> findAllRelationshipsFromEntity(URI entityUri,
+			RepositoryConnection conn) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+		String relationshipPredicateVariableName = "_p";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelationshipsFromEntitySearchString(relationshipPredicateVariableName, entityUri));
+	    TupleQueryResult result = tupleQuery.evaluate();
+	    List<String> relationshipIds = new LinkedList<String>();
+	    try {
+		    BindingSet resultSet = null;
+		    while (result.hasNext()){
+		    	resultSet = result.next(); 
+		    	Value relationshipPredicate = resultSet.getValue(relationshipPredicateVariableName);
+		    	relationshipIds.add(relationshipPredicate.stringValue());
+		    }
+	    } finally {
+	    	result.close();
+	    }
+	    return relationshipIds;
+	}
+	
+	/**
+	 * Generate Query to find all relationships (i.e. anything that is a subProperty of
+	 * HAS_DIRECT_RELATIONSHIP or HAS_INDIRECT_RELATIONSHIP) associated with the
+	 * specific entity. NOTE: does not include the higher level relationships in
+	 * the returned list of relationship IDs.
+	 * 
+	 * @param relationshipPredicateVariableName
+	 * @param entityURI
+	 * @return
+	 */
+	private String generateRelationshipsFromEntitySearchString(
+			String relationshipPredicateVariable,
+			URI entityURI) {
+		String unusedObject = "_o";
+		String topLevelPredicateVariableName = "_topLevelPredicate";
+		
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT ").append(relationshipPredicateVariable).append(" ").append(NEW_LINE);
+		//_e relationshipPredicateVariable _o
+		queryBuilder.append("FROM {\"").append(entityURI).append("\"} ");
+		queryBuilder.append(relationshipPredicateVariable).append(" ");
+		queryBuilder.append("{").append(unusedObject).append("}").append(",").append(NEW_LINE);
+		//relationshipPredicateVariable rdfs:subPropertyOf _topLevelPredicate
+		queryBuilder.append("{").append(relationshipPredicateVariable).append("}").append(" ");
+		queryBuilder.append("<").append(RDFS.SUBPROPERTYOF).append("> ");
+		queryBuilder.append("{").append(topLevelPredicateVariableName).append("}").append(NEW_LINE);
+		// WHERE _topLevelPredicate = HAS_INDIRECT_REL OR HAS_DIRECT_REL
+		queryBuilder.append("WHERE").append(NEW_LINE);
+		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
+		queryBuilder.append("OR").append(NEW_LINE);
+		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
+		
+		return queryBuilder.toString();
+	}
+
+	/**
 	 * Generate query to Find all entityURIs associated with the specific
 	 * boundary objects, filtered based on entity type.
 	 * 
@@ -240,6 +334,23 @@ public class TripleStoreQueryService {
 		queryBuilder.append(" AND ").append(NEW_LINE);
 		queryBuilder.append(boundaryObjectValueVariable).append(" IN ").append(convertStringSetForInClause(boundaryObjectValues)).append(NEW_LINE);
 		
+		return queryBuilder.toString();
+	}
+	
+	/**
+	 * Generate query to Find all entityURIs associated with the specific entityType
+	 * @param entityType
+	 * @param entityURIVariableName
+	 * @return
+	 */
+	private String generateEntitiesFromEntityTypeSearchString(
+			String entityType, String entityURIVariableName) {
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
+		//_e hasEntityType {entityType};
+		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
+		queryBuilder.append("<").append(ontology.HAS_ENTITY_TYPE.URI).append("> ");
+		queryBuilder.append("{\"").append(entityType).append("\"}");
 		return queryBuilder.toString();
 	}
 	
@@ -471,5 +582,10 @@ public class TripleStoreQueryService {
 			super();
 		}
 	}
+
+	
+
+
+
 	
 }

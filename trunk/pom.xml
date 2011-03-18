@@ -162,6 +162,23 @@
 		<artifactId>sesame-sail-memory</artifactId>
 		<version>${org.openrdf.sesame.version}</version>
       </dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-repository-http</artifactId>
+		<version>${org.openrdf.sesame.version}</version>
+   	  </dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-queryresultio-binary</artifactId>
+		<version>${org.openrdf.sesame.version}</version>
+   	  </dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-runtime</artifactId>
+		<version>${org.openrdf.sesame.version}</version>
+   	  </dependency>
+   	  
+   	  
       <dependency>
       	<!--  bridge to log4j from sesame log infrastructure -->
     	<groupId>org.slf4j</groupId>

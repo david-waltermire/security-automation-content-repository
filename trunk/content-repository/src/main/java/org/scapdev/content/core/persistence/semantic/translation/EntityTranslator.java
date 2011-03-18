@@ -127,7 +127,8 @@ public class EntityTranslator extends
 		// first handle the basic entity assertion
 		URI entityUri = genInstanceURI(contentId);
 		target.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
-		target.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(contentId)));
+		//for now just use first key value as label
+		target.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(entity.getKey().getIdToValueMap().values().iterator().next())));
 		target.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
 		target.add(factory.createStatement(entityUri, ontology.HAS_ENTITY_TYPE.URI, factory.createLiteral(entity.getEntityInfo().getId())));
 		

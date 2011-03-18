@@ -29,8 +29,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -89,6 +91,10 @@ public class ContentRepositoryTestBase {
 	public void importUSGCBWin7OVALContent() {
 		File file = new File("src/test/xml/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
 		importFile(file);
+//		Set<String> statIds = new HashSet<String>();
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:definition");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:variable");
+//		repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
 	}
 
 	@Test
