@@ -193,7 +193,24 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 		return entityStats;
 	}
-	
+
+	/**
+	 * <p>
+	 * TODO: NOTE: there is an issue in some cases where an Entity will be sent
+	 * in containing duplicate relationships. At present only the first of the
+	 * set of duplicates is added; from the context of the triple store this is
+	 * the only useful behavior. The duplicate relationships make sense within
+	 * the context of a larger XML document, but the abstraction of the
+	 * metamodel removes that context, and therefore removes the usefulness of
+	 * the duplicate relationships. An example of this is the
+	 * "urn:scap-content:relationship:org.mitre.oval:criterion" Keyed
+	 * relationship in an Oval definition. An oval def. may have multiple
+	 * criterion relationships that are all equal (i.e. reference same test)
+	 * except for the fact that they appear under distinct criteria operators;
+	 * since the metamodel does not capture this extra context the relationships
+	 * just appear to be exactly the same.  WE NEED TO FIGURE OUT HOW TO HANDLE THIS.
+	 * </p>
+	 */
 	@Override
 	public void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model) {
 		try {
@@ -251,7 +268,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 							incompleteStatement.getSubject(),
 							incompleteStatement.getPredicate(),
 							relatedEntityURI), context);
-				}
+				} 
 			}
 		}
 	}
