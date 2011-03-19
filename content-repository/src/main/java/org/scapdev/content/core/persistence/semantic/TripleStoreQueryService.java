@@ -277,12 +277,12 @@ public class TripleStoreQueryService {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append("SELECT ").append(relationshipPredicateVariable).append(" ").append(NEW_LINE);
 		//_e relationshipPredicateVariable _o
-		queryBuilder.append("FROM {\"").append(entityURI).append("\"} ");
+		queryBuilder.append("FROM {<").append(entityURI).append(">} ");
 		queryBuilder.append(relationshipPredicateVariable).append(" ");
 		queryBuilder.append("{").append(unusedObject).append("}").append(",").append(NEW_LINE);
 		//relationshipPredicateVariable rdfs:subPropertyOf _topLevelPredicate
 		queryBuilder.append("{").append(relationshipPredicateVariable).append("}").append(" ");
-		queryBuilder.append("<").append(RDFS.SUBPROPERTYOF).append("> ");
+		queryBuilder.append(" <").append(RDFS.SUBPROPERTYOF).append("> ");
 		queryBuilder.append("{").append(topLevelPredicateVariableName).append("}").append(NEW_LINE);
 		// WHERE _topLevelPredicate = HAS_INDIRECT_REL OR HAS_DIRECT_REL
 		queryBuilder.append("WHERE").append(NEW_LINE);
