@@ -119,10 +119,10 @@ public class ContentRepositoryTestBase {
 		File file = new File("target/content/nvdcve-2.0-2011.xml");
 		importFile(file);
 		
-		Set<String> statIds = new HashSet<String>();
-		statIds.add("urn:scap-content:entity:gov.nist.scap:vulnerability-0.4-vuln");
-		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
-		printStatInfo(stats);
+//		Set<String> statIds = new HashSet<String>();
+//		statIds.add("urn:scap-content:entity:gov.nist.scap:vulnerability-0.4-vuln");
+//		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
+//		printStatInfo(stats);
 	}
 	
 	@Test
