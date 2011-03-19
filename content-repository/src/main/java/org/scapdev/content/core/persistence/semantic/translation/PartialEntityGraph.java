@@ -114,6 +114,34 @@ public class PartialEntityGraph {
 		public URI getSubject() {
 			return subject;
 		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj){
+				return true;
+			}
+			if (obj instanceof IncompleteStatement){
+				IncompleteStatement that = (IncompleteStatement)obj;
+				return this.subject.equals(that.subject) && this.predicate.equals(that.predicate) && this.relatedEntityKey.equals(relatedEntityKey);
+			}
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			int result = 1;
+			result = 37 * result + subject.hashCode();
+			result = 37 * result + predicate.hashCode();
+			result = 37 * result + relatedEntityKey.hashCode();
+			return result;
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder b = new StringBuilder();
+			b.append(subject.stringValue()).append(" ").append(predicate.stringValue()).append(" ").append(relatedEntityKey.toString());
+			return b.toString();
+		}
 	}
 	
 }

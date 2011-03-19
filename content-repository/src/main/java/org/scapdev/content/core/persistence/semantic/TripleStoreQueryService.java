@@ -241,6 +241,7 @@ public class TripleStoreQueryService {
 	 */
 	List<String> findAllRelationshipsFromEntity(URI entityUri,
 			RepositoryConnection conn) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+		
 		String relationshipPredicateVariableName = "_p";
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelationshipsFromEntitySearchString(relationshipPredicateVariableName, entityUri));
 	    TupleQueryResult result = tupleQuery.evaluate();
