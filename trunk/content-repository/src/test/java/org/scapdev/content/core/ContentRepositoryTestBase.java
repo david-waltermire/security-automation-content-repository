@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -41,7 +42,9 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Test;
+import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.core.query.QueryResult;
+import org.scapdev.content.core.query.RelationshipStatistic;
 import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
@@ -85,22 +88,41 @@ public class ContentRepositoryTestBase {
 	public void importRedhatPatchContent() {
 		File file = new File("target/content/com.redhat.rhsa-all.xml");
 		importFile(file);
+		
+//		Set<String> statIds = new HashSet<String>();
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:definition");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:variable");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:test");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:object");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:state");
+//		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
+//		printStatInfo(stats);
 	}
 
 	@Test
 	public void importUSGCBWin7OVALContent() {
 		File file = new File("src/test/xml/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
 		importFile(file);
+		
 //		Set<String> statIds = new HashSet<String>();
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:definition");
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:variable");
-//		repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:test");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:object");
+//		statIds.add("urn:scap-content:entity:org.mitre.oval:state");
+//		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
+//		printStatInfo(stats);
 	}
 
 	@Test
 	public void importNVDVuln2011Content() {
 		File file = new File("target/content/nvdcve-2.0-2011.xml");
 		importFile(file);
+		
+		Set<String> statIds = new HashSet<String>();
+		statIds.add("urn:scap-content:entity:gov.nist.scap:vulnerability-0.4-vuln");
+		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
+		printStatInfo(stats);
 	}
 	
 	@Test
@@ -142,5 +164,20 @@ public class ContentRepositoryTestBase {
     	writer.write(result, stringWriter);
     	stringWriter.flush();
 		log.info(stringWriter.toString());
+	}
+	
+	private void printStatInfo(Map<String, ? extends EntityStatistic> stats){
+		log.info("printing entity stats: ");
+		for (Map.Entry<String, ? extends EntityStatistic> entry : stats.entrySet()){
+			log.info("Entity Key: " + entry.getKey());
+			EntityStatistic stat = entry.getValue();
+			log.info("Entity count: " + stat.getCount());
+			log.info("printing entity relationship stats: ");
+			for (Map.Entry<String, ? extends RelationshipStatistic> relStatEntry : stat.getRelationshipInfoStatistics().entrySet()){
+				log.info("Relationship Key: " + relStatEntry.getKey());
+				RelationshipStatistic relStat = relStatEntry.getValue();
+				log.info("Relationship count: "+ relStat.getCount());
+			}
+		}
 	}
 }
