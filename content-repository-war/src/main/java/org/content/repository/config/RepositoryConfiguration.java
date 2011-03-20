@@ -78,8 +78,8 @@ public enum RepositoryConfiguration {
 		try
 		{
 			repo = new ContentRepository();
-			HybridContentPersistenceManager manager = new MemoryResidentHybridContentPersistenceManager();
-			repo.setContentPersistenceManager(manager);
+//			HybridContentPersistenceManager manager = new MemoryResidentHybridContentPersistenceManager();
+//			repo.setContentPersistenceManager(manager);
 		}
 		catch(Exception e)
 		{
