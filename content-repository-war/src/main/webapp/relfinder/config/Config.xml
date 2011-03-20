@@ -40,8 +40,8 @@
       <maxRelationLength>2</maxRelationLength>
     </endpoint>
     <endpoint>
-      <name>Home SCAP CMS (from URL parameters)</name>
-      <abbreviation>scapCMS1300560881618</abbreviation>
+      <name>SCAPCMS</name>
+      <abbreviation>scapCMSfdafd</abbreviation>
       <endpointURI>http://localhost:8080/openrdf-sesame/repositories/scapCmsTest</endpointURI>
       <dontAppendSPARQL>true</dontAppendSPARQL>
       <isVirtuoso>false</isVirtuoso>

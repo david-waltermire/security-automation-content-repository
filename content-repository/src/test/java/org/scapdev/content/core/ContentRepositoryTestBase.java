@@ -29,11 +29,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -166,6 +164,7 @@ public class ContentRepositoryTestBase {
 		log.info(stringWriter.toString());
 	}
 	
+	@SuppressWarnings("unused")
 	private void printStatInfo(Map<String, ? extends EntityStatistic> stats){
 		log.info("printing entity stats: ");
 		for (Map.Entry<String, ? extends EntityStatistic> entry : stats.entrySet()){

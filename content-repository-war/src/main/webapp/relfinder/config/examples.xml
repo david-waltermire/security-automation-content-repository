@@ -2,92 +2,53 @@
 
 <data>
 	<example>
-		<endpoint>dbp</endpoint>
+		<endpoint>scapCMSfdafd</endpoint>
 		<object>
-			<label>Albert Einstein</label>
-			<uri>http://dbpedia.org/resource/Albert_Einstein</uri>
+			<label>CCE-9222-1</label>
+			<uri>http://scap.nist.gov/cms/individuals#CCE-9222-1</uri>
 		</object>
 		<object>
-			<label>Kurt Gödel</label>
-			<uri>http://dbpedia.org/resource/Kurt_G%C3%B6del</uri>
+			<label>oval:gov.nist.usgcb.windowsseven:ste:120</label>
+			<uri>http://scap.nist.gov/cms/individuals#18557</uri>
 		</object>
 	</example>
+	
+			<example>
+		<endpoint>scapCMSfdafd</endpoint>
+		<object>
+			<label>cpe:/o:microsoft:windows_7</label>
+			<uri>http://scap.nist.gov/cms/individuals#cpe:/o:microsoft:windows_7</uri>
+		</object>
+		<object>
+			<label>oval:gov.nist.usgcb.windowsseven:def:204</label>
+			<uri>http://scap.nist.gov/cms/individuals#17708</uri>
+		</object>
+	</example>
+	
+	
 	<example>
-		<endpoint>dbp</endpoint>
+		<endpoint>scapCMSfdafd</endpoint>
 		<object>
-			<label>Albert Einstein</label>
-			<uri>http://dbpedia.org/resource/Albert_Einstein</uri>
+			<label>cpe:/a:adobe:shockwave_player:2.0</label>
+			<uri>http://scap.nist.gov/cms/individuals#cpe:/a:adobe:shockwave_player:2.0</uri>
 		</object>
 		<object>
-			<label>Stuttgart</label>
-			<uri>http://dbpedia.org/resource/Stuttgart</uri>
-		</object>
-	</example>
-	<example>
-		<endpoint>dbp</endpoint>
-		<object>
-			<label>Leipzig</label>
-			<uri>http://dbpedia.org/resource/Leipzig</uri>
-		</object>
-		<object>
-			<label>Berlin</label>
-			<uri>http://dbpedia.org/resource/Berlin</uri>
+			<label>CWE-119</label>
+			<uri>http://scap.nist.gov/cms/individuals#CWE-119</uri>
 		</object>
 	</example>
-	<example>
-		<endpoint>dbp</endpoint>
+	
+			<example>
+		<endpoint>scapCMSfdafd</endpoint>
 		<object>
-			<label>Duisburg</label>
-			<uri>http://dbpedia.org/resource/Duisburg</uri>
+			<label>cpe:/o:microsoft:windows_7</label>
+			<uri>http://scap.nist.gov/cms/individuals#cpe:/o:microsoft:windows_7</uri>
 		</object>
 		<object>
-			<label>Essen</label>
-			<uri>http://dbpedia.org/resource/Essen</uri>
-		</object>
-	</example>
-	<example>
-		<endpoint>dbp</endpoint>
-		<object>
-			<label>Fiat</label>
-			<uri>http://dbpedia.org/resource/Fiat</uri>
-		</object>
-		<object>
-			<label>Ferrari</label>
-			<uri>http://dbpedia.org/resource/Ferrari</uri>
-		</object>
-		<object>
-			<label>Maserati</label>
-			<uri>http://dbpedia.org/resource/Maserati</uri>
+			<label>entity</label>
+			<uri>http://scap.nist.gov/cms/model#entity</uri>
 		</object>
 	</example>
-	<example>
-		<endpoint>dbp</endpoint>
-		<object>
-			<label>BMW</label>
-			<uri>http://dbpedia.org/resource/BMW</uri>
-		</object>
-		<object>
-			<label>Porsche</label>
-			<uri>http://dbpedia.org/resource/Porsche</uri>
-		</object>
-		<object>
-			<label>Volkswagen</label>
-			<uri>http://dbpedia.org/resource/Volkswagen</uri>
-		</object>
-		<object>
-			<label>MAN SE</label>
-			<uri>http://dbpedia.org/resource/MAN_SE</uri>
-		</object>
-	</example>
-	<example>
-		<endpoint>lmdb</endpoint>
-		<object>
-			<label>Kill Bill</label>
-			<uri>http://data.linkedmdb.org/resource/film/716</uri>
-		</object>
-		<object>
-			<label>Pulp Fiction</label>
-			<uri>http://data.linkedmdb.org/resource/film/77</uri>
-		</object>
-	</example>
+	
+	
 </data>
