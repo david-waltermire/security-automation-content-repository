@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
+import org.apache.commons.lang.WordUtils;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -170,7 +172,7 @@ public class MetaDataOntology {
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : indirectRelationshipIds){
 			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
-			Construct relationshipConstruct = new Construct(factory.createURI(id), id);
+			Construct relationshipConstruct = new Construct(factory.createURI(id), extractLabelFromRelId(id));
 			indirectRelationships.put(id, relationshipConstruct);
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_INDIRECT_RELATIONSHIP_TO.URI));
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.LABEL, factory.createLiteral(relationshipConstruct.LABEL)));
@@ -186,7 +188,7 @@ public class MetaDataOntology {
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : directRelationshipIds){
 			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
-			Construct relationshipConstruct = new Construct(factory.createURI(id), id);
+			Construct relationshipConstruct = new Construct(factory.createURI(id), extractLabelFromRelId(id));
 			directRelationships.put(id, relationshipConstruct);
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_DIRECT_RELATIONSHIP_TO.URI));
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.LABEL, factory.createLiteral(relationshipConstruct.LABEL)));
@@ -194,6 +196,25 @@ public class MetaDataOntology {
 		return statements;
 	}
 	
+	/**
+	 * Helper method to extract RDFish label from ID of form:
+	 * "urn:scap-content:relationship:org.mitre.oval:object-component"
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private String extractLabelFromRelId(String id) {
+		int pos = id.lastIndexOf(":") + 1;
+		StringTokenizer tok = new StringTokenizer(id.substring(pos), "-");
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append("has");
+		while (tok.hasMoreElements()){
+			String element = (String)tok.nextElement();
+			labelBuilder.append(WordUtils.capitalize(element));
+		}
+		return labelBuilder.toString();
+	}
+
 	private List<Statement> createClass(URI classUri, String label){
 		List<Statement> statements = new LinkedList<Statement>();
 		statements.add(factory.createStatement(classUri, RDF.TYPE, RDFS.CLASS));
@@ -204,7 +225,7 @@ public class MetaDataOntology {
 	private List<Statement> createPredicate(URI predicateUri, String label){
 		List<Statement> statements = new LinkedList<Statement>();
 		statements.add(factory.createStatement(predicateUri, RDF.TYPE, RDF.PROPERTY));
-		statements.add(factory.createStatement(predicateUri, RDFS.LABEL, factory.createLiteral("label")));
+		statements.add(factory.createStatement(predicateUri, RDFS.LABEL, factory.createLiteral(label)));
 		return statements;
 	}
 	
