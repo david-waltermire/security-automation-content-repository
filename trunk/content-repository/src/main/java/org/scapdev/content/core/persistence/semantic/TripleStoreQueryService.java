@@ -296,7 +296,7 @@ public class TripleStoreQueryService {
 
 	/**
 	 * Generate query to Find all entityURIs associated with the specific
-	 * boundary objects, filtered based on entity type.
+	 * boundary objects, filtered based on entity type.  If entityTypes is empty, query will match on all entityTypes.
 	 * 
 	 * @param boudaryObjectType
 	 *            - type of boundary object to find on the graph
@@ -331,8 +331,10 @@ public class TripleStoreQueryService {
 		queryBuilder.append("{").append(boundaryObjectValueVariable).append("}").append(" ").append(NEW_LINE);
 		// WHERE
 		queryBuilder.append("WHERE").append(NEW_LINE);
-		queryBuilder.append(entityTypeVariable).append(" IN ").append(convertStringSetForInClause(entityTypes)).append(NEW_LINE);
-		queryBuilder.append(" AND ").append(NEW_LINE);
+		if (!entityTypes.isEmpty()){
+			queryBuilder.append(entityTypeVariable).append(" IN ").append(convertStringSetForInClause(entityTypes)).append(NEW_LINE);
+			queryBuilder.append(" AND ").append(NEW_LINE);
+		}
 		queryBuilder.append(boundaryObjectValueVariable).append(" IN ").append(convertStringSetForInClause(boundaryObjectValues)).append(NEW_LINE);
 		
 		return queryBuilder.toString();
