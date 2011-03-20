@@ -72,11 +72,11 @@ public class RepositoryStatisticsXMLResponse
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:state"))
 		{
-			ovalObjects += stat.getCount();
+			ovalStates += stat.getCount();
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:variable"))
 		{
-			ovalObjects += stat.getCount();
+			ovalVariables += stat.getCount();
 		}
 		else
 		{
