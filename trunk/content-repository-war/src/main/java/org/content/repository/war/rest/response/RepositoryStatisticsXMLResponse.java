@@ -49,9 +49,7 @@ public class RepositoryStatisticsXMLResponse
 	private int ovalStates;
 	private int ovalVariables;
 	private int other;
-		
-	private HashMap<String, String> namespaceToPrefixMap = new HashMap<String, String>();
-	
+			
 	// required by jaxb
 	public RepositoryStatisticsXMLResponse()
 	{
@@ -62,23 +60,23 @@ public class RepositoryStatisticsXMLResponse
 	{
 		if(key.equals("urn:scap-content:entity:org.mitre.oval:test"))
 		{
-			ovalTests = stat.getCount();
+			ovalTests += stat.getCount();
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:definition"))
 		{
-			ovalDefinitions = stat.getCount();
+			ovalDefinitions += stat.getCount();
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:object"))
 		{
-			ovalObjects = stat.getCount();
+			ovalObjects += stat.getCount();
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:state"))
 		{
-			ovalObjects = stat.getCount();
+			ovalObjects += stat.getCount();
 		}
 		else if(key.equals("urn:scap-content:entity:org.mitre.oval:variable"))
 		{
-			ovalObjects = stat.getCount();
+			ovalObjects += stat.getCount();
 		}
 		else
 		{
