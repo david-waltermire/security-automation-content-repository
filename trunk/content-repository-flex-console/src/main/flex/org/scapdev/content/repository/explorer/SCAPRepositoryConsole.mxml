@@ -64,13 +64,13 @@
 	<s:layout>
 		<s:HorizontalLayout paddingTop="5" paddingLeft="5" requestedColumnCount="2" gap="5" verticalAlign="justify" paddingBottom="5" paddingRight="5"/>
 	</s:layout>
-	<s:Panel x="0" y="66" id="navPanel" title="Navigation" textAlign="center" includeIn="BrowseContentState,ContentStatisticsState,QueryContentState,UploadContentState">
+	<s:Panel x="0" y="66" id="navPanel" title="Navigation" textAlign="center" includeIn="BrowseContentState,ContentStatisticsState,QueryContentState,UploadContentState,UNIMPLEMENTED">
 		<s:layout>
 			<s:VerticalLayout gap="10" horizontalAlign="center" paddingTop="10"/>
 		</s:layout>
-		<s:Button width="118" id="btnNavStatistics" label="Repository Statistics" x="10" y="10" click="btnNavStatistics_clickHandler(event)"/>
+		<s:Button width="118" id="btnNavStatistics" label="Repository Statistics" x="10" y="10" click="btnNavStatistics_clickHandler(event)" includeIn="UNIMPLEMENTED"/>
 		<s:Button label="Upload Content" id="btnNavUpload" width="119" x="9" y="42" click.ContentStatisticsState="btnNavUpload_clickHandler(event)" click.BrowseContentState="btnNavUpload_clickHandler(event)" click.QueryContentState="btnNavUpload_clickHandler(event)" label.ContentStatisticsState="Upload Content" label.UploadContentState="Upload Content" label.BrowseContentState="Upload Content" label.QueryContentState="Upload Content"/>
-		<s:Button width="118" id="btnNavBrowse" label="Browse Content" x="10" y="74" click="btnNavBrowse_clickHandler(event)"/>
+		<s:Button width="118" id="btnNavBrowse" label="Browse Content" x="10" y="74" click="btnNavBrowse_clickHandler(event)" includeIn="UNIMPLEMENTED"/>
 		<s:Button label="Query" width="118" id="btnNavQuery" click="btnNavQuery_clickHandler(event)" x="10" y="106"/>
 	</s:Panel>
 	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="68" right="5" id="contentUploadPage" includeIn="UploadContentState">
