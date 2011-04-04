@@ -488,4 +488,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			return relationshipInfo;
 		}
 	}
+
+	@Override
+	public void shutdown() {
+		// TODO: Implement me
+	}
 }

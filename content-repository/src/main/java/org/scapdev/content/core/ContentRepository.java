@@ -226,6 +226,7 @@ public class ContentRepository {
 	 */
 	public void shutdown() {
 		jaxbEntityProcessor.shutdown();
+		persistenceContext.getContentPersistenceManager().shutdown();
 	}
 
 	/**

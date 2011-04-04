@@ -75,4 +75,10 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return metadataStore.getEntityStatistics(entityInfoIds, model);
 	}
 
+	@Override
+	public void shutdown() {
+		metadataStore.shutdown();
+		contentStore.shutdown();
+	}
+
 }

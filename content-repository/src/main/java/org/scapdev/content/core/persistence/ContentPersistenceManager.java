@@ -47,4 +47,5 @@ public interface ContentPersistenceManager {
 	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
 	void storeEntities(List<? extends Entity> entities, MetadataModel model) throws ContentException;
 	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, MetadataModel model);
+	void shutdown();
 }

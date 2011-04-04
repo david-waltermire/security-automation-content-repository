@@ -193,4 +193,8 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 			return relationshipInfo;
 		}
 	}
+
+	@Override
+	public void shutdown() {
+	}
 }

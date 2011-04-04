@@ -78,4 +78,8 @@ public class MemoryResidentContentStore implements ContentStore {
 			return MemoryResidentContentStore.this.getContent(contentId, model);
 		}
 	}
+
+	@Override
+	public void shutdown() {
+	}
 }
