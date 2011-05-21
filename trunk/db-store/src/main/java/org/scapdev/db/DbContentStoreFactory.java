@@ -6,7 +6,7 @@ import org.scapdev.content.core.persistence.hybrid.ContentStoreFactory;
 	
 public class DbContentStoreFactory implements ContentStoreFactory {
 	
-	static DbContentStore INSTANCE = null;
+	private static DbContentStore INSTANCE = null;
 
 	public ContentStore newContentStore() {
 		if (INSTANCE == null) {

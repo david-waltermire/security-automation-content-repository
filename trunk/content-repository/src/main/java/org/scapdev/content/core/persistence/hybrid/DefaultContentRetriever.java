@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,19 +27,17 @@ import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.MetadataModel;
 
-public abstract class AbstractContentRetriever implements ContentRetriever {
-	public String contentId;
-	public MetadataModel model;
+public class DefaultContentRetriever extends AbstractContentRetriever {
+	private ContentStore contentStore;
 
-	public AbstractContentRetriever(String contentId, MetadataModel model) {
-		this.contentId = contentId;
-		this.model = model;
+	public DefaultContentRetriever(String contentId, MetadataModel model, ContentStore contentStore) {
+		super(contentId, model);
+		this.contentStore = contentStore;
 	}
 
 	@Override
-	public JAXBElement<Object> getContent() {
-		return getContentInternal(contentId, model);
+	protected JAXBElement<Object> getContentInternal(String contentId,
+			MetadataModel model) {
+		return contentStore.getContent(contentId, model);
 	}
-
-	protected abstract JAXBElement<Object> getContentInternal(String contentId, MetadataModel model);
 }

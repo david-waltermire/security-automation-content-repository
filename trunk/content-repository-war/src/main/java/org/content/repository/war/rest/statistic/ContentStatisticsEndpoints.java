@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.content.repository.war.rest;
+package org.content.repository.war.rest.statistic;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +32,6 @@ import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
 import org.content.repository.config.RepositoryConfiguration;
-import org.content.repository.war.rest.response.RepositoryStatisticsXMLResponse;
 import org.scapdev.content.core.ContentRepository;
 import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.model.MetadataModel;
@@ -58,17 +56,9 @@ public class ContentStatisticsEndpoints {
 			
 			Set<String> entityInfoIds = mm.getEntityInfoIds();
 			Map<String, ? extends EntityStatistic> stats = cr.queryStatistics(entityInfoIds);
-
-			// TODO: build response
-
-			Iterator<String> keyItr = stats.keySet().iterator();
-			while(keyItr.hasNext())
-			{
-				String key = keyItr.next();
-				EntityStatistic stat = stats.get(key);
-				
-				ret.setCount(key, stat);
-			}			
+			for (EntityStatistic stat : stats.values()) {
+				ret.add(stat);
+			}
 		} 
 		finally
 		{

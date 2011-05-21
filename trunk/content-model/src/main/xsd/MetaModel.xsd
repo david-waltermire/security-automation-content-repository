@@ -289,7 +289,7 @@
   <xs:element name="document-model" type="DocumentModelType" abstract="true"/>
   <xs:complexType name="DocumentModelType">
     <xs:sequence>
-      <xs:element name="entity-containers" type="EntityContainersType">
+      <xs:element name="entity-containers" type="EntityContainersType" minOccurs="0">
       </xs:element>
     </xs:sequence>
   </xs:complexType>

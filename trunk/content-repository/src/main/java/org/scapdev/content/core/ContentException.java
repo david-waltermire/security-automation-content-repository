@@ -25,9 +25,7 @@ package org.scapdev.content.core;
 
 public class ContentException extends RuntimeException {
 
-	/**
-	 * 
-	 */
+	/** the serial version UID  */
 	private static final long serialVersionUID = 1L;
 
 	public ContentException() {

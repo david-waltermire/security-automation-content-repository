@@ -21,7 +21,7 @@
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
 			<!-- ; separated list of package names to look in -->
-			<param-value>org.content.repository.war.rest;org.content.repository.war.rest.oval</param-value>
+			<param-value>org.content.repository.war.rest;org.content.repository.war.rest.oval;org.content.repository.war.rest.query;org.content.repository.war.rest.statistic</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>

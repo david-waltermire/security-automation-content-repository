@@ -19,17 +19,15 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
-import org.scapdev.content.core.persistence.hybrid.AbstractContentRetriever;
-import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
-import org.scapdev.content.core.persistence.hybrid.ContentStore;
+import org.scapdev.content.core.persistence.ContentPersistenceException;
+import org.scapdev.content.core.persistence.hybrid.AbstractContentStore;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.MetadataModel;
-import net.sourceforge.jtds.jdbc.Driver;
-//import com.microsoft.jdbc.sqlserver.SQLServerDriver;
 
 
-public class DbContentStore implements ContentStore {
+public class DbContentStore extends AbstractContentStore {
 	
+	@SuppressWarnings("unused")
 	private static final Properties env = new Properties();
 	private static final Logger LOG = Logger.getLogger(DbContentStore.class);
 	private java.sql.Driver driver =  new net.sourceforge.jtds.jdbc.Driver();
@@ -40,8 +38,7 @@ public class DbContentStore implements ContentStore {
 //			Class.forName("com.microsoft.jdbc.sqlserver.SQLServerDriver");
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			System.out.println("Can't load MS SQL Server JDBC Driver com.microsoft.jdbc.sqlserver.SQLServerDriver");
-			e.printStackTrace();
+			LOG.error("Can't load MS SQL Server JDBC Driver com.microsoft.jdbc.sqlserver.SQLServerDriver", e);
 		}
 	}
 	
@@ -52,12 +49,13 @@ public class DbContentStore implements ContentStore {
 			System.out.println("Trying connection URL: " + urlString);
 			conn = DriverManager.getConnection(urlString, "sa", "adminadmin");
 		} catch (SQLException e) {
-			System.out.println("Can't create database connection");
-			e.printStackTrace();
+			LOG.error("Can't create database connection", e);
 		}
 	}
 
-	public JAXBElement<Object> getContent(String contentId, MetadataModel model) {
+
+	@Override
+	protected JAXBElement<Object> getContentInternal(String contentId, MetadataModel model, Unmarshaller unmarshaller) {
 		JAXBElement<Object> result = null;
 		String content = null;
 		try {
@@ -69,37 +67,37 @@ public class DbContentStore implements ContentStore {
 				content = rs.getString(1);
 				if (content != null) {
 					ByteArrayInputStream bais = new ByteArrayInputStream(content.getBytes());
-					Unmarshaller unmarshaller = model.getJAXBContext().createUnmarshaller();
 					@SuppressWarnings("unchecked")
 					JAXBElement<Object> unmarshalled = (JAXBElement<Object>) unmarshaller.unmarshal(bais);
 					result = unmarshalled;
 				} else {
-					throw new IllegalStateException("CONTENT ID NOT FOUND: " + contentId);
+					throw new ContentPersistenceException("CONTENT ID NOT FOUND: " + contentId);
 				}
 			}
-			
-		} catch (Exception e) {
-			LOG.error("Error getting content for id: " + contentId,e);
+		} catch (JAXBException e) {
+			LOG.error("Error retrieveing content for id: " + contentId, e);
+			throw new ContentPersistenceException("Unable to unmarshall content", e);
+		} catch (SQLException e) {
+			LOG.error("Error querying content for id: " + contentId, e);
+			throw new ContentPersistenceException("Unable to query content", e);
 		}
 		return result;
 	}
 
-	public Map<String, Entity> persist(List<? extends Entity> entities,
-			MetadataModel model) {
+	@Override
+	protected Map<String, Entity> persistInternal(List<? extends Entity> entities, MetadataModel model, Marshaller marshaller) {
 		Map<String, Entity> result = new HashMap<String, Entity>();
 		for (Entity entity : entities) {
 			JAXBElement<Object> element = entity.getObject();
 			String contentId = null;
 			String content = null;
 			try {
-				Marshaller marshaller = model.getJAXBContext().createMarshaller();
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				marshaller.marshal(element, baos);
 				content = new String(baos.toByteArray());
-			} catch (Exception e) {
-				String message = "Error marshalling content " + entity.getKey().getId() + " to be persisted";
-				LOG.error(message, e);
-				throw new IllegalStateException(message, e);
+			} catch (JAXBException e) {
+				LOG.error("Error marshalling content for key: " + entity.getKey().getId(), e);
+				throw new ContentPersistenceException("Unable to marshall content", e);
 			}
 			try {
 				conn.setAutoCommit(false);
@@ -115,36 +113,19 @@ public class DbContentStore implements ContentStore {
 				result.put(contentId, entity);
 				conn.commit();
 				conn.setAutoCommit(true);
-			} catch (Exception e) {
-				String message = "Error inserting content " + entity.getKey().getId() + " into database";
-				LOG.error(message, e);
-				throw new IllegalStateException(message, e);
+			} catch (SQLException e) {
+				LOG.error("Error storing content for key: " + entity.getKey().getId(), e);
+				throw new ContentPersistenceException("Unable to insert content", e);
 			}
 		}
 		return result;
-	}
-
-	public ContentRetriever getContentRetriever(String contentId,
-			MetadataModel model) {
-		return new InternalContentRetriever(contentId, model);
 	}
 
 	public void shutdown() {
 		try {
 			conn.close();
 		} catch (SQLException e) {
-		}
-	}
-	
-	private class InternalContentRetriever extends AbstractContentRetriever<Object> {
-
-		public InternalContentRetriever(String contentId, MetadataModel model) {
-			super(contentId, model);
-		}
-
-		@Override
-		protected JAXBElement<Object> getContentInternal(String contentId, MetadataModel model) {
-			return DbContentStore.this.getContent(contentId, model);
+			LOG.error(e);
 		}
 	}
 	

@@ -34,9 +34,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UploadedFileResponseEntry
 {
+	@SuppressWarnings("unused")
 	private String filename;
+	@SuppressWarnings("unused")
 	@XmlAttribute
 	private int entitiesProcessed;
+	@SuppressWarnings("unused")
 	@XmlAttribute
 	private int relationshipsProcessed;
 	
