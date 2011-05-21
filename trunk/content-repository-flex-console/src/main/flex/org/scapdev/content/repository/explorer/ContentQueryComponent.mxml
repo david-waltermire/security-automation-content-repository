@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%" height="100%" creationComplete="group_creationCompleteHandler(event)">
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
 	<fx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
 			import mx.rpc.http.HTTPService;
 			
 			import spark.components.Application;
@@ -13,6 +18,8 @@
 			public const ID_QUERY_URL:String = FlexGlobals.topLevelApplication.REST_URL_BASE + "/content/query/get/global";
 
 			private var loader:URLLoader;
+
+			protected var EOL:String;
 
 			protected function txtId_changeHandler(event:Event):void
 			{
@@ -87,6 +94,27 @@
 				btnSearch.enabled = true;
 				txtAreaResult.text = event.text;
 			}
+			
+			protected function group_creationCompleteHandler(event:FlexEvent):void
+			{
+				var os:String = flash.system.Capabilities.os.substr(0, 3);
+				if (os == "Win") 
+				{
+					EOL = "\r\n";
+				}
+				else
+				{
+					EOL = "\n";
+				}
+				
+				var message:String;
+				
+				message = "CVE identifiers such as CVE-2003-0858" + EOL;
+				message += "OVAL identifiers like oval:com.redhat.rhsa:def:20030315" + EOL;
+				
+				suggestionsLabel.text = message;
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -94,26 +122,42 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:Panel title="Query Content" width="100%" height="100%">
+	<s:Panel width="100%" height="100%" title="Query Content">
 		<s:layout>
-			<s:VerticalLayout paddingLeft="5"/>
+			<s:VerticalLayout paddingLeft="5" paddingTop="5"/>
 		</s:layout>
-		<s:SkinnableContainer width="288" height="44">
+		<s:SkinnableContainer id="suggestionsContainer" width="100%">
+			<s:layout>
+				<s:VerticalLayout/>
+			</s:layout>
+			<s:Label id="suggestionsCaption" width="100%" text="A few entity ideas to try..."/>
+			<s:Label id="suggestionsLabel" width="100%" height="35" text="text"/>
+		</s:SkinnableContainer>
+		<s:SkinnableContainer id="userInputContainer">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle"/>
 			</s:layout>
 			<s:Label x="10" y="17" text="Entity Id"/>
-			<s:TextInput x="58" y="10" width="141" id="txtId" change="txtId_changeHandler(event)"/>
-			<s:Button x="207" y="7" label="Search" id="btnSearch" click="btnSearch_clickHandler(event)" enabled="false"/>
+			<s:TextInput id="txtId" x="58" y="10" width="141" change="txtId_changeHandler(event)"/>
+			<s:Button id="btnSearch" x="207" y="7" label="Search"
+					  click="btnSearch_clickHandler(event)" enabled="false"/>
 		</s:SkinnableContainer>
-		<s:SkinnableContainer width="413" height="200" x="0" y="91">
+		
+		<s:SkinnableContainer id="resultContainer">
 			<s:layout>
-				<s:VerticalLayout paddingTop="5" paddingLeft="5" horizontalAlign="justify" paddingRight="5"/>
+				<s:VerticalLayout/>
 			</s:layout>
-			<s:Label x="12" y="41" text="Result"/>
-			<s:TextArea id="txtAreaResult" verticalAlign="justify" bottom="10" verticalCenter="25" top="61" left="11" horizontalCenter="-1" right="7"/>
+			<s:SkinnableContainer x="0" y="91" width="413" height="200">
+				<s:layout>
+					<s:VerticalLayout horizontalAlign="justify" paddingLeft="5" paddingRight="5"
+									  paddingTop="5"/>
+				</s:layout>
+				<s:Label x="12" y="41" text="Result"/>
+				<s:TextArea id="txtAreaResult" left="11" right="7" top="61" bottom="10"
+							horizontalCenter="-1" verticalAlign="justify" verticalCenter="25"/>
+			</s:SkinnableContainer>
+			<s:Label text="HTTP return code"/>
+			<s:Label id="lblHttpReturnCode"/>
 		</s:SkinnableContainer>
-		<s:Label text="HTTP return code"/>
-		<s:Label id="lblHttpReturnCode"/>
 	</s:Panel>
 </s:Group>
