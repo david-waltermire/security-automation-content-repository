@@ -21,69 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.content.repository.war.rest.response;
+package org.content.repository.war.rest.statistic;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.log4j.Logger;
 import org.scapdev.content.core.query.EntityStatistic;
 
 @XmlType
 @XmlRootElement(name = "repositoryStatistics")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RepositoryStatisticsXMLResponse
-{
-	@XmlTransient
-	private static Logger LOG = Logger.getLogger(RepositoryStatisticsXMLResponse.class);
-	
-	private int ovalDefinitions;
-	private int ovalTests;
-	private int ovalObjects;
-	private int ovalStates;
-	private int ovalVariables;
-	private int other;
+public class RepositoryStatisticsXMLResponse {
+//    @XmlElementRef(name = "entity", type = StatItem.class)
+	@XmlElement
+	private List<StatItem> item;
 			
 	// required by jaxb
-	public RepositoryStatisticsXMLResponse()
-	{
-		
+	public RepositoryStatisticsXMLResponse() {
+		item = new LinkedList<StatItem>();
 	}
-	
-	public void setCount(String key, EntityStatistic stat)
-	{
-		if(key.equals("urn:scap-content:entity:org.mitre.oval:test"))
-		{
-			ovalTests += stat.getCount();
-		}
-		else if(key.equals("urn:scap-content:entity:org.mitre.oval:definition"))
-		{
-			ovalDefinitions += stat.getCount();
-		}
-		else if(key.equals("urn:scap-content:entity:org.mitre.oval:object"))
-		{
-			ovalObjects += stat.getCount();
-		}
-		else if(key.equals("urn:scap-content:entity:org.mitre.oval:state"))
-		{
-			ovalStates += stat.getCount();
-		}
-		else if(key.equals("urn:scap-content:entity:org.mitre.oval:variable"))
-		{
-			ovalVariables += stat.getCount();
-		}
-		else
-		{
-			LOG.info("Adding unhandled count for key " + key);
-			other += stat.getCount();
-		}
 
+	public void add(EntityStatistic stat) {
+		item.add(new StatItem(stat));
 	}
-	
 }

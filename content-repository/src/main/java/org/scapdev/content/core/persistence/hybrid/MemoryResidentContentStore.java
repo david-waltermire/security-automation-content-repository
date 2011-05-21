@@ -67,7 +67,7 @@ public class MemoryResidentContentStore implements ContentStore {
 		return new InternalContentRetriever(contentId, model);
 	}
 
-	private class InternalContentRetriever extends AbstractContentRetriever<Object> {
+	private class InternalContentRetriever extends AbstractContentRetriever {
 
 		public InternalContentRetriever(String contentId, MetadataModel model) {
 			super(contentId, model);

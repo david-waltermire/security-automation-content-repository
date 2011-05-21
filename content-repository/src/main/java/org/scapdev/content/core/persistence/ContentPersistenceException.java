@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.hybrid;
+package org.scapdev.content.core.persistence;
 
-import javax.xml.bind.JAXBElement;
+import org.scapdev.content.core.ContentException;
 
-import org.scapdev.content.model.MetadataModel;
+public class ContentPersistenceException extends ContentException {
 
-public abstract class AbstractContentRetriever implements ContentRetriever {
-	public String contentId;
-	public MetadataModel model;
+	/** the serial version UID  */
+	private static final long serialVersionUID = 1L;
 
-	public AbstractContentRetriever(String contentId, MetadataModel model) {
-		this.contentId = contentId;
-		this.model = model;
+	public ContentPersistenceException() {
+		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public JAXBElement<Object> getContent() {
-		return getContentInternal(contentId, model);
+	public ContentPersistenceException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
 	}
 
-	protected abstract JAXBElement<Object> getContentInternal(String contentId, MetadataModel model);
+	public ContentPersistenceException(Throwable cause) {
+		super(cause);
+		// TODO Auto-generated constructor stub
+	}
+
+	public ContentPersistenceException(String message, Throwable cause) {
+		super(message, cause);
+		// TODO Auto-generated constructor stub
+	}
+
 }

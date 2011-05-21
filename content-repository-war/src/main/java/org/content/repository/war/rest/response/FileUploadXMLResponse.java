@@ -43,7 +43,6 @@ public class FileUploadXMLResponse extends SimpleXMLResponse {
 	
 	// will actually be used
 	// when response is serialized by jaxb
-	@SuppressWarnings("unused")
 	@XmlElement(name = "fileEntry")
 	private List<UploadedFileResponseEntry> filesUploaded = new LinkedList<UploadedFileResponseEntry>();
 

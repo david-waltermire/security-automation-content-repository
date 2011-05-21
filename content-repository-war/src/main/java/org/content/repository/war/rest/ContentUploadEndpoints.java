@@ -83,7 +83,9 @@ public class ContentUploadEndpoints {
 				List<FileItem> items = null;
 
 				try {
-					items = upload.parseRequest(request);
+					@SuppressWarnings("unchecked")
+					List<FileItem> requestItems = upload.parseRequest(request);
+					items = requestItems;
 				} catch (FileUploadException fue) {
 					// TODO: is the temp dir removed?
 					ret.setCause(fue);

@@ -56,6 +56,7 @@ public class ContentRepositoryStartupServlet extends HttpServlet {
 	private void initRepo()
 	{
 		// initialize repository war configuration
+		@SuppressWarnings("unused")
 		RepositoryConfiguration rc = RepositoryConfiguration.INSTANCE;
 	}
 }

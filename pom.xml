@@ -16,6 +16,7 @@
     <module>content-repository</module>
     <module>content-repository-flex-console</module>
     <module>content-repository-war</module>
+    <module>db-store</module>
   </modules>
 
   <properties>
