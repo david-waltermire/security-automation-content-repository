@@ -80,13 +80,8 @@
 		<s:Button width="118" id="btnNavBrowse" label="Browse Content" x="10" y="74" click="btnNavBrowse_clickHandler(event)" includeIn="UNIMPLEMENTED"/>
 		<s:Button label="Query" width="118" id="btnNavQuery" click="btnNavQuery_clickHandler(event)" x="10" y="106"/>
 	</s:Panel>
-	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="68" right="5" id="contentUploadPage" includeIn="UploadContentState">
-	</explorer:ContentUploadComponent>
-	<explorer:BrowseRepositoryComponent includeIn="BrowseContentState" width="1022">
-	</explorer:BrowseRepositoryComponent>
-	<explorer:ContentStatisticsComponent includeIn="ContentStatisticsState" width="100%"
-										 height="100%">
-	</explorer:ContentStatisticsComponent>
-	<explorer:ContentQueryComponent includeIn="QueryContentState" width="1025">
-	</explorer:ContentQueryComponent>
+	<explorer:ContentUploadComponent top="21" verticalCenter="-175" bottom="337" left="10" horizontalCenter="68" right="5" id="contentUploadPage" includeIn="UploadContentState"/>
+	<explorer:BrowseRepositoryComponent includeIn="BrowseContentState" width="100%" height="100%"/>
+	<explorer:ContentStatisticsComponent includeIn="ContentStatisticsState" width="100%" height="100%"/>
+	<explorer:ContentQueryComponent includeIn="QueryContentState" width="100%" height="100%"/>
 </s:Application>

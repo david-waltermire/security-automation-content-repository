@@ -138,9 +138,7 @@ public class ContentUploadEndpoints {
 								ret.setCause(e);
 								return ret;
 							}
-							
-							Importer importer = RepositoryConfiguration.INSTANCE.getRepo().getJaxbEntityProcessor().newImporter();
-							
+														
 							// assuming no exception occurred, try to load the file into the repository
 							File[] uploadedfiles = tmpSubDir.listFiles();
 							if(uploadedfiles != null && uploadedfiles.length > 0)
@@ -149,6 +147,8 @@ public class ContentUploadEndpoints {
 								{
 									File f = uploadedfiles[x];
 									
+									Importer importer = RepositoryConfiguration.INSTANCE.getRepo().getJaxbEntityProcessor().newImporter();
+
 									LOG.info("importing file " + f.getAbsolutePath());
 									StopWatch timer = new StopWatch();
 									timer.start();
