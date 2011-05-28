@@ -27,10 +27,21 @@ package org.scapdev.content.core.persistence.semantic.translation;
  * Exception thrown by builders if the build() method is called without all required data.
  */
 public class IncompleteBuildStateException extends RuntimeException {
+
 	private static final long serialVersionUID = 1L;
+	public IncompleteBuildStateException() {
+		super();
+	}
 	
-	IncompleteBuildStateException(String arg) {
-		super(arg);
+	IncompleteBuildStateException(String message) {
+		super(message);
 	}
 
+	public IncompleteBuildStateException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public IncompleteBuildStateException(Throwable cause) {
+		super(cause);
+	}
 }

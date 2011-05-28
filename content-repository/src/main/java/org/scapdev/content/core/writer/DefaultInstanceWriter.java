@@ -41,6 +41,7 @@ import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.GeneratedDocumentInfo;
 import org.scapdev.content.model.Key;
 import org.scapdev.content.model.MetadataModel;
+import org.scapdev.content.model.StaticDocumentInfo;
 import org.scapdev.content.util.XmlStreamWriterNamespaceFilter;
 
 public class DefaultInstanceWriter implements InstanceWriter {
@@ -62,7 +63,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 	}
 
 	public void write(QueryResult queryResult, XMLStreamWriter writer) throws XMLStreamException {
-		Map<DocumentInfo, DocumentData<?>> documentDataMap = generateDocumentEntityMap(queryResult, model);
+		Map<DocumentInfo, CompositeDocumentData<?>> documentDataMap = generateDocumentEntityMap(queryResult, model);
 		if (!documentDataMap.isEmpty()) {
 			writer.writeStartDocument();
 			writer.writeStartElement("repo", "repository-data", "http://scapdev.org/schema/meta-model-instance/0.1");
@@ -71,7 +72,7 @@ public class DefaultInstanceWriter implements InstanceWriter {
 
 			XMLStreamWriter filteredWriter = new XmlStreamWriterNamespaceFilter(writer);
 			int i = 1;
-			for (Map.Entry<DocumentInfo, DocumentData<?>> entry : documentDataMap.entrySet()) {
+			for (Map.Entry<DocumentInfo, CompositeDocumentData<?>> entry : documentDataMap.entrySet()) {
 				log.debug("writing document: "+entry.getKey().getId());
 				writer.writeStartElement("http://scapdev.org/schema/meta-model-instance/0.1", "document");
 
@@ -116,35 +117,41 @@ public class DefaultInstanceWriter implements InstanceWriter {
 		return getXMLOutputFactory2().createXMLStreamWriter(writer);
 	}
 
-	private static Map<DocumentInfo, DocumentData<?>> generateDocumentEntityMap(QueryResult queryResult, MetadataModel model) {
-		Map<DocumentInfo, DocumentData<?>> result = new HashMap<DocumentInfo, DocumentData<?>>();
+	private static Map<DocumentInfo, CompositeDocumentData<?>> generateDocumentEntityMap(QueryResult queryResult, MetadataModel model) {
+		Map<DocumentInfo, CompositeDocumentData<?>> result = new HashMap<DocumentInfo, CompositeDocumentData<?>>();
 
 		for (Map.Entry<Key, Entity> entry : queryResult.getEntities().entrySet()) {
 			Entity entity = entry.getValue();
-			Collection<DocumentInfo> documentInfos = model.getDocumentInfosContaining(entity.getEntityInfo());
-
-			if (documentInfos.size() == 1) {
-				DocumentInfo documentInfo = documentInfos.iterator().next();
-
-				DocumentData<?> documentData;
-				if (result.containsKey(documentInfo)) {
-					documentData = result.get(documentInfo);
-				} else {
-					documentData = newDocumentData(documentInfo);
-					result.put(documentInfo, documentData);
-				}
-				documentData.addEntity(entity);
+			StaticDocumentInfo staticDocumentInfo = model.getStaticDocumentInfoByEntityId(entity.getEntityInfo().getId());
+			if (staticDocumentInfo != null) {
+				StaticDocumentData documentData = new StaticDocumentData(staticDocumentInfo, entity);
+				result.put(staticDocumentInfo, documentData);
 			} else {
-				// TODO: need to figure out how to handle multiple possible documents
-				// TODO: perhaps provide a hint as to what to produce
-				throw new UnsupportedOperationException();
+				Collection<DocumentInfo> documentInfos = model.getDocumentInfosContaining(entity.getEntityInfo());
+	
+				if (documentInfos.size() == 1) {
+					DocumentInfo documentInfo = documentInfos.iterator().next();
+	
+					CompositeDocumentData<?> documentData;
+					if (result.containsKey(documentInfo)) {
+						documentData = result.get(documentInfo);
+					} else {
+						documentData = newDocumentData(documentInfo);
+						result.put(documentInfo, documentData);
+					}
+					documentData.addEntity(entity);
+				} else {
+					// TODO: need to figure out how to handle multiple possible documents
+					// TODO: perhaps provide a hint as to what to produce
+					throw new UnsupportedOperationException();
+				}
 			}
 		}
 		return result;
 	}
 
-	private static DocumentData<?> newDocumentData(DocumentInfo documentInfo) {
-		DocumentData<?> result;
+	private static CompositeDocumentData<?> newDocumentData(DocumentInfo documentInfo) {
+		CompositeDocumentData<?> result;
 		if (GeneratedDocumentInfo.class.isAssignableFrom(documentInfo.getClass())) {
 			result = new GeneratedDocumentData((GeneratedDocumentInfo)documentInfo);
 		} else {

@@ -68,4 +68,5 @@ public interface MetadataModel {
 	Collection<String> getKeyedRelationshipIds();
 	
 	Set<String> getEntityInfoIds();
+	StaticDocumentInfo getStaticDocumentInfoByEntityId(String id);
 }

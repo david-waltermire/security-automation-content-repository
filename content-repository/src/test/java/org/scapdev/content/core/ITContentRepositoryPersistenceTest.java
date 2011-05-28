@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager;
 
-public class ITContentRepositoryPersistenceTest extends ContentRepositoryTestBase {
+public class ITContentRepositoryPersistenceTest extends ProcessContentTestBase {
 	private static final Logger log = Logger.getLogger(ITContentRepositoryPersistenceTest.class);
 
 	@BeforeClass

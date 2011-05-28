@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,41 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.scapdev.content.model.GeneratedDocumentInfo;
+import org.scapdev.content.model.Entity;
+import org.scapdev.content.model.StaticDocumentInfo;
 
-public class GeneratedDocumentData extends AbstractCompositeDocumentData<GeneratedDocumentInfo> {
+// TODO: remove unsupported exceptions and implement the compositional model once containment relationships are supported
+public class StaticDocumentData extends AbstractCompositeDocumentData<StaticDocumentInfo> {
+	private final Entity entity;
 
-	public GeneratedDocumentData(GeneratedDocumentInfo info) {
-		super(info);
+	public StaticDocumentData(StaticDocumentInfo documentInfo, Entity entity) {
+		super(documentInfo);
+		this.entity = entity;
+	}
+
+	public Entity getEntity() {
+		return entity;
 	}
 
 	@Override
-	public DocumentWriter newDocumentWriter(XMLStreamWriter writer,
-			Marshaller marshaller) {
-		return new GeneratedDocumentWriter(this, writer, marshaller);
+	public void addEntity(Entity entity) {
+		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public Collection<Entity> getEntities(String documentContainerId,
+			List<String> entityTypeIds) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DocumentWriter newDocumentWriter(XMLStreamWriter writer, Marshaller marshaller) {
+		return new StaticDocumentWriter(this, writer, marshaller);
+	}
 }

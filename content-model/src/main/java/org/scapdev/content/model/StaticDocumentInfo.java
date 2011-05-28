@@ -23,6 +23,6 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
-public interface StaticDocumentInfo extends DocumentInfo, EntityInfo {
-
+public interface StaticDocumentInfo extends DocumentInfo {
+	EntityInfo getEntityInfo();
 }

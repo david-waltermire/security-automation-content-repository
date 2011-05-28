@@ -44,12 +44,12 @@ public class Key implements Comparable<Key> {
 	private final String id;
 	private final LinkedHashMap<String, String> idToValueMap;
 
-	public Key(String id, List<String> typeIds, List<String> values) throws NullFieldValueException, KeyException {
+	Key(String id, List<String> typeIds, List<String> values) throws NullFieldValueException, KeyException {
 		this(id, typeIds.toArray(new String[typeIds.size()]), values
 				.toArray(new String[typeIds.size()]));
 	}
 
-	public Key(String id, String[] typeIds, String[] values) throws NullFieldValueException, KeyException {
+	Key(String id, String[] typeIds, String[] values) throws NullFieldValueException, KeyException {
 		this.id = id;
 		idToValueMap = new LinkedHashMap<String, String>();
 		for (int i = 0; i < typeIds.length; i++) {
@@ -67,7 +67,7 @@ public class Key implements Comparable<Key> {
 		}
 	}
 
-	public Key(String id, LinkedHashMap<String, String> idToValueMap) throws NullFieldValueException, KeyException {
+	Key(String id, LinkedHashMap<String, String> idToValueMap) throws NullFieldValueException, KeyException {
 		this.id = id;
 		this.idToValueMap = idToValueMap;
 		for (Map.Entry<String, String> entry : idToValueMap.entrySet()) {

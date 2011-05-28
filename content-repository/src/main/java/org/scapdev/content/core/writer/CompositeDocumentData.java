@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.Collection;
+import java.util.List;
 
-import org.scapdev.content.model.GeneratedDocumentInfo;
+import org.scapdev.content.model.DocumentInfo;
+import org.scapdev.content.model.Entity;
 
-public class GeneratedDocumentData extends AbstractCompositeDocumentData<GeneratedDocumentInfo> {
-
-	public GeneratedDocumentData(GeneratedDocumentInfo info) {
-		super(info);
-	}
-
-	@Override
-	public DocumentWriter newDocumentWriter(XMLStreamWriter writer,
-			Marshaller marshaller) {
-		return new GeneratedDocumentWriter(this, writer, marshaller);
-	}
-
+public interface CompositeDocumentData<DOCUMENT extends DocumentInfo> extends DocumentData<DOCUMENT> {
+	void addEntity(Entity entity);
+	Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds);
 }

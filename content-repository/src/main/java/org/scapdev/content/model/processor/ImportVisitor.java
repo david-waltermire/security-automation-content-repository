@@ -24,6 +24,7 @@
 package org.scapdev.content.model.processor;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 import org.scapdev.content.annotation.Entity;
 import org.scapdev.content.model.EntityInfo;
@@ -78,24 +79,23 @@ class ImportVisitor extends DefaultInstanceVisitor {
 		
 		Entity entity = jaxbClass.getAnnotation(Entity.class, true);
 		if (entity != null) {
-//			EntityInfo entityInfo = metadataModel.getEntityInfoById(entity.id());
-//			QName qname = entityInfo.getQName();
+			EntityInfo entityInfo = metadataModel.getEntityInfoById(entity.id());
+			QName qname = entityInfo.getType().getQName();
 //			if (qname == null) {
 //				parentProperty.getQName();
 //			}
-//			if (qname == null) {
-//				// TODO: extract ObjectFactory information for use with parentProperty.getQName();
-//				throw new UnsupportedOperationException("Class is not a global element: "+instance.getClass().getName());
-//			}
-//			@SuppressWarnings("unchecked")
-//			JAXBElement<Object> element = new JAXBElement<Object>(
-//					qname,
-//					(Class<Object>) jaxbClass.getType(),
-//					null,
-//					instance);
-//			state.newEntity(entityInfo, element, processor);
-//			processContent = false;
-			throw new UnsupportedOperationException();
+			if (qname == null) {
+				// TODO: extract ObjectFactory information for use with parentProperty.getQName();
+				throw new UnsupportedOperationException("Class is not a global element: "+instance.getClass().getName());
+			}
+			@SuppressWarnings("unchecked")
+			JAXBElement<Object> element = new JAXBElement<Object>(
+					qname,
+					(Class<Object>) jaxbClass.getType(),
+					null,
+					instance);
+			state.newEntity(entityInfo, element, processor);
+			processContent = false;
 		}
 		return processContent;
 	}

@@ -28,24 +28,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
-import org.junit.Test;
-import org.scapdev.content.core.query.EntityStatistic;
+import org.scapdev.content.core.query.Query;
 import org.scapdev.content.core.query.QueryResult;
-import org.scapdev.content.core.query.RelationshipStatistic;
 import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
 import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.ImportData;
 import org.scapdev.content.model.processor.Importer;
@@ -65,7 +57,7 @@ public class ContentRepositoryTestBase {
     	log.info("Repository shutdown: "+watch.toString());
 	}
 
-	private void importFile(File file) {
+	protected void importFile(File file) {
 		log.info("importing: "+file);
     	StopWatch watch = new StopWatch();
     	watch.start();
@@ -80,56 +72,24 @@ public class ContentRepositoryTestBase {
     	}
     	log.info("Relationships processed: "+relationships);
     	log.info("Import timing: "+watch.toString());
-	}
 
-	@Test
-	public void importRedhatPatchContent() {
-		File file = new File("target/content/com.redhat.rhsa-all.xml");
-		importFile(file);
-		
 //		Set<String> statIds = new HashSet<String>();
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:definition");
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:variable");
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:test");
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:object");
 //		statIds.add("urn:scap-content:entity:org.mitre.oval:state");
-//		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
-//		printStatInfo(stats);
-	}
-
-	@Test
-	public void importUSGCBWin7OVALContent() {
-		File file = new File("src/test/xml/USGCB-Major-Version-1.1.0.0/Win7/USGCB-Windows-7-oval.xml");
-		importFile(file);
-		
-//		Set<String> statIds = new HashSet<String>();
-//		statIds.add("urn:scap-content:entity:org.mitre.oval:definition");
-//		statIds.add("urn:scap-content:entity:org.mitre.oval:variable");
-//		statIds.add("urn:scap-content:entity:org.mitre.oval:test");
-//		statIds.add("urn:scap-content:entity:org.mitre.oval:object");
-//		statIds.add("urn:scap-content:entity:org.mitre.oval:state");
-//		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
-//		printStatInfo(stats);
-	}
-
-	@Test
-	public void importNVDVuln2011Content() {
-		File file = new File("target/content/nvdcve-2.0-2011.xml");
-		importFile(file);
-		
-//		Set<String> statIds = new HashSet<String>();
 //		statIds.add("urn:scap-content:entity:gov.nist.scap:vulnerability-0.4-vuln");
 //		Map<String, ? extends EntityStatistic> stats = repository.getContentPersistenceManager().getEntityStatistics(statIds, repository.getMetadataModel());
 //		printStatInfo(stats);
+//    	repository.queryStatistics(entityInfoIds)
 	}
-	
-	@Test
-	public void writeWin7Definition() throws IOException, XMLStreamException, FactoryConfigurationError {
+
+	protected <RESULT extends QueryResult> void writeQuery(Query<RESULT> query) throws XMLStreamException, IOException {
     	StopWatch watch = new StopWatch();
     	watch.start();
 
-    	Key key = repository.getMetadataModel().getKeyFromMappedIdentifier("oval:gov.nist.usgcb.windowsseven:def:2");
-    	QueryResult result = repository.query(key, true);
+    	QueryResult result = repository.query(query);
     	for (Entity entity : result.getEntities().values()) {
     		log.info("Retrieved entity: "+entity.getKey());
     	}
@@ -140,43 +100,22 @@ public class ContentRepositoryTestBase {
     	writer.write(result, stringWriter);
     	stringWriter.flush();
 		log.info(stringWriter.toString());
+
 	}
 
-	@Test
-	public void writeSpecificCCEs() throws IOException, XMLStreamException, FactoryConfigurationError {
-    	StopWatch watch = new StopWatch();
-    	watch.start();
-
-    	List<String> cces = new LinkedList<String>();
-    	cces.add("CCE-9345-0");
-    	cces.add("CCE-8414-5");
-
-    	QueryResult result = repository.query("urn:scap-content:external-identifier:org.mitre:cce-5", cces, Collections.singleton("urn:scap-content:entity:org.mitre.oval:definition"), true);
-    	for (Entity entity : result.getEntities().values()) {
-    		log.info("Retrieved entity: "+entity.getKey());
-    	}
-    	watch.stop();
-    	log.info("Definition query: "+watch.toString());
-
-		Writer stringWriter = new StringWriter();
-    	writer.write(result, stringWriter);
-    	stringWriter.flush();
-		log.info(stringWriter.toString());
-	}
-	
-	@SuppressWarnings("unused")
-	private void printStatInfo(Map<String, ? extends EntityStatistic> stats){
-		log.info("printing entity stats: ");
-		for (Map.Entry<String, ? extends EntityStatistic> entry : stats.entrySet()){
-			log.info("Entity Key: " + entry.getKey());
-			EntityStatistic stat = entry.getValue();
-			log.info("Entity count: " + stat.getCount());
-			log.info("printing entity relationship stats: ");
-			for (Map.Entry<String, ? extends RelationshipStatistic> relStatEntry : stat.getRelationshipInfoStatistics().entrySet()){
-				log.info("Relationship Key: " + relStatEntry.getKey());
-				RelationshipStatistic relStat = relStatEntry.getValue();
-				log.info("Relationship count: "+ relStat.getCount());
-			}
-		}
-	}
+//	@SuppressWarnings("unused")
+//	protected void printStatInfo(Map<String, ? extends EntityStatistic> stats){
+//		log.info("printing entity stats: ");
+//		for (Map.Entry<String, ? extends EntityStatistic> entry : stats.entrySet()){
+//			log.info("Entity Key: " + entry.getKey());
+//			EntityStatistic stat = entry.getValue();
+//			log.info("Entity count: " + stat.getCount());
+//			log.info("printing entity relationship stats: ");
+//			for (Map.Entry<String, ? extends RelationshipStatistic> relStatEntry : stat.getRelationshipInfoStatistics().entrySet()){
+//				log.info("Relationship Key: " + relStatEntry.getKey());
+//				RelationshipStatistic relStat = relStatEntry.getValue();
+//				log.info("Relationship count: "+ relStat.getCount());
+//			}
+//		}
+//	}
 }

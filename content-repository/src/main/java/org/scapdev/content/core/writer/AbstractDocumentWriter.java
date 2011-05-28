@@ -24,8 +24,11 @@
 package org.scapdev.content.core.writer;
 
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.scapdev.content.model.ModelInstanceException;
 
 public abstract class AbstractDocumentWriter implements DocumentWriter {
 	private final XMLStreamWriter writer;
@@ -34,6 +37,11 @@ public abstract class AbstractDocumentWriter implements DocumentWriter {
 	protected AbstractDocumentWriter(XMLStreamWriter writer, Marshaller marshaller) {
 		this.writer = writer;
 		this.marshaller = marshaller;
+		try {
+			this.marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+		} catch (PropertyException e) {
+			throw new ModelInstanceException(e);
+		}
 	}
 
 	/**

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (c) 2011 David Waltermire
+ * Copyright (c) 2011 davidwal
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,29 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.scapdev.content.model.GeneratedDocumentInfo;
+import org.scapdev.content.model.ModelInstanceException;
 
-public class GeneratedDocumentData extends AbstractCompositeDocumentData<GeneratedDocumentInfo> {
+public class StaticDocumentWriter extends AbstractDocumentWriter {
+	private final StaticDocumentData documentData;
 
-	public GeneratedDocumentData(GeneratedDocumentInfo info) {
-		super(info);
+	public StaticDocumentWriter(StaticDocumentData documentData, XMLStreamWriter writer, Marshaller marshaller) {
+		super(writer, marshaller);
+		this.documentData = documentData;
 	}
 
 	@Override
-	public DocumentWriter newDocumentWriter(XMLStreamWriter writer,
-			Marshaller marshaller) {
-		return new GeneratedDocumentWriter(this, writer, marshaller);
+	public void write() throws XMLStreamException {
+		try {
+			getMarshaller().marshal(documentData.getEntity().getObject(), getWriter());
+		} catch (JAXBException e) {
+			throw new ModelInstanceException(e);
+		}
+
 	}
 
 }

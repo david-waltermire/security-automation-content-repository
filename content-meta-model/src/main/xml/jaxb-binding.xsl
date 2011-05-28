@@ -100,18 +100,6 @@
     <annox:annotate>
       <annox:annotate annox:class="org.scapdev.content.annotation.SchemaDocument" id="{$document-id}" type="STATIC"/>
     </annox:annotate>
-    <annox:annotate>
-      <annox:annotate annox:class="org.scapdev.content.annotation.Entity"
-        id="{$document-id}"
-        keyId="{meta:key/@id}">
-<!-- 
-        <xsl:if test="@local-part">
-          <annox:annotate annox:field="localPart"><xsl:value-of select="@local-part"/></annox:annotate>
-        </xsl:if>
- -->
-       </annox:annotate>
-    </annox:annotate>
-    <xsl:apply-templates mode="key"/>
   </xsl:template>
 
   <xsl:template match="meta:document" mode="container">
