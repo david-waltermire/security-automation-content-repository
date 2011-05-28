@@ -32,6 +32,8 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.model.Key;
+import org.scapdev.content.model.KeyBuilder;
+import org.scapdev.content.model.KeyException;
 import org.scapdev.content.model.RelationshipInfo;
 
 /**
@@ -86,7 +88,7 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 */
 	public void populateEntity(RebuiltEntity entity){
 		populateFields();
-		Key key = builder.build();
+		Key key = builder.toKey();
 		entity.setKey(key);
 	}
 
@@ -98,7 +100,11 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 */
 	Key produceKey(){
 		populateFields();
-		return builder.build();
+		try {
+			return builder.toKey();
+		} catch (KeyException e) {
+			throw new IncompleteBuildStateException(e);
+		}
 	}
 	
 	

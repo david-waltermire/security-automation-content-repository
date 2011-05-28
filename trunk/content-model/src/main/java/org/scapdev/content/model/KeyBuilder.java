@@ -21,45 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.persistence.semantic.translation;
+package org.scapdev.content.model;
 
 import java.util.LinkedHashMap;
-
-import org.scapdev.content.model.Key;
 
 /**
  * A class to handle building a Key instance.
  *
  */
-// TODO: move KeyBuilder into content-model
 // TODO: Use KeyInfo to do some validation on fields.
 // TODO: Implement KeyBuilder in place of current Key constructor
-// TODO: Make the Key constructor package private 
-class KeyBuilder {
+public class KeyBuilder {
 	private String id;
 	private LinkedHashMap<String, String> idToValueMap = new LinkedHashMap<String, String>();
 	
-	KeyBuilder() {
-		// TODO Auto-generated constructor stub
+	public KeyBuilder() {
 	}
 	
-	void setId(String id) {
+	public KeyBuilder(String keyId) {
+		this.id = keyId;
+	}
+	
+	public KeyBuilder setId(String id) {
 		this.id = id;
+		return this;
 	}
 	
 	// TODO: Check KeyInfo while adding fields to check if a valid field is associated
-	void addKeyField(String fieldId, String fieldValue){
+	public KeyBuilder addKeyField(String fieldId, String fieldValue){
 		idToValueMap.put(fieldId, fieldValue);
+		return this;
 	}
 	
 	/**
 	 * Builds a key out of all data added to builder.
 	 * @return
 	 */
-	Key build(){
+	public Key toKey() throws KeyException {
 		// TODO: Check with KeyInfo if all required fields are present
 		if (id == null || id.isEmpty() || idToValueMap.isEmpty()){
-			throw new IncompleteBuildStateException("Not all values are populated");
+			throw new KeyException("Not all values are populated");
 		}
 		Key key = new Key(id, idToValueMap);
 		return key;

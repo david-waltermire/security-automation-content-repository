@@ -105,7 +105,6 @@ public class XmlEventGeneratingDocumentModelVisitor extends CyclePreventingModel
 			for (Entity entity : documentData.getEntities(container.id(), Arrays.asList(container.entityIds()))) {
 				try {
 //					log.info("    writeStartElement: "+entity.getKey().toString());
-					marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 					marshaller.marshal(entity.getObject(), writer);
 //					log.info("    writeEndElement: "+entity.getKey().toString());
 				} catch (JAXBException e) {

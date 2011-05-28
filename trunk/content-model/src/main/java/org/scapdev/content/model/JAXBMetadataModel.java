@@ -68,6 +68,7 @@ public class JAXBMetadataModel implements MetadataModel {
 	private final Map<String, IndirectRelationshipInfo> indirectRelationshipIdToInfoMap;
 	private final Map<String, KeyedRelationshipInfo> keyedRelationshipIdToInfoMap;
 	private final Map<String, Set<DocumentInfo>> entityIdToDocumentInfoMap;
+	private final Map<String, StaticDocumentInfo> entityIdToStaticDocumentInfoMap;
 
 	JAXBMetadataModel() throws IOException, JAXBException, ClassNotFoundException {
 		// Initialize JAXB reflection model
@@ -94,6 +95,7 @@ public class JAXBMetadataModel implements MetadataModel {
 		indirectRelationshipIdToInfoMap = new HashMap<String, IndirectRelationshipInfo>();
 		keyedRelationshipIdToInfoMap = new HashMap<String, KeyedRelationshipInfo>();
 		entityIdToDocumentInfoMap = new HashMap<String, Set<DocumentInfo>>();
+		entityIdToStaticDocumentInfoMap = new HashMap<String, StaticDocumentInfo>();
 
 		// Load metadata and associate with JAXB info
 		loadMetadata(init);
@@ -189,6 +191,11 @@ public class JAXBMetadataModel implements MetadataModel {
 
 	public void registerDocument(AbstractDocumentInfo<?> document) {
 		documentMap.put(document.getBinding().getJaxbClass(), document);
+
+		if (StaticDocumentInfo.class.isAssignableFrom(document.getClass())) {
+			StaticDocumentInfo staticDocumentInfo = (StaticDocumentInfo)document;
+			entityIdToStaticDocumentInfoMap.put(staticDocumentInfo.getEntityInfo().getId(), staticDocumentInfo);
+		}
 	}
 
 	public JAXBContext getJAXBContext() {
@@ -262,5 +269,10 @@ public class JAXBMetadataModel implements MetadataModel {
 	@Override
 	public Set<DocumentInfo> getDocumentInfosContaining(EntityInfo info) {
 		return entityIdToDocumentInfoMap.get(info.getId());
+	}
+
+	@Override
+	public StaticDocumentInfo getStaticDocumentInfoByEntityId(String id) {
+		return entityIdToStaticDocumentInfoMap.get(id);
 	}
 }

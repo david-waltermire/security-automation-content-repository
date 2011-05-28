@@ -58,6 +58,18 @@ class SchemaInfoImpl implements SchemaInfo {
 		this.schemaNode = type.getSchemaNode().getNode();
 		this.metadataModel = metadataModel;
 
+		SchemaType.Entities entities = type.getEntities();
+		if (entities != null) {
+			entityMap = new HashMap<JAXBClass, EntityInfoImpl>();
+			for (EntityType node : entities.getEntity()) {
+				EntityInfoImpl entity = new EntityInfoImpl(node, this, metadataModel, init);
+				metadataModel.registerEntity(entity);
+				entityMap.put(entity.getBinding().getJaxbClass(), entity);
+			}
+		} else {
+			entityMap = Collections.emptyMap();
+		}
+
 		SchemaType.Documents documents = type.getDocuments();
 		if (documents != null) {
 			documentMap = new HashMap<JAXBClass, DocumentInfo>();
@@ -81,18 +93,6 @@ class SchemaInfoImpl implements SchemaInfo {
 			}
 		} else {
 			documentMap = Collections.emptyMap();
-		}
-
-		SchemaType.Entities entities = type.getEntities();
-		if (entities != null) {
-			entityMap = new HashMap<JAXBClass, EntityInfoImpl>();
-			for (EntityType node : entities.getEntity()) {
-				EntityInfoImpl entity = new EntityInfoImpl(node, this, metadataModel, init);
-				metadataModel.registerEntity(entity);
-				entityMap.put(entity.getBinding().getJaxbClass(), entity);
-			}
-		} else {
-			entityMap = Collections.emptyMap();
 		}
 
 		SchemaType.Relationships relationships = type.getRelationships();

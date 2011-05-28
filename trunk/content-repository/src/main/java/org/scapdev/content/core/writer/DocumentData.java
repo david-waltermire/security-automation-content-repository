@@ -23,22 +23,15 @@
  ******************************************************************************/
 package org.scapdev.content.core.writer;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.scapdev.content.model.DocumentInfo;
-import org.scapdev.content.model.Entity;
 
 interface DocumentData<DOCUMENT extends DocumentInfo> {
-	void addEntity(Entity entity);
-
 	/**
 	 * @return the info
 	 */
 	DOCUMENT getDocumentInfo();
-	Collection<Entity> getEntities(String documentContainerId, List<String> entityTypeIds);
 	DocumentWriter newDocumentWriter(XMLStreamWriter writer, Marshaller marshaller);
 }

@@ -495,15 +495,20 @@
       <documents>
         <document id="urn:scap-content:document:gov.nist.checklists:xccdf-1.1">
           <schema-node node="//xs:element[@name='Benchmark']/xs:complexType"/>
-          <static-document-model>
-            <key id="urn:scap-content:key:gov.nist.checklists:xccdf-1.1-benchmark">
-              <field id="urn:scap-content:field:gov.nist.checklists:xccdf-1.1-benchmark">
-                <schema-node node="//xs:element[@name='Benchmark']/xs:complexType/xs:attribute[@name='id']"/>
-              </field>
-            </key>
-          </static-document-model>
+          <static-document-model entity-id-ref="urn:scap-content:entity:gov.nist.checklists:xccdf-1.1-benchmark"/>
         </document>
       </documents>
+      
+      <entities>
+        <entity id="urn:scap-content:entity:gov.nist.checklists:xccdf-1.1-benchmark">
+          <schema-node node="//xs:element[@name='Benchmark']/xs:complexType"/>
+          <key id="urn:scap-content:key:gov.nist.checklists:xccdf-1.1-benchmark">
+            <field id="urn:scap-content:field:gov.nist.checklists:xccdf-1.1-benchmark">
+              <schema-node node="//xs:element[@name='Benchmark']/xs:complexType/xs:attribute[@name='id']"/>
+            </field>
+          </key>
+        </entity>
+      </entities>
     </schema>
   </schemas>
 </meta-model>

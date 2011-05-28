@@ -26,14 +26,12 @@ package org.scapdev.content.model;
 import javax.xml.bind.JAXBElement;
 
 import org.scapdev.content.model.jaxb.DocumentType;
-import org.scapdev.content.model.jaxb.IdentifierMappingType;
 import org.scapdev.content.model.jaxb.StaticDocumentModelType;
 
 class StaticDocumentInfoImpl extends AbstractDocumentInfo<StaticDocumentModel> implements StaticDocumentInfo {
 	private final StaticDocumentModel documentModel;
 
-	private final KeyInfo keyInfo;
-	private final EntityIdentifierMapping identifierMapping;
+	private final EntityInfo entityInfo;
 
 	protected StaticDocumentInfoImpl(DocumentType documentType, SchemaInfoImpl schema,
 			JAXBMetadataModel model, InitializingJAXBClassVisitor init) {
@@ -44,13 +42,8 @@ class StaticDocumentInfoImpl extends AbstractDocumentInfo<StaticDocumentModel> i
 		StaticDocumentModelType documentModelType = modelType.getValue();
 		this.documentModel = new StaticDocumentModelImpl(modelType, this);
 
-		keyInfo = new KeyInfoImpl(documentModelType.getKey(), this, model, init);
-		IdentifierMappingType mapping = documentModelType.getIdentifierMapping();
-		if (mapping != null) {
-			identifierMapping = new EntityIdentifierMappingImpl(mapping, this);
-		} else {
-			identifierMapping = null;
-		}
+		String entityIdRef = documentModelType.getEntityIdRef();
+		entityInfo = model.getEntityInfoById(entityIdRef);
 	}
 
 	@Override
@@ -59,12 +52,7 @@ class StaticDocumentInfoImpl extends AbstractDocumentInfo<StaticDocumentModel> i
 	}
 
 	@Override
-	public EntityIdentifierMapping getEntityIdentifierMapping() {
-		return identifierMapping;
-	}
-
-	@Override
-	public KeyInfo getKeyInfo() {
-		return keyInfo;
+	public EntityInfo getEntityInfo() {
+		return entityInfo;
 	}
 }

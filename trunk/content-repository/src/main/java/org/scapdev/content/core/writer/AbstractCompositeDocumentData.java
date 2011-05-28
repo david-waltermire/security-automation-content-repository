@@ -34,11 +34,11 @@ import org.scapdev.content.model.DocumentInfo;
 import org.scapdev.content.model.Entity;
 import org.scapdev.content.model.Key;
 
-abstract class AbstractDocumentData<DOCUMENT extends DocumentInfo> implements DocumentData<DOCUMENT> {
+abstract class AbstractCompositeDocumentData<DOCUMENT extends DocumentInfo> implements CompositeDocumentData<DOCUMENT> {
 	private final DOCUMENT documentInfo;
 	private final Map<String, Map<Key, Entity>> entityTypeToEntityMap;
 
-	public AbstractDocumentData(DOCUMENT info) {
+	public AbstractCompositeDocumentData(DOCUMENT info) {
 		this.documentInfo = info;
 		this.entityTypeToEntityMap = new HashMap<String, Map<Key, Entity>>();
 	}
