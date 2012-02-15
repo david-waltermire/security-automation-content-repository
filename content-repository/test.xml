@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
+  <definitions>
+    <definition id="oval:gov.nist.cpe.oval:def:1" version="3" class="inventory">
+      <metadata>
+        <title>Microsoft Windows 7 is installed</title>
+        <affected family="windows">
+          <platform>Microsoft Windows 7</platform>
+        </affected>
+        <reference source="CPE" ref_id="cpe:/o:microsoft:windows_7"/>
+        <description>The operating system installed on the system is Microsoft Windows
+          7</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:org.mitre.oval:tst:99"
+          comment="the installed operating system is part of the Microsoft Windows family"/>
+        <criterion test_ref="oval:org.mitre.oval:tst:10792" comment="Windows 7 is installed"/>
+      </criteria>
+    </definition>
+    <definition id="oval:gov.nist.usgcb.windowsseven:def:13" version="1" class="compliance">
+      <metadata>
+        <title>Log On Locally - Administrators, Users</title>
+        <affected family="windows">
+          <platform>Microsoft Windows 7</platform>
+        </affected>
+        <reference source="http://cce.mitre.org" ref_id="CCE-9345-0"/>
+        <description>Administrators and Users are allowed to log on locally</description>
+      </metadata>
+      <criteria>
+        <extend_definition definition_ref="oval:gov.nist.cpe.oval:def:1"
+          comment="Windows 7 is installed"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:283"
+          comment="Administrators are allowed to log on locally"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:284"
+          comment="Users are allowed to log on locally"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:285"
+          comment="No one but Administrators and Users are allowed to log on locally"/>
+      </criteria>
+    </definition>
+    <definition id="oval:gov.nist.usgcb.windowsseven:def:16" version="1" class="compliance">
+      <metadata>
+        <title>Bypass Traverse Checking - Administrators, Users, Local Service, Network
+          Service</title>
+        <affected family="windows">
+          <platform>Microsoft Windows 7</platform>
+        </affected>
+        <reference source="http://cce.mitre.org" ref_id="CCE-8414-5"/>
+        <description>Administrators, Users, Local Service and Network Service may bypass traverse
+          checking</description>
+      </metadata>
+      <criteria>
+        <extend_definition definition_ref="oval:gov.nist.cpe.oval:def:1"
+          comment="Windows 7 is installed"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:291"
+          comment="Administrators may bypass traverse checking"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:292"
+          comment="Users may bypass traverse checking"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:293"
+          comment="Local Service may bypass traverse checking"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:294"
+          comment="Network Service may bypass traverse checking"/>
+        <criterion test_ref="oval:gov.nist.usgcb.windowsseven:tst:295"
+          comment="No one but Administrators, Users, Local Service and Network Service may bypass traverse checking"
+        />
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:283" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="Administrators are allowed to log on locally">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:169"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:161"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:284" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="Users are allowed to log on locally">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:172"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:161"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:285" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="No one but Administrators and Users are allowed to log on locally">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:174"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:162"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:291" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="Administrators may bypass traverse checking">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:169"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:167"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:292" version="1"
+      check_existence="at_least_one_exists" check="all" comment="Users may bypass traverse checking">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:172"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:167"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:293" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="Local Service may bypass traverse checking">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:175"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:167"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:294" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="Network Service may bypass traverse checking">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:176"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:167"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:accesstoken_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:tst:295" version="1"
+      check_existence="at_least_one_exists" check="all"
+      comment="No one but Administrators, Users, Local Service and Network Service may bypass traverse checking">
+      <oval-def-windows:object object_ref="oval:gov.nist.usgcb.windowsseven:obj:181"/>
+      <oval-def-windows:state state_ref="oval:gov.nist.usgcb.windowsseven:ste:168"/>
+    </oval-def-windows:accesstoken_test>
+    <oval-def-windows:registry_test
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:org.mitre.oval:tst:10792" version="4" check_existence="at_least_one_exists"
+      check="at least one" comment="Windows 7 is installed">
+      <oval-def-windows:object object_ref="oval:org.mitre.oval:obj:5590"/>
+      <oval-def-windows:state state_ref="oval:org.mitre.oval:ste:5027"/>
+    </oval-def-windows:registry_test>
+    <oval-def-ind:family_test
+      xmlns:oval-def-ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+      id="oval:org.mitre.oval:tst:99" version="1" check_existence="at_least_one_exists"
+      check="only one"
+      comment="the installed operating system is part of the Microsoft Windows family">
+      <oval-def-ind:object object_ref="oval:org.mitre.oval:obj:99"/>
+      <oval-def-ind:state state_ref="oval:org.mitre.oval:ste:99"/>
+    </oval-def-ind:family_test>
+  </tests>
+  <objects>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:169" version="1">
+      <oval-def-windows:security_principle/>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:172" version="1">
+      <oval-def-windows:security_principle/>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:174" version="1">
+      <set set_operator="INTERSECTION">
+        <set set_operator="COMPLEMENT">
+          <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+          <object_reference>oval:gov.nist.usgcb.windowsseven:obj:170</object_reference>
+        </set>
+        <set set_operator="COMPLEMENT">
+          <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+          <object_reference>oval:gov.nist.usgcb.windowsseven:obj:173</object_reference>
+        </set>
+      </set>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:175" version="1">
+      <oval-def-windows:security_principle/>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:176" version="1">
+      <oval-def-windows:security_principle/>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:accesstoken_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:obj:181" version="1">
+      <set set_operator="INTERSECTION">
+        <set set_operator="INTERSECTION">
+          <set set_operator="COMPLEMENT">
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:170</object_reference>
+          </set>
+          <set set_operator="COMPLEMENT">
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:173</object_reference>
+          </set>
+        </set>
+        <set set_operator="INTERSECTION">
+          <set set_operator="COMPLEMENT">
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:176</object_reference>
+          </set>
+          <set set_operator="COMPLEMENT">
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:168</object_reference>
+            <object_reference>oval:gov.nist.usgcb.windowsseven:obj:175</object_reference>
+          </set>
+        </set>
+      </set>
+    </oval-def-windows:accesstoken_object>
+    <oval-def-windows:registry_object
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:org.mitre.oval:obj:5590" version="1"
+      comment="This registry key identifies the Windows ProductName">
+      <oval-def-windows:hive/>
+      <oval-def-windows:key/>
+      <oval-def-windows:name/>
+    </oval-def-windows:registry_object>
+    <oval-def-ind:family_object
+      xmlns:oval-def-ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+      id="oval:org.mitre.oval:obj:99" version="1"
+      comment="This is the default family object. Only one family object should exist."/>
+  </objects>
+  <states>
+    <oval-def-windows:accesstoken_state
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:ste:161" version="1">
+      <oval-def-windows:seinteractivelogonright datatype="boolean"/>
+    </oval-def-windows:accesstoken_state>
+    <oval-def-windows:accesstoken_state
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:ste:162" version="1">
+      <oval-def-windows:seinteractivelogonright datatype="boolean"/>
+    </oval-def-windows:accesstoken_state>
+    <oval-def-windows:accesstoken_state
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:ste:167" version="1">
+      <oval-def-windows:sechangenotifyprivilege datatype="boolean"/>
+    </oval-def-windows:accesstoken_state>
+    <oval-def-windows:accesstoken_state
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:gov.nist.usgcb.windowsseven:ste:168" version="1">
+      <oval-def-windows:sechangenotifyprivilege datatype="boolean"/>
+    </oval-def-windows:accesstoken_state>
+    <oval-def-windows:registry_state
+      xmlns:oval-def-windows="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+      id="oval:org.mitre.oval:ste:5027" version="4"
+      comment="The registry key matches with Windows 7">
+      <oval-def-windows:value operation="pattern match"/>
+    </oval-def-windows:registry_state>
+    <oval-def-ind:family_state
+      xmlns:oval-def-ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+      id="oval:org.mitre.oval:ste:99" version="1" comment="Microsoft Windows family">
+      <oval-def-ind:family operation="equals"/>
+    </oval-def-ind:family_state>
+  </states>
+  <variables/>
+</oval_definitions>
