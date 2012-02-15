@@ -39,8 +39,8 @@
     </xsd:annotation>
 
     <!-- Import base XML namespace -->
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
-        schemaLocation="http://www.w3.org/2001/03/xml.xsd">
+    <!-- FIX: changed http://www.w3.org/2001/03/xml.xsd to http://www.w3.org/2001/xml.xsd to allow catalog mapping -->
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
                 Import the XML namespace because this schema uses
@@ -50,8 +50,8 @@
     </xsd:import>
 
     <!-- Import Dublin Core metadata namespace -->
-    <xsd:import namespace="http://purl.org/dc/elements/1.1/" 
-        schemaLocation="http://dublincore.org/schemas/xmls/qdc/2008/02/11/dc.xsd">
+    <!-- FIX: changed http://dublincore.org/schemas/xmls/qdc/2008/02/11/dc.xsd to http://dublincore.org/schemas/xmls/simpledc20021212.xsd to allow catalog mapping -->
+    <xsd:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="http://dublincore.org/schemas/xmls/simpledc20021212.xsd">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
               Import the simple Dublin Core namespace because this
