@@ -10,11 +10,11 @@ import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.rules.KeyedRelationshipInfo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
@@ -26,14 +26,15 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 
 	private final Collection<KeyedRelationshipInfo> keyedRelationships = new LinkedList<KeyedRelationshipInfo>();
 	private final Map<IKey, IMutableEntity<?>> keyedEntities = new HashMap<IKey, IMutableEntity<?>>();
-	private final Collection<IMutableEntity<?>> entities = new LinkedList<IMutableEntity<?>>();
+	private final LinkedList<IMutableEntity<?>> entities = new LinkedList<IMutableEntity<?>>();
 
 	public DataExtractingContentHandler() {
 	}
 
-	public Collection<? extends IEntity<?>> getEntities() {
+	public Queue<? extends IEntity<?>> getEntities() {
 		process();
-		return Collections.unmodifiableCollection(entities);
+		// TODO: make the queue unmodifiable
+		return entities;
 	}
 
 	public void process() {
