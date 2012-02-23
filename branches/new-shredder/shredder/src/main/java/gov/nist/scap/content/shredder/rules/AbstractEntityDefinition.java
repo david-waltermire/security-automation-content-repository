@@ -3,7 +3,7 @@ package gov.nist.scap.content.shredder.rules;
 import gov.nist.scap.content.shredder.model.ContentException;
 import gov.nist.scap.content.shredder.model.DefaultBoundaryRelationship;
 import gov.nist.scap.content.shredder.model.IBoundaryRelationship;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.parser.ContentHandler;
 
@@ -19,7 +19,7 @@ public abstract class AbstractEntityDefinition extends AbstractDefinition implem
 		super(schema, id);
 	}
 
-	protected abstract IMutableEntity<?> newContainer(XmlCursor cursor, IEntity<?> parentContext) throws ContentException;
+	protected abstract IMutableEntity<?> newContainer(XmlCursor cursor, IContainer<?> parentContext) throws ContentException;
 
 	public void addRelationship(IRelationshipDefinition relationship) {
 		relationships.add(relationship);

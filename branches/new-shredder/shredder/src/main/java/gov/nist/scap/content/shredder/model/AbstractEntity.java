@@ -10,13 +10,13 @@ import org.apache.xmlbeans.XmlCursor;
 
 public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> implements IMutableEntity<DEFINITION> {
 	private final DEFINITION contentDefinition;
-	private final IEntity<?> parentContext;
+	private final IContainer<?> parentContext;
 	private final Bookmark bookmark;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 
 	public AbstractEntity(XmlCursor cursor,
 			DEFINITION contentDefinition,
-			IEntity<?> parentContext) throws ContentException {
+			IContainer<?> parentContext) throws ContentException {
 		this.contentDefinition = contentDefinition;
 		this.parentContext = parentContext;
 		this.bookmark = new Bookmark();
@@ -27,12 +27,16 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		return contentDefinition;
 	}
 
-	public IEntity<?> getParentContext() {
+	public IContainer<?> getParentContext() {
 		return parentContext;
 	}
 
 	public Bookmark getBookmark() {
 		return bookmark;
+	}
+
+	public XmlCursor getCursor() {
+		return (bookmark != null ? bookmark.createCursor() : null);
 	}
 
 	public List<IRelationship<?>> getRelationships() {

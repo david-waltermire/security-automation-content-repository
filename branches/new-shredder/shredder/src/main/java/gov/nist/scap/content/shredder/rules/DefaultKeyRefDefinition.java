@@ -24,7 +24,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.KeyBuilder;
 import gov.nist.scap.content.shredder.model.KeyException;
@@ -48,7 +48,7 @@ public class DefaultKeyRefDefinition extends AbstractKeyedDefinition implements 
 		return keyDefinition;
 	}
 
-	public IKey getKey(IEntity<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
+	public IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
 		Map<String, String> referenceFieldIdToValueMap = getFieldValues(parentContext, cursor);
 
 //		List<? extends IKeyedField> fields = getFields();

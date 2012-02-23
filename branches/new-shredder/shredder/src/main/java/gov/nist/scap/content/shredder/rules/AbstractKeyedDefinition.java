@@ -1,7 +1,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.KeyException;
 
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class AbstractKeyedDefinition extends AbstractDefinition {
 		return fields;
 	}
 
-	protected LinkedHashMap<String, String> getFieldValues(IEntity<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
+	protected LinkedHashMap<String, String> getFieldValues(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
 		LinkedHashMap<String, String> fieldIdToValueMap = new LinkedHashMap<String, String>();
 
 		for (IKeyedField field : fields) {

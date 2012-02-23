@@ -1,6 +1,6 @@
 package gov.nist.scap.content.shredder.rules;
 
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.KeyException;
 
 import org.apache.xmlbeans.XmlBeans;
@@ -16,7 +16,7 @@ public class XPathKeyedField extends AbstractKeyedField {
 	}
 
 	@Override
-	protected String retrieveValue(IEntity<?> parentContext, XmlCursor cursor) throws KeyException {
+	protected String retrieveValue(IContainer<?> parentContext, XmlCursor cursor) throws KeyException {
 		String retval = retriever.getValue(cursor);
 
 		if (retval == null) {

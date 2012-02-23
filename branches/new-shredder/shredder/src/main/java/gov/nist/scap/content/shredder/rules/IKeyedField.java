@@ -1,7 +1,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.KeyException;
 
 import org.apache.xmlbeans.XmlCursor;
@@ -19,5 +19,5 @@ public interface IKeyedField {
 	 * @throws KeyException
 	 * @throws ContentException 
 	 */
-	String getValue(IEntity<?> parentContext, XmlCursor cursor) throws ContentException;
+	String getValue(IContainer<?> parentContext, XmlCursor cursor) throws ContentException;
 }

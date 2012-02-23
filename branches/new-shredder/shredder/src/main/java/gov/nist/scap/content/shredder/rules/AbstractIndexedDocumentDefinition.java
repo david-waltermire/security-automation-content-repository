@@ -1,9 +1,9 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
-import gov.nist.scap.content.shredder.model.IMutableIndexedDocument;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IMutableIndexedDocument;
 
 import javax.xml.namespace.QName;
 
@@ -18,11 +18,11 @@ public abstract class AbstractIndexedDocumentDefinition extends AbstractDocument
 	}
 
 	protected abstract IMutableIndexedDocument newIndexedDocument(XmlCursor cursor,
-			IEntity<?> parentContext, IKey key) throws ContentException;
+			IContainer<?> parentContext, IKey key) throws ContentException;
 
 	@Override
 	protected final IMutableIndexedDocument newContainer(XmlCursor cursor,
-			IEntity<?> parentContext) throws ContentException {
+			IContainer<?> parentContext) throws ContentException {
 		IKey key = keyDefinition.getKey(parentContext, cursor);
 		return newIndexedDocument(cursor, parentContext, key);
 	}

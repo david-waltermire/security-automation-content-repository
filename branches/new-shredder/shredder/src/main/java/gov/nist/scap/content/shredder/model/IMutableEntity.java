@@ -2,7 +2,7 @@ package gov.nist.scap.content.shredder.model;
 
 import gov.nist.scap.content.shredder.rules.IEntityDefinition;
 
-public interface IMutableEntity<DEFINITION extends IEntityDefinition> extends IEntity<DEFINITION> {
+public interface IMutableEntity<DEFINITION extends IEntityDefinition> extends IContainer<DEFINITION> {
 	void appendRelationship(IRelationship<?> relationship);
 	/**
 	 * 
