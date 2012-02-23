@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>gov.nist.scap</groupId>
+		<artifactId>content-master</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>gov.nist.scap.content</groupId>
+	<artifactId>rules-model</artifactId>
+
+	<name>XMLBeans Rule Model</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>gov.nist.scap.content</groupId>
+			<artifactId>shredder</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans-xpath</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.saxon</groupId>
+			<artifactId>saxon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xmlbeans-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xmlbeans</goal>
+						</goals>
+					</execution>
+				</executions>
+				<inherited>true</inherited>
+				<configuration>
+					<quiet>false</quiet>
+					<verbose>false</verbose>
+					<download>false</download>
+					<javaSource>1.5</javaSource>
+					<schemaDirectory>src/main/xsd</schemaDirectory>
+					<catalogLocation>src/main/xsd/resolver-catalog.xml</catalogLocation>
+					<staleFile>${project.build.directory}/generated-sources/xmlbeans/.staleFlag</staleFile>
+					<noJavac>true</noJavac>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>xml-resolver</groupId>
+						<artifactId>xml-resolver</artifactId>
+						<version>1.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>
