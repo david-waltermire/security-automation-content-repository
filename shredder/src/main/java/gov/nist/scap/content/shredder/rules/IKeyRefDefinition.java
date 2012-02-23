@@ -24,7 +24,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.KeyException;
 
@@ -53,5 +53,5 @@ public interface IKeyRefDefinition extends IDefinition {
 	 * @throws KeyException if the key is malformed or incomplete
 	 * @throws ContentException 
 	 */
-	IKey getKey(IEntity<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
+	IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
 }

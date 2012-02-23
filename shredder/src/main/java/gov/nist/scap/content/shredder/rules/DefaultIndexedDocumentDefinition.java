@@ -2,7 +2,7 @@ package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
 import gov.nist.scap.content.shredder.model.DefaultIndexedDocument;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 
 import javax.xml.namespace.QName;
@@ -19,7 +19,7 @@ public class DefaultIndexedDocumentDefinition extends
 
 	@Override
 	protected DefaultIndexedDocument newIndexedDocument(XmlCursor cursor,
-			IEntity<?> parentContext, IKey key) throws ContentException {
+			IContainer<?> parentContext, IKey key) throws ContentException {
 		return new DefaultIndexedDocument(cursor, this, parentContext, key);
 	}
 }

@@ -10,7 +10,7 @@ public abstract class AbstractDocument<DEFINITION extends IDocumentDefinition> e
 
 	public AbstractDocument(XmlCursor cursor,
 			DEFINITION documentDefinition,
-			IEntity<?> parentContext) throws ContentException {
+			IContainer<?> parentContext) throws ContentException {
 		super(cursor, documentDefinition, parentContext);
 	}
 }

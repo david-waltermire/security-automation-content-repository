@@ -1,7 +1,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.KeyBuilder;
 import gov.nist.scap.content.shredder.model.KeyException;
@@ -17,7 +17,7 @@ public class DefaultKeyDefinition extends AbstractKeyedDefinition implements IKe
 		super(schema, id, keyFields);
 	}
 
-	public IKey getKey(IEntity<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
+	public IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
 		Map<String, String> fieldIdToValueMap = getFieldValues(parentContext, cursor);
 		KeyBuilder builder = new KeyBuilder(getFields());
 		builder.setId(getId());

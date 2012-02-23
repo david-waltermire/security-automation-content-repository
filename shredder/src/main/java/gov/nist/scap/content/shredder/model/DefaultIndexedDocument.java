@@ -12,7 +12,7 @@ public class DefaultIndexedDocument extends AbstractDocument<IIndexedDocumentDef
 
 	public DefaultIndexedDocument(XmlCursor cursor,
 			IIndexedDocumentDefinition documentDefinition,
-			IEntity<?> parentContext, IKey key) throws ContentException {
+			IContainer<?> parentContext, IKey key) throws ContentException {
 		super(cursor, documentDefinition, parentContext);
 		this.key = key;
 	}

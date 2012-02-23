@@ -4,12 +4,12 @@ import gov.nist.scap.content.shredder.rules.IContentNodeDefinition;
 
 import org.apache.xmlbeans.XmlCursor;
 
-public class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IMutableContentNode {
+public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IMutableContentNode {
 	private final IKey key;
 
 	public AbstractContentNode(XmlCursor cursor,
 			IContentNodeDefinition contentNodeDefinition,
-			IEntity<?> parentContext, IKey key) throws ContentException {
+			IContainer<?> parentContext, IKey key) throws ContentException {
 		super(cursor, contentNodeDefinition, parentContext);
 		this.key = key;
 	}

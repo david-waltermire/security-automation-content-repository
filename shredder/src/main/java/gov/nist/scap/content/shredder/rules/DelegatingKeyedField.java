@@ -1,6 +1,6 @@
 package gov.nist.scap.content.shredder.rules;
 
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.KeyException;
 
@@ -17,7 +17,7 @@ public class DelegatingKeyedField extends AbstractKeyedField {
 	}
 
 	@Override
-	protected String retrieveValue(IEntity<?> parentContext, XmlCursor cursor)
+	protected String retrieveValue(IContainer<?> parentContext, XmlCursor cursor)
 			throws KeyException {
 		IKey key = parentContext.getKey(keyId);
 		if (key == null) {

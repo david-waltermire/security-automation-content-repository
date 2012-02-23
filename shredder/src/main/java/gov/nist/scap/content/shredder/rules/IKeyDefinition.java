@@ -1,11 +1,11 @@
 package gov.nist.scap.content.shredder.rules;
 
-import java.util.List;
-
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.KeyException;
+
+import java.util.List;
 
 import org.apache.xmlbeans.XmlCursor;
 
@@ -20,6 +20,6 @@ public interface IKeyDefinition extends IDefinition {
 	 * @throws KeyException
 	 * @throws ContentException 
 	 */
-	IKey getKey(IEntity<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
+	IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
 	List<? extends IKeyedField> getFields();
 }
