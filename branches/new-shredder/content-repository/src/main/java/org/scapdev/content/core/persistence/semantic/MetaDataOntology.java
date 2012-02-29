@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -38,7 +40,6 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.scapdev.content.model.MetadataModel;
 
 /**
  * Contains necessary assertions to model and build meta-data model in RDFS.
@@ -114,7 +115,7 @@ public class MetaDataOntology {
 	}
 	
 	/** helper method to load all model triples into triple store using given connection */
-	void loadModel(RepositoryConnection conn, MetadataModel javaModel) throws RepositoryException {
+	void loadModel(RepositoryConnection conn, IMetadataModel javaModel) throws RepositoryException {
 		// add statements
 		List<Statement> statements = new LinkedList<Statement>();
 		

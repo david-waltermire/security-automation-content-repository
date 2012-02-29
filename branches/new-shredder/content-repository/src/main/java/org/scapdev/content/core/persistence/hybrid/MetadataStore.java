@@ -23,14 +23,15 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.core.query.EntityStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
 
 public interface MetadataStore {
 
@@ -41,7 +42,7 @@ public interface MetadataStore {
 	 * @param model
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 */
-	Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model);
+	IEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
 	/**
 	 * 
 	 * @param indirectType
@@ -49,8 +50,8 @@ public interface MetadataStore {
 	 * @param entityTypes filter results to only these entity types or no filtering if empty
 	 * @return
 	 */
-	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
-	void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model);
-	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, MetadataModel model);
+	Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
+	void persist(Map<String, IEntity<?>> contentIdToEntityMap, IMetadataModel model);
+	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }

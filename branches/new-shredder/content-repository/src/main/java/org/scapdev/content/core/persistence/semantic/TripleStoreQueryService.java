@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +49,6 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.scapdev.content.model.Key;
 
 /**
  * A service class to provide any triple store searching related services
@@ -75,7 +76,7 @@ public class TripleStoreQueryService {
 	 * @throws MalformedQueryException 
 	 * @throws RepositoryException 
 	 */
-	URI findEntityURI(Key key, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
+	URI findEntityURI(IKey key, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
 		// TODO Implement!!
 		String entityURIVariableName = "_e";
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateEntitySearchQuery(key, entityURIVariableName));
@@ -511,7 +512,7 @@ public class TripleStoreQueryService {
 	 * @return - the query that will produce the entity URI
 	 *	TODO: change to sparql query?
 	 */
-	private String generateEntitySearchQuery(Key key, String entityURIVariableName){
+	private String generateEntitySearchQuery(IKey key, String entityURIVariableName){
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
 		//_e hasKey _key
@@ -523,7 +524,7 @@ public class TripleStoreQueryService {
 		queryBuilder.append("<").append(ontology.HAS_KEY_TYPE.URI).append(">");
 		queryBuilder.append(" {\"").append(key.getId()).append("\"},").append(NEW_LINE);
 		int fieldNumber = 1;
-		for (Map.Entry<String, String> keyFieldEntry : key.getIdToValueMap().entrySet()){
+		for (Map.Entry<String, String> keyFieldEntry : key.getFieldIdToValueMap().entrySet()){
 			if (fieldNumber > 1){
 				queryBuilder.append(",").append(NEW_LINE);
 			}

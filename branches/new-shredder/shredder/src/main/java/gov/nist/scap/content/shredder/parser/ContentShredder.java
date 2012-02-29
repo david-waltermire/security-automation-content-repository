@@ -46,7 +46,7 @@ public class ContentShredder {
 
 		IDocumentDefinition documentDef = ruleDefinitions.getDocumentDefinition(name);
 		if (documentDef != null) {
-			documentDef.processCursor(cursor, null, handler, null);
+			documentDef.processCursor(cursor, handler, null);
 		}
 	}
 }

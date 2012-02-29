@@ -23,19 +23,19 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBElement;
-
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.MetadataModel;
+import org.apache.xmlbeans.XmlObject;
 
 public interface ContentStore {
 
-	JAXBElement<Object> getContent(String contentId, MetadataModel model);
-	Map<String, Entity> persist(List<? extends Entity> entities, MetadataModel model);
-	ContentRetriever getContentRetriever(String contentId, MetadataModel model);
+	XmlObject getContent(String contentId, IMetadataModel model);
+	Map<String, IEntity<?>> persist(List<? extends IEntity<?>> entities, IMetadataModel model);
+	ContentRetriever getContentRetriever(String contentId, IMetadataModel model);
 	void shutdown();
 
 }

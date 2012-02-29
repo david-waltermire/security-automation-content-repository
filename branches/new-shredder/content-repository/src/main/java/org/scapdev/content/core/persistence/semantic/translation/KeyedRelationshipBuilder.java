@@ -23,29 +23,31 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.AbstractRelationship;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IKeyedEntity;
+import gov.nist.scap.content.shredder.model.IKeyedRelationship;
+import gov.nist.scap.content.shredder.rules.IKeyedRelationshipDefinition;
+
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-import org.scapdev.content.model.AbstractRelationship;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.KeyedRelationshipInfo;
-import org.scapdev.content.model.MetadataModel;
 
 //TODO: need to handle rebuilding the KEY AND ENTITY!!!!
 class KeyedRelationshipBuilder {
-	private KeyedRelationshipInfo keyedRelationshipInfo;
+	private IKeyedRelationshipDefinition keyedRelationshipInfo;
 	
-	private Key relatedEntityKey;
+	private IKey relatedEntityKey;
 	
 	
 	KeyedRelationshipBuilder(MetaDataOntology ontology) {
 	}
 	
-	void setKeyedRelationshipInfo(KeyedRelationshipInfo keyedRelationshipInfo) {
+	void setKeyedRelationshipInfo(IKeyedRelationshipDefinition keyedRelationshipInfo) {
 		this.keyedRelationshipInfo = keyedRelationshipInfo;
 	}
 	
-	void setRelatedEntityKey(Key relatedEntityKey) {
+	void setRelatedEntityKey(IKey relatedEntityKey) {
 		this.relatedEntityKey = relatedEntityKey;
 	}
 
@@ -62,30 +64,35 @@ class KeyedRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	KeyedRelationship build(MetadataModel model, RebuiltEntity entity){
+	IKeyedRelationship build(IMetadataModel model, RebuiltEntity<?> entity){
 		if (keyedRelationshipInfo == null || relatedEntityKey == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-		KeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, entity, relatedEntityKey);
+		
+		IKeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, entity, relatedEntityKey);
 		
 		return rel;
 	}
 	
 	private static class InternalKeyedRelationship extends
-			AbstractRelationship<KeyedRelationshipInfo> implements
-			KeyedRelationship {
+			AbstractRelationship<IKeyedRelationshipDefinition> implements
+			IKeyedRelationship {
 		//key of related entity
-		private Key key;
+		private IKey key;
 		
-		InternalKeyedRelationship(KeyedRelationshipInfo relationshipInfo,
-				Entity owningEntity, Key key) {
+		InternalKeyedRelationship(IKeyedRelationshipDefinition relationshipInfo,
+				IEntity<?> owningEntity, IKey key) {
 			super(relationshipInfo, owningEntity);
 			this.key = key;
 		}
 
-		@Override
-		public Key getKey() {
+		public IKey getKey() {
 			return key;
+		}
+
+		public IKeyedEntity<?> getReferencedEntity() {
+			// TODO: figure out how to provide this information
+			throw new UnsupportedOperationException("implement");
 		}
 
 		

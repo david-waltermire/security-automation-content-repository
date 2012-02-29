@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -45,10 +49,6 @@ import org.scapdev.content.core.resolver.Resolver;
 import org.scapdev.content.core.writer.DefaultInstanceWriter;
 import org.scapdev.content.core.writer.InstanceWriter;
 import org.scapdev.content.core.writer.NamespaceMapper;
-import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.MetadataModelFactory;
 import org.scapdev.content.model.processor.JAXBEntityProcessor;
 import org.scapdev.content.util.ServiceLoaderUtil;
 
@@ -90,7 +90,7 @@ public class ContentRepository {
 	 * 
 	 * @return the metadata schema model instance
 	 */
-	public MetadataModel getMetadataModel() {
+	public IMetadataModel getMetadataModel() {
 		return persistenceContext.getMetadataModel();
 	}
 
@@ -132,7 +132,7 @@ public class ContentRepository {
 	 * @return a query result containing the entity associated with the key
 	 * @throws IOException
 	 */
-	public QueryResult query(Key key) throws IOException {
+	public QueryResult query(IKey key) throws IOException {
 		return query(key, false);
 	}
 
@@ -149,7 +149,7 @@ public class ContentRepository {
 	 * @return a query result containing the entity associated with the key
 	 * @throws IOException
 	 */
-	public QueryResult query(Key key, boolean resolveReferences)
+	public QueryResult query(IKey key, boolean resolveReferences)
 			throws IOException {
 		SimpleQuery query = new SimpleQuery(key);
 		query.setResolveReferences(resolveReferences);
@@ -186,9 +186,9 @@ public class ContentRepository {
 		return query(query);
 	}
 
-	public QueryResult query(ExternalIdentifier externalIdentifier,
+	public QueryResult query(IExternalIdentifier externalIdentifier, String value,
 			boolean resolveRelationships) {
-		IndirectQuery query = new IndirectQuery(externalIdentifier,
+		IndirectQuery query = new IndirectQuery(externalIdentifier, value,
 				getContentPersistenceManager());
 		query.setResolveReferences(resolveRelationships);
 		return query(query);

@@ -19,6 +19,6 @@ public interface IEntityDefinition extends IDefinition {
 	 * @throws ProcessingException
 	 * @throws ContentException
 	 */
-	void processCursor(XmlCursor cursor, IBoundaryRelationshipDefinition boundary, ContentHandler handler, IMutableEntity<?> parent) throws ProcessingException, ContentException;
+	IMutableEntity<?> processCursor(XmlCursor cursor, ContentHandler handler, IMutableEntity<?> parent) throws ProcessingException, ContentException;
 
 }

@@ -23,6 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IKeyedRelationship;
+import gov.nist.scap.content.shredder.rules.IKeyedRelationshipDefinition;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,24 +36,19 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.KeyedRelationshipInfo;
-import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.RelationshipInfo;
 
 class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
 	//should be okay to store at class level since this should be created/destroyed within a single instance
-	private MetadataModel model;
+	private IMetadataModel model;
 	
 	//all IDs of directRelationships
 	private Collection<String> directRelationshipIds;
 	
 	// keys of all relatedEntities
-	private Map<URI, Key> relatedEntityKeys;
+	private Map<URI, IKey> relatedEntityKeys;
 	
 	private ValueFactory factory;
 	
@@ -65,7 +65,7 @@ class KeyedRelationshipStatementManager implements
 	 *            relatedKey (TODO: determine if there is another way to build
 	 *            out this part of the graph).
 	 */
-	KeyedRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model, ValueFactory factory, Map<URI, Key> relatedEntityKeys) {
+	KeyedRelationshipStatementManager(MetaDataOntology ontology, IMetadataModel model, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
 		this.ontology = ontology;
 		this.model = model;
 		this.factory = factory;
@@ -87,12 +87,12 @@ class KeyedRelationshipStatementManager implements
 
 	
 	@Override
-	public void populateEntity(RebuiltEntity entity) {
+	public void populateEntity(RebuiltEntity<?> entity) {
 		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
 			URI relatedEntityURI = entry.getKey();
 			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
 			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
-			KeyedRelationship keyedRelationship = keyedRelBuilder.build(model, entity);
+			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(model, entity);
 			entity.addKeyedRelationship(keyedRelationship);
 		}
 	}
@@ -109,7 +109,7 @@ class KeyedRelationshipStatementManager implements
 	 * 
 	 * @see RelationshipInfo
 	 */
-	private void populateKeyedRelationshipInfo(MetadataModel model2,
+	private void populateKeyedRelationshipInfo(IMetadataModel model2,
 			Statement statement) {
 		// hit on an keyedRelationship (called directRelationship in ontology) of some type
 		String keyedRelationshipId = statement.getPredicate().stringValue();
@@ -117,11 +117,11 @@ class KeyedRelationshipStatementManager implements
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
 			keyedRelBuilder = new KeyedRelationshipBuilder(ontology);
-			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipInfoById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) model.getRelationshipInfoById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		} else {
 			// can't be sure this was set before
-			keyedRelBuilder.setKeyedRelationshipInfo((KeyedRelationshipInfo)model.getRelationshipInfoById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)model.getRelationshipInfoById(keyedRelationshipId));
 		}
 		
 	}

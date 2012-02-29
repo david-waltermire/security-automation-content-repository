@@ -23,21 +23,26 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import javax.xml.bind.JAXBElement;
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
 
-import org.scapdev.content.model.MetadataModel;
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlObject;
 
 public class DefaultContentRetriever extends AbstractContentRetriever {
 	private ContentStore contentStore;
 
-	public DefaultContentRetriever(String contentId, MetadataModel model, ContentStore contentStore) {
+	public DefaultContentRetriever(String contentId, IMetadataModel model, ContentStore contentStore) {
 		super(contentId, model);
 		this.contentStore = contentStore;
 	}
 
 	@Override
-	protected JAXBElement<Object> getContentInternal(String contentId,
-			MetadataModel model) {
+	protected XmlObject getContentInternal(String contentId, IMetadataModel model) {
 		return contentStore.getContent(contentId, model);
+	}
+
+	@Override
+	public XmlCursor getCursor() {
+		throw new UnsupportedOperationException("implement");
 	}
 }

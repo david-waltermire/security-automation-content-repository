@@ -1,8 +1,6 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.DefaultBoundaryRelationship;
-import gov.nist.scap.content.shredder.model.IBoundaryRelationship;
 import gov.nist.scap.content.shredder.model.IContainer;
 import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.parser.ContentHandler;
@@ -25,13 +23,8 @@ public abstract class AbstractEntityDefinition extends AbstractDefinition implem
 		relationships.add(relationship);
 	}
 
-	public void processCursor(XmlCursor cursor, IBoundaryRelationshipDefinition boundaryDef, ContentHandler handler, IMutableEntity<?> parent) throws ProcessingException, ContentException {
+	public IMutableEntity<?> processCursor(XmlCursor cursor, ContentHandler handler, IMutableEntity<?> parent) throws ProcessingException, ContentException {
 		IMutableEntity<?> entity = newContainer(cursor, parent);
-
-		if (boundaryDef != null) {
-			IBoundaryRelationship relationship = new DefaultBoundaryRelationship(boundaryDef, entity, parent);
-			entity.appendRelationship(relationship);
-		}
 
 		// Handle all relationships
 		for (IRelationshipDefinition relationship : relationships) {
@@ -39,5 +32,6 @@ public abstract class AbstractEntityDefinition extends AbstractDefinition implem
 		}
 
 		handler.handle(entity);
+		return entity;
 	}
 }

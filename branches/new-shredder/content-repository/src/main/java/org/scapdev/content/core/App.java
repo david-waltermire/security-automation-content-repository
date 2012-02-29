@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -35,13 +38,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.scapdev.content.core.query.QueryResult;
 import org.scapdev.content.core.writer.InstanceWriter;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.Relationship;
 import org.scapdev.content.model.processor.ImportData;
 import org.scapdev.content.model.processor.ImportException;
 import org.scapdev.content.model.processor.Importer;
@@ -86,9 +86,9 @@ public class App {
 	    	StopWatch watch = new StopWatch();
 	    	watch.start();
 
-	    	Key key = repository.getMetadataModel().getKeyFromMappedIdentifier("oval:gov.nist.usgcb.windowsseven:def:2");
+	    	IKey key = repository.getMetadataModel().getKeyFromMappedIdentifier("oval:gov.nist.usgcb.windowsseven:def:2");
 	    	QueryResult result = repository.query(key, true);
-	    	for (Entity entity : result.getEntities().values()) {
+	    	for (IEntity<?> entity : result.getEntities().values()) {
 	    		log.info("Retrieved entity: "+entity.getKey());
 	    	}
 	    	watch.stop();
@@ -109,7 +109,7 @@ public class App {
 	    	cces.add("CCE-8414-5");
 
 	    	QueryResult result = repository.query("urn:scap-content:external-identifier:org.mitre:cce-5", cces, Collections.singleton("urn:scap-content:entity:org.mitre.oval:definition"), true);
-	    	for (Entity entity : result.getEntities().values()) {
+	    	for (IEntity<?> entity : result.getEntities().values()) {
 	    		log.info("Retrieved entity: "+entity.getKey());
 	    	}
 	    	watch.stop();
@@ -131,7 +131,7 @@ public class App {
     	watch.stop();
     	log.info("Entities processed: "+data.getEntities().size());
     	int relationships = 0;
-    	for (Entity entity : data.getEntities()) {
+    	for (IEntity<?> entity : data.getEntities()) {
     		for (@SuppressWarnings("unused") Relationship relationship : entity.getRelationships()) {
     			++relationships;
     		}

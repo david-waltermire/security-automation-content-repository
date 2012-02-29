@@ -23,13 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.resolver;
 
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Map;
 import java.util.Set;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-
 public interface Resolver {
-	Map<Key, Entity> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
+	Map<IKey, IEntity<?>> resolve(Set<IKey> keys, ResolutionParameters parameters) throws UnresolvableKeysException;
 	void resolveResolvable(ResolutionState state, ResolutionParameters parameters);
 }

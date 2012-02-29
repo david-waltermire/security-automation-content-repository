@@ -23,29 +23,30 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.scapdev.content.core.resolver.ResolutionParameters;
 import org.scapdev.content.core.resolver.Resolver;
-import org.scapdev.content.model.Key;
 
 
 public class SimpleQuery implements Query<SimpleQueryResult> {
-	private final Set<Key> keys;
+	private final Set<IKey> keys;
 	private boolean resolveReferences = false;
 
-	public SimpleQuery(Key key) {
+	public SimpleQuery(IKey key) {
 		this.keys = Collections.singleton(key);
 	}
 
-	public SimpleQuery(Set<Key> keys) {
+	public SimpleQuery(Set<IKey> keys) {
 		this.keys = Collections.unmodifiableSet(keys);
 	}
 
-	public SimpleQuery(SimpleQuery query, Set<Key> keys) {
+	public SimpleQuery(SimpleQuery query, Set<IKey> keys) {
 		this.resolveReferences = query.isResolveReferences();
 		this.keys = Collections.unmodifiableSet(keys);
 	}

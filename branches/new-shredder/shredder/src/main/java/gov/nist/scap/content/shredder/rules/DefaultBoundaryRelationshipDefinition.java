@@ -3,6 +3,8 @@ package gov.nist.scap.content.shredder.rules;
 import javax.xml.namespace.QName;
 
 import gov.nist.scap.content.shredder.model.ContentException;
+import gov.nist.scap.content.shredder.model.DefaultBoundaryRelationship;
+import gov.nist.scap.content.shredder.model.IBoundaryRelationship;
 import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.parser.ContentHandler;
 
@@ -72,7 +74,12 @@ public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipD
 			log.warn("Unrecognized QName '"+qname.toString()+"' at boundary: "+getId());
 		} else {
 			// process the child node
-			contentDefinition.processCursor(cursor, this, handler, containingEntity);
+			IMutableEntity<?> entity = contentDefinition.processCursor(cursor, handler, containingEntity);
+
+			IBoundaryRelationship relationship = new DefaultBoundaryRelationship(this, entity, containingEntity);
+			// TODO: determine which to keep
+			containingEntity.appendRelationship(relationship);
+			entity.appendRelationship(relationship);
 		}
 	}
 }

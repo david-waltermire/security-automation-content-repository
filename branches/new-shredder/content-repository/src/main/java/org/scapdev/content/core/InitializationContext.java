@@ -23,14 +23,15 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.QueryProcessor;
 import org.scapdev.content.core.resolver.Resolver;
-import org.scapdev.content.model.MetadataModel;
 import org.scapdev.content.model.processor.JAXBEntityProcessor;
 
 public interface InitializationContext {
-	MetadataModel getMetadataModel();
+	IMetadataModel getMetadataModel();
 	ContentPersistenceManager getContentPersistenceManager();
 	JAXBEntityProcessor getJAXBEntityProcessor();
 	Resolver getResolver();

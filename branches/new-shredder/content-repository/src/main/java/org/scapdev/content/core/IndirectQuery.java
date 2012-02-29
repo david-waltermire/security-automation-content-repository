@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -32,8 +35,6 @@ import org.scapdev.content.core.query.Query;
 import org.scapdev.content.core.query.SimpleQueryResult;
 import org.scapdev.content.core.resolver.ResolutionParameters;
 import org.scapdev.content.core.resolver.Resolver;
-import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.Key;
 
 public class IndirectQuery implements Query<SimpleQueryResult> {
 	private final String indirectType;
@@ -49,9 +50,9 @@ public class IndirectQuery implements Query<SimpleQueryResult> {
 		this.persistenceManager = contentPersistenceManager;
 	}
 
-	public IndirectQuery(ExternalIdentifier externalIdentifier,
+	public IndirectQuery(IExternalIdentifier externalIdentifier, String value,
 			ContentPersistenceManager contentPersistenceManager) {
-		this(externalIdentifier.getId(), Collections.singleton(externalIdentifier.getValue()), Collections.<String>emptySet(), contentPersistenceManager);
+		this(externalIdentifier.getId(), Collections.singleton(value), Collections.<String>emptySet(), contentPersistenceManager);
 	}
 
 	/**
@@ -70,7 +71,7 @@ public class IndirectQuery implements Query<SimpleQueryResult> {
 
 	@Override
 	public SimpleQueryResult resolve(Resolver resolver) {
-		Set<Key> keys = persistenceManager.getKeysForIndirectIds(indirectType, indirectIds, requestedEntityIds);
+		Set<IKey> keys = persistenceManager.getKeysForIndirectIds(indirectType, indirectIds, requestedEntityIds);
 		
 		ResolutionParameters parameters = new ResolutionParameters();
 		if (resolveReferences) {

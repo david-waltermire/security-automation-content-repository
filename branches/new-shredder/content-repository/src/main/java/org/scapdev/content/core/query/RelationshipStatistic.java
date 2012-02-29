@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
-import org.scapdev.content.model.RelationshipInfo;
+import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
 
 public interface RelationshipStatistic
 {
@@ -32,7 +32,7 @@ public interface RelationshipStatistic
 	 * 
 	 * @return RelationshipInfo
 	 */
-	RelationshipInfo getRelationshipInfo();
+	IRelationshipDefinition getRelationshipInfo();
 	
 	/**
 	 * Get the number of Relationship instances for this RelationshipInfo object.

@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +34,10 @@ import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.query.EntityStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
 
 
 public interface ContentPersistenceManager {
-	Entity getEntityByKey(Key key, MetadataModel model);
+	IEntity<?> getEntityByKey(IKey key, IMetadataModel model);
 	/**
 	 * 
 	 * @param indirectType
@@ -44,8 +45,8 @@ public interface ContentPersistenceManager {
 	 * @param entityType the entity types to filter the results based on or empty if all results should be provided
 	 * @return
 	 */
-	Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
-	void storeEntities(List<? extends Entity> entities, MetadataModel model) throws ContentException;
-	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, MetadataModel model);
+	Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
+	void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException;
+	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }

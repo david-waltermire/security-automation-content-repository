@@ -23,23 +23,22 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import javax.xml.bind.JAXBElement;
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
 
-import org.scapdev.content.model.MetadataModel;
+import org.apache.xmlbeans.XmlObject;
 
 public abstract class AbstractContentRetriever implements ContentRetriever {
 	public String contentId;
-	public MetadataModel model;
+	public IMetadataModel model;
 
-	public AbstractContentRetriever(String contentId, MetadataModel model) {
+	public AbstractContentRetriever(String contentId, IMetadataModel model) {
 		this.contentId = contentId;
 		this.model = model;
 	}
 
-	@Override
-	public JAXBElement<Object> getContent() {
+	public XmlObject getContent() {
 		return getContentInternal(contentId, model);
 	}
 
-	protected abstract JAXBElement<Object> getContentInternal(String contentId, MetadataModel model);
+	protected abstract XmlObject getContentInternal(String contentId, IMetadataModel model);
 }

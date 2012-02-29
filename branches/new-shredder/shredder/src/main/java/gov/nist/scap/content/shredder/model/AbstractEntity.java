@@ -2,6 +2,7 @@ package gov.nist.scap.content.shredder.model;
 
 import gov.nist.scap.content.shredder.rules.IEntityDefinition;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	private final IContainer<?> parentContext;
 	private final Bookmark bookmark;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
+	private final List<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
+	private final List<IIndirectRelationship> indirectRelationships = new LinkedList<IIndirectRelationship>();
 
 	public AbstractEntity(XmlCursor cursor,
 			DEFINITION contentDefinition,
@@ -40,14 +43,44 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	}
 
 	public List<IRelationship<?>> getRelationships() {
-		return relationships;
+		return Collections.unmodifiableList(relationships);
+	}
+
+	public List<IKeyedRelationship> getKeyedRelationships() {
+		return Collections.unmodifiableList(keyedRelationships);
+	}
+
+	public List<IIndirectRelationship> getIndirectRelationships() {
+		return Collections.unmodifiableList(indirectRelationships);
 	}
 
 	public IKey getKey(String keyId) {
 		return (getParentContext() == null ? null : getParentContext().getKey(keyId));
 	}
 
+	public void appendRelationship(IKeyedRelationship relationship) {
+		keyedRelationships.add(relationship);
+		appendRelationship((IRelationship<?>)relationship);
+	}
+
+	public void appendRelationship(IIndirectRelationship relationship) {
+		indirectRelationships.add(relationship);
+		appendRelationship((IRelationship<?>)relationship);
+	}
+
 	public void appendRelationship(IRelationship<?> relationship) {
 		relationships.add(relationship);
+	}
+
+	@Override
+	public IContentHandle getContentHandle() {
+		return new ContentHandle();
+	}
+
+	private class ContentHandle implements IContentHandle {
+		public XmlCursor getCursor() {
+			return bookmark.createCursor();
+		}
+		
 	}
 }

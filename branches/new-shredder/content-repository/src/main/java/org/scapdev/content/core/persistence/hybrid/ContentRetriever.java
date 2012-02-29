@@ -23,8 +23,12 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import javax.xml.bind.JAXBElement;
+import gov.nist.scap.content.shredder.model.IContentHandle;
 
-public interface ContentRetriever {
-	JAXBElement<Object> getContent();
+import org.apache.xmlbeans.XmlCursor;
+
+public interface ContentRetriever extends IContentHandle {
+//	XmlObject getContent();
+//	Bookmark getBookmark();
+	XmlCursor getCursor();
 }

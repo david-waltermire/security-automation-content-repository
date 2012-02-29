@@ -23,11 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Map;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-
 public interface QueryResult {
-	Map<Key, Entity> getEntities();
+	Map<IKey, IEntity<?>> getEntities();
 }
