@@ -23,8 +23,14 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
 import info.aduna.iteration.Iterations;
 
+import java.awt.RenderingHints.Key;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,11 +66,6 @@ import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGr
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
 import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.core.query.RelationshipStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.RelationshipInfo;
 
 /**
  * At this point this is just going to be a facade into the triple store REST interfaces
@@ -107,7 +108,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 	
 	@Override
-	public Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
+	public IEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {
@@ -115,7 +116,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				if (entityURI != null){
 					Set<Statement> entityStatements = getEntityStatements(entityURI, conn);
 					// need to find the entityKeys from the KeyedRelationship...these are not included in owningEntityContext on persist
-					Map<URI, Key> relatedEntityKeys = findEntityKeys(queryService.findAllRelatedEntityURIs(entityURI, conn), conn);
+					Map<URI, IKey> relatedEntityKeys = findEntityKeys(queryService.findAllRelatedEntityURIs(entityURI, conn), conn);
 					return entityTranslator.translateToJava(entityStatements, relatedEntityKeys,
 							model, contentRetrieverFactory);
 				}
@@ -137,7 +138,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	
 
 	@Override
-	public Set<Key> getKeysForIndirectIds(String indirectType,
+	public Set<IKey> getKeysForIndirectIds(String indirectType,
 			Collection<String> indirectIds, Set<String> entityType) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
@@ -145,7 +146,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 				List<URI> entityURIs = queryService
 						.findEntityUrisFromBoundaryObjectIds(indirectType,
 								indirectIds, entityType, conn);
-				return new HashSet<Key>(findEntityKeys(entityURIs, conn)
+				return new HashSet<IKey>(findEntityKeys(entityURIs, conn)
 						.values());
 
 			} catch (MalformedQueryException e) {
@@ -166,7 +167,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	
 	@Override
 	public Map<String, ? extends EntityStatistic> getEntityStatistics(
-			Set<String> entityInfoIds, MetadataModel model) {
+			Set<String> entityInfoIds, IMetadataModel model) {
 		Map<String, InternalEntityStatistic> entityStats = new HashMap<String, InternalEntityStatistic>();
 		try {
 			RepositoryConnection conn = repository.getConnection();
@@ -212,7 +213,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	 * </p>
 	 */
 	@Override
-	public void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model) {
+	public void persist(Map<String, IEntity<?>> contentIdToEntityMap, IMetadataModel model) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {
@@ -220,11 +221,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 					ontology.loadModel(conn, model);
 					modelLoaded = true;
 				}
-				Map<Key, String> keyToContentIdMap = new HashMap<Key, String>(); //need reverse map for resolving direct dependencies at cleanup
+				Map<IKey, String> keyToContentIdMap = new HashMap<IKey, String>(); //need reverse map for resolving direct dependencies at cleanup
 				Map<BNode, List<IncompleteStatement>> incompleteStatements = new HashMap<BNode, List<IncompleteStatement>>();
-				for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()){
+				for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet()){
 					String contentId = entry.getKey();
-					Entity entity = entry.getValue();
+					IEntity<?> entity = entry.getValue();
 					keyToContentIdMap.put(entity.getKey(), contentId);  
 					
 					BNode context = factory.createBNode();
@@ -251,12 +252,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	 */
 	private void persistIncompleteStatements(
 			Map<BNode, List<IncompleteStatement>> incompleteStatements,
-			Map<Key, String> keyToContentIdMap, RepositoryConnection conn) throws RepositoryException{
-		Map<Key, URI> keyToEntityURICache = new HashMap<Key, URI>(); 
+			Map<IKey, String> keyToContentIdMap, RepositoryConnection conn) throws RepositoryException{
+		Map<IKey, URI> keyToEntityURICache = new HashMap<IKey, URI>(); 
 		for (Map.Entry<BNode, List<IncompleteStatement>> entry : incompleteStatements.entrySet()) {
 			BNode context = entry.getKey();
 			for (IncompleteStatement incompleteStatement : entry.getValue()) {
-				Key relatedEntityKey = incompleteStatement.getRelatedEntityKey();
+				IKey relatedEntityKey = incompleteStatement.getRelatedEntityKey();
 				String relatedEntityContentId = keyToContentIdMap.get(relatedEntityKey);
 				URI relatedEntityURI = keyToEntityURICache.get(relatedEntityKey);
 				if (relatedEntityURI == null){
@@ -282,13 +283,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	 * @throws QueryEvaluationException 
 	 * @throws RepositoryException 
 	 */
-	private Map<URI, Key> findEntityKeys(List<URI> entityURIs, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
+	private Map<URI, IKey> findEntityKeys(List<URI> entityURIs, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
 		KeyTranslator keyTranslator = new KeyTranslator(BASE_URI, ontology, factory);
-		Map<URI, Key> entityURIToKeyMap= new HashMap<URI, Key>();
+		Map<URI, IKey> entityURIToKeyMap= new HashMap<URI, IKey>();
 		for (URI entityURI : entityURIs){
 			Set<Statement> entityStatements = getEntityStatements(entityURI, conn);
 			//TODO: may want to refactor to only pass translator key statements, but this will work
-			Key entityKey = keyTranslator.translateToJava(entityStatements);
+			IKey entityKey = keyTranslator.translateToJava(entityStatements);
 			entityURIToKeyMap.put(entityURI, entityKey);
 		}
 		return entityURIToKeyMap;
@@ -321,7 +322,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	 * @param conn
 	 * @return null if nothing is found
 	 */
-	private URI findEntityURI(Key key, String contentId, RepositoryConnection conn) {
+	private URI findEntityURI(IKey key, String contentId, RepositoryConnection conn) {
 		try {
 			URI entityURI = null;
 			if (contentId != null){
@@ -428,15 +429,15 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
 	
 	private class InternalEntityStatistic implements EntityStatistic {
-		private final EntityInfo entityInfo;
+		private final IEntityDefinition entityInfo;
 		private int count = 0;
 		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
 
-		public InternalEntityStatistic(EntityInfo entityInfo) {
+		public InternalEntityStatistic(IEntityDefinition entityInfo) {
 			this.entityInfo = entityInfo;
 		}
 
-		public void handleRelationships(String relationshipId, RelationshipInfo info) {
+		public void handleRelationships(String relationshipId, IRelationshipDefinition info) {
 			InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
 			if (stat == null) {
 				stat = new InternalRelationshipStatistic(info);
@@ -455,7 +456,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 
 		@Override
-		public EntityInfo getEntityInfo() {
+		public IEntityDefinition getEntityInfo() {
 			return entityInfo;
 		}
 
@@ -467,10 +468,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 
 	private class InternalRelationshipStatistic implements RelationshipStatistic {
-		private final RelationshipInfo relationshipInfo;
+		private final IRelationshipDefinition relationshipInfo;
 		private int count = 0;
 
-		public InternalRelationshipStatistic(RelationshipInfo relationshipInfo) {
+		public InternalRelationshipStatistic(IRelationshipDefinition relationshipInfo) {
 			this.relationshipInfo = relationshipInfo;
 		}
 
@@ -484,7 +485,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		}
 
 		@Override
-		public RelationshipInfo getRelationshipInfo() {
+		public IRelationshipDefinition getRelationshipInfo() {
 			return relationshipInfo;
 		}
 	}

@@ -23,50 +23,50 @@
  ******************************************************************************/
 package org.scapdev.content.core.resolver;
 
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-
 public class ResolutionState {
-	private Set<Key> unresolvedKeys;
-	private final Set<Key> unresolvableKeys;
-	private final Map<Key, Entity> retrievedFragments;
+	private Set<IKey> unresolvedKeys;
+	private final Set<IKey> unresolvableKeys;
+	private final Map<IKey, IEntity<?>> retrievedFragments;
 
-	public ResolutionState(Set<Key> initalKeys) {
-		unresolvedKeys = new HashSet<Key>(initalKeys);
-		unresolvableKeys = new HashSet<Key>();
-		retrievedFragments = new TreeMap<Key, Entity>();
+	public ResolutionState(Set<IKey> initalKeys) {
+		unresolvedKeys = new HashSet<IKey>(initalKeys);
+		unresolvableKeys = new HashSet<IKey>();
+		retrievedFragments = new TreeMap<IKey, IEntity<?>>();
 	}
 
 	/**
 	 * @return the unresolvedKeys
 	 */
-	public Set<Key> getUnresolvedKeys() {
+	public Set<IKey> getUnresolvedKeys() {
 		return unresolvedKeys;
 	}
 
 	/**
 	 * @param unresolvedKeys the unresolvedKeys to set
 	 */
-	public void setUnresolvedKeys(Set<Key> unresolvedKeys) {
+	public void setUnresolvedKeys(Set<IKey> unresolvedKeys) {
 		this.unresolvedKeys = unresolvedKeys;
 	}
 
 	/**
 	 * @return the unresolvableKeys
 	 */
-	public Set<Key> getUnresolvableKeys() {
+	public Set<IKey> getUnresolvableKeys() {
 		return unresolvableKeys;
 	}
 
 	/**
 	 * @return the retrievedFragments
 	 */
-	public Map<Key, Entity> getRetrievedFragments() {
+	public Map<IKey, IEntity<?>> getRetrievedFragments() {
 		return retrievedFragments;
 	}
 

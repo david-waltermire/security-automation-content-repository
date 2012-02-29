@@ -3,15 +3,19 @@ package gov.nist.scap.content.shredder.model;
 import gov.nist.scap.content.shredder.rules.IKeyedRelationshipDefinition;
 
 public class DefaultKeyedRelationship extends AbstractRelationship<IKeyedRelationshipDefinition> implements IKeyedRelationship {
-	private final IEntity<?> referencedEntity;
+	private final IKeyedEntity<?> referencedEntity;
 
 	public DefaultKeyedRelationship(IKeyedRelationshipDefinition definition,
-			IEntity<?> owningEntity, IEntity<?> referencedEntity) {
+			IEntity<?> owningEntity, IKeyedEntity<?> referencedEntity) {
 		super(definition, owningEntity);
 		this.referencedEntity = referencedEntity;
 	}
 
-	public IEntity<?> getReferencedEntity() {
+	public IKeyedEntity<?> getReferencedEntity() {
 		return referencedEntity;
+	}
+
+	public IKey getKey() {
+		return getReferencedEntity().getKey();
 	}
 }

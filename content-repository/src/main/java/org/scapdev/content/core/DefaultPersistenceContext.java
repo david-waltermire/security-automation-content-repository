@@ -23,20 +23,20 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.MetadataModel;
 
 public class DefaultPersistenceContext implements PersistenceContext {
 
-	private MetadataModel metadataModel;
+	private IMetadataModel metadataModel;
 	private ContentPersistenceManager contentPersistenceManager;
 
-	@Override
-	public MetadataModel getMetadataModel() {
+	public IMetadataModel getMetadataModel() {
 		return metadataModel;
 	}
 
-	public void setMetadataModel(MetadataModel metadataModel) {
+	public void setMetadataModel(IMetadataModel metadataModel) {
 		this.metadataModel = metadataModel;
 		
 	}

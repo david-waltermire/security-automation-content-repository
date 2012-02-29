@@ -26,15 +26,15 @@
  */
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.KeyBuilder;
+import gov.nist.scap.content.shredder.model.KeyException;
+
 import java.util.LinkedHashMap;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyBuilder;
-import org.scapdev.content.model.KeyException;
-import org.scapdev.content.model.RelationshipInfo;
 
 /**
  * <p>A manager to coordinate the building of Key from triples originating from a specific
@@ -86,9 +86,9 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 * @param entity
 	 *            - to populate.
 	 */
-	public void populateEntity(RebuiltEntity entity){
+	public void populateEntity(RebuiltEntity<?> entity){
 		populateFields();
-		Key key = builder.toKey();
+		IKey key = builder.toKey();
 		entity.setKey(key);
 	}
 
@@ -98,7 +98,7 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 * 
 	 * @return
 	 */
-	Key produceKey(){
+	IKey produceKey(){
 		populateFields();
 		try {
 			return builder.toKey();
@@ -110,7 +110,7 @@ class KeyStatementManager implements RegenerationStatementManager {
 	
 	private void populateFields(){
 		for (Field field : fieldUriToFieldMap.values()){
-			builder.addKeyField(field.getFieldId(), field.getFieldValue());
+			builder.addField(field.getFieldId(), field.getFieldValue());
 		}
 	}
 

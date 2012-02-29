@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IIndirectRelationship;
+import gov.nist.scap.content.shredder.rules.IIndirectRelationshipDefinition;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +34,6 @@ import java.util.Map;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.IndirectRelationshipInfo;
-import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.RelationshipInfo;
 
 /**
  * <p>A manager to coordinate multiple IndirectRelationshipBuilders working in
@@ -46,7 +46,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	private MetaDataOntology ontology;
 	
 	//should be okay to store at class level since this should be created/destroyed within a single instance
-	private MetadataModel model;
+	private IMetadataModel model;
 	
 	//all IDs of indirectRelationships
 	private Collection<String> indirectRelationshipIds;
@@ -55,7 +55,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	private Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
 	
 	
-	IndirectRelationshipStatementManager(MetaDataOntology ontology, MetadataModel model) {
+	IndirectRelationshipStatementManager(MetaDataOntology ontology, IMetadataModel model) {
 		this.ontology = ontology;
 		this.model = model;
 		this.indirectRelationshipIds = model.getIndirectRelationshipIds();
@@ -93,9 +93,9 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param entity
 	 *            - to populate.
 	 */
-	public void populateEntity(RebuiltEntity entity){
+	public void populateEntity(RebuiltEntity<?> entity){
 		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
-			IndirectRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
+			IIndirectRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
 			entity.addIndirectRelationship(indirectRelationship);
 		}
 	}
@@ -112,18 +112,18 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * 
 	 * @see RelationshipInfo
 	 */
-	private void populateIndirectRelationshipInfo(MetadataModel model, Statement statement){
+	private void populateIndirectRelationshipInfo(IMetadataModel model, Statement statement){
 		// hit on an indirectRelationship of some type
 		String indirectRelationshipId = statement.getPredicate().stringValue();
 		String boundaryObjectURI = statement.getObject().stringValue();
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
 		if (indirectRelBuilder == null){
 			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IIndirectRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
 			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setIndirectRelationshipInfo((IndirectRelationshipInfo)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IIndirectRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
 		}
 	}
 	
@@ -137,7 +137,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param statement
 	 * 
 	 */
-	private void populateIndirectRelationshipExternalIdType(MetadataModel model, Statement statement){
+	private void populateIndirectRelationshipExternalIdType(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectType = statement.getObject().stringValue();
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
@@ -161,7 +161,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param statement
 	 * 
 	 */
-	private void populateIndirectRelationshipExternalIdValue(MetadataModel model, Statement statement){
+	private void populateIndirectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectValue = statement.getObject().stringValue();
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);

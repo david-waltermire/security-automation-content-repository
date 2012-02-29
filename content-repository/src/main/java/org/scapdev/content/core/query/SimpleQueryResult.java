@@ -23,20 +23,20 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collections;
 import java.util.Map;
 
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-
 public class SimpleQueryResult implements QueryResult {
-	private final Map<Key, Entity> fragments;
+	private final Map<IKey, IEntity<?>> fragments;
 
-	public SimpleQueryResult(Map<Key, Entity> fragments) {
+	public SimpleQueryResult(Map<IKey, IEntity<?>> fragments) {
 		this.fragments = Collections.unmodifiableMap(fragments);
 	}
 
-	public Map<Key, Entity> getEntities() {
+	public Map<IKey, IEntity<?>> getEntities() {
 		return fragments;
 	}
 }

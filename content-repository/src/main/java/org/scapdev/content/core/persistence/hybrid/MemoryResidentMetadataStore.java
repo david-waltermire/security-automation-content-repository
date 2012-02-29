@@ -23,6 +23,15 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IIndirectRelationship;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IRelationship;
+import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
+import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,42 +43,34 @@ import java.util.Set;
 
 import org.scapdev.content.core.query.EntityStatistic;
 import org.scapdev.content.core.query.RelationshipStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
-import org.scapdev.content.model.Relationship;
-import org.scapdev.content.model.RelationshipInfo;
 
 public class MemoryResidentMetadataStore implements MetadataStore {
 //	private static final Logger log = Logger.getLogger(MemoryResidentMetadataStore.class);
-	private final Map<Key, Entity> descriptorMap;
-	private final Map<String, Map<String, List<Entity>>> externalIdentifierToValueMap;
+	private final Map<IKey, IEntity<?>> descriptorMap;
+	private final Map<String, Map<String, List<IEntity<?>>>> externalIdentifierToValueMap;
 
 	public MemoryResidentMetadataStore() {
-		this.descriptorMap = new HashMap<Key, Entity>();
-		this.externalIdentifierToValueMap = new HashMap<String, Map<String, List<Entity>>>();
+		this.descriptorMap = new HashMap<IKey, IEntity<?>>();
+		this.externalIdentifierToValueMap = new HashMap<String, Map<String, List<IEntity<?>>>>();
 	}
 
 	@Override
-	public Entity getEntity(Key key, ContentRetrieverFactory contentRetrieverFactory, MetadataModel model) {
+	public IEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
 		return descriptorMap.get(key);
 	}
 
 
 	@Override
-	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes) {
-		Set<Key> result = Collections.emptySet();
-		Map<String, List<Entity>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
+	public Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes) {
+		Set<IKey> result = Collections.emptySet();
+		Map<String, List<IEntity<?>>> indirectValueToDescriptorsMap = externalIdentifierToValueMap.get(indirectType);
 		if (indirectValueToDescriptorsMap != null) {
-			result = new HashSet<Key>();
+			result = new HashSet<IKey>();
 			for (String indirectId : indirectIds) {
-				List<Entity> entities = indirectValueToDescriptorsMap.get(indirectId);
+				List<IEntity<?>> entities = indirectValueToDescriptorsMap.get(indirectId);
 				if (entities != null) {
-					for (Entity entity : entities) {
-						if (entityTypes.isEmpty() || entityTypes.contains(entity.getEntityInfo().getId())) {
+					for (IEntity<?> entity : entities) {
+						if (entityTypes.isEmpty() || entityTypes.contains(entity.getDefinition().getId())) {
 							result.add(entity.getKey());
 						}
 					}
@@ -80,26 +81,26 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	@Override
-	public void persist(Map<String, Entity> contentIdToEntityMap, MetadataModel model) {
-		for (Map.Entry<String, Entity> entry : contentIdToEntityMap.entrySet()) {
+	public void persist(Map<String, IEntity<?>> contentIdToEntityMap, IMetadataModel model) {
+		for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet()) {
 			persist(entry.getValue(), entry.getKey());
 		}
 	}
 
-	public void persist(Entity entity, String contentId) {
+	public void persist(IEntity<?> entity, String contentId) {
 		descriptorMap.put(entity.getKey(), entity);
 		
-		for (IndirectRelationship relationship : entity.getIndirectRelationships()) {
-			ExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
-			Map<String, List<Entity>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
+		for (IIndirectRelationship relationship : entity.getIndirectRelationships()) {
+			IExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
+			Map<String, List<IEntity<?>>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
 			if (externalIdentifierValueToEntityMap == null) {
-				externalIdentifierValueToEntityMap = new HashMap<String, List<Entity>>();
+				externalIdentifierValueToEntityMap = new HashMap<String, List<IEntity<?>>>();
 				externalIdentifierToValueMap.put(externalIdentifier.getId(), externalIdentifierValueToEntityMap);
 			}
-			List<Entity> descriptorList = externalIdentifierValueToEntityMap.get(externalIdentifier.getValue());
+			List<IEntity<?>> descriptorList = externalIdentifierValueToEntityMap.get(relationship.getValue());
 			if (descriptorList == null) {
-				descriptorList = new LinkedList<Entity>();
-				externalIdentifierValueToEntityMap.put(externalIdentifier.getValue(), descriptorList);
+				descriptorList = new LinkedList<IEntity<?>>();
+				externalIdentifierValueToEntityMap.put(relationship.getValue(), descriptorList);
 			}
 			descriptorList.add(entity);
 //			if (descriptorList.size() >= 2) {
@@ -110,15 +111,15 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 
 	@Override
 	public Map<String, ? extends EntityStatistic> getEntityStatistics(
-			Set<String> entityInfoIds, MetadataModel model) {
+			Set<String> entityInfoIds, IMetadataModel model) {
 
 		Map<String, InternalEntityStatistic> results = new HashMap<String, InternalEntityStatistic>();
-		for (Entity entity : descriptorMap.values()) {
-			String entityInfoId = entity.getEntityInfo().getId();
+		for (IEntity<?> entity : descriptorMap.values()) {
+			String entityInfoId = entity.getDefinition().getId();
 			if (entityInfoIds.contains(entityInfoId)) {
 				InternalEntityStatistic stat = results.get(entityInfoId);
 				if (stat == null) {
-					stat = new InternalEntityStatistic(entity.getEntityInfo());
+					stat = new InternalEntityStatistic(entity.getDefinition());
 					results.put(entityInfoId, stat);
 				}
 				stat.incrementCount();
@@ -129,17 +130,17 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	private class InternalEntityStatistic implements EntityStatistic {
-		private final EntityInfo entityInfo;
+		private final IEntityDefinition entityInfo;
 		private int count = 0;
 		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
 
-		public InternalEntityStatistic(EntityInfo entityInfo) {
+		public InternalEntityStatistic(IEntityDefinition entityInfo) {
 			this.entityInfo = entityInfo;
 		}
 
-		public void handleRelationships(Collection<Relationship> relationships) {
-			for (Relationship relationship : relationships) {
-				RelationshipInfo relationshipInfo = relationship.getRelationshipInfo();
+		public void handleRelationships(Collection<? extends IRelationship<?>> relationships) {
+			for (IRelationship<?> relationship : relationships) {
+				IRelationshipDefinition relationshipInfo = relationship.getDefinition();
 				String relationshipId = relationshipInfo.getId();
 				InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
 				if (stat == null) {
@@ -160,7 +161,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 		}
 
 		@Override
-		public EntityInfo getEntityInfo() {
+		public IEntityDefinition getEntityInfo() {
 			return entityInfo;
 		}
 
@@ -172,10 +173,10 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	}
 
 	private class InternalRelationshipStatistic implements RelationshipStatistic {
-		private final RelationshipInfo relationshipInfo;
+		private final IRelationshipDefinition relationshipInfo;
 		private int count = 0;
 
-		public InternalRelationshipStatistic(RelationshipInfo relationshipInfo) {
+		public InternalRelationshipStatistic(IRelationshipDefinition relationshipInfo) {
 			this.relationshipInfo = relationshipInfo;
 		}
 
@@ -189,7 +190,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 		}
 
 		@Override
-		public RelationshipInfo getRelationshipInfo() {
+		public IRelationshipDefinition getRelationshipInfo() {
 			return relationshipInfo;
 		}
 	}

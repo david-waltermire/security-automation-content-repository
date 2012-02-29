@@ -23,10 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.MetadataModel;
 
 public interface PersistenceContext {
-	MetadataModel getMetadataModel();
+	IMetadataModel getMetadataModel();
 	ContentPersistenceManager getContentPersistenceManager();
 }

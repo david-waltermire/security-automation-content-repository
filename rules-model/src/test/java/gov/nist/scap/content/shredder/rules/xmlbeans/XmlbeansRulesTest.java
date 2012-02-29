@@ -30,7 +30,7 @@ public class XmlbeansRulesTest {
 		shredder.shred(new File("scap_gov.nist_USGCB-Windows-7.xml"), handler);
 		Collection<? extends IEntity<?>> entities = handler.getEntities();
 		for (IEntity<?> entity : entities) {
-			XmlCursor cursor = entity.getBookmark().createCursor();
+			XmlCursor cursor = entity.getContentHandle().getCursor();
 			QName qname = cursor.getName();
 			System.out.println("Entity("+entity.getRelationships().size()+"): "+qname.toString());
 		}

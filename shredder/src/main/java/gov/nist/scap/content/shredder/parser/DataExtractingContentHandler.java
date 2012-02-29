@@ -6,6 +6,7 @@ import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.model.IGeneratedDocument;
 import gov.nist.scap.content.shredder.model.IIndexedDocument;
 import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IKeyedEntity;
 import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.rules.KeyedRelationshipInfo;
 
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlCursor;
 
 
 // TODO: deal with synchronization issues 'synchronized'
@@ -26,7 +26,7 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 	private static final Logger log = Logger.getLogger(DataExtractingContentHandler.class);
 
 	private final Collection<KeyedRelationshipInfo> keyedRelationships = new LinkedList<KeyedRelationshipInfo>();
-	private final Map<IKey, IMutableEntity<?>> keyedEntities = new HashMap<IKey, IMutableEntity<?>>();
+	private final Map<IKey, IKeyedEntity<?>> keyedEntities = new HashMap<IKey, IKeyedEntity<?>>();
 	private final LinkedList<IMutableEntity<?>> entities = new LinkedList<IMutableEntity<?>>();
 
 	public DataExtractingContentHandler() {
@@ -45,7 +45,7 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 		while (i.hasNext()) {
 			KeyedRelationshipInfo info = i.next();
 			IKey key = info.getKey();
-			IMutableEntity<?> referencedEntity = keyedEntities.get(key);
+			IKeyedEntity<?> referencedEntity = keyedEntities.get(key);
 			if (referencedEntity != null) {
 				info.applyRelationship(referencedEntity);
 				i.remove();
@@ -57,10 +57,6 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 
 	public void handle(IMutableEntity<?> entity) {
 		entity.accept((IContainerVisitor)this);
-		IKey key = entity.getKey();
-		if (key != null) {
-			keyedEntities.put(key, entity);
-		}
 		entities.add(entity);
 	}
 
@@ -68,44 +64,54 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 		keyedRelationships.add(info);
 	}
 
-	public void visit(IContentNode entity) {
-		XmlCursor cursor = entity.getBookmark().createCursor();
-		StringBuilder builder = new StringBuilder();
-		builder.append("handling content node: ");
-		builder.append(entity.getDefinition().getId());
-		builder.append(": qname=");
-		builder.append(cursor.getName());
-		builder.append(", key=");
-		builder.append(entity.getKey());
+	private void addKeyedEntity(IKeyedEntity<?> keyedEntity) {
+		IKey key = keyedEntity.getKey();
+		if (key != null) {
+			keyedEntities.put(key, keyedEntity);
+		}
+	}
 
-		log.debug(builder.toString());
-		cursor.dispose();
+	public void visit(IContentNode entity) {
+		addKeyedEntity(entity);
+//
+//		XmlCursor cursor = entity.getBookmark().createCursor();
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("handling content node: ");
+//		builder.append(entity.getDefinition().getId());
+//		builder.append(": qname=");
+//		builder.append(cursor.getName());
+//		builder.append(", key=");
+//		builder.append(entity.getKey());
+//
+//		log.debug(builder.toString());
+//		cursor.dispose();
 	}
 
 	public void visit(IIndexedDocument document) {
-		XmlCursor cursor = document.getBookmark().createCursor();
-		StringBuilder builder = new StringBuilder();
-		builder.append("Handling indexed document: ");
-		builder.append(document.getDefinition().getId());
-		builder.append(": qname=");
-		builder.append(cursor.getName());
-
-		builder.append(", key=");
-		builder.append(document.getKey());
-
-		log.debug(builder.toString());
-		cursor.dispose();
+		addKeyedEntity(document);
+//		XmlCursor cursor = document.getBookmark().createCursor();
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("Handling indexed document: ");
+//		builder.append(document.getDefinition().getId());
+//		builder.append(": qname=");
+//		builder.append(cursor.getName());
+//
+//		builder.append(", key=");
+//		builder.append(document.getKey());
+//
+//		log.debug(builder.toString());
+//		cursor.dispose();
 	}
 
 	public void visit(IGeneratedDocument document) {
-		XmlCursor cursor = document.getBookmark().createCursor();
-		StringBuilder builder = new StringBuilder();
-		builder.append("Handling generated document: ");
-		builder.append(document.getDefinition().getId());
-		builder.append(": qname=");
-		builder.append(cursor.getName());
-
-		log.debug(builder.toString());
-		cursor.dispose();
+//		XmlCursor cursor = document.getBookmark().createCursor();
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("Handling generated document: ");
+//		builder.append(document.getDefinition().getId());
+//		builder.append(": qname=");
+//		builder.append(cursor.getName());
+//
+//		log.debug(builder.toString());
+//		cursor.dispose();
 	}
 }

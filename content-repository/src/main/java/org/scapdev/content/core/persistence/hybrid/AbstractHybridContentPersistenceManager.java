@@ -23,15 +23,16 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.core.query.EntityStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
 
 public abstract class AbstractHybridContentPersistenceManager implements HybridContentPersistenceManager, ContentRetrieverFactory {
 
@@ -43,35 +44,31 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		this.contentStore = contentStore;
 	}
 
-	@Override
-	public Entity getEntityByKey(Key key, MetadataModel model) {
+	public IEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
 		return generateEntity(key, model);
 	}
 
-	@Override
-	public void storeEntities(List<? extends Entity> entities, MetadataModel model) {
-		Map<String, Entity> contentIdToEntityMap = contentStore.persist(entities, model);
+	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) {
+		Map<String, IEntity<?>> contentIdToEntityMap = contentStore.persist(entities, model);
 		metadataStore.persist(contentIdToEntityMap, model);
 	}
 
-	@Override
-	public ContentRetriever newContentRetriever(String contentId, MetadataModel model) {
+	public ContentRetriever newContentRetriever(String contentId, IMetadataModel model) {
 		return contentStore.getContentRetriever(contentId, model);
 	}
 
-	private Entity generateEntity(Key key, MetadataModel model) {
+	private IEntity<?> generateEntity(IKey key, IMetadataModel model) {
 		return metadataStore.getEntity(key, this, model);
 	}
 
 
-	@Override
-	public Set<Key> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
+	public Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
 		return metadataStore.getKeysForIndirectIds(indirectType, indirectIds, entityType);
 	}
 
 	@Override
 	public Map<String, ? extends EntityStatistic> getEntityStatistics(
-			Set<String> entityInfoIds, MetadataModel model) {
+			Set<String> entityInfoIds, IMetadataModel model) {
 		return metadataStore.getEntityStatistics(entityInfoIds, model);
 	}
 

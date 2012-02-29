@@ -23,90 +23,81 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.model.IContentHandle;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IIndirectRelationship;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IKeyedRelationship;
+import gov.nist.scap.content.shredder.model.IRelationship;
+import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
-import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.EntityInfo;
-import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.Relationship;
-
 /**
  * An entity that was rebuilt from within the metadata repository workflow
  *
  */
-class RebuiltEntity implements Entity {
-	private Key key;
-	private EntityInfo entityInfo;
-	private Collection<KeyedRelationship> keyedRelationships = new LinkedList<KeyedRelationship>();
-	private Collection<IndirectRelationship> indirectRelationships = new LinkedList<IndirectRelationship>();
-	private ContentRetriever retriever;
+class RebuiltEntity<DEFINITION extends IEntityDefinition> implements IEntity<DEFINITION> {
+	private IKey key;
+	private DEFINITION entityInfo;
+	private Collection<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
+	private Collection<IIndirectRelationship> indirectRelationships = new LinkedList<IIndirectRelationship>();
+	private IContentHandle contentHandle;
 
 	RebuiltEntity() {
 	}
 
-	@Override
-	public Key getKey() {
+	public IEntity<?> getParentContext() {
+		throw new UnsupportedOperationException("implement");
+	}
+
+	public IKey getKey() {
 		return key;
 	}
 	
-	void setKey(Key key) {
+	void setKey(IKey key) {
 		this.key = key;
 	}
 
-	/**
-	 * @return the entityInfo
-	 */
-	public EntityInfo getEntityInfo() {
+	public DEFINITION getDefinition() {
 		return entityInfo;
 	}
 	
-	void setEntityInfo(EntityInfo entityInfo) {
+	void setEntityInfo(DEFINITION entityInfo) {
 		this.entityInfo = entityInfo;
 	}
 
-	@Override
-	public Collection<Relationship> getRelationships() {
-		List<Relationship> rels = new LinkedList<Relationship>();
+	public Collection<? extends IRelationship<?>> getRelationships() {
+		List<IRelationship<?>> rels = new LinkedList<IRelationship<?>>();
 		rels.addAll(indirectRelationships);
 		rels.addAll(keyedRelationships);
-		return rels;
+		return Collections.unmodifiableCollection(rels);
 	}
 
-	@Override
-	public Collection<IndirectRelationship> getIndirectRelationships() {
+	public Collection<IIndirectRelationship> getIndirectRelationships() {
 		return Collections.unmodifiableCollection(indirectRelationships);
 	}
 	
-	void addIndirectRelationship(IndirectRelationship rel){
+	void addIndirectRelationship(IIndirectRelationship rel){
 		indirectRelationships.add(rel);
 	}
 
-	@Override
-	public Collection<KeyedRelationship> getKeyedRelationships() {
+	public Collection<? extends IKeyedRelationship> getKeyedRelationships() {
 		return Collections.unmodifiableCollection(keyedRelationships);
 	}
 	
-	
-	void addKeyedRelationship(KeyedRelationship rel){
+	void addKeyedRelationship(IKeyedRelationship rel){
 		keyedRelationships.add(rel);
 	}
 
-	@Override
-	public JAXBElement<Object> getObject() {
-		return retriever.getContent();
-	}
-	
-	void setRetriever(ContentRetriever retriever) {
-		this.retriever = retriever;
+	public IContentHandle getContentHandle() {
+		return contentHandle;
 	}
 
-
+	void setContentHandle(IContentHandle handle) {
+		this.contentHandle = handle;
+	}
 }

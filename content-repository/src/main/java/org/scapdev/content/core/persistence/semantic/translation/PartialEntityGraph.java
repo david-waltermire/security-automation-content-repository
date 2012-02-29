@@ -23,13 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import org.scapdev.content.model.Key;
  * predicates are incommlete.
  * </p>
  * 
- * @See {@link Entity}
+ * @See {@link IEntity}
  * 
  *      TODO: this class is way to specific, see if you can make the concept
  *      more generic.
@@ -71,7 +71,7 @@ public class PartialEntityGraph {
 	 * @param predicate
 	 * @param relatedEntityKey
 	 */
-	void add(URI subject, URI predicate, Key relatedEntityKey){
+	void add(URI subject, URI predicate, IKey relatedEntityKey){
 		incompleteStatements.add(new IncompleteStatement(subject, predicate, relatedEntityKey));
 	}
 	
@@ -95,9 +95,9 @@ public class PartialEntityGraph {
 	public static class IncompleteStatement{
 		private final URI subject;
 		private final URI predicate;
-		private final Key relatedEntityKey;
+		private final IKey relatedEntityKey;
 		
-		IncompleteStatement(URI subject, URI predicate, Key relatedEntityKey) {
+		IncompleteStatement(URI subject, URI predicate, IKey relatedEntityKey) {
 			this.subject = subject;
 			this.predicate = predicate;
 			this.relatedEntityKey = relatedEntityKey;
@@ -107,7 +107,7 @@ public class PartialEntityGraph {
 			return predicate;
 		}
 		
-		public Key getRelatedEntityKey() {
+		public IKey getRelatedEntityKey() {
 			return relatedEntityKey;
 		}
 		

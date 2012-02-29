@@ -23,9 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
-import java.util.Map;
+import gov.nist.scap.content.shredder.rules.IEntityDefinition;
 
-import org.scapdev.content.model.EntityInfo;
+import java.util.Map;
 
 public interface EntityStatistic 
 {
@@ -34,7 +34,7 @@ public interface EntityStatistic
 	 * 
 	 * @return EntityInfo
 	 */
-	EntityInfo getEntityInfo();
+	IEntityDefinition getEntityInfo();
 	
 	/**
 	 * Get the detailed relationship statistics for each entity instance of this

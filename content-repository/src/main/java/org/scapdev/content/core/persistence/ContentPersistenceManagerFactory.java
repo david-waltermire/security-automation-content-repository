@@ -26,5 +26,4 @@ package org.scapdev.content.core.persistence;
 
 public interface ContentPersistenceManagerFactory {
 	ContentPersistenceManager newContentPersistenceManager();
-
 }

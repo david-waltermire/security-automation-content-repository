@@ -23,103 +23,36 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import java.util.LinkedList;
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.scapdev.content.core.persistence.ContentPersistenceException;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.MetadataModel;
+import org.apache.xmlbeans.XmlObject;
 
 public abstract class AbstractContentStore implements ContentStore {
-//	private final JAXBMarshallerPool marshallerPool;
-//	private final JAXBUnmarshallerPool unmarshallerPool;
-	private Queue<Marshaller> marshallerPool;
-	private Queue<Unmarshaller> unmarshallerPool;
 
 	public AbstractContentStore() {
-		marshallerPool = new LinkedList<Marshaller>();
-		unmarshallerPool = new LinkedList<Unmarshaller>();
 	}
 
-	private Unmarshaller retrieveUnmarshaller(JAXBContext context) throws JAXBException {
-		Unmarshaller unmarshaller;
-		synchronized (this) {
-			unmarshaller = unmarshallerPool.poll();
-		}
-		if (unmarshaller == null) {
-			unmarshaller = context.createUnmarshaller();
-		}
-		return unmarshaller;
-	}
-
-	private void storeUnmarshaller(Unmarshaller unmarshaller) {
-		synchronized (this) {
-			unmarshallerPool.offer(unmarshaller); // always returns true
-		}
-	}
-
-	@Override
-	public JAXBElement<Object> getContent(String contentId, MetadataModel model) {
-		try {
-			Unmarshaller unmarshaller = retrieveUnmarshaller(model.getJAXBContext());
-			JAXBElement<Object> result = getContentInternal(contentId, model, unmarshaller);
-			storeUnmarshaller(unmarshaller);
-			return result;
-		} catch (JAXBException e) {
-			throw new ContentPersistenceException(e);
-		}
+	public XmlObject getContent(String contentId, IMetadataModel model) {
+		return getContentInternal(contentId, model);
 	}
 	
-	protected abstract JAXBElement<Object> getContentInternal(String contentId, MetadataModel model, Unmarshaller unmarshaller);
+	protected abstract XmlObject getContentInternal(String contentId, IMetadataModel model);
 	
-	@Override
-	public ContentRetriever getContentRetriever(String contentId, MetadataModel model) {
+	public ContentRetriever getContentRetriever(String contentId, IMetadataModel model) {
 		return new DefaultContentRetriever(contentId, model, this);
 	}
 
-	private Marshaller retrieveMarshaller(JAXBContext context) throws JAXBException {
-		Marshaller marshaller;
-		synchronized (this) {
-			marshaller = marshallerPool.poll();
-		}
-		if (marshaller == null) {
-			marshaller = context.createMarshaller();
-		}
-		return marshaller;
-	}
-
-	private void storeMarshaller(Marshaller marshaller) {
-		synchronized (this) {
-			marshallerPool.offer(marshaller); // always returns true
-		}
-	}
-
-	@Override
-	public Map<String, Entity> persist(List<? extends Entity> entities,
-			MetadataModel model) {
-		try {
-			Marshaller marshaller = retrieveMarshaller(model.getJAXBContext());
-			Map<String, Entity> result = persistInternal(entities, model, marshaller);
-			storeMarshaller(marshaller);
-			return result;
-		} catch (JAXBException e) {
-			throw new ContentPersistenceException(e);
-		}
+	public Map<String, IEntity<?>> persist(List<? extends IEntity<?>> entities,
+			IMetadataModel model) {
+		return persistInternal(entities, model);
 	}
 	
-	protected abstract Map<String, Entity> persistInternal(List<? extends Entity> entities, MetadataModel model, Marshaller marshaller);
+	protected abstract Map<String, IEntity<?>> persistInternal(List<? extends IEntity<?>> entities, IMetadataModel model);
 
-	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-		
 	}
 }

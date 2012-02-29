@@ -23,16 +23,16 @@
  ******************************************************************************/
 package org.scapdev.content.core.resolver;
 
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Collections;
 import java.util.Set;
-
-import org.scapdev.content.model.Key;
 
 public class UnresolvableKeysException extends ResolverException {
 
 	/** the serial version UID */
 	private static final long serialVersionUID = 1L;
-	private Set<Key> unresolvableKeys;
+	private Set<IKey> unresolvableKeys;
 
 	public UnresolvableKeysException() {
 	}
@@ -52,14 +52,14 @@ public class UnresolvableKeysException extends ResolverException {
 	/**
 	 * @return the unresolvableKeys
 	 */
-	public Set<Key> getUnresolvableKeys() {
+	public Set<IKey> getUnresolvableKeys() {
 		return unresolvableKeys;
 	}
 
 	/**
 	 * @param unresolvableKeys the unresolvableKeys to set
 	 */
-	public void setUnresolvableKeys(Set<Key> unresolvableKeys) {
+	public void setUnresolvableKeys(Set<IKey> unresolvableKeys) {
 		this.unresolvableKeys = Collections.unmodifiableSet(unresolvableKeys);
 	}
 

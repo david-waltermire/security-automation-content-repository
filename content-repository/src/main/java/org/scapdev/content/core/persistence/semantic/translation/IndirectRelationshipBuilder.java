@@ -23,20 +23,18 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import org.scapdev.content.model.AbstractRelationship;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.ExternalIdentifier;
-import org.scapdev.content.model.ExternalIdentifierInfo;
-import org.scapdev.content.model.IndirectRelationship;
-import org.scapdev.content.model.IndirectRelationshipInfo;
-import org.scapdev.content.model.MetadataModel;
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.DefaultIndirectRelationship;
+import gov.nist.scap.content.shredder.model.IIndirectRelationship;
+import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
+import gov.nist.scap.content.shredder.rules.IIndirectRelationshipDefinition;
 
 /**
  * Builder for constructing IndirectRelationships
  *
  */
 class IndirectRelationshipBuilder {
-	private IndirectRelationshipInfo relationshipInfo;
+	private IIndirectRelationshipDefinition relationshipDefinition;
 	private String externalIdValue;
 	private String externalIdType;
 	
@@ -48,8 +46,8 @@ class IndirectRelationshipBuilder {
 		this.externalIdValue = externalIdValue;
 	}
 	
-	void setIndirectRelationshipInfo(IndirectRelationshipInfo relationshipInfo) {
-		this.relationshipInfo = relationshipInfo;
+	void setIndirectRelationshipInfo(IIndirectRelationshipDefinition relationshipDefinition) {
+		this.relationshipDefinition = relationshipDefinition;
 	}
 	
 	void setExternalIdType(String externalIdType) {
@@ -66,40 +64,14 @@ class IndirectRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IndirectRelationship build(MetadataModel model, RebuiltEntity entity){
-		if (relationshipInfo == null || externalIdValue == null || externalIdType == null){
+	IIndirectRelationship build(IMetadataModel model, RebuiltEntity<?> entity){
+		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-		ExternalIdentifierInfo externalIdInfo = model.getExternalIdentifierInfoById(externalIdType);
-		ExternalIdentifier externalIdentifier = new InternalExternalIdentifier(externalIdInfo, externalIdValue);
-		IndirectRelationship rel = new InternalIndirectRelationship(relationshipInfo, entity, externalIdentifier);
+		
+		IExternalIdentifier externalIdentifier = model.getExternalIdentifierInfoById(externalIdType);
+		IIndirectRelationship rel = new DefaultIndirectRelationship(relationshipDefinition, entity, externalIdentifier, externalIdValue);
 		
 		return rel;
-	}
-	
-	
-	private static class InternalExternalIdentifier extends ExternalIdentifier {
-
-		InternalExternalIdentifier(
-				ExternalIdentifierInfo externalIdentifierInfo, String value) {
-			super(externalIdentifierInfo, value);
-			// TODO Auto-generated constructor stub
-		}
-		
-	}
-	
-	private static class InternalIndirectRelationship extends AbstractRelationship<IndirectRelationshipInfo> implements IndirectRelationship {
-		private final ExternalIdentifier externalIdentifier;
-
-		InternalIndirectRelationship(IndirectRelationshipInfo relationshipInfo, Entity owningEntity, ExternalIdentifier externalIdentifier) {
-			super(relationshipInfo, owningEntity);
-			this.externalIdentifier = externalIdentifier;
-		}
-
-		@Override
-		public ExternalIdentifier getExternalIdentifier() {
-			return externalIdentifier;
-		}
-		
 	}
 }

@@ -23,32 +23,33 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBElement;
-
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.MetadataModel;
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlObject;
 
 public class MemoryResidentContentStore implements ContentStore {
 	private int index = 0;
-	private Map<Integer, JAXBElement<Object>> contentMap;
+	private Map<Integer, XmlObject> contentMap;
 
 	public MemoryResidentContentStore() {
-		contentMap = new HashMap<Integer, JAXBElement<Object>>();
+		contentMap = new HashMap<Integer, XmlObject>();
 	}
 
 	@Override
-	public JAXBElement<Object> getContent(String contentId, MetadataModel model) {
+	public XmlObject getContent(String contentId, IMetadataModel model) {
 		return contentMap.get(Integer.valueOf(contentId));
 	}
 
 	@Override
-	public Map<String, Entity> persist(List<? extends Entity> entities, MetadataModel model) {
-		Map<String, Entity> result = new HashMap<String, Entity>();
-		for (Entity entity : entities) {
+	public Map<String, IEntity<?>> persist(List<? extends IEntity<?>> entities, IMetadataModel model) {
+		Map<String, IEntity<?>> result = new HashMap<String, IEntity<?>>();
+		for (IEntity<?> entity : entities) {
 			String contentId = persist(entity, model);
 			result.put(contentId, entity);
 		}
@@ -56,26 +57,31 @@ public class MemoryResidentContentStore implements ContentStore {
 	}
 
 	// TODO: remove this method and merge into persist above
-	public String persist(Entity entity, MetadataModel model) {
+	public String persist(IEntity<?> entity, IMetadataModel model) {
 		Integer key = Integer.valueOf(++index);
-		contentMap.put(key, entity.getObject());
+		contentMap.put(key, entity.getContentHandle().getCursor().getObject());
 		return key.toString();
 	}
 
 	@Override
-	public InternalContentRetriever getContentRetriever(String contentId, MetadataModel model) {
+	public InternalContentRetriever getContentRetriever(String contentId, IMetadataModel model) {
 		return new InternalContentRetriever(contentId, model);
 	}
 
 	private class InternalContentRetriever extends AbstractContentRetriever {
 
-		public InternalContentRetriever(String contentId, MetadataModel model) {
+		public InternalContentRetriever(String contentId, IMetadataModel model) {
 			super(contentId, model);
 		}
 
 		@Override
-		protected JAXBElement<Object> getContentInternal(String contentId, MetadataModel model) {
+		protected XmlObject getContentInternal(String contentId, IMetadataModel model) {
 			return MemoryResidentContentStore.this.getContent(contentId, model);
+		}
+
+		@Override
+		public XmlCursor getCursor() {
+			return MemoryResidentContentStore.this.getContent(contentId, model).newCursor();
 		}
 	}
 

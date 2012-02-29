@@ -23,6 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.resolver;
 
+import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.shredder.model.IEntity;
+import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.shredder.model.IKeyedRelationship;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -31,10 +36,6 @@ import java.util.Set;
 
 import org.scapdev.content.core.PersistenceContext;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.KeyedRelationship;
-import org.scapdev.content.model.MetadataModel;
 
 public class LocalResolver implements Resolver {
 	private final PersistenceContext persistenceContext;
@@ -51,7 +52,7 @@ public class LocalResolver implements Resolver {
 	}
 
 	@Override
-	public Map<Key, Entity> resolve(Set<Key> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
+	public Map<IKey, IEntity<?>> resolve(Set<IKey> keys, ResolutionParameters parameters) throws UnresolvableKeysException {
 		ResolutionState state = new ResolutionState(keys);
 		do {
 			resolveResolvable(state, parameters);
@@ -75,20 +76,20 @@ public class LocalResolver implements Resolver {
 	}
 
 	private void resolveInternal(ResolutionState state, ResolutionParameters parameters) {
-		Map<Key, Entity> retrievedFragments = state.getRetrievedFragments();
-		Set<Key> unresolvableKeys = state.getUnresolvableKeys();
-		Set<Key> unresolvedKeys = new HashSet<Key>();
+		Map<IKey, IEntity<?>> retrievedFragments = state.getRetrievedFragments();
+		Set<IKey> unresolvableKeys = state.getUnresolvableKeys();
+		Set<IKey> unresolvedKeys = new HashSet<IKey>();
 
-		MetadataModel model = persistenceContext.getMetadataModel();
+		IMetadataModel model = persistenceContext.getMetadataModel();
 		ContentPersistenceManager contentPersistenceManager = persistenceContext.getContentPersistenceManager();
-		for (Key key : state.getUnresolvedKeys()) {
-			Entity handle = contentPersistenceManager.getEntityByKey(key, model);
+		for (IKey key : state.getUnresolvedKeys()) {
+			IEntity<?> handle = contentPersistenceManager.getEntityByKey(key, model);
 			if (handle == null) {
 				unresolvableKeys.add(key);
 			} else {
 				retrievedFragments.put(key, handle);
 				if (parameters.isResolveReferences()) {
-					Set<Key> relatedKeys = generateRelatedKeys(handle, parameters);
+					Set<IKey> relatedKeys = generateRelatedKeys(handle, parameters);
 					relatedKeys.removeAll(retrievedFragments.keySet());
 					unresolvedKeys.addAll(relatedKeys);
 				}
@@ -97,10 +98,10 @@ public class LocalResolver implements Resolver {
 		state.setUnresolvedKeys(unresolvedKeys);
 	}
 
-	private Set<Key> generateRelatedKeys(Entity entity, ResolutionParameters parameters) {
-		Set<Key> keys = new LinkedHashSet<Key>();
-		for (KeyedRelationship relationship : entity.getKeyedRelationships()) {
-			Key key = relationship.getKey();
+	private Set<IKey> generateRelatedKeys(IEntity<?> entity, ResolutionParameters parameters) {
+		Set<IKey> keys = new LinkedHashSet<IKey>();
+		for (IKeyedRelationship relationship : entity.getKeyedRelationships()) {
+			IKey key = relationship.getKey();
 			keys.add(key);
 		}
 		return keys;

@@ -23,12 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.shredder.model.IKey;
+
 import java.util.Set;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-import org.scapdev.content.model.Key;
 
 public class KeyTranslator extends AbstractSemanticTranslator {
 	private MetaDataOntology ontology;
@@ -51,7 +52,7 @@ public class KeyTranslator extends AbstractSemanticTranslator {
 	 * @param contentRetrieverFactory
 	 * @return
 	 */
-	public Key translateToJava(Set<Statement> statements) {
+	public IKey translateToJava(Set<Statement> statements) {
 		KeyStatementManager statementManager = new KeyStatementManager(ontology);
 		
 		for (Statement statement : statements){

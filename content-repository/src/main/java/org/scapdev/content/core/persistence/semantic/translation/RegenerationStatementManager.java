@@ -24,7 +24,6 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import org.openrdf.model.Statement;
-import org.scapdev.content.model.MetadataModel;
 
 /**
  * 
@@ -57,7 +56,7 @@ interface RegenerationStatementManager {
 	 * @param entity
 	 *            - to populate.
 	 */
-	void populateEntity(RebuiltEntity entity);
+	void populateEntity(RebuiltEntity<?> entity);
 	
 	
 }
