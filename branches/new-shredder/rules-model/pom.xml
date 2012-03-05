@@ -9,7 +9,6 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>gov.nist.scap.content</groupId>
 	<artifactId>rules-model</artifactId>
 
 	<name>XMLBeans Rule Model</name>
@@ -41,6 +40,27 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>gov.nist.scap</groupId>
+			<artifactId>scap-signature</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.existdb</groupId>
+			<artifactId>existdb</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.fabric3.fabric3-db-exist</groupId>
+			<artifactId>xmldb</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlrpc</groupId>
+			<artifactId>xmlrpc-client</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>

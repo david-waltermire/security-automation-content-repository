@@ -9,7 +9,6 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>gov.nist.scap.content</groupId>
 	<artifactId>shredder</artifactId>
 
 	<name>XML Content Shredder</name>

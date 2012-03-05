@@ -26,13 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>gov.nist.scap</groupId>
-    <artifactId>content-master</artifactId>
-    <version>0.1-SNAPSHOT</version>
+	<groupId>gov.nist.scap</groupId>
+	<artifactId>content-master</artifactId>
+	<version>0.1-SNAPSHOT</version>
   </parent>
   
-  <groupId>gov.nist.scap.content</groupId>
-  <artifactId>repository</artifactId>
+  <artifactId>content-repository</artifactId>
 
   <packaging>jar</packaging>
   <name>content-repository</name>
@@ -40,14 +39,12 @@
 
   <dependencies> 
   	<dependency>
-  	  <groupId>gov.nist.scap.content</groupId>
+  	  <groupId>${project.groupId}</groupId>
   	  <artifactId>rules-model</artifactId>
-  		<version>0.1-SNAPSHOT</version>
   	</dependency>
     <dependency>
-      <groupId>gov.nist.scap.content</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>shredder</artifactId>
-      <version>0.1-SNAPSHOT</version>
     </dependency>
     
   	<dependency>
@@ -101,6 +98,10 @@
    		<groupId>org.slf4j</groupId>
    		<artifactId>slf4j-log4j12</artifactId>
   	</dependency>
+ 	<dependency>
+        	<groupId>${project.groupId}</groupId>
+ 		<artifactId>content-model</artifactId>
+ 	</dependency>
   </dependencies>
  
   <build>
