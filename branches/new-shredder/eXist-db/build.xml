@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="run">
+    
+  <target name="setup">
+    <available file="eXist/exist.jar" property="exist.exists"/>
+    <condition property="exist.notexists">
+      <not>
+        <isset property="exist.exists"/>
+      </not>
+    </condition>
+  </target>
+  
+  <target name="run" depends="setup" if="${exist.notexists}">
+    <ant dir="eXist"/>
+  </target>
+  
+</project>
