@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>exist-db</artifactId>
+	<packaging>pom</packaging>
 
   <name>eXist DB Maven Build</name>
 
@@ -83,5 +84,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
