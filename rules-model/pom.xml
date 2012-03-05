@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>gov.nist.scap</groupId>
-		<artifactId>content-master</artifactId>
+		<groupId>gov.nist.scap.content</groupId>
+		<artifactId>master</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
@@ -17,7 +17,6 @@
 		<dependency>
 			<groupId>gov.nist.scap.content</groupId>
 			<artifactId>shredder</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
