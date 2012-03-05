@@ -1,0 +1,40 @@
+Index: src/org/exist/Indexer.java
+===================================================================
+--- src/org/exist/Indexer.java	(revision 15971)
++++ src/org/exist/Indexer.java	(working copy)
+@@ -549,22 +549,23 @@
+         if (!stack.empty()) {
+             last = stack.peek();
+             if (charBuf != null) {
+-                if (charBuf.isWhitespaceOnly()) {
+-                    if (suppressWSmixed) {
+-                        if (charBuf.length() > 0 && last.getChildCount() > 0) {
+-                            text.setData(charBuf);
+-                            text.setOwnerDocument(document);
+-                            last.appendChildInternal(prevNode, text);
+-                            if (!validate)
+-                                storeText();
+-                            setPrevious(text);
+-                        }
++               XMLString normalized = charBuf.normalize(normalize);
++            	if (normalized.isWhitespaceOnly()) {
++                    if (((!suppressWSmixed && last.getChildCount() > 0) || suppressWSmixed) 
++                    		&& normalized.length() > 0) {
++                    	
++                        text.setData(charBuf);
++                        text.setOwnerDocument(document);
++                        last.appendChildInternal(prevNode, text);
++                        if (!validate)
++                            storeText();
++                        setPrevious(text);
+                     }
+-                } else if (charBuf.length() > 0) {
++                } else if (normalized.length() > 0) {
+                     // mixed element content: don't normalize the text node,
+                     // just check
+                     // if there is any text at all
+-                    text.setData(charBuf);
++                    text.setData(normalized);
+                     text.setOwnerDocument(document);
+                     last.appendChildInternal(prevNode, text);
+                     if (!validate)
