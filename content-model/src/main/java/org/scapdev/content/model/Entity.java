@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.model;
 
+import java.io.OutputStream;
 import java.util.Collection;
 
 import javax.xml.bind.JAXBElement;
@@ -49,6 +50,10 @@ public interface Entity {
 	 * @return the object
 	 */
 	JAXBElement<Object> getObject();
+	/**
+	 * Writes the entity out to the OutputStream.
+	 */
+	void writeOutEntity(OutputStream os);
 	/**
 	 * This method retrieves the combination of instances returned by
 	 * {@link #getKeyedRelationships} and {@link #getIndirectRelationships}.  It
