@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>exist-db</artifactId>
-	<packaging>pom</packaging>
+  <packaging>pom</packaging>
 
   <name>eXist DB Maven Build</name>
 
@@ -111,7 +111,7 @@
             <phase>compile</phase>
             <configuration>
               <target>
-                <ant dir="eXist"/>
+                <ant dir="."/>
               </target>
             </configuration>
             <goals>
