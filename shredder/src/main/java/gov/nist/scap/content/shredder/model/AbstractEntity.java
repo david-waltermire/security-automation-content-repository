@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlCursor.XmlBookmark;
 
 
 public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> implements IMutableEntity<DEFINITION> {
@@ -80,6 +81,10 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	private class ContentHandle implements IContentHandle {
 		public XmlCursor getCursor() {
 			return bookmark.createCursor();
+		}
+
+		public XmlBookmark getBookmark() {
+			return bookmark;
 		}
 		
 	}

@@ -6,12 +6,8 @@ import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.ProcessingException;
 import gov.nist.scap.content.shredder.rules.RuleDefinitions;
-import gov.nist.scap.signature.Signature;
 import gov.nist.scap.signature.XMLValidator;
 import gov.nist.scap.signature.config.ValidateSigConfig;
-import gov.nist.scap.signature.enums.CanonicalizationType;
-import gov.nist.scap.signature.enums.HashType;
-import gov.nist.scap.signature.enums.SignatureType;
 import gov.nist.scap.signature.model.IReferenceValidationResult;
 import gov.nist.scap.signature.model.ISignatureValidationResult;
 
@@ -42,7 +38,6 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.CollectionManagementService;
-import org.xmldb.api.modules.XMLResource;
 
 public class ExistTest {
 
@@ -92,7 +87,7 @@ public class ExistTest {
 				res = (RemoteXMLResource) col.createResource(null, "XMLResource");
 				XmlOptions xo = new XmlOptions();
 				xo.setSaveOuter();
-				XmlCursor xc = ie.getCursor();
+				XmlCursor xc = ie.getContentHandle().getCursor();
 				TokenType tt = xc.toNextToken();
 				Map<String,String> localNamespaces = new HashMap<String,String>();
 				while( tt == TokenType.ATTR || tt == TokenType.NAMESPACE ) {
@@ -102,7 +97,7 @@ public class ExistTest {
 					}
 					tt = xc.toNextToken();
 				}
-				xc.toBookmark(ie.getBookmark());
+				xc.toBookmark(ie.getContentHandle().getBookmark());
 				res.setContent(xc.getObject().xmlText(xo));
 				col.storeResource(res);
 				resId = res.getId();
@@ -110,7 +105,7 @@ public class ExistTest {
 				xc.removeXml();
 				xc.beginElement("xinclude", "gov:nist:scap:content-repo");
 				xc.insertAttributeWithValue("resource-id",resId);
-				System.out.println(resId + " entity("+ie.getRelationships().size()+"): "+ie.getCursor().getName());
+				System.out.println(resId + " entity("+ie.getRelationships().size()+"): "+ie.getContentHandle().getCursor().getName());
 
 			} finally {
 				// dont forget to cleanup
