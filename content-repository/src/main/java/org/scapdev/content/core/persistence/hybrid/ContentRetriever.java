@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import gov.nist.scap.content.shredder.model.IContentHandle;
+import gov.nist.scap.content.model.IContentHandle;
 
 import org.apache.xmlbeans.XmlCursor;
 

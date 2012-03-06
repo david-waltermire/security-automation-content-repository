@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
-import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+import gov.nist.scap.content.definitions.IEntityDefinition;
 
 import java.util.Map;
 

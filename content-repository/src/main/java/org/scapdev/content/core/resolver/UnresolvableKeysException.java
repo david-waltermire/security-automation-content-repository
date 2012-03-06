@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.resolver;
 
-import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.model.IKey;
 
 import java.util.Collections;
 import java.util.Set;

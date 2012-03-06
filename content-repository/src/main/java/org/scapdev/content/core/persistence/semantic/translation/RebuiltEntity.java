@@ -23,13 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.shredder.model.IContentHandle;
-import gov.nist.scap.content.shredder.model.IIndirectRelationship;
-import gov.nist.scap.content.shredder.model.IKey;
-import gov.nist.scap.content.shredder.model.IKeyedRelationship;
-import gov.nist.scap.content.shredder.model.IRelationship;
-import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedRelationship;
+import gov.nist.scap.content.model.IRelationship;
 
 import java.util.Collection;
 import java.util.Collections;

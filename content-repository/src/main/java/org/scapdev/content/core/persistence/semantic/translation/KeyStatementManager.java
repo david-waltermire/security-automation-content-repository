@@ -26,9 +26,9 @@
  */
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.shredder.model.IKey;
-import gov.nist.scap.content.shredder.model.KeyBuilder;
-import gov.nist.scap.content.shredder.model.KeyException;
+import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.KeyBuilder;
+import gov.nist.scap.content.model.KeyException;
 
 import java.util.LinkedHashMap;
 

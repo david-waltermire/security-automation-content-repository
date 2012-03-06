@@ -23,8 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core;
 
-import gov.nist.scap.content.shredder.model.IKey;
-import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
+import gov.nist.scap.content.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.IKey;
 
 import java.util.Collection;
 import java.util.Collections;

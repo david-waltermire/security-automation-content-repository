@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.query;
 
-import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
+import gov.nist.scap.content.definitions.IRelationshipDefinition;
 
 public interface RelationshipStatistic
 {
