@@ -30,17 +30,53 @@ import org.apache.log4j.Logger;
 public class ServiceLoaderUtil {
 	private static final Logger log = Logger.getLogger(ServiceLoaderUtil.class);
 
-	public static <FACTORY> FACTORY load(Class<FACTORY> serviceClass, String property, Class<? extends FACTORY> defaultInstance) {
+	/**
+	 * Loads a service instance using the Java SPI. The service class instance
+	 * retrieved will be the class described by the value of the provided
+	 * property if it is available; or the default instance if no matching class
+	 * was found.
+	 * 
+	 * @param <SERVICE_CLASS> the base type of the service to load
+	 * @param serviceClass the class representing the service to load
+	 * @param property the name of a system property that describes the class
+	 * 		name of the service instance to load
+	 * @param defaultInstance the class of the service instance to return if
+	 * 		no instance matches the <code>property</code> argument 
+	 * @return a service instance
+	 * @throws UnsupportedOperationException if an instance was not found that
+	 * 		matches the provided property and the defaultInstance
+	 * @see java.util.ServiceLoader#load(Class)
+	 */
+	public static <SERVICE_CLASS> SERVICE_CLASS load(Class<SERVICE_CLASS> serviceClass, String property, Class<? extends SERVICE_CLASS> defaultInstance) {
 		return load(serviceClass, property, defaultInstance, null);
 	}
 
-	public static <FACTORY> FACTORY load(Class<FACTORY> serviceClass, String property, Class<? extends FACTORY> defaultInstance, ClassLoader classLoader) {
-		ServiceLoader<? extends FACTORY> loader = ServiceLoader.load(serviceClass, classLoader);
+	/**
+	 * Loads a service instance using the Java SPI. The service class instance
+	 * retrieved will be the class described by the value of the provided
+	 * property if it is available; or the default instance if no matching class
+	 * was found.
+	 * 
+	 * @param <SERVICE_CLASS> the base type of the service to load
+	 * @param serviceClass the class representing the service to load
+	 * @param property the name of a system property that describes the class
+	 * 		name of the service instance to load
+	 * @param defaultInstance the class of the service instance to return if
+	 * 		no instance matches the <code>property</code> argument 
+	 * @param classLoader the class loader to use or <code>null</code>
+	 * 		indicating that the system class loader should be used.
+	 * @return a service instance
+	 * @throws UnsupportedOperationException if an instance was not found that
+	 * 		matches the provided property and the defaultInstance
+	 * @see java.util.ServiceLoader#load(Class, ClassLoader)
+	 */
+	public static <SERVICE_CLASS> SERVICE_CLASS load(Class<SERVICE_CLASS> serviceClass, String property, Class<? extends SERVICE_CLASS> defaultInstance, ClassLoader classLoader) {
+		ServiceLoader<? extends SERVICE_CLASS> loader = ServiceLoader.load(serviceClass, classLoader);
 		String propertyValue = System.getProperty(property);
 
-		FACTORY result = null;
-		FACTORY defaultFactory = null;
-		for (FACTORY service : loader) {
+		SERVICE_CLASS result = null;
+		SERVICE_CLASS defaultFactory = null;
+		for (SERVICE_CLASS service : loader) {
 			if (service.getClass().equals(defaultInstance)) {
 				defaultFactory = service;
 			}
