@@ -20,20 +20,10 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.existdb</groupId>
-			<artifactId>existdb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.fabric3.fabric3-db-exist</groupId>
-			<artifactId>xmldb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlrpc</groupId>
-			<artifactId>xmlrpc-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>exist-db</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
 		</dependency>
             		
 	</dependencies>
