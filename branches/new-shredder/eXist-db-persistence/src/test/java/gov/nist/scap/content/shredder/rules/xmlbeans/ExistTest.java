@@ -1,11 +1,11 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
-import gov.nist.scap.content.shredder.model.ContentException;
+import gov.nist.scap.content.definitions.ProcessingException;
+import gov.nist.scap.content.definitions.RuleDefinitions;
+import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
-import gov.nist.scap.content.shredder.rules.ProcessingException;
-import gov.nist.scap.content.shredder.rules.RuleDefinitions;
 import gov.nist.scap.signature.Signature;
 import gov.nist.scap.signature.XMLValidator;
 import gov.nist.scap.signature.config.ValidateSigConfig;

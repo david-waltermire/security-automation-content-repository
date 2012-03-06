@@ -24,7 +24,7 @@
 package org.scapdev.content.core;
 
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.model.IKey;
 
 import java.io.File;
 import java.io.IOException;

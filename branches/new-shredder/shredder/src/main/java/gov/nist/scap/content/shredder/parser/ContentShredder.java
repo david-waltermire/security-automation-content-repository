@@ -1,9 +1,9 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.rules.IDocumentDefinition;
-import gov.nist.scap.content.shredder.rules.ProcessingException;
-import gov.nist.scap.content.shredder.rules.RuleDefinitions;
+import gov.nist.scap.content.definitions.IDocumentDefinition;
+import gov.nist.scap.content.definitions.ProcessingException;
+import gov.nist.scap.content.definitions.RuleDefinitions;
+import gov.nist.scap.content.model.ContentException;
 
 import java.io.File;
 import java.io.IOException;

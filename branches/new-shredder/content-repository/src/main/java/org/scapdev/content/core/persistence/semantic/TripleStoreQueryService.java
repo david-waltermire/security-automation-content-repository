@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
-import gov.nist.scap.content.shredder.model.IKey;
+import gov.nist.scap.content.model.IKey;
 
 import java.util.Collection;
 import java.util.LinkedList;

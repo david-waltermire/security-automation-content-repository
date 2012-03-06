@@ -1,11 +1,6 @@
 package gov.nist.scap.content.model;
 
-import gov.nist.scap.content.shredder.model.IContentConstruct;
-import gov.nist.scap.content.shredder.model.IContentHandle;
-import gov.nist.scap.content.shredder.model.IIndirectRelationship;
-import gov.nist.scap.content.shredder.model.IKeyedRelationship;
-import gov.nist.scap.content.shredder.model.IRelationship;
-import gov.nist.scap.content.shredder.rules.IEntityDefinition;
+import gov.nist.scap.content.definitions.IEntityDefinition;
 
 import java.util.Collection;
 

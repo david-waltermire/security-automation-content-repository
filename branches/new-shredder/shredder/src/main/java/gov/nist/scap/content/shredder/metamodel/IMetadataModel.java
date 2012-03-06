@@ -1,8 +1,8 @@
 package gov.nist.scap.content.shredder.metamodel;
 
-import gov.nist.scap.content.shredder.rules.IEntityDefinition;
-import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
-import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
+import gov.nist.scap.content.definitions.IEntityDefinition;
+import gov.nist.scap.content.definitions.IExternalIdentifier;
+import gov.nist.scap.content.definitions.IRelationshipDefinition;
 
 import java.util.Collection;
 

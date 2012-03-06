@@ -23,11 +23,11 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import gov.nist.scap.content.definitions.IEntityDefinition;
+import gov.nist.scap.content.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
-import gov.nist.scap.content.shredder.model.IKey;
-import gov.nist.scap.content.shredder.rules.IEntityDefinition;
-import gov.nist.scap.content.shredder.rules.IRelationshipDefinition;
 import info.aduna.iteration.Iterations;
 
 import java.awt.RenderingHints.Key;
