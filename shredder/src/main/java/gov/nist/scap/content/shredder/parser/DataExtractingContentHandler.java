@@ -1,6 +1,5 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.definitions.KeyedRelationshipInfo;
 import gov.nist.scap.content.model.IContainerVisitor;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
@@ -9,6 +8,7 @@ import gov.nist.scap.content.model.IIndexedDocument;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IMutableEntity;
+import gov.nist.scap.content.model.definitions.KeyedRelationshipInfo;
 
 import java.util.Collection;
 import java.util.Collections;

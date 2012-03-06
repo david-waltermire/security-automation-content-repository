@@ -1,8 +1,8 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
-import gov.nist.scap.content.definitions.ProcessingException;
-import gov.nist.scap.content.definitions.RuleDefinitions;
 import gov.nist.scap.content.model.ContentException;
+import gov.nist.scap.content.model.definitions.ProcessingException;
+import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;

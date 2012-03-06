@@ -19,12 +19,6 @@
 			<artifactId>content-repository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>content-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.existdb</groupId>
 			<artifactId>existdb</artifactId>

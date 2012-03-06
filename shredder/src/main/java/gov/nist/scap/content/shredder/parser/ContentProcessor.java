@@ -1,24 +1,5 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.definitions.ContentMapping;
-import gov.nist.scap.content.definitions.IBoundaryRelationshipDefinition;
-import gov.nist.scap.content.definitions.IContentNodeDefinition;
-import gov.nist.scap.content.definitions.IDocumentDefinition;
-import gov.nist.scap.content.definitions.IEntityDefinition;
-import gov.nist.scap.content.definitions.IEntityDefinitionVisitor;
-import gov.nist.scap.content.definitions.IExternalIdentifier;
-import gov.nist.scap.content.definitions.IExternalIdentifierMapping;
-import gov.nist.scap.content.definitions.IGeneratedDocumentDefinition;
-import gov.nist.scap.content.definitions.IIndirectRelationshipDefinition;
-import gov.nist.scap.content.definitions.IKeyDefinition;
-import gov.nist.scap.content.definitions.IKeyedDocumentDefinition;
-import gov.nist.scap.content.definitions.IKeyedRelationshipDefinition;
-import gov.nist.scap.content.definitions.IRelationshipDefinition;
-import gov.nist.scap.content.definitions.IRelationshipDefinitionVisitor;
-import gov.nist.scap.content.definitions.KeyedRelationshipInfo;
-import gov.nist.scap.content.definitions.ProcessingException;
-import gov.nist.scap.content.definitions.XPathRetriever;
-import gov.nist.scap.content.model.Bookmark;
 import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.DefaultBoundaryRelationship;
 import gov.nist.scap.content.model.DefaultContentNode;
@@ -33,6 +14,24 @@ import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.IMutableGeneratedDocument;
 import gov.nist.scap.content.model.IMutableKeyedDocument;
 import gov.nist.scap.content.model.KeyException;
+import gov.nist.scap.content.model.definitions.ContentMapping;
+import gov.nist.scap.content.model.definitions.IBoundaryRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
+import gov.nist.scap.content.model.definitions.IDocumentDefinition;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IEntityDefinitionVisitor;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
+import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
+import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IKeyDefinition;
+import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
+import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IRelationshipDefinitionVisitor;
+import gov.nist.scap.content.model.definitions.KeyedRelationshipInfo;
+import gov.nist.scap.content.model.definitions.ProcessingException;
+import gov.nist.scap.content.model.definitions.XPathRetriever;
 
 import java.util.Collection;
 
@@ -40,7 +39,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlCursor.XmlBookmark;
 import org.apache.xmlbeans.XmlRuntimeException;
 
 public class ContentProcessor {
@@ -67,7 +65,7 @@ public class ContentProcessor {
 		Bookmark bookmark = new Bookmark();
 		cursor.setBookmark(bookmark);
 
-		return new ContentHandle(bookmark);
+		return new BookmarkContentHandle(bookmark);
 	}
 
 	private void processRelationships(IMutableEntity<?> entity,
@@ -106,22 +104,6 @@ public class ContentProcessor {
 					relationship.accept(visitor);
 				}
 			}
-		}
-	}
-
-	private static class ContentHandle implements IContentHandle {
-		private final XmlCursor.XmlBookmark bookmark;
-
-		public ContentHandle(XmlCursor.XmlBookmark bookmark) {
-			this.bookmark = bookmark;
-		}
-
-		public XmlCursor getCursor() {
-			return bookmark.createCursor();
-		}
-
-		public XmlBookmark getBookmark() {
-			return bookmark;
 		}
 	}
 

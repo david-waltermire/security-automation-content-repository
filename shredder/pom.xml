@@ -15,6 +15,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>gov.nist.scap.content</groupId>
+			<artifactId>rules-model</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
 		</dependency>

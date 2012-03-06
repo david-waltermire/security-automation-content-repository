@@ -25,7 +25,7 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.List;
