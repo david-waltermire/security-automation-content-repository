@@ -16,8 +16,8 @@
 		<module>exist-db-persistence</module>
 		<module>shredder</module>
 		<module>rules-model</module>
-        <module>content-repository</module>
-        <module>model</module>
+        	<module>repository</module>
+        	<module>model</module>
 	</modules>
 
 	<properties>
