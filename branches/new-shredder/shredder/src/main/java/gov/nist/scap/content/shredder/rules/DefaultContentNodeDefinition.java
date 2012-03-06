@@ -1,11 +1,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.DefaultContentNode;
-import gov.nist.scap.content.shredder.model.IContainer;
-import gov.nist.scap.content.shredder.model.IKey;
 
-import org.apache.xmlbeans.XmlCursor;
 
 
 public class DefaultContentNodeDefinition extends AbstractContentNodeDefinition  {
@@ -14,9 +10,7 @@ public class DefaultContentNodeDefinition extends AbstractContentNodeDefinition 
 		super(schema, id, keyDefinition);
 	}
 
-	@Override
-	protected DefaultContentNode newEntity(XmlCursor cursor, IContainer<?> parentContext,
-			IKey key) throws ContentException {
-		return new DefaultContentNode(cursor, this, parentContext, key);
+	public <T> T accept(IEntityDefinitionVisitor<T> visitor) throws ContentException, ProcessingException {
+		return visitor.visit(this);
 	}
 }

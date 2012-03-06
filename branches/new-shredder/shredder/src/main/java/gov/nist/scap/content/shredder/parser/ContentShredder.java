@@ -23,11 +23,11 @@ public class ContentShredder {
 		this.ruleDefinitions = ruleDefinitions;
 	}
 
-	public void shred(File file, ContentHandler handler) throws XmlException, IOException, ContentException, ProcessingException {
-		shred(XmlObject.Factory.parse(file), handler);
+	public void shred(File file, ContentHandler contentHandler) throws XmlException, IOException, ContentException, ProcessingException {
+		shred(XmlObject.Factory.parse(file), contentHandler);
 	}
 
-	public void shred(XmlObject obj, ContentHandler handler) throws ContentException, ProcessingException {
+	public void shred(XmlObject obj, ContentHandler contentHandler) throws ContentException, ProcessingException {
 		XmlCursor cursor = obj.newCursor();
 
 		if (cursor.isStartdoc()) {
@@ -36,17 +36,20 @@ public class ContentShredder {
 			}
 		}
 
-		shred(cursor, handler);
+		shred(cursor, contentHandler);
 		cursor.dispose();
 	}
 
-	public void shred(XmlCursor cursor, ContentHandler handler) throws ContentException, ProcessingException {
+	public void shred(XmlCursor cursor, ContentHandler contentHandler) throws ContentException, ProcessingException {
 		QName name = cursor.getName();
 		log.debug("Shredding element with qname: "+name);
 
+		ContentProcessor processor = new ContentProcessor(contentHandler);
 		IDocumentDefinition documentDef = ruleDefinitions.getDocumentDefinition(name);
 		if (documentDef != null) {
-			documentDef.processCursor(cursor, handler, null);
+			processor.process(documentDef, cursor);
+		} else {
+			throw new ContentException("Unsupported document type: "+name.toString());
 		}
 	}
 }

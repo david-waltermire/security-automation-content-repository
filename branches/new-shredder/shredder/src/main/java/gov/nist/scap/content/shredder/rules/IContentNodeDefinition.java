@@ -1,5 +1,5 @@
 package gov.nist.scap.content.shredder.rules;
 
 
-public interface IContentNodeDefinition extends IEntityDefinition {
+public interface IContentNodeDefinition extends IKeyedEntityDefinition {
 }

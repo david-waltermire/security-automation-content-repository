@@ -2,7 +2,7 @@ package gov.nist.scap.content.shredder.rules;
 
 import org.apache.xmlbeans.XmlCursor;
 
-class XPathRetriever {
+public class XPathRetriever {
 	private final String xpath;
 
 	public XPathRetriever(String xpath) {

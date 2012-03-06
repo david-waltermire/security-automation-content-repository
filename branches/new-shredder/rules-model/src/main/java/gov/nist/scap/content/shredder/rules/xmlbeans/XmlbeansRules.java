@@ -19,7 +19,7 @@ import gov.nist.scap.content.shredder.rules.IEntityDefinition;
 import gov.nist.scap.content.shredder.rules.IExternalIdentifier;
 import gov.nist.scap.content.shredder.rules.IExternalIdentifierMapping;
 import gov.nist.scap.content.shredder.rules.IGeneratedDocumentDefinition;
-import gov.nist.scap.content.shredder.rules.IIndexedDocumentDefinition;
+import gov.nist.scap.content.shredder.rules.IKeyedDocumentDefinition;
 import gov.nist.scap.content.shredder.rules.IKeyDefinition;
 import gov.nist.scap.content.shredder.rules.IKeyRefDefinition;
 import gov.nist.scap.content.shredder.rules.IKeyedField;
@@ -140,7 +140,7 @@ public class XmlbeansRules {
 	private void processDocuments(ISchema schemaDef, SchemaType schema) {
 		for (IndexedDocumentType document : schema.getIndexedDocumentList()) {
 			IKeyDefinition keyDef = keys.get(document.getKey().getRefId());
-			IIndexedDocumentDefinition def = new DefaultIndexedDocumentDefinition(schemaDef, document.getId(), document.getQname(), keyDef);
+			IKeyedDocumentDefinition def = new DefaultIndexedDocumentDefinition(schemaDef, document.getId(), document.getQname(), keyDef);
 			documents.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}

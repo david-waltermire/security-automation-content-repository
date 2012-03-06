@@ -1,11 +1,7 @@
 package gov.nist.scap.content.shredder.rules;
 
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IKey;
-import gov.nist.scap.content.shredder.model.IMutableEntity;
-import gov.nist.scap.content.shredder.parser.ContentHandler;
 
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
 public class DefaultKeyedRelationshipDefinition extends AbstractRelationshipDefinition implements
@@ -26,12 +22,7 @@ public class DefaultKeyedRelationshipDefinition extends AbstractRelationshipDefi
 		return keyRefDefinition;
 	}
 
-	@Override
-	protected void handleRelationship(XmlCursor cursor,
-			ContentHandler handler, IMutableEntity<?> containingEntity)
-			throws ProcessingException, ContentException {
-		IKey key = getKeyRefDefinition().getKey(containingEntity, cursor);
-
-		handler.handle(new KeyedRelationshipInfo(this, containingEntity, key));
+	public void accept(IRelationshipDefinitionVisitor visitor) throws ContentException, ProcessingException {
+		visitor.visit(this);
 	}
 }

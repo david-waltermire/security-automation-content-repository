@@ -1,5 +1,6 @@
 package gov.nist.scap.content.shredder.model;
 
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.shredder.rules.IKeyedRelationshipDefinition;
 
 public class DefaultKeyedRelationship extends AbstractRelationship<IKeyedRelationshipDefinition> implements IKeyedRelationship {

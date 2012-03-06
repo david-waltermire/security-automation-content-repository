@@ -1,16 +1,14 @@
 package gov.nist.scap.content.shredder.model;
 
+import gov.nist.scap.content.model.IMutableContentNode;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.shredder.rules.IContentNodeDefinition;
-
-import org.apache.xmlbeans.XmlCursor;
 
 public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IMutableContentNode {
 	private final IKey key;
 
-	public AbstractContentNode(XmlCursor cursor,
-			IContentNodeDefinition contentNodeDefinition,
-			IContainer<?> parentContext, IKey key) throws ContentException {
-		super(cursor, contentNodeDefinition, parentContext);
+	public AbstractContentNode(IContentNodeDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
+		super(definition, contentHandle, parent);
 		this.key = key;
 	}
 
@@ -23,7 +21,7 @@ public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDef
 		if (key.getId().equals(keyId)) {
 			retval = key;
 		} else {
-			retval = getParentContext().getKey(keyId);
+			retval = getParent().getKey(keyId);
 		}
 		return retval;
 	}
