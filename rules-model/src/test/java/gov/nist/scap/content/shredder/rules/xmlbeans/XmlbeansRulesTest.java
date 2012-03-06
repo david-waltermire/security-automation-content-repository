@@ -1,7 +1,7 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.ProcessingException;

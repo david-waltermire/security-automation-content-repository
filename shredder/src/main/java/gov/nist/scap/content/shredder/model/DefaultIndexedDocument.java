@@ -1,19 +1,17 @@
 package gov.nist.scap.content.shredder.model;
 
-import gov.nist.scap.content.shredder.rules.IIndexedDocumentDefinition;
+import gov.nist.scap.content.model.IMutableEntity;
+import gov.nist.scap.content.model.IMutableKeyedDocument;
+import gov.nist.scap.content.shredder.rules.IKeyedDocumentDefinition;
 
-import org.apache.xmlbeans.XmlCursor;
 
-
-public class DefaultIndexedDocument extends AbstractDocument<IIndexedDocumentDefinition>
-		implements IMutableIndexedDocument {
+public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinition>
+		implements IMutableKeyedDocument {
 
 	private final IKey key;
 
-	public DefaultIndexedDocument(XmlCursor cursor,
-			IIndexedDocumentDefinition documentDefinition,
-			IContainer<?> parentContext, IKey key) throws ContentException {
-		super(cursor, documentDefinition, parentContext);
+	public DefaultIndexedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
+		super(definition, contentHandle, parent);
 		this.key = key;
 	}
 
@@ -30,7 +28,7 @@ public class DefaultIndexedDocument extends AbstractDocument<IIndexedDocumentDef
 		if (key.getId().equals(keyId)) {
 			retval = key;
 		} else {
-			retval = getParentContext().getKey(keyId);
+			retval = getParent().getKey(keyId);
 		}
 		return retval;
 	}

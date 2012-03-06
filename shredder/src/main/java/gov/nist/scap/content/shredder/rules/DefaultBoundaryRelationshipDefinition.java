@@ -1,29 +1,14 @@
 package gov.nist.scap.content.shredder.rules;
 
-import javax.xml.namespace.QName;
-
 import gov.nist.scap.content.shredder.model.ContentException;
-import gov.nist.scap.content.shredder.model.DefaultBoundaryRelationship;
-import gov.nist.scap.content.shredder.model.IBoundaryRelationship;
-import gov.nist.scap.content.shredder.model.IMutableEntity;
-import gov.nist.scap.content.shredder.parser.ContentHandler;
 
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
 public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipDefinition implements IBoundaryRelationshipDefinition {
-	private static final Logger log = Logger.getLogger(DefaultBoundaryRelationshipDefinition.class);
-
 	/**
 	 * The content definition mapping associated with this boundary
 	 */
 	private final ContentMapping contentMapping;
-
-//	/**
-//	 * The content definition containing this boundary
-//	 */
-//	private final IContentDefinition parent;
 
 	/**
 	 * Creates a new boundary instance.
@@ -50,36 +35,15 @@ public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipD
 		if (contentMapping == null) {
 			throw new NullPointerException("contentMapping");
 		}
-//
-//		if (parent == null) {
-//			throw new NullPointerException("parent");
-//		}
 
 		this.contentMapping = contentMapping;
-//		this.parent = parent;
 	}
-//
-//	public IContentDefinition getParent() {
-//		return parent;
-//	}
 
-	@Override
-	protected void handleRelationship(XmlCursor cursor,
-			ContentHandler handler, IMutableEntity<?> containingEntity)
-			throws ProcessingException, ContentException {
-		QName qname = cursor.getName();
-		// retrieve the content definition to use to process the child node
-		IEntityDefinition contentDefinition = contentMapping.getContentDefinitionForQName(qname);
-		if (contentDefinition == null) {
-			log.warn("Unrecognized QName '"+qname.toString()+"' at boundary: "+getId());
-		} else {
-			// process the child node
-			IMutableEntity<?> entity = contentDefinition.processCursor(cursor, handler, containingEntity);
+	public ContentMapping getContentMapping() {
+		return contentMapping;
+	}
 
-			IBoundaryRelationship relationship = new DefaultBoundaryRelationship(this, entity, containingEntity);
-			// TODO: determine which to keep
-			containingEntity.appendRelationship(relationship);
-			entity.appendRelationship(relationship);
-		}
+	public void accept(IRelationshipDefinitionVisitor visitor) throws ContentException, ProcessingException {
+		visitor.visit(this);
 	}
 }

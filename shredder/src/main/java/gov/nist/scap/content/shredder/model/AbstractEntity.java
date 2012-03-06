@@ -1,46 +1,29 @@
 package gov.nist.scap.content.shredder.model;
 
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.shredder.rules.IEntityDefinition;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlCursor.XmlBookmark;
-
 
 public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> implements IMutableEntity<DEFINITION> {
 	private final DEFINITION contentDefinition;
-	private final IContainer<?> parentContext;
-	private final Bookmark bookmark;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final List<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
 	private final List<IIndirectRelationship> indirectRelationships = new LinkedList<IIndirectRelationship>();
+	private final IContentHandle contentHandle;
+	private final IMutableEntity<?> parent;
 
-	public AbstractEntity(XmlCursor cursor,
-			DEFINITION contentDefinition,
-			IContainer<?> parentContext) throws ContentException {
-		this.contentDefinition = contentDefinition;
-		this.parentContext = parentContext;
-		this.bookmark = new Bookmark();
-		cursor.setBookmark(bookmark);
+	public AbstractEntity(DEFINITION definition, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
+		this.contentDefinition = definition;
+		this.contentHandle = contentHandle;
+		this.parent = parent;
 	}
 
 	public DEFINITION getDefinition() {
 		return contentDefinition;
-	}
-
-	public IContainer<?> getParentContext() {
-		return parentContext;
-	}
-
-	public Bookmark getBookmark() {
-		return bookmark;
-	}
-
-	public XmlCursor getCursor() {
-		return (bookmark != null ? bookmark.createCursor() : null);
 	}
 
 	public List<IRelationship<?>> getRelationships() {
@@ -56,36 +39,28 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	}
 
 	public IKey getKey(String keyId) {
-		return (getParentContext() == null ? null : getParentContext().getKey(keyId));
+		return (getParent() == null ? null : getParent().getKey(keyId));
 	}
 
-	public void appendRelationship(IKeyedRelationship relationship) {
-		keyedRelationships.add(relationship);
-		appendRelationship((IRelationship<?>)relationship);
+	public IMutableEntity<?> getParent() {
+		return parent;
 	}
 
-	public void appendRelationship(IIndirectRelationship relationship) {
-		indirectRelationships.add(relationship);
-		appendRelationship((IRelationship<?>)relationship);
-	}
-
-	public void appendRelationship(IRelationship<?> relationship) {
-		relationships.add(relationship);
-	}
-
-	@Override
 	public IContentHandle getContentHandle() {
-		return new ContentHandle();
+		return contentHandle;
 	}
 
-	private class ContentHandle implements IContentHandle {
-		public XmlCursor getCursor() {
-			return bookmark.createCursor();
-		}
+	public void addRelationship(IKeyedRelationship relationship) {
+		keyedRelationships.add(relationship);
+		addRelationship((IRelationship<?>)relationship);
+	}
 
-		public XmlBookmark getBookmark() {
-			return bookmark;
-		}
-		
+	public void addRelationship(IIndirectRelationship relationship) {
+		indirectRelationships.add(relationship);
+		addRelationship((IRelationship<?>)relationship);
+	}
+
+	public void addRelationship(IRelationship<?> relationship) {
+		relationships.add(relationship);
 	}
 }

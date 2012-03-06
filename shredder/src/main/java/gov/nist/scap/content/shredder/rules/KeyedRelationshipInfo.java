@@ -1,9 +1,9 @@
 package gov.nist.scap.content.shredder.rules;
 
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.shredder.model.DefaultKeyedRelationship;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.IKeyedEntity;
-import gov.nist.scap.content.shredder.model.IMutableEntity;
 
 public class KeyedRelationshipInfo {
 	private final IKeyedRelationshipDefinition definition;
@@ -21,6 +21,6 @@ public class KeyedRelationshipInfo {
 	}
 	
 	public void applyRelationship(IKeyedEntity<?> referencedEntity) {
-		containingEntity.appendRelationship(new DefaultKeyedRelationship(definition, containingEntity, referencedEntity));
+		containingEntity.addRelationship(new DefaultKeyedRelationship(definition, containingEntity, referencedEntity));
 	}
 }

@@ -23,8 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.shredder.model.IContentHandle;
-import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.model.IIndirectRelationship;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.IKeyedRelationship;

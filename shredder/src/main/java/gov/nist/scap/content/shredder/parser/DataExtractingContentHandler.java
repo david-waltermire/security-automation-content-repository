@@ -1,13 +1,13 @@
 package gov.nist.scap.content.shredder.parser;
 
+import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.shredder.model.IContainerVisitor;
 import gov.nist.scap.content.shredder.model.IContentNode;
-import gov.nist.scap.content.shredder.model.IEntity;
 import gov.nist.scap.content.shredder.model.IGeneratedDocument;
 import gov.nist.scap.content.shredder.model.IIndexedDocument;
 import gov.nist.scap.content.shredder.model.IKey;
 import gov.nist.scap.content.shredder.model.IKeyedEntity;
-import gov.nist.scap.content.shredder.model.IMutableEntity;
 import gov.nist.scap.content.shredder.rules.KeyedRelationshipInfo;
 
 import java.util.Collection;
