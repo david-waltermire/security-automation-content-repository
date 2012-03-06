@@ -4,7 +4,7 @@ import gov.nist.scap.content.model.IContainerVisitor;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IGeneratedDocument;
-import gov.nist.scap.content.model.IIndexedDocument;
+import gov.nist.scap.content.model.IKeyedDocument;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IMutableEntity;
@@ -87,7 +87,7 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 //		cursor.dispose();
 	}
 
-	public void visit(IIndexedDocument document) {
+	public void visit(IKeyedDocument document) {
 		addKeyedEntity(document);
 //		XmlCursor cursor = document.getBookmark().createCursor();
 //		StringBuilder builder = new StringBuilder();
