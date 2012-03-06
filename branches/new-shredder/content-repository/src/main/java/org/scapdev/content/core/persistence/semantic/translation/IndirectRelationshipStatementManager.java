@@ -23,9 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.definitions.IIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.IIndirectRelationship;
-import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.HashMap;

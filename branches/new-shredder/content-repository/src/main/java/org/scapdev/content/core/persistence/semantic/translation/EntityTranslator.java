@@ -26,12 +26,12 @@
  */
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IIndirectRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
-import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.LinkedList;
 import java.util.List;

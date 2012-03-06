@@ -23,14 +23,14 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import gov.nist.scap.content.definitions.IEntityDefinition;
-import gov.nist.scap.content.definitions.IExternalIdentifier;
-import gov.nist.scap.content.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IIndirectRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IRelationship;
-import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.Collections;

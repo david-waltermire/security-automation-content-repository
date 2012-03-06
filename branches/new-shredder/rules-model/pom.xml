@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>gov.nist.scap.content</groupId>
-			<artifactId>shredder</artifactId>
+			<artifactId>model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>

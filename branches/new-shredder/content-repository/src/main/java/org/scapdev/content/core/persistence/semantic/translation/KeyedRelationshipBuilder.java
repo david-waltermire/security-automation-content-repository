@@ -23,13 +23,13 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.AbstractRelationship;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
-import gov.nist.scap.content.shredder.metamodel.IMetadataModel;
+import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 

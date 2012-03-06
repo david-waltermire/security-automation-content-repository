@@ -1,10 +1,14 @@
 package gov.nist.scap.content.exist;
 
+import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.shredder.rules.xmlbeans.TestContentHandler;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +20,6 @@ import org.exist.xmldb.EXistResource;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.EntityStatistic;
-import org.scapdev.content.model.Entity;
-import org.scapdev.content.model.Key;
-import org.scapdev.content.model.MetadataModel;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
@@ -66,7 +67,7 @@ public class ExistDBContentPersistenceManager implements
 
     }
 
-    public Entity getEntityByKey(Key key, MetadataModel model) {
+    public IEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
         if (key == null)
             return null;
         OutputStream os =
@@ -97,13 +98,13 @@ public class ExistDBContentPersistenceManager implements
     @Override
     public Map<String, ? extends EntityStatistic> getEntityStatistics(
             Set<String> entityInfoIds,
-            MetadataModel model) {
+            IMetadataModel model) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Set<Key> getKeysForIndirectIds(
+    public Set<IKey> getKeysForIndirectIds(
             String indirectType,
             java.util.Collection<String> indirectIds,
             Set<String> entityType) {
@@ -113,8 +114,8 @@ public class ExistDBContentPersistenceManager implements
 
     @Override
     public void storeEntities(
-            List<? extends Entity> entities,
-            MetadataModel model) throws ContentException {
+            List<? extends IEntity<?>> entities,
+            IMetadataModel model) throws ContentException {
         // TODO Auto-generated method stub
 
     }
