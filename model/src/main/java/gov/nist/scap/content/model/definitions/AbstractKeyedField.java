@@ -38,7 +38,7 @@ public abstract class AbstractKeyedField implements IKeyedField {
 	}
 
 	public String getValue(IContainer<?> parentContext, XmlCursor cursor)
-			throws ContentException {
+			throws KeyException, ContentException {
 		String value = retrieveValue(parentContext, cursor);
 		if (pattern != null) {
 			Matcher matcher = pattern.matcher(value);

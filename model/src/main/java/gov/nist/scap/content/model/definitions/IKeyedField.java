@@ -19,5 +19,5 @@ public interface IKeyedField {
 	 * @throws KeyException
 	 * @throws ContentException 
 	 */
-	String getValue(IContainer<?> parentContext, XmlCursor cursor) throws ContentException;
+	String getValue(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
 }

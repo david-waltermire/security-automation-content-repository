@@ -11,11 +11,10 @@ import java.util.List;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
-public class AbstractKeyedDefinition extends AbstractDefinition {
+public class KeyedSupport {
 	private final List<? extends IKeyedField> fields;
 
-	public AbstractKeyedDefinition(ISchema schema, String id, List<? extends IKeyedField> fields) throws XmlException {
-		super(schema, id);
+	public KeyedSupport(List<? extends IKeyedField> fields) throws XmlException {
 		this.fields = Collections.unmodifiableList(fields);
 	}
 
@@ -31,7 +30,7 @@ public class AbstractKeyedDefinition extends AbstractDefinition {
 			String value = field.getValue(parentContext, cursor);
 
 			if (value == null) {
-				throw new RuntimeException("null field '" + id + "' for key '" + getId() + "'");
+				throw new KeyException("null field '" + id + "'");
 			}
 			fieldIdToValueMap.put(id, value);
 		}

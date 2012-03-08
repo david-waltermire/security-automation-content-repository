@@ -35,13 +35,17 @@ import java.util.Map;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
-public class DefaultKeyRefDefinition extends AbstractKeyedDefinition implements IKeyRefDefinition {
+public class DefaultKeyRefDefinition implements IKeyRefDefinition {
+	private final KeyedSupport keyedSupport;
 	private final IKeyDefinition keyDefinition;
 
-	public DefaultKeyRefDefinition(ISchema schema, String id,
-			List<? extends IKeyedField> fields, IKeyDefinition keyDefinition) throws XmlException {
-		super(schema, id, fields);
+	public DefaultKeyRefDefinition(List<? extends IKeyedField> fields, IKeyDefinition keyDefinition) throws XmlException {
+		this.keyedSupport = new KeyedSupport(fields);
 		this.keyDefinition = keyDefinition;
+	}
+
+	public List<? extends IKeyedField> getFields() {
+		return keyedSupport.getFields();
 	}
 
 	public IKeyDefinition getKeyDefinition() {
@@ -49,7 +53,7 @@ public class DefaultKeyRefDefinition extends AbstractKeyedDefinition implements 
 	}
 
 	public IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
-		Map<String, String> referenceFieldIdToValueMap = getFieldValues(parentContext, cursor);
+		Map<String, String> referenceFieldIdToValueMap = keyedSupport.getFieldValues(parentContext, cursor);
 
 //		List<? extends IKeyedField> fields = getFields();
 //

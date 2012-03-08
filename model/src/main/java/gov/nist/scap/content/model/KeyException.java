@@ -1,7 +1,7 @@
 package gov.nist.scap.content.model;
 
 
-public class KeyException extends ContentException {
+public class KeyException extends Exception {
 
 	/** the serial version UID */
 	private static final long serialVersionUID = 1L;
