@@ -33,7 +33,7 @@ import org.apache.xmlbeans.XmlCursor;
 /**
  * Represents a key reference within an XML model.
  */
-public interface IKeyRefDefinition extends IDefinition {
+public interface IKeyRefDefinition {
 	/**
 	 * Retrieves the key definition associated with this reference
 	 * 

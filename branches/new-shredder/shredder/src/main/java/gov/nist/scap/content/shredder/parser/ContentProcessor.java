@@ -89,7 +89,6 @@ public class ContentProcessor {
 							if (!cursor.toSelection(i)) {
 								throw new RuntimeException("unable to navigate to next cursor position");
 							}
-			
 							XmlCursor newCursor = cursor.newCursor();
 							visitor.setXmlCursor(newCursor);
 							relationship.accept(visitor);
@@ -151,9 +150,13 @@ public class ContentProcessor {
 			}
 		}
 
-		@Override
-		public void visit(IKeyedRelationshipDefinition definition) throws KeyException, ContentException {
-			IKey key = definition.getKeyRefDefinition().getKey(entity, cursor);
+		public void visit(IKeyedRelationshipDefinition definition) throws ProcessingException, ContentException {
+			IKey key;
+			try {
+				key = definition.getKeyRefDefinition().getKey(entity, cursor);
+			} catch (KeyException e) {
+				throw new ProcessingException("Unable to extract key for keyed relationship '"+definition.getId()+"' on entity: "+entity.getDefinition().getId(), e);
+			}
 			contentHandler.handle(new KeyedRelationshipInfo(definition, entity, key));
 		}
 		
@@ -177,16 +180,26 @@ public class ContentProcessor {
 
 		public IMutableEntity<?> visit(IKeyedDocumentDefinition definition) throws ContentException, ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
-			IKey key = keyDefinition.getKey(parent, cursor);
+			IKey key;
+			try {
+				key = keyDefinition.getKey(parent, cursor);
+			} catch (KeyException e) {
+				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
+			}
 
 			IMutableKeyedDocument document = new DefaultIndexedDocument(definition, key, getContentHandle(cursor), parent);
 			processEntity(document, cursor);
 			return document;
 		}
 
-		public IMutableEntity<?> visit(IContentNodeDefinition definition) throws KeyException, ContentException, ProcessingException {
+		public IMutableEntity<?> visit(IContentNodeDefinition definition) throws ContentException, ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
-			IKey key = keyDefinition.getKey(parent, cursor);
+			IKey key;
+			try {
+				key = keyDefinition.getKey(parent, cursor);
+			} catch (KeyException e) {
+				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
+			}
 
 			IMutableContentNode node = new DefaultContentNode(definition, key, getContentHandle(cursor), parent);
 			processEntity(node, cursor);

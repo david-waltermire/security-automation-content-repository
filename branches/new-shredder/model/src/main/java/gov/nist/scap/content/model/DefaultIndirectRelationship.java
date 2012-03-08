@@ -28,4 +28,8 @@ public class DefaultIndirectRelationship extends AbstractRelationship<IIndirectR
 		return value;
 	}
 
+	public void accept(IRelationshipVisitor visitor) {
+		visitor.visit(this);
+	}
+
 }

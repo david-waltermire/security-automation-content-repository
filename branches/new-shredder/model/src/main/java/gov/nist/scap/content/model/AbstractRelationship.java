@@ -2,7 +2,7 @@ package gov.nist.scap.content.model;
 
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 
-public class AbstractRelationship<DEFINITION extends IRelationshipDefinition> implements IRelationship<DEFINITION> {
+public abstract class AbstractRelationship<DEFINITION extends IRelationshipDefinition> implements IRelationship<DEFINITION> {
 	private final DEFINITION definition;
 	private final IEntity<?> owningEntity;
 

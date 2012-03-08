@@ -71,25 +71,25 @@
     <dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">SP 800-68</dc:identifier>
   </xccdf:reference>
       <cpe2:platform-specification>
-        <cpe2:platform id="#automatic_updates_not_enabled">
+        <cpe2:platform id="automatic_updates_not_enabled">
           <cpe2:title xml:lang="en-US">Automatic Updates are not Enabled</cpe2:title>
           <cpe2:logical-test operator="AND" negate="false">
             <cpe2:check-fact-ref system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="USGCB-Windows-7-oval.xml" id-ref="oval:gov.nist.usgcb.windowsseven:def:21001"/>
           </cpe2:logical-test>
         </cpe2:platform>
-        <cpe2:platform id="#IPv6_not_enabled">
+        <cpe2:platform id="IPv6_not_enabled">
           <cpe2:title xml:lang="en-US">IPv6 Network Protocol is not Enabled</cpe2:title>
           <cpe2:logical-test operator="AND" negate="false">
             <cpe2:check-fact-ref system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="USGCB-Windows-7-oval.xml" id-ref="oval:gov.nist.usgcb.windowsseven:def:21002"/>
           </cpe2:logical-test>
         </cpe2:platform>
-        <cpe2:platform id="#WER_not_enabled">
+        <cpe2:platform id="WER_not_enabled">
           <cpe2:title xml:lang="en-US">Windows Error Reporting is not Enabled</cpe2:title>
           <cpe2:logical-test operator="AND" negate="false">
             <cpe2:check-fact-ref system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="USGCB-Windows-7-oval.xml" id-ref="oval:gov.nist.usgcb.windowsseven:def:21003"/>
           </cpe2:logical-test>
         </cpe2:platform>
-        <cpe2:platform id="#remote_assistance_not_enabled">
+        <cpe2:platform id="remote_assistance_not_enabled">
           <cpe2:title xml:lang="en-US">Remote Assistance is not Enabled</cpe2:title>
           <cpe2:logical-test operator="AND" negate="false">
             <cpe2:check-fact-ref system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="USGCB-Windows-7-oval.xml" id-ref="oval:gov.nist.usgcb.windowsseven:def:21004"/>
@@ -104,6 +104,7 @@
         <cpe2:platform id="#bluetooth_not_enabled">
           <cpe2:title xml:lang="en-US">Bluetooth is not Enabled</cpe2:title>
           <cpe2:logical-test operator="AND" negate="false">
+            <cpe2:fact-ref name="cpe:/a:test:test:1.0"/>
             <cpe2:check-fact-ref system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="USGCB-Windows-7-oval.xml" id-ref="oval:gov.nist.usgcb.windowsseven:def:21006"/>
           </cpe2:logical-test>
         </cpe2:platform>
@@ -2273,6 +2274,8 @@
             <dc:type xmlns:dc="http://purl.org/dc/elements/1.1/">GPO</dc:type>
             <dc:source xmlns:dc="http://purl.org/dc/elements/1.1/">Computer Configuration\Windows Settings\Security Settings\Account Policies\Account Lockout Policy</dc:source>
           </xccdf:reference>
+          <xccdf:requires idref="xccdf_gov.nist_rule_account_lockout_threshold xccdf_gov.nist_rule_account_lockout_reset"/>
+          <xccdf:conflicts idref="xccdf_gov.nist_rule_enforce_password_history"/>
           <xccdf:ident system="http://cce.mitre.org">CCE-9308-8</xccdf:ident>
           <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <xccdf:check-export export-name="oval:gov.nist.usgcb.windowsseven:var:23" value-id="xccdf_gov.nist_value_account_lockout_duration_var"/>

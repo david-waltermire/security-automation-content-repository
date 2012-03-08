@@ -23,16 +23,16 @@
             <xs:field xpath="@id"/>
         </xs:key>
 
-        <xs:key name="GlobalFocusKeyKey">
+        <xs:key name="KeyKey">
             <xs:selector xpath="tns:schema/tns:key"/>
             <xs:field xpath="@id"/>
         </xs:key>
 
-        <xs:keyref name="GlobalFocusKeyRefIdKeyRef" refer="GlobalFocusKeyKey" >
-            <xs:selector xpath="tns:schema/tns:key-ref"/>
+        <xs:keyref name="KeyRefRefIdKeyRef" refer="KeyKey" >
+            <xs:selector xpath="tns:schema/tns:keyed-relationship/tns:key-ref"/>
             <xs:field xpath="@ref-id"/>
         </xs:keyref>
-
+        
         <xs:key name="EntityKey">
             <xs:selector xpath="tns:schema/tns:indexed-document|tns:schema/tns:generated-document|tns:schema/tns:content-node"/>
             <xs:field xpath="@id"/>
@@ -96,11 +96,11 @@
             <xs:element ref="key" maxOccurs="unbounded"/>
             <xs:element ref="key-ref" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="content-node" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:choice maxOccurs="unbounded">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="indexed-document"/>
                 <xs:element ref="generated-document"/>
             </xs:choice>
-            <xs:choice maxOccurs="unbounded">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="boundary-relationship"/>
                 <xs:element ref="keyed-relationship"/>
                 <xs:element ref="indirect-relationship"/>
@@ -153,7 +153,10 @@
     <xs:simpleType name="KeyFieldNameType">
         <xs:restriction base="xs:NCName"/>
     </xs:simpleType>
-    
+
+    <!-- ******************************************************************* -->
+    <!-- * Key References                                                  * -->
+    <!-- ******************************************************************* -->
     <xs:complexType name="KeyRefType">
         <xs:attribute name="ref-id" type="KeyIdType" use="required"/>
     </xs:complexType>
@@ -173,16 +176,9 @@
                 <xs:sequence>
                     <xs:element ref="field" maxOccurs="unbounded"/>
                 </xs:sequence>
-                <xs:attribute name="id" type="KeyRefIdType" use="required"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
-    <xs:simpleType name="KeyRefIdType">
-        <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:key-ref:.+"/>
-        </xs:restriction>
-    </xs:simpleType>
     
     <!-- ******************************************************************* -->
     <!-- * Content Node                                                    * -->
@@ -239,7 +235,7 @@
     <!-- ******************************************************************* -->
     <xs:complexType name="RelationshipType">
         <xs:sequence>
-            <xs:element name="entity-ref" type="EntityReferenceType"/>
+            <xs:element name="entity-ref" type="EntityReferenceType" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="id" type="RelationshipIdType" use="required"/>
     </xs:complexType>
@@ -288,14 +284,10 @@
             <xs:extension base="RelationshipType">
                 <xs:sequence>
                     <xs:element ref="xpath" minOccurs="0"/>
-                    <xs:element name="key-ref" type="KeyRefRefType"/>
+                    <xs:element ref="key-ref"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
-    </xs:complexType>
-    
-    <xs:complexType name="KeyRefRefType">
-        <xs:attribute name="ref-id" type="KeyRefIdType" use="required"/>
     </xs:complexType>
     
     <xs:element name="indirect-relationship" type="IndirectRelationshipType"/>
@@ -307,7 +299,13 @@
                     <xs:element name="value" type="XPathNodeType"/>
                     <xs:choice>
                         <xs:element name="external-identifier" type="ExternalIdentifierRefType"/>
-                        <xs:element name="qualifier-mapping" type="QualifierMappingType"/>
+                        <xs:element name="qualifier-mapping" type="QualifierMappingType">
+                            <xs:unique name="unique-external-identifer-qualifier">
+                                <xs:selector xpath="tns:external-identifier"/>
+                                <xs:field xpath="@ref-id"/>
+                                <xs:field xpath="@qualifier-value"/>
+                            </xs:unique>
+                        </xs:element>
                     </xs:choice>
                 </xs:sequence>
             </xs:extension>

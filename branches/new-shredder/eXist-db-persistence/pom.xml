@@ -40,7 +40,14 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>rules-model</artifactId>
+      <version>${project.version}</version>
+      <classifier>test-jar</classifier>
+      <scope>test</scope>
+    </dependency>
+    
     <dependency>
       <groupId>org.existdb</groupId>
       <artifactId>existdb</artifactId>

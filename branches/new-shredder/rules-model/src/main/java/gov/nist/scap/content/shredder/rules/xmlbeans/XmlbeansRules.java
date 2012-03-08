@@ -20,9 +20,9 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
-import gov.nist.scap.content.model.definitions.IKeyRefDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedField;
+import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.ISchema;
 import gov.nist.scap.content.model.definitions.QualifiedExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
@@ -32,6 +32,7 @@ import gov.nist.scap.schema.contentRules.x01.BoundaryRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.ContentMappingType;
 import gov.nist.scap.schema.contentRules.x01.ContentNodeType;
 import gov.nist.scap.schema.contentRules.x01.EntityQNameMappingType;
+import gov.nist.scap.schema.contentRules.x01.EntityReferenceType;
 import gov.nist.scap.schema.contentRules.x01.ExternalIdentifierRefMappingType;
 import gov.nist.scap.schema.contentRules.x01.ExternalIdentifierType;
 import gov.nist.scap.schema.contentRules.x01.FieldType;
@@ -43,6 +44,7 @@ import gov.nist.scap.schema.contentRules.x01.KeyRefDefinitionType;
 import gov.nist.scap.schema.contentRules.x01.KeyType;
 import gov.nist.scap.schema.contentRules.x01.KeyedRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.QualifierMappingType;
+import gov.nist.scap.schema.contentRules.x01.RelationshipType;
 import gov.nist.scap.schema.contentRules.x01.RulesDocument;
 import gov.nist.scap.schema.contentRules.x01.RulesType;
 import gov.nist.scap.schema.contentRules.x01.SchemaType;
@@ -68,7 +70,6 @@ public class XmlbeansRules {
 	private final Map<String, IExternalIdentifier> externalIdentifiers = new HashMap<String, IExternalIdentifier>();
 	private final Map<String, ISchema> schemas = new HashMap<String, ISchema>();
 	private final Map<String, IKeyDefinition> keys = new HashMap<String, IKeyDefinition>();
-	private final Map<String, IKeyRefDefinition> keyRefs = new HashMap<String, IKeyRefDefinition>();
 	private final Map<String, IContentNodeDefinition> nodes = new HashMap<String, IContentNodeDefinition>();
 	private final Map<String, IDocumentDefinition> documents = new HashMap<String, IDocumentDefinition>();
 	private final Map<String, IEntityDefinition> entities = new HashMap<String, IEntityDefinition>();
@@ -118,7 +119,6 @@ public class XmlbeansRules {
 		// Must process these after all keys have been processed
 		for (SchemaType schema : rules.getSchemaList()) {
 			ISchema def = schemas.get(schema.getId());
-			processKeyRefs(def, schema.getKeyRefList());
 			processRelationships(def, schema);
 		}
 	}
@@ -157,17 +157,6 @@ public class XmlbeansRules {
 		}
 	}
 
-	private void processKeyRefs(ISchema schemaDef, List<KeyRefDefinitionType> keyRefDataList) throws XmlException {
-		for (KeyRefDefinitionType keyRef : keyRefDataList) {
-			String keyRefId = keyRef.getId();
-			LinkedHashMap<String, IKeyedField> fields = getFields(keyRef.newCursor());
-			IKeyDefinition keyDefinition = keys.get(keyRef.getRefId());
-			
-			DefaultKeyRefDefinition keyRefDefinition = new DefaultKeyRefDefinition(schemaDef, keyRefId, new ArrayList<IKeyedField>(fields.values()), keyDefinition);
-			keyRefs.put(keyRefDefinition.getId(), keyRefDefinition);
-		}
-	}
-
 	private void processRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
 		processBoundaryRelationships(schemaDef, schema);
 		processKeyedRelationships(schemaDef, schema);
@@ -176,31 +165,30 @@ public class XmlbeansRules {
 
 	private void processBoundaryRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
 		for (BoundaryRelationshipType relationship : schema.getBoundaryRelationshipList()) {
-			IEntityDefinition entity = entities.get(relationship.getEntityRef().getRefId());
 
 			ContentMapping contentMapping = getContentMapping(relationship.getContentMapping());
 			DefaultBoundaryRelationshipDefinition def = new DefaultBoundaryRelationshipDefinition(schemaDef, relationship.getId(), relationship.getXpath().getExpression(), contentMapping);
-			entity.addRelationship(def);
+			associateRelationshipWithEntities(def, relationship);
 		}
 	}
 
 	private void processKeyedRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
 		for (KeyedRelationshipType relationship : schema.getKeyedRelationshipList()) {
-			IEntityDefinition entity = entities.get(relationship.getEntityRef().getRefId());
-
-			IKeyRefDefinition keyRefDefinition = keyRefs.get(relationship.getKeyRef().getRefId());
+			KeyRefDefinitionType keyRef = relationship.getKeyRef();
+			LinkedHashMap<String, IKeyedField> fields = getFields(keyRef.newCursor());
+			IKeyDefinition keyDefinition = keys.get(keyRef.getRefId());
+			
+			DefaultKeyRefDefinition keyRefDefinition = new DefaultKeyRefDefinition(new ArrayList<IKeyedField>(fields.values()), keyDefinition);
 
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
 			DefaultKeyedRelationshipDefinition def = new DefaultKeyedRelationshipDefinition(schemaDef, relationship.getId(), locationXpath, keyRefDefinition);
-			entity.addRelationship(def);
+			associateRelationshipWithEntities(def, relationship);
 		}
 	}
 
 	private void processIndirectRelationships(ISchema schemaDef,
 			SchemaType schema) throws XmlException {
 		for (IndirectRelationshipType relationship : schema.getIndirectRelationshipList()) {
-			IEntityDefinition entity = entities.get(relationship.getEntityRef().getRefId());
-
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
 			IExternalIdentifierMapping mapping = null;
 			if (relationship.isSetExternalIdentifier()) {
@@ -215,6 +203,20 @@ public class XmlbeansRules {
 			}
 
 			DefaultIndirectRelationshipDefinition def = new DefaultIndirectRelationshipDefinition(schemaDef, relationship.getId(), locationXpath, relationship.getValue().getXpath().getExpression(), mapping);
+			associateRelationshipWithEntities(def, relationship);
+		}
+	}
+
+	private void associateRelationshipWithEntities(
+			IRelationshipDefinition def,
+			RelationshipType relationship) {
+
+		for (EntityReferenceType entityRef : relationship.getEntityRefList()) {
+			String entityId = entityRef.getRefId();
+			IEntityDefinition entity = entities.get(entityId);
+			if (entity == null) {
+				throw new RuntimeException("Unable to find the entity with the id: "+entityId);
+			}
 			entity.addRelationship(def);
 		}
 	}
@@ -236,7 +238,7 @@ public class XmlbeansRules {
 
 		LinkedHashMap<String, IKeyedField> retval = new LinkedHashMap<String, IKeyedField>();
 		if (!cursor.toFirstChild()) {
-			throw new RuntimeException();
+			throw new RuntimeException("Unable to navigate cursor to first child");
 		}
 
 		do {
@@ -246,6 +248,9 @@ public class XmlbeansRules {
 			AbstractKeyedField field;
 			if (fieldData.isSetXpath()) {
 				String xpath = fieldData.getXpath().getExpression();
+//				Map<String, String> namespaces = new HashMap<String, String>();
+//				fieldData.newCursor().getAllNamespaces(namespaces);
+//				field = new XPathKeyedField(name, xpath, namespaces);
 				field = new XPathKeyedField(name, xpath);
 			} else if (fieldData.isSetKeyRef()) {
 				KeyFieldRefType keyFieldRef = fieldData.getKeyRef();

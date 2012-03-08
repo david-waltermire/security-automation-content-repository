@@ -18,4 +18,8 @@ public class DefaultKeyedRelationship extends AbstractRelationship<IKeyedRelatio
 	public IKey getKey() {
 		return getReferencedEntity().getKey();
 	}
+
+	public void accept(IRelationshipVisitor visitor) {
+		visitor.visit(this);
+	}
 }

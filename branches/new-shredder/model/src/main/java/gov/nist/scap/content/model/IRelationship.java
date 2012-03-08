@@ -21,4 +21,5 @@ public interface IRelationship<DEFINITION extends IRelationshipDefinition> exten
 	 * @return the entity associated with the relationship
 	 */
 	IEntity<?> getOwningEntity();
+	void accept(IRelationshipVisitor visitor);
 }

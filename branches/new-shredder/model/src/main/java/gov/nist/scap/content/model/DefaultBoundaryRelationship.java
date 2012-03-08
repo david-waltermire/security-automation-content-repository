@@ -16,4 +16,8 @@ public class DefaultBoundaryRelationship extends AbstractRelationship<IBoundaryR
 	public IEntity<?> getContainingObject() {
 		return containingObject;
 	}
+
+	public void accept(IRelationshipVisitor visitor) {
+		visitor.visit(this);
+	}
 }

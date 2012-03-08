@@ -19,6 +19,12 @@
 			<artifactId>rules-model</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>gov.nist.scap.content</groupId>
+			<artifactId>rules-model</artifactId>
+			<classifier>test-jar</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
 		</dependency>
