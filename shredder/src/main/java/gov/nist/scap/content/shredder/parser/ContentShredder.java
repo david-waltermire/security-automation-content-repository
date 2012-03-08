@@ -7,6 +7,7 @@ import gov.nist.scap.content.model.definitions.RuleDefinitions;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 
@@ -27,6 +28,10 @@ public class ContentShredder {
 		shred(XmlObject.Factory.parse(file), contentHandler);
 	}
 
+    public void shred(InputStream is, ContentHandler contentHandler) throws XmlException, IOException, ContentException, ProcessingException {
+        shred(XmlObject.Factory.parse(is), contentHandler);
+    }
+	
 	public void shred(XmlObject obj, ContentHandler contentHandler) throws ContentException, ProcessingException {
 		XmlCursor cursor = obj.newCursor();
 

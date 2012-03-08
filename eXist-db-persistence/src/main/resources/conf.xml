@@ -319,7 +319,7 @@
             Changing the parameter will only have an effect on newly loaded 
             files, not old ones.
         
-        - suppress-whitespace-mixed-content:
+        - preserve-whitespace-mixed-content:
             preserve the white space inside a mixed content node
         
         - tokenizer:

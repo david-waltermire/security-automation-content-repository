@@ -49,6 +49,7 @@ import gov.nist.scap.schema.contentRules.x01.SchemaType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +77,10 @@ public class XmlbeansRules {
 		this(RulesDocument.Factory.parse(file));
 	}
 
+    public XmlbeansRules(InputStream is) throws XmlException, IOException {
+        this(RulesDocument.Factory.parse(is));
+    }
+	
 	public XmlbeansRules(RulesDocument data) throws XmlException {
 		this.data = data;
 		this.rules = data.getRules();
