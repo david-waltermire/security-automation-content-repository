@@ -1,7 +1,47 @@
+Index: conf.xml.tmpl
+===================================================================
+--- conf.xml.tmpl	(revision 16132)
++++ conf.xml.tmpl	(working copy)
+@@ -319,7 +319,7 @@
+             Changing the parameter will only have an effect on newly loaded 
+             files, not old ones.
+         
+-        - suppress-whitespace-mixed-content:
++        - preserve-whitespace-mixed-content:
+             preserve the white space inside a mixed content node
+         
+         - tokenizer:
 Index: src/org/exist/Indexer.java
 ===================================================================
---- src/org/exist/Indexer.java	(revision 15971)
+--- src/org/exist/Indexer.java	(revision 16132)
 +++ src/org/exist/Indexer.java	(working copy)
+@@ -122,7 +122,7 @@
+     protected String ignorePrefix = null;
+     protected ProgressIndicator progress;
+ 
+-    protected boolean suppressWSmixed = false;
++    protected boolean preserveWSmixed = false;
+ 
+     protected int docSize = 0;
+ 
+@@ -194,7 +194,7 @@
+         Boolean temp;
+         if ((temp = (Boolean) config
+                 .getProperty(PROPERTY_PRESERVE_WS_MIXED_CONTENT)) != null)
+-            suppressWSmixed = temp.booleanValue();
++            preserveWSmixed = temp.booleanValue();
+     }
+ 
+     public void setValidating(boolean validate) {
+@@ -336,7 +336,7 @@
+                 // remove whitespace if the node has just a single text child,
+                 // keep whitespace for mixed content.
+                 final XMLString normalized;
+-                if ((charBuf.isWhitespaceOnly() && suppressWSmixed) || last.preserveSpace()) {
++                if ((charBuf.isWhitespaceOnly() && preserveWSmixed) || last.preserveSpace()) {
+                     normalized = charBuf;
+                 } else {
+                     normalized = last.getChildCount() == 0 ? 
 @@ -549,22 +549,23 @@
          if (!stack.empty()) {
              last = stack.peek();
@@ -18,7 +58,7 @@ Index: src/org/exist/Indexer.java
 -                        }
 +               XMLString normalized = charBuf.normalize(normalize);
 +            	if (normalized.isWhitespaceOnly()) {
-+                    if (((!suppressWSmixed && last.getChildCount() > 0) || suppressWSmixed) 
++                    if (((!preserveWSmixed && last.getChildCount() > 0) || preserveWSmixed) 
 +                    		&& normalized.length() > 0) {
 +                    	
 +                        text.setData(charBuf);

@@ -25,7 +25,7 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
@@ -33,7 +33,7 @@ import org.apache.xmlbeans.XmlObject;
 public interface ContentStore {
 
 	XmlObject getContent(String contentId);
-	Map<String, IEntity<?>> persist(List<? extends IEntity<?>> entities);
+	Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities);
 	ContentRetriever getContentRetriever(String contentId);
 	void shutdown();
 
