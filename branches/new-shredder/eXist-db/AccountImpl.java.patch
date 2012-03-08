@@ -1,0 +1,12 @@
+Index: src/org/exist/security/internal/AccountImpl.java
+===================================================================
+--- src/org/exist/security/internal/AccountImpl.java	(revision 16132)
++++ src/org/exist/security/internal/AccountImpl.java	(working copy)
+@@ -258,6 +258,7 @@
+             this.configuration = Configurator.configure(this, this.configuration);
+         }
+         this.hasDbaRole = this.hasGroup(SecurityManager.DBA_GROUP);
++        setPassword(password);
+     }
+ 
+     public AccountImpl(AbstractRealm realm, Configuration configuration, boolean removed) throws ConfigurationException {
