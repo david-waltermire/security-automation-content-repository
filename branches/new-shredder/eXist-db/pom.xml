@@ -123,10 +123,23 @@
         <version>1.7</version>
         <executions>
           <execution>
+            <id>antrun-compile</id>
             <phase>compile</phase>
             <configuration>
               <target>
                 <ant dir="."/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>antrun-clean</id>
+            <phase>clean</phase>
+            <configuration>
+              <target>
+                <ant dir="." target="clean"/>
               </target>
             </configuration>
             <goals>

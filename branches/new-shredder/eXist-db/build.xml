@@ -13,5 +13,9 @@
   <target name="run" depends="setup" if="${exist.notexists}">
     <ant dir="eXist"/>
   </target>
+
+  <target name="clean" >
+    <delete file="eXist/exist.jar"/>
+  </target>
   
 </project>
