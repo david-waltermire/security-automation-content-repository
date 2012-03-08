@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules xmlns="http://scap.nist.gov/schema/content-rules/0.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:scap-ds="http://scap.nist.gov/schema/scap/source/1.2"
+    xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2"
+    xmlns:oval="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+    xsi:schemaLocation="http://scap.nist.gov/schema/content-rules/0.1 file:/C:/code/active/gcode-content-repo-shredder/rules-model/src/main/xsd/rules.xsd">
+
+    <external-identifiers>
+        <external-identifier id="urn:scap-content:external-identifier:org.mitre:cve">
+            <pattern expression="CVE-\d{4}-\d{4}"/>
+        </external-identifier>
+        <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-4">
+            <pattern expression="CCE-\d+"/>
+        </external-identifier>
+        <external-identifier id="urn:scap-content:external-identifier:org.mitre:cce-5">
+            <pattern expression="CCE-\d+-\d"/>
+        </external-identifier>
+        <external-identifier id="urn:scap-content:external-identifier:org.mitre:cwe">
+            <pattern expression="CWE-\d+"/>
+        </external-identifier>
+        <external-identifier id="urn:scap-content:external-identifier:gov.nist:cpe-2-x">
+            <pattern expression="[c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9\._\-~%]*){0,6}"/>
+        </external-identifier>
+    </external-identifiers>
+    
+    <!-- SCAP 1.2 Datastream -->
+    <schema id="urn:scap-content:schema:gov.nist.scap:datastream-collection-1.2" namespace="http://scap.nist.gov/schema/scap/source/1.2">
+        <key id="urn:scap-content:key:gov.nist.scap:datastream-collection">
+            <field name="datastream-collection-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key id="urn:scap-content:key:gov.nist.scap:datastream">
+            <field name="datastream-collection-id">
+                <key-ref ref-id="urn:scap-content:key:gov.nist.scap:datastream-collection"
+                    field="datastream-collection-id"/>
+            </field>
+            <field name="datastream-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key id="urn:scap-content:key:gov.nist.scap:component-ref">
+            <field name="datastream-collection-id">
+                <key-ref ref-id="urn:scap-content:key:gov.nist.scap:datastream-collection"
+                    field="datastream-collection-id"/>
+            </field>
+            <field name="datastream-id">
+                <key-ref ref-id="urn:scap-content:key:gov.nist.scap:datastream"
+                    field="datastream-id"/>
+            </field>
+            <field name="component-ref-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key id="urn:scap-content:key:gov.nist.scap:component">
+            <field name="datastream-collection-id">
+                <key-ref ref-id="urn:scap-content:key:gov.nist.scap:datastream-collection"
+                    field="datastream-collection-id"/>
+            </field>
+            <field name="component-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+
+        <key-ref id="urn:scap-content:key-ref:gov.nist.scap:component-ref" ref-id="urn:scap-content:key:gov.nist.scap:component">
+            <field name="datastream-collection-id">
+                <key-ref ref-id="urn:scap-content:key:gov.nist.scap:datastream-collection"
+                    field="datastream-collection-id"/>
+            </field>
+            <field name="component-id">
+                <xpath expression="declare namespace xlink='http://www.w3.org/1999/xlink';./@xlink:href"/>
+                <pattern expression="^#(.*)$"/>
+            </field>
+        </key-ref>
+
+        <content-node id="urn:scap-content:content-node:gov.nist.scap:datastream">
+            <key ref-id="urn:scap-content:key:gov.nist.scap:datastream"/>
+        </content-node>
+        
+        <content-node id="urn:scap-content:content-node:gov.nist.scap:component-ref">
+            <key ref-id="urn:scap-content:key:gov.nist.scap:component-ref"/>
+        </content-node>
+        
+        <content-node id="urn:scap-content:content-node:gov.nist.scap:component">
+            <key ref-id="urn:scap-content:key:gov.nist.scap:component"/>
+        </content-node>
+
+        <indexed-document id="urn:scap-content:document:gov.nist.scap:datastream-collection" qname="scap-ds:data-stream-collection">
+            <key ref-id="urn:scap-content:key:gov.nist.scap:datastream-collection"/>
+        </indexed-document>
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap:datastream-boundary">
+            <entity-ref ref-id="urn:scap-content:document:gov.nist.scap:datastream-collection"/>
+            <xpath expression="declare namespace scap='http://scap.nist.gov/schema/scap/source/1.2';./scap:data-stream"/>
+            <content-mapping>
+                <qname-mapping qname="scap-ds:data-stream" ref-id="urn:scap-content:content-node:gov.nist.scap:datastream"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap:component-boundary">
+            <entity-ref ref-id="urn:scap-content:document:gov.nist.scap:datastream-collection"/>
+            <xpath expression="declare namespace scap='http://scap.nist.gov/schema/scap/source/1.2';./scap:component"/>
+            <content-mapping>
+                <qname-mapping qname="scap-ds:component" ref-id="urn:scap-content:content-node:gov.nist.scap:component"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap:component-ref-boundary">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap:datastream"/>
+            <xpath expression="declare namespace scap='http://scap.nist.gov/schema/scap/source/1.2';./*/scap:component-ref"/>
+            <content-mapping>
+                <qname-mapping qname="scap-ds:component-ref" ref-id="urn:scap-content:content-node:gov.nist.scap:component-ref"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap:component-content-boundary">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap:component"/>
+            <xpath expression="declare namespace scap='http://scap.nist.gov/schema/scap/source/1.2';./*"/>
+            <content-mapping>
+                <qname-mapping qname="xccdf:Benchmark" ref-id="urn:scap-content:document:gov.nist.scap.xccdf:benchmark"/>
+                <qname-mapping qname="oval:oval_definitions" ref-id="urn:scap-content:document:org.mitre.oval:oval-definitions"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <keyed-relationship id="urn:scap-content:relationship:gov.nist.scap:component-keyref">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap:component-ref"/>
+            <xpath expression="."/>
+            <key-ref ref-id="urn:scap-content:key-ref:gov.nist.scap:component-ref"/>
+        </keyed-relationship>
+    </schema>
+
+    <!-- XCCDF 1.2 -->
+    <schema id="urn:scap-content:schema:gov.nist.scap.xccdf:xccdf-1.2" namespace="http://checklists.nist.gov/xccdf/1.2">
+        <key id="urn:scap-content:key:gov.nist.scap.xccdf:benchmark">
+            <field name="benchmark-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key id="urn:scap-content:key:gov.nist.scap.xccdf:profile">
+            <field name="profile-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key id="urn:scap-content:key:gov.nist.scap.xccdf:item">
+            <field name="item-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+        
+        <key-ref id="urn:scap-content:key-ref:gov.nist.scap.xccdf:selector-item-ref" ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item">
+            <field name="item-id">
+                <xpath expression="@idref"/>
+            </field>
+        </key-ref>
+        
+        <key-ref id="urn:scap-content:key-ref:gov.nist.scap.xccdf:check-export-value-ref" ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item">
+            <field name="item-id">
+                <xpath expression="@value-id"/>
+            </field>
+        </key-ref>
+
+        <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:profile">
+            <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:profile"/>
+        </content-node>
+        
+        <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule">
+            <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+        </content-node>
+        
+        <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:group">
+            <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+        </content-node>
+        
+        <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:value">
+            <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+        </content-node>
+
+        <indexed-document id="urn:scap-content:document:gov.nist.scap.xccdf:benchmark" qname="xccdf:Benchmark">
+            <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:benchmark"/>
+        </indexed-document>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:benchmark-profile-boundary">
+            <entity-ref ref-id="urn:scap-content:document:gov.nist.scap.xccdf:benchmark"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:Profile"/>
+            <content-mapping>
+                <qname-mapping qname="xccdf:Profile" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:profile"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:benchmark-item-boundary">
+            <entity-ref ref-id="urn:scap-content:document:gov.nist.scap.xccdf:benchmark"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:Rule|xccdf:Group|xccdf:Value"/>
+            <content-mapping>
+                <qname-mapping qname="xccdf:Group" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:group"/>
+                <qname-mapping qname="xccdf:Rule" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule"/>
+                <qname-mapping qname="xccdf:Value" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:value"/>
+            </content-mapping>
+        </boundary-relationship>
+        
+        <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:group-item-boundary">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:group"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:Rule|xccdf:Group|xccdf:Value"/>
+            <content-mapping>
+                <qname-mapping qname="xccdf:Group" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:group"/>
+                <qname-mapping qname="xccdf:Rule" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule"/>
+                <qname-mapping qname="xccdf:Value" ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:value"/>
+            </content-mapping>
+        </boundary-relationship>
+
+        <keyed-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:profile-selector-item-keyref">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:profile"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:select|xccdf:refine-value|xccdf:refine-rule|xccdf:set-value|xccdf:set-complex-value"/>
+            <key-ref ref-id="urn:scap-content:key-ref:gov.nist.scap.xccdf:selector-item-ref"/>
+        </keyed-relationship>
+
+        <indirect-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:rule-ident">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:ident"/>
+            <value>
+                <xpath expression="text()"/>
+            </value>
+            <qualifier-mapping>
+                <xpath expression="@system"/>
+                <!-- TODO: add support for other identifiers -->
+                <external-identifier ref-id="urn:scap-content:external-identifier:org.mitre:cce-5" qualifier-value="http://cce.mitre.org"/>
+            </qualifier-mapping>
+        </indirect-relationship>
+        
+        <keyed-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:rule-check-export-value-keyref">
+            <entity-ref ref-id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule"/>
+            <xpath expression="declare namespace xccdf='http://checklists.nist.gov/xccdf/1.2';xccdf:check/xccdf:check-export"/>
+            <key-ref ref-id="urn:scap-content:key-ref:gov.nist.scap.xccdf:check-export-value-ref"/>
+        </keyed-relationship>
+        
+        <!-- TODO: add check-export to check variable -->
+        <!-- TODO: add check-content-ref to check -->
+        <!-- TODO: parse out version and associate with content-nodes -->
+    </schema>
+    
+    <!-- OVAL 5 definition -->
+    <schema id="urn:scap-content:schema:org.mitre.oval:definition-5" namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5">
+        
+        <key id="urn:scap-content:key:org.mitre.oval:definition">
+            <field name="definition-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
+
+        <content-node id="urn:scap-content:content-node:org.mitre.oval:definition">
+            <key ref-id="urn:scap-content:key:org.mitre.oval:definition"/>
+        </content-node>
+
+        <generated-document id="urn:scap-content:document:org.mitre.oval:oval-definitions" qname="oval:oval_definitions"/>
+
+        <boundary-relationship id="urn:scap-content:relationship:org.mitre.oval:definitions-boundary">
+            <entity-ref ref-id="urn:scap-content:document:org.mitre.oval:oval-definitions"/>
+            <xpath expression="declare namespace oval='http://oval.mitre.org/XMLSchema/oval-definitions-5';oval:definitions/oval:definition"/>
+            <content-mapping>
+                <qname-mapping qname="oval:definition" ref-id="urn:scap-content:content-node:org.mitre.oval:definition"/>
+            </content-mapping>
+        </boundary-relationship>
+
+        <indirect-relationship id="urn:scap-content:relationship:org.mitre.oval:definition-reference">
+            <entity-ref ref-id="urn:scap-content:content-node:org.mitre.oval:definition"/>
+            <xpath expression="declare namespace oval='http://oval.mitre.org/XMLSchema/oval-definitions-5';oval:metadata/oval:reference"/>
+            <value>
+                <xpath expression="@ref_id"/>
+            </value>
+            <qualifier-mapping>
+                <xpath expression="@source"/>
+                <!-- TODO: verify that this is a complete mapping -->
+                <external-identifier ref-id="urn:scap-content:external-identifier:org.mitre:cce-5" qualifier-value="http://cce.mitre.org"/>
+                <external-identifier ref-id="urn:scap-content:external-identifier:org.mitre:cce-5" qualifier-value="CCE"/>
+                <external-identifier ref-id="urn:scap-content:external-identifier:org.mitre:cve" qualifier-value="CVE"/>
+                <external-identifier ref-id="urn:scap-content:external-identifier:gov.nist:cpe-2-x" qualifier-value="CPE"/>
+            </qualifier-mapping>
+        </indirect-relationship>
+    </schema>
+</rules>
