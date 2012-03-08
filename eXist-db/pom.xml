@@ -43,7 +43,7 @@
           <groupId>bsh</groupId>
           <artifactId>bsh</artifactId>
         </exclusion>
-      </exclusions>       
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>bsh</groupId>
@@ -99,7 +99,22 @@
       <artifactId>jta</artifactId>
       <version>1.1</version>
     </dependency>
-    
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.6.12</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -175,6 +190,20 @@
               <packaging>jar</packaging>
             </configuration>
           </execution>
+          <execution>
+            <id>install-gnu-crypto</id>
+            <phase>install</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <file>eXist/lib/core/gnu-crypto-2.0.1-min.jar</file>
+              <groupId>gnu-crypto</groupId>
+              <artifactId>gnu-crypto</artifactId>
+              <version>2.0.1-min</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -183,21 +212,38 @@
         <version>1.2.1</version>
         <executions>
           <execution>
+            <id>apply-indexer-patch</id>
             <phase>process-sources</phase>
             <goals>
               <goal>exec</goal>
             </goals>
+            <configuration>
+              <executable>svn</executable>
+              <workingDirectory>.</workingDirectory>
+              <arguments>
+                <argument>patch</argument>
+                <argument>Indexer.java.patch</argument>
+                <argument>eXist</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apply-accountimpl-patch</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>svn</executable>
+              <workingDirectory>.</workingDirectory>
+              <arguments>
+                <argument>patch</argument>
+                <argument>AccountImpl.java.patch</argument>
+                <argument>eXist</argument>
+              </arguments>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <executable>svn</executable>
-          <workingDirectory>.</workingDirectory>
-          <arguments>
-            <argument>patch</argument>
-            <argument>eXist.patch</argument>
-            <argument>eXist</argument>
-          </arguments>
-        </configuration>
       </plugin>
     </plugins>
   </build>
