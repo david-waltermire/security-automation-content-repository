@@ -298,7 +298,7 @@ public class XmlbeansRules {
 		return retval;
 	}
 
-	private IVersionDefinition getVersion(VersionType version) throws XmlException {
+	private static IVersionDefinition getVersion(VersionType version) throws XmlException {
 		IVersionDefinition.Method method = map(version.getMethod());
 		String xpath = version.getXpath().getExpression();
 		return new DefaultVersionDefinition(method, xpath, version.getUseParentVersionWhenUndefined());

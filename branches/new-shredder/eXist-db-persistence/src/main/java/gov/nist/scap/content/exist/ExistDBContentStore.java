@@ -188,9 +188,8 @@ public class ExistDBContentStore implements ContentStore {
                 }
             }
             return getOrCreateCollection(collectionUri, ++pathSegmentOffset);
-        } else {
-            return col;
         }
+        return col;
     }
 
 }
