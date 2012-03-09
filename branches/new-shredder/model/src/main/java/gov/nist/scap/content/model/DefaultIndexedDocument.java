@@ -7,6 +7,7 @@ public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinit
 		implements IMutableKeyedDocument {
 
 	private final IKey key;
+	private IVersion version;
 
 	public DefaultIndexedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
 		super(definition, contentHandle, parent);
@@ -17,7 +18,7 @@ public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinit
 		return key;
 	}
 
-	public void accept(IContainerVisitor visitor) {
+	public void accept(IEntityVisitor visitor) {
 		visitor.visit(this);
 	}
 
@@ -29,5 +30,13 @@ public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinit
 			retval = getParent().getKey(keyId);
 		}
 		return retval;
+	}
+
+	public IVersion getVersion() {
+		return version;
+	}
+
+	public void setVersion(IVersion version) {
+		this.version = version;
 	}
 }

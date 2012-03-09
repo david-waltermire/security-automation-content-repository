@@ -6,6 +6,7 @@ import gov.nist.scap.content.model.DefaultContentNode;
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
 import gov.nist.scap.content.model.DefaultIndexedDocument;
 import gov.nist.scap.content.model.DefaultIndirectRelationship;
+import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IBoundaryRelationship;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IKey;
@@ -13,6 +14,7 @@ import gov.nist.scap.content.model.IMutableContentNode;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.IMutableGeneratedDocument;
 import gov.nist.scap.content.model.IMutableKeyedDocument;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.ContentMapping;
 import gov.nist.scap.content.model.definitions.IBoundaryRelationshipDefinition;
@@ -29,6 +31,7 @@ import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinitionVisitor;
+import gov.nist.scap.content.model.definitions.IVersionDefinition;
 import gov.nist.scap.content.model.definitions.KeyedRelationshipInfo;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.XPathRetriever;
@@ -56,6 +59,17 @@ public class ContentProcessor {
 
 	private void processEntity(IMutableEntity<?> entity,
 			XmlCursor cursor) throws ProcessingException, ContentException {
+
+		IVersionDefinition versionDef = entity.getDefinition().getVersionDefinition();
+		if (versionDef != null) {
+			IVersion version = processVersion(versionDef, cursor);
+			if (version == null && versionDef.isUseParentVersionWhenUndefined()) {
+				version = entity.getParent().getVersion();
+			}
+			if (version != null) {
+				entity.setVersion(version);
+			}
+		}
 		processRelationships(entity, cursor);
 
 		contentHandler.handle(entity);
@@ -104,6 +118,12 @@ public class ContentProcessor {
 				}
 			}
 		}
+	}
+
+	private IVersion processVersion(IVersionDefinition version, XmlCursor cursor) {
+		XPathRetriever valueRetriever = version.getXpath();
+		String value = valueRetriever.getValue(cursor);
+		return (value == null ? null : new DefaultVersion(version, value));
 	}
 
 	private class ContentProcessingRelationshipDefinitionVisitor implements IRelationshipDefinitionVisitor {
@@ -188,6 +208,14 @@ public class ContentProcessor {
 			}
 
 			IMutableKeyedDocument document = new DefaultIndexedDocument(definition, key, getContentHandle(cursor), parent);
+
+			IVersionDefinition versionDef = definition.getVersionDefinition();
+			if (versionDef != null) {
+				IVersion version = processVersion(versionDef, cursor);
+				if (version != null) {
+					document.setVersion(version);
+				}
+			}
 			processEntity(document, cursor);
 			return document;
 		}

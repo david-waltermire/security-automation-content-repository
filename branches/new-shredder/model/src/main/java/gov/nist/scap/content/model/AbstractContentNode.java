@@ -4,6 +4,7 @@ import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 
 public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IMutableContentNode {
 	private final IKey key;
+	private IVersion version;
 
 	public AbstractContentNode(IContentNodeDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
 		super(definition, contentHandle, parent);
@@ -24,7 +25,15 @@ public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDef
 		return retval;
 	}
 
-	public void accept(IContainerVisitor visitor) {
+	public IVersion getVersion() {
+		return version;
+	}
+
+	public void setVersion(IVersion version) {
+		this.version = version;
+	}
+
+	public void accept(IEntityVisitor visitor) {
 		visitor.visit(this);
 	}
 }

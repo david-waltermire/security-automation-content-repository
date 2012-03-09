@@ -115,7 +115,7 @@
             <xs:pattern value="urn:scap-content:schema:.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * Key                                                             * -->
     <!-- ******************************************************************* -->
@@ -181,12 +181,44 @@
     </xs:complexType>
     
     <!-- ******************************************************************* -->
+    <!-- * Version                                                         * -->
+    <!-- ******************************************************************* -->
+    <xs:simpleType name="VersionMethodType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="SERIAL">
+                <xs:annotation>
+                    <xs:documentation>A ascending sequence number normally zero based.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DECIMAL">
+                <xs:annotation>
+                    <xs:documentation>A decimal value.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="TEXT">
+                <xs:annotation>
+                    <xs:documentation>A textual value.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="version" type="VersionType"/>
+    <xs:complexType name="VersionType">
+        <xs:sequence>
+            <xs:element ref="xpath"/>
+        </xs:sequence>
+        <xs:attribute name="method" type="VersionMethodType" use="required"/>
+        <xs:attribute name="use-parent-version-when-undefined" type="xs:boolean" use="optional" default="false"/>
+    </xs:complexType>
+
+    <!-- ******************************************************************* -->
     <!-- * Content Node                                                    * -->
     <!-- ******************************************************************* -->
     <xs:element name="content-node" type="ContentNodeType"/>
     <xs:complexType name="ContentNodeType">
         <xs:sequence>
             <xs:element name="key" type="KeyRefType"/>
+            <xs:element ref="version" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="id" type="ContentNodeIdType" use="required"/>
     </xs:complexType>
@@ -217,6 +249,7 @@
             <xs:extension base="DocumentType">
                 <xs:sequence>
                     <xs:element name="key" type="KeyRefType"/>
+                    <xs:element ref="version" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

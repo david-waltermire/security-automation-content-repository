@@ -20,5 +20,6 @@ public interface IEntityDefinition extends IDefinition {
 //	IMutableEntity<?> processCursor(XmlCursor cursor, ContentHandler handler, IMutableEntity<?> parent) throws ProcessingException, ContentException;
 
 	Collection<? extends IRelationshipDefinition> getRelationshipDefinitions();
+	IVersionDefinition getVersionDefinition();
 	<T> T accept(IEntityDefinitionVisitor<T> visitor) throws ContentException, ProcessingException;
 }

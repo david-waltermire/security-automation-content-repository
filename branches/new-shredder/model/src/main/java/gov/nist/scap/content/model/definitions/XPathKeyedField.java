@@ -3,12 +3,9 @@ package gov.nist.scap.content.model.definitions;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.KeyException;
 
-import java.util.Map;
-
 import org.apache.xmlbeans.XmlBeans;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlOptions;
 
 public class XPathKeyedField extends AbstractKeyedField {
 	private final XPathRetriever retriever;

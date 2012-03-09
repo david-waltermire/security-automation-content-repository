@@ -13,7 +13,15 @@ public class DefaultGeneratedDocument extends AbstractEntity<IGeneratedDocumentD
 		return null;
 	}
 
-	public void accept(IContainerVisitor visitor) {
+	public void accept(IEntityVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	public IVersion getVersion() {
+		return null;
+	}
+
+	public void setVersion(IVersion version) {
+		throw new UnsupportedOperationException();
 	}
 }
