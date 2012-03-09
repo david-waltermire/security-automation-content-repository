@@ -86,6 +86,7 @@ class DefaultKey implements IKey {
 		return idToValueMap;
 	}
 
+	@Override
 	public String toString() {
 		return new StringBuilder().append(id).append("=").append(
 				getFieldIdToValueMap().toString()).toString();
@@ -129,7 +130,8 @@ class DefaultKey implements IKey {
 	 * @return <code>true</code> if this object is compatible for equals
 	 *         comparison or <code>false</code> otherwise.
 	 */
-    protected boolean canEqual(Object other) {
+    @SuppressWarnings("static-method")
+	protected boolean canEqual(Object other) {
         return (other instanceof DefaultKey);
     }
 

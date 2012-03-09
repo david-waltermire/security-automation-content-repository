@@ -15,7 +15,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	private final IContentHandle contentHandle;
 	private final IMutableEntity<?> parent;
 
-	public AbstractEntity(DEFINITION definition, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
+	public AbstractEntity(DEFINITION definition, IContentHandle contentHandle, IMutableEntity<?> parent) {
 		this.contentDefinition = definition;
 		this.contentHandle = contentHandle;
 		this.parent = parent;

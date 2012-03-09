@@ -9,12 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
 
 public class KeyedSupport {
 	private final List<? extends IKeyedField> fields;
 
-	public KeyedSupport(List<? extends IKeyedField> fields) throws XmlException {
+	public KeyedSupport(List<? extends IKeyedField> fields) {
 		this.fields = Collections.unmodifiableList(fields);
 	}
 

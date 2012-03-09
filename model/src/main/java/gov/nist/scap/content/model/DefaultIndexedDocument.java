@@ -9,7 +9,7 @@ public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinit
 	private final IKey key;
 	private IVersion version;
 
-	public DefaultIndexedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) throws ContentException {
+	public DefaultIndexedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) {
 		super(definition, contentHandle, parent);
 		this.key = key;
 	}
@@ -22,6 +22,7 @@ public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinit
 		visitor.visit(this);
 	}
 
+	@Override
 	public IKey getKey(String keyId) {
 		IKey retval;
 		if (key.getId().equals(keyId)) {

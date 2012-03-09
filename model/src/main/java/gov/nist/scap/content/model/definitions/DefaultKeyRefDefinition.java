@@ -33,13 +33,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
 
 public class DefaultKeyRefDefinition implements IKeyRefDefinition {
 	private final KeyedSupport keyedSupport;
 	private final IKeyDefinition keyDefinition;
 
-	public DefaultKeyRefDefinition(List<? extends IKeyedField> fields, IKeyDefinition keyDefinition) throws XmlException {
+	public DefaultKeyRefDefinition(List<? extends IKeyedField> fields, IKeyDefinition keyDefinition) {
 		this.keyedSupport = new KeyedSupport(fields);
 		this.keyDefinition = keyDefinition;
 	}

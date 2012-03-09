@@ -10,12 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
 
 public class DefaultKeyDefinition extends AbstractDefinition implements IKeyDefinition {
 	private final KeyedSupport keyedSupport;
 
-	public DefaultKeyDefinition(ISchema schema, String id, List<? extends IKeyedField> keyFields) throws XmlException {
+	public DefaultKeyDefinition(ISchema schema, String id, List<? extends IKeyedField> keyFields) {
 		super(schema, id);
 		this.keyedSupport = new KeyedSupport(keyFields);
 	}
