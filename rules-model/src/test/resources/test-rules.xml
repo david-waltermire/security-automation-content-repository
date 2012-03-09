@@ -4,7 +4,7 @@
     xmlns:scap-ds="http://scap.nist.gov/schema/scap/source/1.2"
     xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2"
     xmlns:oval="http://oval.mitre.org/XMLSchema/oval-definitions-5"
-    xsi:schemaLocation="http://scap.nist.gov/schema/content-rules/0.1 src/main/xsd/rules.xsd">
+    xsi:schemaLocation="http://scap.nist.gov/schema/content-rules/0.1 ../../main/xsd/rules.xsd">
 
     <external-identifiers>
         <external-identifier id="urn:scap-content:external-identifier:org.mitre:cve">
@@ -175,22 +175,37 @@
 
         <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:profile">
             <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:profile"/>
+            <version method="TEXT" use-parent-version-when-undefined="true">
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:rule">
             <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+            <version method="TEXT" use-parent-version-when-undefined="true">
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:group">
             <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+            <version method="TEXT" use-parent-version-when-undefined="true">
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:gov.nist.scap.xccdf:value">
             <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:item"/>
+            <version method="TEXT" use-parent-version-when-undefined="true">
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+            </version>
         </content-node>
 
         <indexed-document id="urn:scap-content:document:gov.nist.scap.xccdf:benchmark" qname="xccdf:Benchmark">
             <key ref-id="urn:scap-content:key:gov.nist.scap.xccdf:benchmark"/>
+            <version method="TEXT">
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+            </version>
         </indexed-document>
 
         <boundary-relationship id="urn:scap-content:relationship:gov.nist.scap.xccdf:benchmark-profile-boundary">
@@ -317,7 +332,6 @@
         <!-- TODO: handle uses of cluster ids -->
         <!-- TODO: add check-export to check variable -->
         <!-- TODO: add check-content-ref to check -->
-        <!-- TODO: parse out version and associate with content-nodes -->
     </schema>
     
     <!-- OVAL 5 definition -->
@@ -355,22 +369,37 @@
         
         <content-node id="urn:scap-content:content-node:org.mitre.oval:definition">
             <key ref-id="urn:scap-content:key:org.mitre.oval:definition"/>
+            <version method="SERIAL">
+                <xpath expression="@version"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:org.mitre.oval:test">
             <key ref-id="urn:scap-content:key:org.mitre.oval:test"/>
+            <version method="SERIAL">
+                <xpath expression="@version"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:org.mitre.oval:object">
             <key ref-id="urn:scap-content:key:org.mitre.oval:object"/>
+            <version method="SERIAL">
+                <xpath expression="@version"/>
+            </version>
         </content-node>
 
         <content-node id="urn:scap-content:content-node:org.mitre.oval:state">
             <key ref-id="urn:scap-content:key:org.mitre.oval:state"/>
+            <version method="SERIAL">
+                <xpath expression="@version"/>
+            </version>
         </content-node>
         
         <content-node id="urn:scap-content:content-node:org.mitre.oval:variable">
             <key ref-id="urn:scap-content:key:org.mitre.oval:variable"/>
+            <version method="SERIAL">
+                <xpath expression="@version"/>
+            </version>
         </content-node>
         
         <generated-document id="urn:scap-content:document:org.mitre.oval:oval-definitions" qname="oval:oval_definitions"/>
@@ -539,7 +568,5 @@
                 </field>
             </key-ref>
         </keyed-relationship>
-
-        <!-- TODO: parse out version and associate with content-nodes -->
     </schema>
 </rules>

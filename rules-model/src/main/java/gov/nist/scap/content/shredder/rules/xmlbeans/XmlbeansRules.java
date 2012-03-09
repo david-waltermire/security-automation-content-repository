@@ -6,12 +6,13 @@ import gov.nist.scap.content.model.definitions.DefaultBoundaryRelationshipDefini
 import gov.nist.scap.content.model.definitions.DefaultContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.DefaultExternalIdentifier;
 import gov.nist.scap.content.model.definitions.DefaultGeneratedDocumentDefinition;
-import gov.nist.scap.content.model.definitions.DefaultIndexedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.DefaultIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyRefDefinition;
+import gov.nist.scap.content.model.definitions.DefaultKeyedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.DefaultSchema;
+import gov.nist.scap.content.model.definitions.DefaultVersionDefinition;
 import gov.nist.scap.content.model.definitions.DelegatingKeyedField;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.IDocumentDefinition;
@@ -20,10 +21,10 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
-import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedField;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.ISchema;
+import gov.nist.scap.content.model.definitions.IVersionDefinition;
 import gov.nist.scap.content.model.definitions.QualifiedExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.model.definitions.StaticExternalIdentifierMapping;
@@ -48,12 +49,15 @@ import gov.nist.scap.schema.contentRules.x01.RelationshipType;
 import gov.nist.scap.schema.contentRules.x01.RulesDocument;
 import gov.nist.scap.schema.contentRules.x01.RulesType;
 import gov.nist.scap.schema.contentRules.x01.SchemaType;
+import gov.nist.scap.schema.contentRules.x01.VersionMethodType;
+import gov.nist.scap.schema.contentRules.x01.VersionType;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -64,6 +68,20 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
 public class XmlbeansRules {
+	private static final Map<VersionMethodType.Enum, IVersionDefinition.Method> versionMethodEnumToVersionMethodMap;
+
+	static {
+		Map<VersionMethodType.Enum, IVersionDefinition.Method> mapping = new HashMap<VersionMethodType.Enum, IVersionDefinition.Method>();
+		mapping.put(VersionMethodType.DECIMAL, IVersionDefinition.Method.DECIMAL);
+		mapping.put(VersionMethodType.SERIAL, IVersionDefinition.Method.SERIAL);
+		mapping.put(VersionMethodType.TEXT, IVersionDefinition.Method.TEXT);
+		versionMethodEnumToVersionMethodMap = Collections.unmodifiableMap(mapping);
+	}
+
+	private static IVersionDefinition.Method map(VersionMethodType.Enum key) {
+		return versionMethodEnumToVersionMethodMap.get(key);
+	}
+
 	@SuppressWarnings("unused")
 	private final RulesDocument data;
 	private final RulesType rules;
@@ -133,19 +151,30 @@ public class XmlbeansRules {
 		}
 	}
 
-	private void processContentNodes(ISchema schemaDef, List<ContentNodeType> nodeDataList) {
+	private void processContentNodes(ISchema schemaDef, List<ContentNodeType> nodeDataList) throws XmlException {
 		for (ContentNodeType node : nodeDataList) {
 			IKeyDefinition keyDef = keys.get(node.getKey().getRefId());
-			IContentNodeDefinition def = new DefaultContentNodeDefinition(schemaDef, node.getId(), keyDef);
+			DefaultContentNodeDefinition def = new DefaultContentNodeDefinition(schemaDef, node.getId(), keyDef);
+
+			if (node.isSetVersion()) {
+				IVersionDefinition versionDef = getVersion(node.getVersion());
+				def.setVersionDefinition(versionDef);
+			}
 			nodes.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}
 	}
 
-	private void processDocuments(ISchema schemaDef, SchemaType schema) {
+	private void processDocuments(ISchema schemaDef, SchemaType schema) throws XmlException {
 		for (IndexedDocumentType document : schema.getIndexedDocumentList()) {
 			IKeyDefinition keyDef = keys.get(document.getKey().getRefId());
-			IKeyedDocumentDefinition def = new DefaultIndexedDocumentDefinition(schemaDef, document.getId(), document.getQname(), keyDef);
+			DefaultKeyedDocumentDefinition def = new DefaultKeyedDocumentDefinition(schemaDef, document.getId(), document.getQname(), keyDef);
+
+			if (document.isSetVersion()) {
+				IVersionDefinition versionDef = getVersion(document.getVersion());
+				def.setVersionDefinition(versionDef);
+			}
+
 			documents.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}
@@ -267,5 +296,11 @@ public class XmlbeansRules {
 			retval.put(field.getName(), field);
 		} while (cursor.toNextSibling());
 		return retval;
+	}
+
+	private IVersionDefinition getVersion(VersionType version) throws XmlException {
+		IVersionDefinition.Method method = map(version.getMethod());
+		String xpath = version.getXpath().getExpression();
+		return new DefaultVersionDefinition(method, xpath, version.getUseParentVersionWhenUndefined());
 	}
 }

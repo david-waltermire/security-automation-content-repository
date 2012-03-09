@@ -2,11 +2,16 @@ package gov.nist.scap.content.shredder.rules.xmlbeans;
 
 import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.IBoundaryRelationship;
+import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IEntityVisitor;
+import gov.nist.scap.content.model.IGeneratedDocument;
 import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IKeyedDocument;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.IRelationshipVisitor;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
@@ -35,15 +40,43 @@ public class XmlbeansRulesTest {
 		shredder.shred(getClass().getResourceAsStream("/scap_gov.nist_USGCB-Windows-7.xml"), handler);
 		Collection<? extends IEntity<?>> entities = handler.getEntities();
 
+		EntityVisitor entityVisitor = new EntityVisitor();
 		RelationshipVisitor relationshipVisitor = new RelationshipVisitor();
 		for (IEntity<?> entity : entities) {
-			XmlCursor cursor = entity.getContentHandle().getCursor();
-			QName qname = cursor.getName();
-			System.out.println("Entity("+entity.getRelationships().size()+"): "+qname.toString());
+			entity.accept(entityVisitor);
 			for (IRelationship<?> relationship : entity.getRelationships()) {
 				relationship.accept(relationshipVisitor);
 			}
 		}
+	}
+
+	private static class EntityVisitor implements IEntityVisitor {
+
+		public void visit(IKeyedDocument entity) {
+			XmlCursor cursor = entity.getContentHandle().getCursor();
+			QName qname = cursor.getName();
+
+			IVersion version = entity.getVersion();
+			String ver = (version != null ? version.getValue() : null);
+			System.out.println(qname.toString()+": "+entity.getDefinition().getId()+": "+entity.getKey().toString()+": "+ver);
+		}
+
+		public void visit(IGeneratedDocument entity) {
+			XmlCursor cursor = entity.getContentHandle().getCursor();
+			QName qname = cursor.getName();
+			System.out.println(qname.toString()+": "+entity.getDefinition().getId());
+		}
+
+		public void visit(IContentNode entity) {
+			XmlCursor cursor = entity.getContentHandle().getCursor();
+			QName qname = cursor.getName();
+
+			IVersion version = entity.getVersion();
+			String ver = (version != null ? version.getValue() : null);
+
+			System.out.println(qname.toString()+": "+entity.getDefinition().getId()+": "+entity.getKey().toString()+": "+ver);
+		}
+		
 	}
 
 	private static class RelationshipVisitor implements IRelationshipVisitor {

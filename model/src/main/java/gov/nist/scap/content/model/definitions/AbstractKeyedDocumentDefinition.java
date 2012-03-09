@@ -1,13 +1,13 @@
 package gov.nist.scap.content.model.definitions;
 
+import javax.xml.namespace.QName;
 
-public abstract class AbstractContentNodeDefinition extends AbstractEntityDefinition implements IContentNodeDefinition {
-
+public abstract class AbstractKeyedDocumentDefinition extends AbstractDocumentDefinition implements IKeyedDocumentDefinition {
 	private final IKeyDefinition keyDefinition;
 	private IVersionDefinition versionDefinition;
 
-	public AbstractContentNodeDefinition(ISchema schema, String id, IKeyDefinition keyDefinition) {
-		super(schema, id);
+	public AbstractKeyedDocumentDefinition(ISchema schema, String id, QName name, IKeyDefinition keyDefinition) {
+		super(schema, id, name);
 		if (keyDefinition == null) {
 			throw new NullPointerException("keyDefinition");
 		}

@@ -7,4 +7,5 @@ public interface IMutableEntity<DEFINITION extends IEntityDefinition> extends IC
 	void addRelationship(IKeyedRelationship relationship);
 	void addRelationship(IIndirectRelationship relationship);
 	void addRelationship(IRelationship<?> relationship);
+	void setVersion(IVersion version);
 }

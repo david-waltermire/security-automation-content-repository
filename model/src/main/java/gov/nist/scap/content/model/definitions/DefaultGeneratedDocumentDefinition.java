@@ -10,6 +10,10 @@ public class DefaultGeneratedDocumentDefinition extends AbstractDocumentDefiniti
 		super(schema, id, name);
 	}
 
+	public IVersionDefinition getVersionDefinition() {
+		return null;
+	}
+
 	public <T> T accept(IEntityDefinitionVisitor<T> visitor) throws ContentException, ProcessingException {
 		return visitor.visit(this);
 	}

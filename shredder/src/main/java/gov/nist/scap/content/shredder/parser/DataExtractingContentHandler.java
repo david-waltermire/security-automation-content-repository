@@ -1,6 +1,6 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.model.IContainerVisitor;
+import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IGeneratedDocument;
@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 
 
 // TODO: deal with synchronization issues 'synchronized'
-public class DataExtractingContentHandler implements ContentHandler, IContainerVisitor {
+public class DataExtractingContentHandler implements ContentHandler, IEntityVisitor {
 	private static final Logger log = Logger.getLogger(DataExtractingContentHandler.class);
 
 	private final Collection<KeyedRelationshipInfo> keyedRelationships = new LinkedList<KeyedRelationshipInfo>();
@@ -56,7 +56,7 @@ public class DataExtractingContentHandler implements ContentHandler, IContainerV
 	}
 
 	public void handle(IMutableEntity<?> entity) {
-		entity.accept((IContainerVisitor)this);
+		entity.accept((IEntityVisitor)this);
 		entities.add(entity);
 	}
 

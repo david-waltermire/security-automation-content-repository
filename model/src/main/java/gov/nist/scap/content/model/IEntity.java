@@ -41,4 +41,6 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	 * @see IContentHandle
 	 */
 	IContentHandle getContentHandle();
+	void accept(IEntityVisitor visitor);
+	IVersion getVersion();
 }
