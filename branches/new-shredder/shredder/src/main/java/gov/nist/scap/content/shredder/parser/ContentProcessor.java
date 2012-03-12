@@ -75,7 +75,7 @@ public class ContentProcessor {
 		contentHandler.handle(entity);
 	}
 
-	private IContentHandle getContentHandle(XmlCursor cursor) {
+	private static IContentHandle getContentHandle(XmlCursor cursor) {
 		Bookmark bookmark = new Bookmark();
 		cursor.setBookmark(bookmark);
 
@@ -120,7 +120,7 @@ public class ContentProcessor {
 		}
 	}
 
-	private IVersion processVersion(IVersionDefinition version, XmlCursor cursor) {
+	private static IVersion processVersion(IVersionDefinition version, XmlCursor cursor) {
 		XPathRetriever valueRetriever = version.getXpath();
 		String value = valueRetriever.getValue(cursor);
 		return (value == null ? null : new DefaultVersion(version, value));
