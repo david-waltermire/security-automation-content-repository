@@ -285,23 +285,6 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-			      <plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-				  <execution>
-				    <phase> compile </phase>
-				    <configuration>
-				      <target>
-					<ant dir="eXist"/>
-				      </target>
-				    </configuration>
-				    <goals>
-				      <goal>run</goal>
-				    </goals>
-				  </execution>
-				</executions>
-			      </plugin>				
 			</plugins>
 		</pluginManagement>
 	</build>
