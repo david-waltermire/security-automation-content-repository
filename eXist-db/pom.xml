@@ -239,22 +239,6 @@
               </arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>apply-accountimpl-patch</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>svn</executable>
-              <workingDirectory>.</workingDirectory>
-              <arguments>
-                <argument>patch</argument>
-                <argument>AccountImpl.java.patch</argument>
-                <argument>eXist</argument>
-              </arguments>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
     </plugins>
