@@ -30,6 +30,7 @@ public class HybridContentPersistenceManagerFactory implements ContentPersistenc
 		return new DefaultHybridContentPersistenceManager();
 	}
 
+	@SuppressWarnings("static-method")
 	public HybridContentPersistenceManager newHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		return new DefaultHybridContentPersistenceManager(metadataStore, contentStore);
 	}

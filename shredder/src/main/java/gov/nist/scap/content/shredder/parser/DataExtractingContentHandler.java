@@ -56,7 +56,7 @@ public class DataExtractingContentHandler implements ContentHandler, IEntityVisi
 	}
 
 	public void handle(IMutableEntity<?> entity) {
-		entity.accept((IEntityVisitor)this);
+		entity.accept(this);
 		entities.add(entity);
 	}
 
