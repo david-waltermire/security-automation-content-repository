@@ -12,12 +12,12 @@
 	<name>Content Repository Master Build</name>
 
 	<modules>
+		<module>rules-model</module>
+		<module>shredder</module>
+		<module>repository</module>
+		<module>model</module>
 		<module>exist-db</module>
 		<module>exist-db-persistence</module>
-		<module>shredder</module>
-		<module>rules-model</module>
-        <module>repository</module>
-        <module>model</module>
 	</modules>
 
 	<properties>
@@ -53,6 +53,13 @@
 			    <artifactId>rules-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+		<dependency>
+			<groupId>gov.nist.scap.content</groupId>
+			<artifactId>rules-model</artifactId>
+			<classifier>tests</classifier>
+			<version>${project.version}</version>
+		</dependency>
+			
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>rules-model</artifactId>

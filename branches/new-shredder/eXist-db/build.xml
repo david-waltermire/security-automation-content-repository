@@ -3,14 +3,9 @@
     
   <target name="setup">
     <available file="eXist/exist.jar" property="exist.exists"/>
-    <condition property="exist.notexists">
-      <not>
-        <isset property="exist.exists"/>
-      </not>
-    </condition>
   </target>
   
-  <target name="run" depends="setup" if="${exist.notexists}">
+  <target name="run" depends="setup" unless="${exist.exists}">
     <ant dir="eXist"/>
   </target>
 
