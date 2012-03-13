@@ -3,13 +3,13 @@ package gov.nist.scap.content.model.definitions;
 import org.apache.xmlbeans.XmlBeans;
 import org.apache.xmlbeans.XmlException;
 
-public class DefaultIndirectRelationshipDefinition extends
+public class DefaultBoundaryIdentifierRelationshipDefinition extends
 		AbstractRelationshipDefinition implements
 		IBoundaryIdentifierRelationshipDefinition {
 	private final XPathRetriever valueRetriever;
 	private final IExternalIdentifierMapping qualifierMapping;
 
-	public DefaultIndirectRelationshipDefinition(ISchema schema, String id,
+	public DefaultBoundaryIdentifierRelationshipDefinition(ISchema schema, String id,
 			String xpath, String valueXpath, IExternalIdentifierMapping qualifierMapping) throws XmlException {
 		super(schema, id, xpath);
 

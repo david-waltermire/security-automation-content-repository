@@ -2,7 +2,7 @@ package gov.nist.scap.content.model.definitions;
 
 import org.apache.xmlbeans.XmlException;
 
-public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipDefinition implements ICompositeRelationshipDefinition {
+public class DefaultCompositeRelationshipDefinition extends AbstractRelationshipDefinition implements ICompositeRelationshipDefinition {
 	/**
 	 * The content definition mapping associated with this boundary
 	 */
@@ -23,7 +23,7 @@ public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipD
 	 * 		parameters are <code>null</code>
 	 * @throws IllegalArgumentException if the id or xpath arguments are empty
 	 */
-	public DefaultBoundaryRelationshipDefinition(ISchema schema, String id, String xpath, ContentMapping contentMapping) throws XmlException {
+	public DefaultCompositeRelationshipDefinition(ISchema schema, String id, String xpath, ContentMapping contentMapping) throws XmlException {
 		super(schema, id, xpath);
 
 		if (xpath == null) {

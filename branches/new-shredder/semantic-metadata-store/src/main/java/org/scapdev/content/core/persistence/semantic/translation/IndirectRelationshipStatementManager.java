@@ -59,7 +59,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	IndirectRelationshipStatementManager(MetaDataOntology ontology, IMetadataModel model) {
 		this.ontology = ontology;
 		this.model = model;
-		this.indirectRelationshipIds = model.getIndirectRelationshipIds();
+		this.indirectRelationshipIds = model.getBoundaryIndentifierRelationshipIds();
 	}
 	
 	/**
@@ -120,11 +120,11 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
 		if (indirectRelBuilder == null){
 			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(indirectRelationshipId));
 			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(indirectRelationshipId));
 		}
 	}
 	

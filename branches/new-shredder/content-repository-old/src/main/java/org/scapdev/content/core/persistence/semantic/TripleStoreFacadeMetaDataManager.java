@@ -174,13 +174,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 			try {
 				for (String entityTypeId : entityInfoIds) {
 					List<URI> existingEntities = findEntitybyEntityTypeId(entityTypeId, conn);
-					InternalEntityStatistic stat = new InternalEntityStatistic(model.getEntityInfoById(entityTypeId));
+					InternalEntityStatistic stat = new InternalEntityStatistic(model.getEntityDefinitionById(entityTypeId));
 					// 4. loop through this list, incrementing count of entityStatistic for every iteration
 					for (URI entityURI : existingEntities){
 						stat.incrementCount();
 						List<String> relationshipIds = findAllRelationshipsFromEntity(entityURI, conn);
 						for (String relationshipId : relationshipIds){
-							stat.handleRelationships(relationshipId, model.getRelationshipInfoById(relationshipId));
+							stat.handleRelationships(relationshipId, model.getRelationshipDefinitionById(relationshipId));
 						}
 					}
 					entityStats.put(entityTypeId, stat);

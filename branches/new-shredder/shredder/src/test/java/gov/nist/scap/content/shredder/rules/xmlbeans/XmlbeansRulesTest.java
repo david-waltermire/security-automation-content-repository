@@ -81,11 +81,11 @@ public class XmlbeansRulesTest {
 	private static class RelationshipVisitor implements IRelationshipVisitor {
 
 		public void visit(ICompositeRelationship relationship) {
-//			System.out.println("  Boundary: "+relationship.getDefinition().getId());
+//			System.out.println("  Composite: "+relationship.getDefinition().getId());
 		}
 
 		public void visit(IBoundaryIdentifierRelationship relationship) {
-			System.out.println("  Indirect: "+relationship.getDefinition().getId());
+			System.out.println("  Boundary: "+relationship.getDefinition().getId());
 		}
 
 		public void visit(IKeyedRelationship relationship) {
