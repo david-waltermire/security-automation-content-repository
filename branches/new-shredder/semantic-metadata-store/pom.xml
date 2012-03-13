@@ -31,21 +31,13 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>repository</artifactId>
+  <artifactId>semantic-metadata-store</artifactId>
 
   <packaging>jar</packaging>
-  <name>content-repository</name>
+  <name>semantic-metadata-store</name>
   <url>http://maven.apache.org</url>
 
   <dependencies> 
-  	<dependency>
-  	  <groupId>gov.nist.scap.content</groupId>
-  	  <artifactId>rules-model</artifactId>
-  	</dependency>
-    <dependency>
-      <groupId>gov.nist.scap.content</groupId>
-      <artifactId>shredder</artifactId>
-    </dependency>
     
   	<dependency>
   		<groupId>junit</groupId>
@@ -56,19 +48,36 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
+<!--
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-<!--
+-->    
+  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-repository-api</artifactId>
+   	</dependency>
     <dependency>
-        <groupId>org.codehaus.woodstox</groupId>
-        <artifactId>wstx-asl</artifactId>
-  		<type>jar</type>
-  		<optional>false</optional>
-        <scope>compile</scope>
-    </dependency>
--->
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-repository-sail</artifactId>
+   	</dependency>
+   	<dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-sail-memory</artifactId>
+   	</dependency>
+   	<dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-repository-http</artifactId>
+   	</dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-queryresultio-binary</artifactId>
+   	  </dependency>
+   	  <dependency>
+    	<groupId>org.openrdf.sesame</groupId>
+		<artifactId>sesame-runtime</artifactId>
+   	  </dependency>
  	<dependency>
      	<!--  bridge to log4j from sesame log infrastructure -->
    		<groupId>org.slf4j</groupId>
