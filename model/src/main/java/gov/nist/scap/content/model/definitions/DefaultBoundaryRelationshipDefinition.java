@@ -2,7 +2,7 @@ package gov.nist.scap.content.model.definitions;
 
 import org.apache.xmlbeans.XmlException;
 
-public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipDefinition implements IBoundaryRelationshipDefinition {
+public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipDefinition implements ICompositeRelationshipDefinition {
 	/**
 	 * The content definition mapping associated with this boundary
 	 */

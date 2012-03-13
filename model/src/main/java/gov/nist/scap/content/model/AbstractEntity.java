@@ -11,7 +11,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	private final DEFINITION contentDefinition;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final List<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
-	private final List<IIndirectRelationship> indirectRelationships = new LinkedList<IIndirectRelationship>();
+	private final List<IBoundaryIdentifierRelationship> indirectRelationships = new LinkedList<IBoundaryIdentifierRelationship>();
 	private final IContentHandle contentHandle;
 	private final IMutableEntity<?> parent;
 
@@ -33,7 +33,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		return Collections.unmodifiableList(keyedRelationships);
 	}
 
-	public List<IIndirectRelationship> getIndirectRelationships() {
+	public List<IBoundaryIdentifierRelationship> getIndirectRelationships() {
 		return Collections.unmodifiableList(indirectRelationships);
 	}
 
@@ -54,7 +54,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		addRelationship((IRelationship<?>)relationship);
 	}
 
-	public void addRelationship(IIndirectRelationship relationship) {
+	public void addRelationship(IBoundaryIdentifierRelationship relationship) {
 		indirectRelationships.add(relationship);
 		addRelationship((IRelationship<?>)relationship);
 	}

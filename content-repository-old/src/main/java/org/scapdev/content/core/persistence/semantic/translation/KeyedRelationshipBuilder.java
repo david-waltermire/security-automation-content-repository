@@ -28,6 +28,7 @@ import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
+import gov.nist.scap.content.model.IRelationshipVisitor;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -93,6 +94,10 @@ class KeyedRelationshipBuilder {
 		public IKeyedEntity<?> getReferencedEntity() {
 			// TODO: figure out how to provide this information
 			throw new UnsupportedOperationException("implement");
+		}
+
+		public void accept(IRelationshipVisitor visitor) {
+			visitor.visit(this);
 		}
 
 		

@@ -29,6 +29,7 @@ import gov.nist.scap.content.model.definitions.QualifiedExternalIdentifierMappin
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.model.definitions.StaticExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.XPathKeyedField;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.schema.contentRules.x01.BoundaryRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.ContentMappingType;
 import gov.nist.scap.schema.contentRules.x01.ContentNodeType;
@@ -57,6 +58,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -67,7 +69,7 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
-public class XmlbeansRules {
+public class XmlbeansRules implements IMetadataModel {
 	private static final Map<VersionMethodType.Enum, IVersionDefinition.Method> versionMethodEnumToVersionMethodMap;
 
 	static {
@@ -302,5 +304,37 @@ public class XmlbeansRules {
 		IVersionDefinition.Method method = map(version.getMethod());
 		String xpath = version.getXpath().getExpression();
 		return new DefaultVersionDefinition(method, xpath, version.getUseParentVersionWhenUndefined());
+	}
+
+	@Override
+	public Collection<String> getIndirectRelationshipIds() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<String> getKeyedRelationshipIds() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IExternalIdentifier getExternalIdentifierInfoById(
+			String externalIdType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends IRelationshipDefinition> T getRelationshipInfoById(
+			String keyedRelationshipId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends IEntityDefinition> T getEntityInfoById(String entityType) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

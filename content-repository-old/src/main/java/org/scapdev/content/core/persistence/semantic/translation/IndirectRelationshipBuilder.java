@@ -23,10 +23,10 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.model.DefaultIndirectRelationship;
-import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
-import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 /**
@@ -34,7 +34,7 @@ import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
  *
  */
 class IndirectRelationshipBuilder {
-	private IIndirectRelationshipDefinition relationshipDefinition;
+	private IBoundaryIdentifierRelationshipDefinition relationshipDefinition;
 	private String externalIdValue;
 	private String externalIdType;
 	
@@ -46,7 +46,7 @@ class IndirectRelationshipBuilder {
 		this.externalIdValue = externalIdValue;
 	}
 	
-	void setIndirectRelationshipInfo(IIndirectRelationshipDefinition relationshipDefinition) {
+	void setIndirectRelationshipInfo(IBoundaryIdentifierRelationshipDefinition relationshipDefinition) {
 		this.relationshipDefinition = relationshipDefinition;
 	}
 	
@@ -64,13 +64,13 @@ class IndirectRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IIndirectRelationship build(IMetadataModel model, RebuiltEntity<?> entity){
+	IBoundaryIdentifierRelationship build(IMetadataModel model, RebuiltEntity<?> entity){
 		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
 		
 		IExternalIdentifier externalIdentifier = model.getExternalIdentifierInfoById(externalIdType);
-		IIndirectRelationship rel = new DefaultIndirectRelationship(relationshipDefinition, entity, externalIdentifier, externalIdValue);
+		IBoundaryIdentifierRelationship rel = new DefaultBoundaryIdentifierRelationship(relationshipDefinition, entity, externalIdentifier, externalIdValue);
 		
 		return rel;
 	}

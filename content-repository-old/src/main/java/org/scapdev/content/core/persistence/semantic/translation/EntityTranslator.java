@@ -27,7 +27,7 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
@@ -151,7 +151,7 @@ public class EntityTranslator extends
 		// now handle all relationship information
 		
 		// handle indirect relationships first
-		for (IIndirectRelationship relationship : entity.getIndirectRelationships()) {
+		for (IBoundaryIdentifierRelationship relationship : entity.getIndirectRelationships()) {
 			String relationshipId = relationship.getDefinition().getId();
 			IExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
 			String boundaryObjectValue = relationship.getValue();

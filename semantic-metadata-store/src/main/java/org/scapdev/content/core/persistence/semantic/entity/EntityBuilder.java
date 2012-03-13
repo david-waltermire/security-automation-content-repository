@@ -11,11 +11,11 @@ import gov.nist.scap.content.model.definitions.ProcessingException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 
 public class EntityBuilder {
+	private static final EntityDefinitionVisitor visitor = new EntityDefinitionVisitor();
 	private AbstractInternalBuilder<?> internalBuilder;
 	private ContentRetriever contentRetriever;
 
 	public <T extends IEntityDefinition> void setEntityDefinition(T definition) throws ProcessingException {
-		EntityDefinitionVisitor visitor = new EntityDefinitionVisitor();
 		this.internalBuilder = definition.accept(visitor);
 	}
 
@@ -37,7 +37,7 @@ public class EntityBuilder {
 		return retval;
 	}
 
-	private class EntityDefinitionVisitor implements IEntityDefinitionVisitor<AbstractInternalBuilder<?>> {
+	private static class EntityDefinitionVisitor implements IEntityDefinitionVisitor<AbstractInternalBuilder<?>> {
 
 		public AbstractInternalBuilder<?> visit(IGeneratedDocumentDefinition definition)
 				throws ProcessingException {
@@ -53,6 +53,5 @@ public class EntityBuilder {
 				throws ProcessingException {
 			return new ContentNodeInternalBuilder(definition);
 		}
-		
 	}
 }

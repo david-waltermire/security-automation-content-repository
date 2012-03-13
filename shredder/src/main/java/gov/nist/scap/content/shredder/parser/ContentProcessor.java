@@ -1,12 +1,12 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.model.DefaultBoundaryRelationship;
+import gov.nist.scap.content.model.DefaultCompositeRelationship;
 import gov.nist.scap.content.model.DefaultContentNode;
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
 import gov.nist.scap.content.model.DefaultKeyedDocument;
-import gov.nist.scap.content.model.DefaultIndirectRelationship;
+import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.DefaultVersion;
-import gov.nist.scap.content.model.IBoundaryRelationship;
+import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IKey;
@@ -18,7 +18,7 @@ import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.ContentMapping;
-import gov.nist.scap.content.model.definitions.IBoundaryRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.IDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
@@ -26,7 +26,7 @@ import gov.nist.scap.content.model.definitions.IEntityDefinitionVisitor;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
-import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
 import gov.nist.scap.content.model.definitions.IKeyRefDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
@@ -181,7 +181,7 @@ public class ContentProcessor {
 		}
 
 		@Override
-		public void visit(IBoundaryRelationshipDefinition definition) throws ProcessingException {
+		public void visit(ICompositeRelationshipDefinition definition) throws ProcessingException {
 			ContentMapping contentMapping = definition.getContentMapping();
 			QName qname = cursor.getName();
 			// retrieve the content definition to use to process the child node
@@ -192,21 +192,21 @@ public class ContentProcessor {
 				// process the child node
 				IMutableEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
 
-				IBoundaryRelationship relationship = new DefaultBoundaryRelationship(definition, childEntity, entity);
+				ICompositeRelationship relationship = new DefaultCompositeRelationship(definition, childEntity, entity);
 				// TODO: determine which to keep
 				entity.addRelationship(relationship);
 				childEntity.addRelationship(relationship);
 			}
 		}
 
-		public void visit(IIndirectRelationshipDefinition definition) {
+		public void visit(IBoundaryIdentifierRelationshipDefinition definition) {
 			XPathRetriever valueRetriever = definition.getValueRetriever();
 			IExternalIdentifierMapping qualifierMapping = definition.getQualifierMapping();
 
 			String value = valueRetriever.getValue(cursor);
 			IExternalIdentifier externalIdentifier = qualifierMapping.resolveExternalIdentifier(cursor);
 			if (externalIdentifier != null) {
-				entity.addRelationship(new DefaultIndirectRelationship(definition, entity, externalIdentifier, value));
+				entity.addRelationship(new DefaultBoundaryIdentifierRelationship(definition, entity, externalIdentifier, value));
 			} else {
 				log.warn("Unable to extract indirect relationship for value: "+value);
 			}

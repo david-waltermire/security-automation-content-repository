@@ -5,7 +5,7 @@ import org.apache.xmlbeans.XmlException;
 
 public class DefaultIndirectRelationshipDefinition extends
 		AbstractRelationshipDefinition implements
-		IIndirectRelationshipDefinition {
+		IBoundaryIdentifierRelationshipDefinition {
 	private final XPathRetriever valueRetriever;
 	private final IExternalIdentifierMapping qualifierMapping;
 
