@@ -1,6 +1,5 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
-import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.IBoundaryRelationship;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
@@ -29,7 +28,7 @@ import org.junit.Test;
 public class XmlbeansRulesTest {
 
 	@Test
-	public void testXmlbeansRulesFile() throws XmlException, IOException, ContentException, ProcessingException {
+	public void testXmlbeansRulesFile() throws XmlException, IOException, ProcessingException {
         XmlbeansRules xmlbeansRules =
                 new XmlbeansRules(this.getClass().getResourceAsStream(
                     "/test-rules.xml"));
