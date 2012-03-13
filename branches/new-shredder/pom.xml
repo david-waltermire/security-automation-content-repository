@@ -15,6 +15,7 @@
 		<module>rules-model</module>
 		<module>shredder</module>
 		<module>repository</module>
+		<module>semantic-metadata-store</module>
 		<module>model</module>
 		<module>exist-db</module>
 		<module>exist-db-persistence</module>
