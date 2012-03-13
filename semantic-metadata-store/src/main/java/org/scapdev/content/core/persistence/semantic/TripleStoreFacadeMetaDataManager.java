@@ -25,14 +25,11 @@ package org.scapdev.content.core.persistence.semantic;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.definitions.IEntityDefinition;
-import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import info.aduna.iteration.Iterations;
 
-import java.awt.RenderingHints.Key;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -108,7 +105,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 	
 	@Override
-	public IEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
+	public IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {
@@ -136,6 +133,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		return null;
 	}
 	
+    @Override
+    public IEntity<?> getEntity(String contentId, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
+        return null;
+    }
 
 	@Override
 	public Set<IKey> getKeysForIndirectIds(String indirectType,
@@ -165,35 +166,35 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 		return null;
 	}
 	
-	@Override
-	public Map<String, ? extends EntityStatistic> getEntityStatistics(
-			Set<String> entityInfoIds, IMetadataModel model) {
-		Map<String, InternalEntityStatistic> entityStats = new HashMap<String, InternalEntityStatistic>();
-		try {
-			RepositoryConnection conn = repository.getConnection();
-			try {
-				for (String entityTypeId : entityInfoIds) {
-					List<URI> existingEntities = findEntitybyEntityTypeId(entityTypeId, conn);
-					InternalEntityStatistic stat = new InternalEntityStatistic(model.getEntityInfoById(entityTypeId));
-					// 4. loop through this list, incrementing count of entityStatistic for every iteration
-					for (URI entityURI : existingEntities){
-						stat.incrementCount();
-						List<String> relationshipIds = findAllRelationshipsFromEntity(entityURI, conn);
-						for (String relationshipId : relationshipIds){
-							stat.handleRelationships(relationshipId, model.getRelationshipInfoById(relationshipId));
-						}
-					}
-					entityStats.put(entityTypeId, stat);
-				}
-				
-			} finally {
-				conn.close();
-			}
-		} catch (RepositoryException e) {
-			log.error(e);
-		}
-		return entityStats;
-	}
+//	@Override
+//	public Map<String, ? extends EntityStatistic> getEntityStatistics(
+//			Set<String> entityInfoIds, IMetadataModel model) {
+//		Map<String, InternalEntityStatistic> entityStats = new HashMap<String, InternalEntityStatistic>();
+//		try {
+//			RepositoryConnection conn = repository.getConnection();
+//			try {
+//				for (String entityTypeId : entityInfoIds) {
+//					List<URI> existingEntities = findEntitybyEntityTypeId(entityTypeId, conn);
+//					InternalEntityStatistic stat = new InternalEntityStatistic(model.getEntityInfoById(entityTypeId));
+//					// 4. loop through this list, incrementing count of entityStatistic for every iteration
+//					for (URI entityURI : existingEntities){
+//						stat.incrementCount();
+//						List<String> relationshipIds = findAllRelationshipsFromEntity(entityURI, conn);
+//						for (String relationshipId : relationshipIds){
+//							stat.handleRelationships(relationshipId, model.getRelationshipInfoById(relationshipId));
+//						}
+//					}
+//					entityStats.put(entityTypeId, stat);
+//				}
+//				
+//			} finally {
+//				conn.close();
+//			}
+//		} catch (RepositoryException e) {
+//			log.error(e);
+//		}
+//		return entityStats;
+//	}
 
 	/**
 	 * <p>
