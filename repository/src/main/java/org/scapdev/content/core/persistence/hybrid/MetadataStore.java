@@ -25,6 +25,7 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public interface MetadataStore {
 	 * @param model
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 */
-	IEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
+	IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
 	/**
 	 * 
 	 * @param indirectType
