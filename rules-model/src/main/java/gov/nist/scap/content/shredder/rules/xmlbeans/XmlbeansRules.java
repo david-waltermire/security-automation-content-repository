@@ -33,7 +33,8 @@ import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.model.definitions.StaticExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.XPathKeyedField;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
-import gov.nist.scap.schema.contentRules.x01.BoundaryRelationshipType;
+import gov.nist.scap.schema.contentRules.x01.BoundaryIdentifierRelationshipType;
+import gov.nist.scap.schema.contentRules.x01.CompositeRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.ContentMappingType;
 import gov.nist.scap.schema.contentRules.x01.ContentNodeType;
 import gov.nist.scap.schema.contentRules.x01.EntityQNameMappingType;
@@ -43,7 +44,6 @@ import gov.nist.scap.schema.contentRules.x01.ExternalIdentifierType;
 import gov.nist.scap.schema.contentRules.x01.FieldType;
 import gov.nist.scap.schema.contentRules.x01.GeneratedDocumentType;
 import gov.nist.scap.schema.contentRules.x01.IndexedDocumentType;
-import gov.nist.scap.schema.contentRules.x01.IndirectRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.KeyFieldRefType;
 import gov.nist.scap.schema.contentRules.x01.KeyRefDefinitionType;
 import gov.nist.scap.schema.contentRules.x01.KeyType;
@@ -202,7 +202,7 @@ public class XmlbeansRules implements IMetadataModel {
 	}
 
 	private void processCompositeRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
-		for (BoundaryRelationshipType relationship : schema.getBoundaryRelationshipList()) {
+		for (CompositeRelationshipType relationship : schema.getCompositeRelationshipList()) {
 
 			ContentMapping contentMapping = getContentMapping(relationship.getContentMapping());
 			DefaultCompositeRelationshipDefinition def = new DefaultCompositeRelationshipDefinition(schemaDef, relationship.getId(), relationship.getXpath().getExpression(), contentMapping);
@@ -230,7 +230,7 @@ public class XmlbeansRules implements IMetadataModel {
 
 	private void processBoundaryIdentifierRelationships(ISchema schemaDef,
 			SchemaType schema) throws XmlException {
-		for (IndirectRelationshipType relationship : schema.getIndirectRelationshipList()) {
+		for (BoundaryIdentifierRelationshipType relationship : schema.getBoundaryIdentifierRelationshipList()) {
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
 			IExternalIdentifierMapping mapping = null;
 			if (relationship.isSetExternalIdentifier()) {

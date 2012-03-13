@@ -74,7 +74,7 @@
     
     <xs:simpleType name="ExternalIdentifierIdType">
         <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:external-identifier:.+"/>
+            <xs:pattern value="[^#]+#external-identifier-.+"/>
         </xs:restriction>
     </xs:simpleType>
     
@@ -101,9 +101,9 @@
                 <xs:element ref="generated-document"/>
             </xs:choice>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="boundary-relationship"/>
+                <xs:element ref="composite-relationship"/>
                 <xs:element ref="keyed-relationship"/>
-                <xs:element ref="indirect-relationship"/>
+                <xs:element ref="boundary-identifier-relationship"/>
             </xs:choice>
         </xs:sequence>
         <xs:attribute name="id" type="SchemaIdType" use="required"/>
@@ -112,7 +112,7 @@
     
     <xs:simpleType name="SchemaIdType">
         <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:schema:.+"/>
+            <xs:pattern value="[^#]+#schema"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -134,7 +134,7 @@
     
     <xs:simpleType name="KeyIdType">
         <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:key:.+"/>
+            <xs:pattern value="[^#]+#key-.+"/>
         </xs:restriction>
     </xs:simpleType>
     
@@ -225,7 +225,7 @@
     
     <xs:simpleType name="ContentNodeIdType">
         <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:content-node:.+"/>
+            <xs:pattern value="[^#]+#content-node-.+"/>
         </xs:restriction>
     </xs:simpleType>
     
@@ -239,7 +239,7 @@
     
     <xs:simpleType name="DocumentIdType">
         <xs:restriction base="DefinitionIdType">
-            <xs:pattern value="urn:scap-content:document:.+"/>
+            <xs:pattern value="[^#]+#document-.+"/>
         </xs:restriction>
     </xs:simpleType>
     
@@ -275,12 +275,13 @@
     
     <xs:simpleType name="RelationshipIdType">
         <xs:restriction base="DefinitionIdType">
+            <xs:pattern value="[^#]+#relationship-.+"/>
             <xs:pattern value="urn:scap-content:relationship:.+"/>
         </xs:restriction>
     </xs:simpleType>
     
-    <xs:element name="boundary-relationship" type="BoundaryRelationshipType"/>
-    <xs:complexType name="BoundaryRelationshipType">
+    <xs:element name="composite-relationship" type="CompositeRelationshipType"/>
+    <xs:complexType name="CompositeRelationshipType">
         <xs:complexContent>
             <xs:extension base="RelationshipType">
                 <xs:sequence>
@@ -323,8 +324,8 @@
         </xs:complexContent>
     </xs:complexType>
     
-    <xs:element name="indirect-relationship" type="IndirectRelationshipType"/>
-    <xs:complexType name="IndirectRelationshipType">
+    <xs:element name="boundary-identifier-relationship" type="BoundaryIdentifierRelationshipType"/>
+    <xs:complexType name="BoundaryIdentifierRelationshipType">
         <xs:complexContent>
             <xs:extension base="RelationshipType">
                 <xs:sequence>
@@ -396,7 +397,7 @@
     
     <xs:simpleType name="DefinitionIdType">
         <xs:restriction base="xs:anyURI">
-            <xs:pattern value="urn:scap-content:[a-z\-]+:[a-z][a-z0-9.\-_]+:[a-z][a-z0-9.\-_]+"/>
+            <xs:pattern value="http://[^#]+#.+"/>
         </xs:restriction>
     </xs:simpleType>
 
