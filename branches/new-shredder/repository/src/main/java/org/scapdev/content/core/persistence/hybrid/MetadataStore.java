@@ -42,6 +42,16 @@ public interface MetadataStore {
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 */
 	IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
+
+	   /**
+     * 
+     * @param contentId
+     * @param contentRetrieverFactory
+     * @param model
+     * @return the entity if the content ID exists or <code>null</code> if it was not found
+     */
+    IEntity<?> getEntity(String contentId, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
+
 	/**
 	 * 
 	 * @param indirectType
