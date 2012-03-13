@@ -1,12 +1,12 @@
 package gov.nist.scap.content.model;
 
-import gov.nist.scap.content.model.definitions.IBoundaryRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 
-public class DefaultBoundaryRelationship extends AbstractRelationship<IBoundaryRelationshipDefinition> implements IBoundaryRelationship {
+public class DefaultCompositeRelationship extends AbstractRelationship<ICompositeRelationshipDefinition> implements ICompositeRelationship {
 	private final IEntity<?> containingObject;
 
-	public DefaultBoundaryRelationship(
-			IBoundaryRelationshipDefinition definition,
+	public DefaultCompositeRelationship(
+			ICompositeRelationshipDefinition definition,
 			IEntity<?> owningEntity,
 			IEntity<?> containingObject) {
 		super(definition, owningEntity);

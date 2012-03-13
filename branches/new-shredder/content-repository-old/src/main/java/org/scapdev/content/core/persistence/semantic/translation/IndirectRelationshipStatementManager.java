@@ -23,8 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.model.IIndirectRelationship;
-import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -95,7 +95,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 */
 	public void populateEntity(RebuiltEntity<?> entity){
 		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
-			IIndirectRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
+			IBoundaryIdentifierRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
 			entity.addIndirectRelationship(indirectRelationship);
 		}
 	}
@@ -119,11 +119,11 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
 		if (indirectRelBuilder == null){
 			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setIndirectRelationshipInfo((IIndirectRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
 			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setIndirectRelationshipInfo((IIndirectRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
+			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipInfoById(indirectRelationshipId));
 		}
 	}
 	

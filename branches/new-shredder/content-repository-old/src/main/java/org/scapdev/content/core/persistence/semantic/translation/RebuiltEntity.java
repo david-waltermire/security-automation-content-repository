@@ -25,7 +25,7 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationship;
@@ -44,7 +44,7 @@ class RebuiltEntity<DEFINITION extends IEntityDefinition> implements IEntity<DEF
 	private IKey key;
 	private DEFINITION entityInfo;
 	private Collection<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
-	private Collection<IIndirectRelationship> indirectRelationships = new LinkedList<IIndirectRelationship>();
+	private Collection<IBoundaryIdentifierRelationship> indirectRelationships = new LinkedList<IBoundaryIdentifierRelationship>();
 	private IContentHandle contentHandle;
 
 	RebuiltEntity() {
@@ -77,11 +77,11 @@ class RebuiltEntity<DEFINITION extends IEntityDefinition> implements IEntity<DEF
 		return Collections.unmodifiableCollection(rels);
 	}
 
-	public Collection<IIndirectRelationship> getIndirectRelationships() {
+	public Collection<IBoundaryIdentifierRelationship> getIndirectRelationships() {
 		return Collections.unmodifiableCollection(indirectRelationships);
 	}
 	
-	void addIndirectRelationship(IIndirectRelationship rel){
+	void addIndirectRelationship(IBoundaryIdentifierRelationship rel){
 		indirectRelationships.add(rel);
 	}
 

@@ -1,14 +1,14 @@
 package gov.nist.scap.content.model;
 
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
-import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 
-public class DefaultIndirectRelationship extends AbstractRelationship<IIndirectRelationshipDefinition> implements IIndirectRelationship {
+public class DefaultBoundaryIdentifierRelationship extends AbstractRelationship<IBoundaryIdentifierRelationshipDefinition> implements IBoundaryIdentifierRelationship {
 	private final IExternalIdentifier externalIdentifier;
 	private final String value;
 
-	public DefaultIndirectRelationship(
-			IIndirectRelationshipDefinition definition, IEntity<?> owningEntity, IExternalIdentifier externalIdentifier, String value) {
+	public DefaultBoundaryIdentifierRelationship(
+			IBoundaryIdentifierRelationshipDefinition definition, IEntity<?> owningEntity, IExternalIdentifier externalIdentifier, String value) {
 		super(definition, owningEntity);
 		this.externalIdentifier = externalIdentifier;
 		this.value = value;

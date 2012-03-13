@@ -33,7 +33,7 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	 * Retrieves the indirect relationships associated with this entity.
 	 * @return a non-null collection
 	 */
-	Collection<? extends IIndirectRelationship> getIndirectRelationships();
+	Collection<? extends IBoundaryIdentifierRelationship> getIndirectRelationships();
 	/**
 	 * Retrieves a ContentHandle that can be used to access the underlying XML
 	 * segment represented by the entity. 

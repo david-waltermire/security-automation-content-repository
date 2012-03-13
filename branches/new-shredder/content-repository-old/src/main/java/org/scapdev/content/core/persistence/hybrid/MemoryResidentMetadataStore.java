@@ -24,7 +24,7 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
@@ -90,7 +90,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	public void persist(IEntity<?> entity, String contentId) {
 		descriptorMap.put(entity.getKey(), entity);
 		
-		for (IIndirectRelationship relationship : entity.getIndirectRelationships()) {
+		for (IBoundaryIdentifierRelationship relationship : entity.getIndirectRelationships()) {
 			IExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
 			Map<String, List<IEntity<?>>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
 			if (externalIdentifierValueToEntityMap == null) {
