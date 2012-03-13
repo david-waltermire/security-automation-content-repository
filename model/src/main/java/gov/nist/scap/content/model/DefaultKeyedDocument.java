@@ -3,13 +3,13 @@ package gov.nist.scap.content.model;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 
 
-public class DefaultIndexedDocument extends AbstractEntity<IKeyedDocumentDefinition>
+public class DefaultKeyedDocument extends AbstractEntity<IKeyedDocumentDefinition>
 		implements IMutableKeyedDocument {
 
 	private final IKey key;
 	private IVersion version;
 
-	public DefaultIndexedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) {
+	public DefaultKeyedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) {
 		super(definition, contentHandle, parent);
 		this.key = key;
 	}

@@ -1,7 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
-
 import org.apache.xmlbeans.XmlBeans;
 import org.apache.xmlbeans.XmlException;
 
@@ -34,7 +32,7 @@ public class DefaultIndirectRelationshipDefinition extends
 		return qualifierMapping;
 	}
 
-	public void accept(IRelationshipDefinitionVisitor visitor) throws ContentException, ProcessingException {
+	public void accept(IRelationshipDefinitionVisitor visitor) throws ProcessingException {
 		visitor.visit(this);
 	}
 

@@ -1,6 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
 
 
 
@@ -10,7 +9,7 @@ public class DefaultContentNodeDefinition extends AbstractContentNodeDefinition 
 		super(schema, id, keyDefinition);
 	}
 
-	public <T> T accept(IEntityDefinitionVisitor<T> visitor) throws ContentException, ProcessingException {
+	public <T> T accept(IEntityDefinitionVisitor<T> visitor) throws ProcessingException {
 		return visitor.visit(this);
 	}
 }

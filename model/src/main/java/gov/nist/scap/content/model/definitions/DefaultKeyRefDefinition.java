@@ -23,16 +23,7 @@
  ******************************************************************************/
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
-import gov.nist.scap.content.model.IContainer;
-import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.KeyBuilder;
-import gov.nist.scap.content.model.KeyException;
-
 import java.util.List;
-import java.util.Map;
-
-import org.apache.xmlbeans.XmlCursor;
 
 public class DefaultKeyRefDefinition implements IKeyRefDefinition {
 	private final KeyedSupport keyedSupport;
@@ -49,24 +40,6 @@ public class DefaultKeyRefDefinition implements IKeyRefDefinition {
 
 	public IKeyDefinition getKeyDefinition() {
 		return keyDefinition;
-	}
-
-	public IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException {
-		Map<String, String> referenceFieldIdToValueMap = keyedSupport.getFieldValues(parentContext, cursor);
-
-//		List<? extends IKeyedField> fields = getFields();
-//
-//		Map<String, String> keyFieldIdToValueMap = new HashMap<String, String>();
-//		for (IKeyedField field : fields) {
-//			String referenceFieldName = field.getId();
-//			String keyFieldName = field.getKeyFieldDefinition().getId();
-//			keyFieldIdToValueMap.put(keyFieldName, referenceFieldIdToValueMap.get(referenceFieldName));
-//		}
-		KeyBuilder builder = new KeyBuilder(getKeyDefinition().getFields());
-		builder.setId(keyDefinition.getId());
-//		builder.addFields(keyFieldIdToValueMap);
-		builder.addFields(referenceFieldIdToValueMap);
-		return builder.toKey();
 	}
 
 //	private LinkedHashMap<String, String> getKeyValues(Object instance) throws ModelInstanceException {

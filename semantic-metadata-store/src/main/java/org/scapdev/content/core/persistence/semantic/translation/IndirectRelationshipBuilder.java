@@ -25,6 +25,7 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.DefaultIndirectRelationship;
 import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
@@ -64,7 +65,7 @@ class IndirectRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IIndirectRelationship build(IMetadataModel model, RebuiltEntity<?> entity){
+	IIndirectRelationship build(IMetadataModel model, IMutableEntity<?> entity){
 		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}

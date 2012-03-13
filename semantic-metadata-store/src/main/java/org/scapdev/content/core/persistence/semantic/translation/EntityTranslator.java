@@ -29,8 +29,11 @@ package org.scapdev.content.core.persistence.semantic.translation;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IIndirectRelationship;
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.LinkedList;
@@ -46,6 +49,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 
 /**
  * Translates entities across the different modeling languages.
@@ -75,27 +79,29 @@ public class EntityTranslator extends
 	 * @param model
 	 * @param contentRetrieverFactory
 	 * @return
+	 * @throws ProcessingException 
 	 */
-	public IEntity<?> translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, IMetadataModel model, ContentRetrieverFactory contentRetrieverFactory) {
+	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, IMetadataModel model, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
 		managers.add(new IndirectRelationshipStatementManager(ontology, model));
 		managers.add(new KeyedRelationshipStatementManager(ontology, model, factory, relatedEntityKeys));
 		managers.add(new KeyStatementManager(ontology));
-		// TODO: determine the entity type before construction
-		RebuiltEntity<?> target = new RebuiltEntity();
+
+		EntityBuilder target = new EntityBuilder();
 		for (Statement statement : statements){
 			URI predicate = statement.getPredicate();
 			//first handle entity specific predicates
 			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
 				String contentId = statement.getObject().stringValue();
-				target.setContentHandle((contentRetrieverFactory.newContentRetriever(contentId, model)));
+				target.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId, model)));
 				continue;
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
 				String entityType = statement.getObject().stringValue();
-				target.setEntityInfo(model.getEntityInfoById(entityType));
+				target.setEntityDefinition(model.getEntityInfoById(entityType));
 				continue;
 			}
+
 			//now handle rest of graph
 			for (RegenerationStatementManager statementManager : managers){
 				if (statementManager.scan(statement)){
@@ -103,10 +109,16 @@ public class EntityTranslator extends
 				}
 			}
 		}
+
+		IMutableEntity<?> result = target.build();
+
 		for (RegenerationStatementManager statementManager : managers){
-			statementManager.populateEntity(target);
+			statementManager.populateEntity(result);
 		}
-		return target;
+
+		@SuppressWarnings("unchecked")
+		T retval = (T)result;
+		return retval;
 	}
 	
 
@@ -129,8 +141,6 @@ public class EntityTranslator extends
 		// first handle the basic entity assertion
 		URI entityUri = genInstanceURI(contentId);
 		target.add(factory.createStatement(entityUri, RDF.TYPE, ontology.ENTITY_CLASS.URI));
-		//for now just use first key value as label
-		target.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(entity.getKey().getIdToValueMap().values().iterator().next())));
 		target.add(factory.createStatement(entityUri, ontology.HAS_CONTENT_ID.URI, factory.createLiteral(contentId)));
 		target.add(factory.createStatement(entityUri, ontology.HAS_ENTITY_TYPE.URI, factory.createLiteral(entity.getDefinition().getId())));
 		
@@ -140,13 +150,22 @@ public class EntityTranslator extends
 		
 		target.add(factory.createStatement(key, RDF.TYPE, ontology.KEY_CLASS.URI));
 		target.add(factory.createStatement(entityUri, ontology.HAS_KEY.URI, key));
-		target.add(factory.createStatement(key, ontology.HAS_KEY_TYPE.URI, factory.createLiteral(entity.getKey().getId())));
-		for (Map.Entry<String, String> keyFieldEntry : entity.getKey().getIdToValueMap().entrySet()){
-			BNode keyField = factory.createBNode();
-			target.add(factory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
-			target.add(factory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
-			target.add(factory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, factory.createLiteral(keyFieldEntry.getKey())));
-			target.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFieldEntry.getValue())));
+
+		if (entity instanceof IKeyedEntity) {
+			IKeyedEntity<?> keyedEntity = (IKeyedEntity<?>)entity;
+			IKey entityKey = keyedEntity.getKey();
+
+			//for now just use first key value as label
+			target.add(factory.createStatement(entityUri, RDFS.LABEL, factory.createLiteral(entityKey.getFieldNameToValueMap().values().iterator().next())));
+
+			target.add(factory.createStatement(key, ontology.HAS_KEY_TYPE.URI, factory.createLiteral(entityKey.getId())));
+			for (Map.Entry<String, String> keyFieldEntry : entityKey.getFieldNameToValueMap().entrySet()){
+				BNode keyField = factory.createBNode();
+				target.add(factory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
+				target.add(factory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
+				target.add(factory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, factory.createLiteral(keyFieldEntry.getKey())));
+				target.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFieldEntry.getValue())));
+			}
 		}
 		// now handle all relationship information
 		

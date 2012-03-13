@@ -25,6 +25,7 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -87,13 +88,13 @@ class KeyedRelationshipStatementManager implements
 
 	
 	@Override
-	public void populateEntity(RebuiltEntity<?> entity) {
+	public void populateEntity(IMutableEntity<?> entity) {
 		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
 			URI relatedEntityURI = entry.getKey();
 			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
 			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
 			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(model, entity);
-			entity.addKeyedRelationship(keyedRelationship);
+			entity.addRelationship(keyedRelationship);
 		}
 	}
 

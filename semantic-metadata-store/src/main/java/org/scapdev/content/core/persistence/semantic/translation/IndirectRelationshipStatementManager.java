@@ -24,6 +24,7 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IIndirectRelationship;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -93,10 +94,10 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param entity
 	 *            - to populate.
 	 */
-	public void populateEntity(RebuiltEntity<?> entity){
+	public void populateEntity(IMutableEntity<?> entity){
 		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
 			IIndirectRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
-			entity.addIndirectRelationship(indirectRelationship);
+			entity.addRelationship(indirectRelationship);
 		}
 	}
 	
