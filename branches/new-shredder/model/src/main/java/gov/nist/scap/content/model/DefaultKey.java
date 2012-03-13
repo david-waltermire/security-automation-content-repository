@@ -67,29 +67,29 @@ class DefaultKey implements IKey {
 		return id;
 	}
 
-	public Set<String> getFieldIds() {
-		return Collections.unmodifiableSet(getFieldIdToValueMap().keySet());
+	public Set<String> getFieldNames() {
+		return Collections.unmodifiableSet(getFieldNameToValueMap().keySet());
 	}
 
 	public String getValue(String fieldId) {
-		return getFieldIdToValueMap().get(fieldId);
+		return getFieldNameToValueMap().get(fieldId);
 	}
 
 	public Collection<String> getValues() {
-		return Collections.unmodifiableCollection(getFieldIdToValueMap().values());
+		return Collections.unmodifiableCollection(getFieldNameToValueMap().values());
 	}
 
 	/**
 	 * @return {@inheritDoc}
 	 */
-	public LinkedHashMap<String, String> getFieldIdToValueMap() {
+	public LinkedHashMap<String, String> getFieldNameToValueMap() {
 		return idToValueMap;
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder().append(id).append("=").append(
-				getFieldIdToValueMap().toString()).toString();
+				getFieldNameToValueMap().toString()).toString();
 	}
 
 	/**
@@ -114,7 +114,7 @@ class DefaultKey implements IKey {
         	DefaultKey that = (DefaultKey) other;
             result = (that.canEqual(this)
             		&& this.getId().equals(that.getId())
-            		&& this.getFieldIdToValueMap().equals(that.getFieldIdToValueMap())
+            		&& this.getFieldNameToValueMap().equals(that.getFieldNameToValueMap())
             		);
         }
         return result;
@@ -159,7 +159,7 @@ class DefaultKey implements IKey {
     	if (hashCache == null) {
 			int hash = 15;
 			hash = hash * 31 + getId().hashCode();
-			hash = hash * 31 + getFieldIdToValueMap().hashCode();
+			hash = hash * 31 + getFieldNameToValueMap().hashCode();
 			hashCache = hash;
     	}
 		return hashCache;
@@ -171,8 +171,8 @@ class DefaultKey implements IKey {
 
 		int result = this.getId().compareTo(that.getId());
 		if (result == 0) {
-			Map<String, String> thatValueMap = that.getFieldIdToValueMap();
-			for (Map.Entry<String, String> entry : getFieldIdToValueMap().entrySet()) {
+			Map<String, String> thatValueMap = that.getFieldNameToValueMap();
+			for (Map.Entry<String, String> entry : getFieldNameToValueMap().entrySet()) {
 				result = entry.getValue().compareTo(thatValueMap.get(entry.getKey()));
 				if (result != 0)
 					break;

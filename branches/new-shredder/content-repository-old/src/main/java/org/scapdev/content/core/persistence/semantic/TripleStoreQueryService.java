@@ -524,7 +524,7 @@ public class TripleStoreQueryService {
 		queryBuilder.append("<").append(ontology.HAS_KEY_TYPE.URI).append(">");
 		queryBuilder.append(" {\"").append(key.getId()).append("\"},").append(NEW_LINE);
 		int fieldNumber = 1;
-		for (Map.Entry<String, String> keyFieldEntry : key.getFieldIdToValueMap().entrySet()){
+		for (Map.Entry<String, String> keyFieldEntry : key.getFieldNameToValueMap().entrySet()){
 			if (fieldNumber > 1){
 				queryBuilder.append(",").append(NEW_LINE);
 			}

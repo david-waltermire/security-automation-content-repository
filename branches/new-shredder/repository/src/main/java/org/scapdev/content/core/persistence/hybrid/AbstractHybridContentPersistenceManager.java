@@ -25,6 +25,7 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -44,7 +45,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		this.contentStore = contentStore;
 	}
 
-	public IEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
+	public IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
 		return generateEntity(key, model);
 	}
 
@@ -57,7 +58,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return contentStore.getContentRetriever(contentId);
 	}
 
-	private IEntity<?> generateEntity(IKey key, IMetadataModel model) {
+	private IKeyedEntity<?> generateEntity(IKey key, IMetadataModel model) {
 		return metadataStore.getEntity(key, this, model);
 	}
 
