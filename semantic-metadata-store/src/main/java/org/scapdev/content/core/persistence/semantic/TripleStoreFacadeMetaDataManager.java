@@ -64,8 +64,8 @@ import org.scapdev.content.core.persistence.semantic.translation.EntityTranslato
 import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
-import org.scapdev.content.core.query.EntityStatistic;
-import org.scapdev.content.core.query.RelationshipStatistic;
+//import org.scapdev.content.core.query.EntityStatistic;
+//import org.scapdev.content.core.query.RelationshipStatistic;
 
 /**
  * At this point this is just going to be a facade into the triple store REST interfaces
@@ -428,67 +428,67 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
 
 	
-	private class InternalEntityStatistic implements EntityStatistic {
-		private final IEntityDefinition entityInfo;
-		private int count = 0;
-		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
-
-		public InternalEntityStatistic(IEntityDefinition entityInfo) {
-			this.entityInfo = entityInfo;
-		}
-
-		public void handleRelationships(String relationshipId, IRelationshipDefinition info) {
-			InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
-			if (stat == null) {
-				stat = new InternalRelationshipStatistic(info);
-				relationshipStats.put(relationshipId, stat);
-			}
-			stat.incrementCount();
-		}
-
-		public void incrementCount() {
-			++count;
-		}
-
-		@Override
-		public int getCount() {
-			return count;
-		}
-
-		@Override
-		public IEntityDefinition getEntityInfo() {
-			return entityInfo;
-		}
-
-		@Override
-		public Map<String, ? extends RelationshipStatistic> getRelationshipInfoStatistics() {
-			return Collections.unmodifiableMap(relationshipStats);
-		}
-		
-	}
-
-	private class InternalRelationshipStatistic implements RelationshipStatistic {
-		private final IRelationshipDefinition relationshipInfo;
-		private int count = 0;
-
-		public InternalRelationshipStatistic(IRelationshipDefinition relationshipInfo) {
-			this.relationshipInfo = relationshipInfo;
-		}
-
-		public void incrementCount() {
-			++count;
-		}
-
-		@Override
-		public int getCount() {
-			return count;
-		}
-
-		@Override
-		public IRelationshipDefinition getRelationshipInfo() {
-			return relationshipInfo;
-		}
-	}
+//	private class InternalEntityStatistic implements EntityStatistic {
+//		private final IEntityDefinition entityInfo;
+//		private int count = 0;
+//		private final Map<String, InternalRelationshipStatistic> relationshipStats = new HashMap<String, InternalRelationshipStatistic>();
+//
+//		public InternalEntityStatistic(IEntityDefinition entityInfo) {
+//			this.entityInfo = entityInfo;
+//		}
+//
+//		public void handleRelationships(String relationshipId, IRelationshipDefinition info) {
+//			InternalRelationshipStatistic stat = relationshipStats.get(relationshipId);
+//			if (stat == null) {
+//				stat = new InternalRelationshipStatistic(info);
+//				relationshipStats.put(relationshipId, stat);
+//			}
+//			stat.incrementCount();
+//		}
+//
+//		public void incrementCount() {
+//			++count;
+//		}
+//
+//		@Override
+//		public int getCount() {
+//			return count;
+//		}
+//
+//		@Override
+//		public IEntityDefinition getEntityInfo() {
+//			return entityInfo;
+//		}
+//
+//		@Override
+//		public Map<String, ? extends RelationshipStatistic> getRelationshipInfoStatistics() {
+//			return Collections.unmodifiableMap(relationshipStats);
+//		}
+//		
+//	}
+//
+//	private class InternalRelationshipStatistic implements RelationshipStatistic {
+//		private final IRelationshipDefinition relationshipInfo;
+//		private int count = 0;
+//
+//		public InternalRelationshipStatistic(IRelationshipDefinition relationshipInfo) {
+//			this.relationshipInfo = relationshipInfo;
+//		}
+//
+//		public void incrementCount() {
+//			++count;
+//		}
+//
+//		@Override
+//		public int getCount() {
+//			return count;
+//		}
+//
+//		@Override
+//		public IRelationshipDefinition getRelationshipInfo() {
+//			return relationshipInfo;
+//		}
+//	}
 
 	@Override
 	public void shutdown() {
