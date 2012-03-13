@@ -187,7 +187,7 @@ public class ContentProcessor {
 			// retrieve the content definition to use to process the child node
 			IEntityDefinition contentDefinition = contentMapping.getContentDefinitionForQName(qname);
 			if (contentDefinition == null) {
-				log.warn("Unrecognized QName '"+qname.toString()+"' at boundary: "+definition.getId());
+				log.warn("Unrecognized QName '"+qname.toString()+"' at composite boundary: "+definition.getId());
 			} else {
 				// process the child node
 				IMutableEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
@@ -208,7 +208,7 @@ public class ContentProcessor {
 			if (externalIdentifier != null) {
 				entity.addRelationship(new DefaultBoundaryIdentifierRelationship(definition, entity, externalIdentifier, value));
 			} else {
-				log.warn("Unable to extract indirect relationship for value: "+value);
+				log.warn("Unable to extract boundary identifier relationship for value: "+value);
 			}
 		}
 

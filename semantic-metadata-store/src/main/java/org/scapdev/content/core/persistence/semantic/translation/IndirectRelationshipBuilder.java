@@ -70,7 +70,7 @@ class IndirectRelationshipBuilder {
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
 		
-		IExternalIdentifier externalIdentifier = model.getExternalIdentifierInfoById(externalIdType);
+		IExternalIdentifier externalIdentifier = model.getExternalIdentifierById(externalIdType);
 		IBoundaryIdentifierRelationship rel = new DefaultBoundaryIdentifierRelationship(relationshipDefinition, entity, externalIdentifier, externalIdValue);
 		
 		return rel;

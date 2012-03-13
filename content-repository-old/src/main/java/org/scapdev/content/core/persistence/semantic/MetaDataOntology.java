@@ -139,7 +139,7 @@ public class MetaDataOntology {
 		statements.addAll(createPredicate(HAS_BOUNDARY_OBJECT_VALUE.URI, HAS_BOUNDARY_OBJECT_VALUE.LABEL));
 		
 		//assert dynamic predicates
-		statements.addAll(loadIndirectRelationships(javaModel.getIndirectRelationshipIds()));
+		statements.addAll(loadIndirectRelationships(javaModel.getBoundaryIndentifierRelationshipIds()));
 		statements.addAll(loadDirectRelationships(javaModel.getKeyedRelationshipIds()));
 		
 		conn.add(statements);

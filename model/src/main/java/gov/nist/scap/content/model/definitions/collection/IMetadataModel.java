@@ -7,9 +7,10 @@ import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import java.util.Collection;
 
 public interface IMetadataModel {
-	Collection<String> getIndirectRelationshipIds();
+	Collection<String> getCompositeRelationshipIds();
+	Collection<String> getBoundaryIndentifierRelationshipIds();
 	Collection<String> getKeyedRelationshipIds();
-	IExternalIdentifier getExternalIdentifierInfoById(String externalIdType);
-	<T extends IRelationshipDefinition> T getRelationshipInfoById(String keyedRelationshipId);
-	<T extends IEntityDefinition> T getEntityInfoById(String entityType);
+	IExternalIdentifier getExternalIdentifierById(String externalIdType);
+	<T extends IRelationshipDefinition> T getRelationshipDefinitionById(String keyedRelationshipId);
+	<T extends IEntityDefinition> T getEntityDefinitionById(String entityType);
 }

@@ -98,7 +98,7 @@ public class EntityTranslator extends
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
 				String entityType = statement.getObject().stringValue();
-				target.setEntityDefinition(model.getEntityInfoById(entityType));
+				target.setEntityDefinition(model.getEntityDefinitionById(entityType));
 				continue;
 			}
 

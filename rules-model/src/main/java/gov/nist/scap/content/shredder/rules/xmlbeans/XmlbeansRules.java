@@ -2,11 +2,11 @@ package gov.nist.scap.content.shredder.rules.xmlbeans;
 
 import gov.nist.scap.content.model.definitions.AbstractKeyedField;
 import gov.nist.scap.content.model.definitions.ContentMapping;
-import gov.nist.scap.content.model.definitions.DefaultBoundaryRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.DefaultBoundaryIdentifierRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.DefaultCompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.DefaultContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.DefaultExternalIdentifier;
 import gov.nist.scap.content.model.definitions.DefaultGeneratedDocumentDefinition;
-import gov.nist.scap.content.model.definitions.DefaultIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyRefDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyedDocumentDefinition;
@@ -14,6 +14,8 @@ import gov.nist.scap.content.model.definitions.DefaultKeyedRelationshipDefinitio
 import gov.nist.scap.content.model.definitions.DefaultSchema;
 import gov.nist.scap.content.model.definitions.DefaultVersionDefinition;
 import gov.nist.scap.content.model.definitions.DelegatingKeyedField;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.IDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
@@ -22,6 +24,7 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedField;
+import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.ISchema;
 import gov.nist.scap.content.model.definitions.IVersionDefinition;
@@ -93,6 +96,10 @@ public class XmlbeansRules implements IMetadataModel {
 	private final Map<String, IContentNodeDefinition> nodes = new HashMap<String, IContentNodeDefinition>();
 	private final Map<String, IDocumentDefinition> documents = new HashMap<String, IDocumentDefinition>();
 	private final Map<String, IEntityDefinition> entities = new HashMap<String, IEntityDefinition>();
+	private final Map<String, IRelationshipDefinition> relationships = new HashMap<String, IRelationshipDefinition>();
+	private final Map<String, IKeyedRelationshipDefinition> keyedRelationships = new HashMap<String, IKeyedRelationshipDefinition>();
+	private final Map<String, IBoundaryIdentifierRelationshipDefinition> boundaryIdentifierRelationships = new HashMap<String, IBoundaryIdentifierRelationshipDefinition>();
+	private final Map<String, ICompositeRelationshipDefinition> compositeRelationships = new HashMap<String, ICompositeRelationshipDefinition>();
 
 	public XmlbeansRules(File file) throws XmlException, IOException {
 		this(RulesDocument.Factory.parse(file));
@@ -189,17 +196,19 @@ public class XmlbeansRules implements IMetadataModel {
 	}
 
 	private void processRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
-		processBoundaryRelationships(schemaDef, schema);
+		processCompositeRelationships(schemaDef, schema);
 		processKeyedRelationships(schemaDef, schema);
-		processIndirectRelationships(schemaDef, schema);
+		processBoundaryIdentifierRelationships(schemaDef, schema);
 	}
 
-	private void processBoundaryRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
+	private void processCompositeRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
 		for (BoundaryRelationshipType relationship : schema.getBoundaryRelationshipList()) {
 
 			ContentMapping contentMapping = getContentMapping(relationship.getContentMapping());
-			DefaultBoundaryRelationshipDefinition def = new DefaultBoundaryRelationshipDefinition(schemaDef, relationship.getId(), relationship.getXpath().getExpression(), contentMapping);
+			DefaultCompositeRelationshipDefinition def = new DefaultCompositeRelationshipDefinition(schemaDef, relationship.getId(), relationship.getXpath().getExpression(), contentMapping);
 			associateRelationshipWithEntities(def, relationship);
+			compositeRelationships.put(def.getId(), def);
+			relationships.put(def.getId(), def);
 		}
 	}
 
@@ -214,10 +223,12 @@ public class XmlbeansRules implements IMetadataModel {
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
 			DefaultKeyedRelationshipDefinition def = new DefaultKeyedRelationshipDefinition(schemaDef, relationship.getId(), locationXpath, keyRefDefinition);
 			associateRelationshipWithEntities(def, relationship);
+			keyedRelationships.put(def.getId(), def);
+			relationships.put(def.getId(), def);
 		}
 	}
 
-	private void processIndirectRelationships(ISchema schemaDef,
+	private void processBoundaryIdentifierRelationships(ISchema schemaDef,
 			SchemaType schema) throws XmlException {
 		for (IndirectRelationshipType relationship : schema.getIndirectRelationshipList()) {
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
@@ -233,8 +244,10 @@ public class XmlbeansRules implements IMetadataModel {
 				mapping = qualifiedMapping;
 			}
 
-			DefaultIndirectRelationshipDefinition def = new DefaultIndirectRelationshipDefinition(schemaDef, relationship.getId(), locationXpath, relationship.getValue().getXpath().getExpression(), mapping);
+			DefaultBoundaryIdentifierRelationshipDefinition def = new DefaultBoundaryIdentifierRelationshipDefinition(schemaDef, relationship.getId(), locationXpath, relationship.getValue().getXpath().getExpression(), mapping);
 			associateRelationshipWithEntities(def, relationship);
+			boundaryIdentifierRelationships.put(def.getId(), def);
+			relationships.put(def.getId(), def);
 		}
 	}
 
@@ -306,35 +319,35 @@ public class XmlbeansRules implements IMetadataModel {
 		return new DefaultVersionDefinition(method, xpath, version.getUseParentVersionWhenUndefined());
 	}
 
-	@Override
-	public Collection<String> getIndirectRelationshipIds() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<String> getCompositeRelationshipIds() {
+		return Collections.unmodifiableSet(compositeRelationships.keySet());
 	}
 
-	@Override
+	public Collection<String> getBoundaryIndentifierRelationshipIds() {
+		return Collections.unmodifiableSet(boundaryIdentifierRelationships.keySet());
+	}
+
 	public Collection<String> getKeyedRelationshipIds() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableSet(keyedRelationships.keySet());
 	}
 
-	@Override
-	public IExternalIdentifier getExternalIdentifierInfoById(
-			String externalIdType) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T extends IRelationshipDefinition> T getRelationshipDefinitionById(
+			String id) {
+		IRelationshipDefinition result = relationships.get(id);
+		@SuppressWarnings("unchecked")
+		T retval = (T)result;
+		return retval;
 	}
 
-	@Override
-	public <T extends IRelationshipDefinition> T getRelationshipInfoById(
-			String keyedRelationshipId) {
-		// TODO Auto-generated method stub
-		return null;
+	public IExternalIdentifier getExternalIdentifierById(
+			String id) {
+		return externalIdentifiers.get(id);
 	}
 
-	@Override
-	public <T extends IEntityDefinition> T getEntityInfoById(String entityType) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T extends IEntityDefinition> T getEntityDefinitionById(String id) {
+		IEntityDefinition result = entities.get(id);
+		@SuppressWarnings("unchecked")
+		T retval = (T)result;
+		return retval;
 	}
 }
