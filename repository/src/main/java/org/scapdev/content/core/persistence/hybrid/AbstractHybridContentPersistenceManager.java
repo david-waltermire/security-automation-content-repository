@@ -26,6 +26,7 @@ package org.scapdev.content.core.persistence.hybrid;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -45,7 +46,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		this.contentStore = contentStore;
 	}
 
-	public IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
+	public IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) throws ProcessingException {
 		return generateKeyedEntity(key, model);
 	}
 
@@ -58,7 +59,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return contentStore.getContentRetriever(contentId);
 	}
 
-	private IKeyedEntity<?> generateKeyedEntity(IKey key, IMetadataModel model) {
+	private IKeyedEntity<?> generateKeyedEntity(IKey key, IMetadataModel model) throws ProcessingException {
 		return metadataStore.getEntity(key, this, model);
 	}
 

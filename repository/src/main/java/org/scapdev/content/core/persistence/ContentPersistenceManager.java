@@ -26,6 +26,7 @@ package org.scapdev.content.core.persistence;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ import org.scapdev.content.core.ContentException;
 
 
 public interface ContentPersistenceManager {
-	IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model);
+	IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) throws ProcessingException;
 	/**
 	 * 
 	 * @param indirectType
