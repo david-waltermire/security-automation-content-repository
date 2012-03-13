@@ -27,6 +27,7 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 
@@ -86,7 +87,7 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 * @param entity
 	 *            - to populate.
 	 */
-	public void populateEntity(RebuiltEntity<?> entity){
+	public void populateEntity(IMutableEntity<?> entity){
 		populateFields();
 		IKey key = builder.toKey();
 		entity.setKey(key);

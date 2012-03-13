@@ -1,7 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
-
 import org.apache.xmlbeans.XmlException;
 
 public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipDefinition implements IBoundaryRelationshipDefinition {
@@ -43,7 +41,7 @@ public class DefaultBoundaryRelationshipDefinition extends AbstractRelationshipD
 		return contentMapping;
 	}
 
-	public void accept(IRelationshipDefinitionVisitor visitor) throws ContentException, ProcessingException {
+	public void accept(IRelationshipDefinitionVisitor visitor) throws ProcessingException {
 		visitor.visit(this);
 	}
 }

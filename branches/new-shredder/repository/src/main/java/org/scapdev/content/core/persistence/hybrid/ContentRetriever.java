@@ -25,10 +25,8 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IContentHandle;
 
-import org.apache.xmlbeans.XmlCursor;
-
 public interface ContentRetriever extends IContentHandle {
 //	XmlObject getContent();
 //	Bookmark getBookmark();
-	XmlCursor getCursor();
+//	XmlCursor getCursor();
 }

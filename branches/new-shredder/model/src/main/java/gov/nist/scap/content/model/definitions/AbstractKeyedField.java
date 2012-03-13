@@ -1,6 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.KeyException;
 
@@ -38,12 +37,12 @@ public abstract class AbstractKeyedField implements IKeyedField {
 	}
 
 	public String getValue(IContainer<?> parentContext, XmlCursor cursor)
-			throws KeyException, ContentException {
+			throws KeyException, ProcessingException {
 		String value = retrieveValue(parentContext, cursor);
 		if (pattern != null) {
 			Matcher matcher = pattern.matcher(value);
 			if (!matcher.matches()) {
-				throw new ContentException("the specified pattern '"+pattern.pattern()+"' did not match the retrieved value: "+value);
+				throw new ProcessingException("the specified pattern '"+pattern.pattern()+"' did not match the retrieved value: "+value);
 			}
 			value = matcher.group(1);
 		}

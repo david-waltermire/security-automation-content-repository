@@ -1,13 +1,13 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.DefaultBoundaryRelationship;
 import gov.nist.scap.content.model.DefaultContentNode;
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
-import gov.nist.scap.content.model.DefaultIndexedDocument;
+import gov.nist.scap.content.model.DefaultKeyedDocument;
 import gov.nist.scap.content.model.DefaultIndirectRelationship;
 import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IBoundaryRelationship;
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableContentNode;
@@ -15,6 +15,7 @@ import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.IMutableGeneratedDocument;
 import gov.nist.scap.content.model.IMutableKeyedDocument;
 import gov.nist.scap.content.model.IVersion;
+import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.ContentMapping;
 import gov.nist.scap.content.model.definitions.IBoundaryRelationshipDefinition;
@@ -27,7 +28,9 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IIndirectRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
+import gov.nist.scap.content.model.definitions.IKeyRefDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
+import gov.nist.scap.content.model.definitions.IKeyedField;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinitionVisitor;
@@ -37,6 +40,9 @@ import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.XPathRetriever;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -53,12 +59,12 @@ public class ContentProcessor {
 		this.contentHandler = contentHandler;
 	}
 
-	public void process(IDocumentDefinition definition, XmlCursor cursor) throws ContentException, ProcessingException {
+	public void process(IDocumentDefinition definition, XmlCursor cursor) throws ProcessingException {
 		definition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, null));
 	}
 
 	private void processEntity(IMutableEntity<?> entity,
-			XmlCursor cursor) throws ProcessingException, ContentException {
+			XmlCursor cursor) throws ProcessingException {
 
 		IVersionDefinition versionDef = entity.getDefinition().getVersionDefinition();
 		if (versionDef != null) {
@@ -83,7 +89,7 @@ public class ContentProcessor {
 	}
 
 	private void processRelationships(IMutableEntity<?> entity,
-			XmlCursor cursor) throws ProcessingException, ContentException {
+			XmlCursor cursor) throws ProcessingException {
 		Collection<? extends IRelationshipDefinition> relationshipDefinitions = entity.getDefinition().getRelationshipDefinitions();
 
 		if (!relationshipDefinitions.isEmpty()) {
@@ -120,6 +126,42 @@ public class ContentProcessor {
 		}
 	}
 
+	private static IKey getKey(IKeyDefinition keyDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+		List<? extends IKeyedField> fields = keyDefinition.getFields();
+
+		Map<String, String> fieldIdToValueMap = getFieldValues(fields, parentContext, cursor);
+		KeyBuilder builder = new KeyBuilder(fields);
+		builder.setId(keyDefinition.getId());
+		builder.addFields(fieldIdToValueMap);
+		return builder.toKey();
+	}
+
+	public static IKey getKey(IKeyRefDefinition keyRefDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+		List<? extends IKeyedField> fields = keyRefDefinition.getFields();
+		Map<String, String> referenceFieldIdToValueMap = getFieldValues(fields, parentContext, cursor);
+
+		IKeyDefinition keyDefinition = keyRefDefinition.getKeyDefinition();
+		KeyBuilder builder = new KeyBuilder(keyDefinition.getFields());
+		builder.setId(keyDefinition.getId());
+		builder.addFields(referenceFieldIdToValueMap);
+		return builder.toKey();
+	}
+
+	private static LinkedHashMap<String, String> getFieldValues(List<? extends IKeyedField> fields, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+		LinkedHashMap<String, String> fieldIdToValueMap = new LinkedHashMap<String, String>();
+
+		for (IKeyedField field : fields) {
+			String id = field.getName();
+			String value = field.getValue(parentContext, cursor);
+
+			if (value == null) {
+				throw new KeyException("null field '" + id + "'");
+			}
+			fieldIdToValueMap.put(id, value);
+		}
+		return fieldIdToValueMap;
+	}
+
 	private static IVersion processVersion(IVersionDefinition version, XmlCursor cursor) {
 		XPathRetriever valueRetriever = version.getXpath();
 		String value = valueRetriever.getValue(cursor);
@@ -139,7 +181,7 @@ public class ContentProcessor {
 		}
 
 		@Override
-		public void visit(IBoundaryRelationshipDefinition definition) throws ContentException, ProcessingException {
+		public void visit(IBoundaryRelationshipDefinition definition) throws ProcessingException {
 			ContentMapping contentMapping = definition.getContentMapping();
 			QName qname = cursor.getName();
 			// retrieve the content definition to use to process the child node
@@ -170,10 +212,10 @@ public class ContentProcessor {
 			}
 		}
 
-		public void visit(IKeyedRelationshipDefinition definition) throws ProcessingException, ContentException {
+		public void visit(IKeyedRelationshipDefinition definition) throws ProcessingException {
 			IKey key;
 			try {
-				key = definition.getKeyRefDefinition().getKey(entity, cursor);
+				key = getKey(definition.getKeyRefDefinition(), entity, cursor);
 			} catch (KeyException e) {
 				throw new ProcessingException("Unable to extract key for keyed relationship '"+definition.getId()+"' on entity: "+entity.getDefinition().getId(), e);
 			}
@@ -192,22 +234,22 @@ public class ContentProcessor {
 			this.parent = parent;
 		}
 
-		public IMutableEntity<?> visit(IGeneratedDocumentDefinition definition) throws ContentException, ProcessingException {
+		public IMutableEntity<?> visit(IGeneratedDocumentDefinition definition) throws ProcessingException {
 			IMutableGeneratedDocument document = new DefaultGeneratedDocument(definition, getContentHandle(cursor), parent);
 			processEntity(document, cursor);
 			return document;
 		}
 
-		public IMutableEntity<?> visit(IKeyedDocumentDefinition definition) throws ContentException, ProcessingException {
+		public IMutableEntity<?> visit(IKeyedDocumentDefinition definition) throws ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
 			IKey key;
 			try {
-				key = keyDefinition.getKey(parent, cursor);
+				key = getKey(keyDefinition, parent, cursor);
 			} catch (KeyException e) {
 				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
 			}
 
-			IMutableKeyedDocument document = new DefaultIndexedDocument(definition, key, getContentHandle(cursor), parent);
+			IMutableKeyedDocument document = new DefaultKeyedDocument(definition, key, getContentHandle(cursor), parent);
 
 			IVersionDefinition versionDef = definition.getVersionDefinition();
 			if (versionDef != null) {
@@ -220,11 +262,11 @@ public class ContentProcessor {
 			return document;
 		}
 
-		public IMutableEntity<?> visit(IContentNodeDefinition definition) throws ContentException, ProcessingException {
+		public IMutableEntity<?> visit(IContentNodeDefinition definition) throws ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
 			IKey key;
 			try {
-				key = keyDefinition.getKey(parent, cursor);
+				key = getKey(keyDefinition, parent, cursor);
 			} catch (KeyException e) {
 				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
 			}

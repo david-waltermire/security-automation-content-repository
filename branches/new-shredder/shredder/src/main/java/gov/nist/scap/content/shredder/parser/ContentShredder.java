@@ -1,6 +1,5 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.definitions.IDocumentDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
@@ -24,20 +23,20 @@ public class ContentShredder {
 		this.ruleDefinitions = ruleDefinitions;
 	}
 
-	public void shred(File file, ContentHandler contentHandler) throws XmlException, IOException, ContentException, ProcessingException {
+	public void shred(File file, ContentHandler contentHandler) throws XmlException, IOException, ProcessingException {
 		shred(XmlObject.Factory.parse(file), contentHandler);
 	}
 
-    public void shred(InputStream is, ContentHandler contentHandler) throws XmlException, IOException, ContentException, ProcessingException {
+    public void shred(InputStream is, ContentHandler contentHandler) throws XmlException, IOException, ProcessingException {
         shred(XmlObject.Factory.parse(is), contentHandler);
     }
 	
-	public void shred(XmlObject obj, ContentHandler contentHandler) throws ContentException, ProcessingException {
+	public void shred(XmlObject obj, ContentHandler contentHandler) throws ProcessingException {
 		XmlCursor cursor = obj.newCursor();
 
 		if (cursor.isStartdoc()) {
 			if (!cursor.toFirstChild()) {
-				throw new ContentException("document has no child");
+				throw new ProcessingException("document has no child");
 			}
 		}
 
@@ -45,7 +44,7 @@ public class ContentShredder {
 		cursor.dispose();
 	}
 
-	public void shred(XmlCursor cursor, ContentHandler contentHandler) throws ContentException, ProcessingException {
+	public void shred(XmlCursor cursor, ContentHandler contentHandler) throws ProcessingException {
 		QName name = cursor.getName();
 		log.debug("Shredding element with qname: "+name);
 
@@ -54,7 +53,7 @@ public class ContentShredder {
 		if (documentDef != null) {
 			processor.process(documentDef, cursor);
 		} else {
-			throw new ContentException("Unsupported document type: "+name.toString());
+			throw new ProcessingException("Unsupported document type: "+name.toString());
 		}
 	}
 }

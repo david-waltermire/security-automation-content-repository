@@ -26,6 +26,7 @@ package org.scapdev.content.core.persistence.semantic;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import info.aduna.iteration.Iterations;
 
@@ -61,8 +62,6 @@ import org.scapdev.content.core.persistence.semantic.translation.EntityTranslato
 import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph;
 import org.scapdev.content.core.persistence.semantic.translation.PartialEntityGraph.IncompleteStatement;
-//import org.scapdev.content.core.query.EntityStatistic;
-//import org.scapdev.content.core.query.RelationshipStatistic;
 
 /**
  * At this point this is just going to be a facade into the triple store REST interfaces
@@ -105,7 +104,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 	}
 	
 	@Override
-	public IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) {
+	public IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) throws ProcessingException {
 		try {
 			RepositoryConnection conn = repository.getConnection();
 			try {

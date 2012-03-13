@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic.translation;
 
+import gov.nist.scap.content.model.IMutableEntity;
+
 import org.openrdf.model.Statement;
 
 /**
@@ -56,7 +58,7 @@ interface RegenerationStatementManager {
 	 * @param entity
 	 *            - to populate.
 	 */
-	void populateEntity(RebuiltEntity<?> entity);
+	void populateEntity(IMutableEntity<?> entity);
 	
 	
 }

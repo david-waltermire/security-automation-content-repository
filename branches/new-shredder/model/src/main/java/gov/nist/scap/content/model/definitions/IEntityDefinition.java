@@ -1,7 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
-
 import java.util.Collection;
 
 public interface IEntityDefinition extends IDefinition {
@@ -21,5 +19,5 @@ public interface IEntityDefinition extends IDefinition {
 
 	Collection<? extends IRelationshipDefinition> getRelationshipDefinitions();
 	IVersionDefinition getVersionDefinition();
-	<T> T accept(IEntityDefinitionVisitor<T> visitor) throws ContentException, ProcessingException;
+	<T> T accept(IEntityDefinitionVisitor<T> visitor) throws ProcessingException;
 }

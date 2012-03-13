@@ -23,12 +23,7 @@
  ******************************************************************************/
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
-import gov.nist.scap.content.model.IContainer;
-import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.KeyException;
-
-import org.apache.xmlbeans.XmlCursor;
+import java.util.List;
 
 /**
  * Represents a key reference within an XML model.
@@ -41,17 +36,5 @@ public interface IKeyRefDefinition {
 	 */
 	IKeyDefinition getKeyDefinition();
 
-	/**
-	 * Generates a new key based on the XML bound node provided by the
-	 * <code>instance</code> parameter.
-	 * 
-	 * @param parentContext the parent entity containing this reference
-	 * @param cursor the current location in the XML instance used to resolve
-	 * 		the reference
-	 * @return a new Key instance that can be used to lookup the referenced
-	 * 		entity
-	 * @throws KeyException if the key is malformed or incomplete
-	 * @throws ContentException 
-	 */
-	IKey getKey(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
+	List<? extends IKeyedField> getFields();
 }

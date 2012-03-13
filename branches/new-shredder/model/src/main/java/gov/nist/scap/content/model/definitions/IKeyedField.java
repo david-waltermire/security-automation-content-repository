@@ -1,6 +1,5 @@
 package gov.nist.scap.content.model.definitions;
 
-import gov.nist.scap.content.model.ContentException;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.KeyException;
 
@@ -17,7 +16,6 @@ public interface IKeyedField {
 	 * @param cursor
 	 * @return
 	 * @throws KeyException
-	 * @throws ContentException 
 	 */
-	String getValue(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ContentException;
+	String getValue(IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException;
 }

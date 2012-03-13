@@ -46,7 +46,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	}
 
 	public IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) {
-		return generateEntity(key, model);
+		return generateKeyedEntity(key, model);
 	}
 
 	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) {
@@ -58,7 +58,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return contentStore.getContentRetriever(contentId);
 	}
 
-	private IKeyedEntity<?> generateEntity(IKey key, IMetadataModel model) {
+	private IKeyedEntity<?> generateKeyedEntity(IKey key, IMetadataModel model) {
 		return metadataStore.getEntity(key, this, model);
 	}
 
