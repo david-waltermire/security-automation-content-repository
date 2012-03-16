@@ -5,6 +5,10 @@ public interface IVersionDefinition {
 		TEXT,
 		DECIMAL,
 		SERIAL;
+
+		public String getId() {
+			return "http://change.me/#"+this.name();
+		}
 	}
 
 	Method getMethod();
