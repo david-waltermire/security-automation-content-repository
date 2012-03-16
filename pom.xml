@@ -218,6 +218,12 @@
 			<version>1.6.4</version>
 		</dependency>
 		<dependency>
+			<!--  adding this import so that the version gets preference over transitive imports -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+		<dependency>
 			<groupId>gov.nist.scap</groupId>
 			<artifactId>scap-signature</artifactId>
 			<version>0.1</version>
