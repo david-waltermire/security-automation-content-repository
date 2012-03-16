@@ -30,6 +30,6 @@ public class TripleStoreMetadataStoreFactory implements MetadataStoreFactory {
 
 	@Override
 	public MetadataStore newMetadataStore() {
-		return new TripleStoreFacadeMetaDataManager();
+		return TripleStoreFacadeMetaDataManager.getInstance();
 	}
 }

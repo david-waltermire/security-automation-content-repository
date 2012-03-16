@@ -91,8 +91,13 @@
  		<artifactId>repository</artifactId>
  		<version>${project.version}</version>
  	</dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>rules-model</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
- 
   <build>
     <plugins>
       <plugin>
