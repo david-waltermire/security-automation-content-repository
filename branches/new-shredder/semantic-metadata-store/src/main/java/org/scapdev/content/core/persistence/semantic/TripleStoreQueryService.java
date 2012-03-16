@@ -358,7 +358,7 @@ public class TripleStoreQueryService {
 		return queryBuilder.toString();
 	}
 	
-	private String convertStringSetForInClause(Collection<String> target){
+	private static String convertStringSetForInClause(Collection<String> target){
 		StringBuilder inClauseBuilder = new StringBuilder();
 		inClauseBuilder.append("(");
 		boolean beginning = true;
