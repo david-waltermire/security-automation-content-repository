@@ -193,9 +193,9 @@ public class ContentProcessor {
 				IMutableEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
 
 				ICompositeRelationship relationship = new DefaultCompositeRelationship(definition, childEntity, entity);
-				// TODO: determine which to keep
+				// Add to the parent entity.  The child has a pointer back to
+				// the parent that can be used as well
 				entity.addRelationship(relationship);
-				childEntity.addRelationship(relationship);
 			}
 		}
 
