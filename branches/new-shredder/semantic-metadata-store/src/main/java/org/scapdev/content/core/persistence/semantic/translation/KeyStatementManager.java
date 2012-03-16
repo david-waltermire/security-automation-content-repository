@@ -46,7 +46,9 @@ import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 class KeyStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	private KeyBuilder builder = new KeyBuilder();
+	//TODO: Fix this later
+	//private KeyBuilder builder = new KeyBuilder();
+    private KeyBuilder builder;
 	
 	private LinkedHashMap<String, Field> fieldUriToFieldMap = new LinkedHashMap<String, Field>();
 	
@@ -89,8 +91,9 @@ class KeyStatementManager implements RegenerationStatementManager {
 	 */
 	public void populateEntity(IMutableEntity<?> entity){
 		populateFields();
-		IKey key = builder.toKey();
-		entity.setKey(key);
+		//TODO: Fix this later
+        //IKey key = builder.toKey();
+	    //entity.setKey(key);
 	}
 
 	/**
