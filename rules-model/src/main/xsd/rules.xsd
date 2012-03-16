@@ -55,8 +55,9 @@
     </xs:complexType>
     
     <!-- ******************************************************************* -->
-    <!-- * External identifiers                                                          * -->
+    <!-- * External identifiers                                            * -->
     <!-- ******************************************************************* -->
+    <!-- TODO: Insure that id-namespace is unique -->
     <xs:element name="external-identifiers" type="ExternalIdentifiersType"/>
     <xs:complexType name="ExternalIdentifiersType">
         <xs:sequence>
@@ -67,11 +68,17 @@
     <xs:element name="external-identifier" type="ExternalIdentifierType"/>
     <xs:complexType name="ExternalIdentifierType">
         <xs:sequence>
+            <xs:element name="namespace" type="namespaceType"/>
             <xs:element ref="pattern"/>
         </xs:sequence>
         <xs:attribute name="id" type="ExternalIdentifierIdType" use="required"/>
     </xs:complexType>
-    
+
+    <xs:complexType name="namespaceType">
+        <!-- TODO: disallow the use of a fragment -->
+        <xs:attribute name="value" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+
     <xs:simpleType name="ExternalIdentifierIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#external-identifier-.+"/>

@@ -8,18 +8,23 @@
 
     <external-identifiers>
         <external-identifier id="http://cve.mitre.org/resource/content/cve#external-identifier-cve">
+            <namespace value="http://cve.mitre.org/"/>
             <pattern expression="CVE-\d{4}-\d{4}"/>
         </external-identifier>
         <external-identifier id="http://cce.mitre.org/resource/content/cce#external-identifier-cce-4">
+            <namespace value="http://cce.mitre.org/4"/>
             <pattern expression="CCE-\d+"/>
         </external-identifier>
         <external-identifier id="http://cce.mitre.org/resource/content/cce#external-identifier-cce-5">
+            <namespace value="http://cce.mitre.org/5"/>
             <pattern expression="CCE-\d+-\d"/>
         </external-identifier>
         <external-identifier id="http://cwe.mitre.org/resource/content/cwe#external-identifier-cwe">
+            <namespace value="http://cwe.mitre.org/"/>
             <pattern expression="CWE-\d+"/>
         </external-identifier>
         <external-identifier id="http://scap.nist.gov/resource/content/cpe/2.x#external-identifier-cpe">
+            <namespace value="http://cpe.mitre.org/2.x"/>
             <pattern expression="[c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9\._\-~%]*){0,6}"/>
         </external-identifier>
     </external-identifiers>
