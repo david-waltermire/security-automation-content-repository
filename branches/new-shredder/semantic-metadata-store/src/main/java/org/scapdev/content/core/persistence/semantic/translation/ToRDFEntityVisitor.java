@@ -94,6 +94,9 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         target.add(valueFactory.createStatement(resourceId, ontology.HAS_CONTENT_ID.URI, valueFactory.createLiteral(contentId)));
         //Shouldn't this be a URI to the type?
         target.add(valueFactory.createStatement(resourceId, ontology.HAS_ENTITY_TYPE.URI, valueFactory.createLiteral(entity.getDefinition().getId())));
+        if( entity.getParent() != null ) {
+            target.add(valueFactory.createStatement(resourceId, ontology.HAS_PARENT_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(entity.getParent())));
+        }
         return target;
     }
 

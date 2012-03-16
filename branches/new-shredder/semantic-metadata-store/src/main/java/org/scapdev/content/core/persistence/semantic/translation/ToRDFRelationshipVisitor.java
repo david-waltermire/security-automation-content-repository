@@ -83,8 +83,18 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
 
     @Override
     public void visit(ICompositeRelationship relationship) {
-        // TODO Auto-generated method stub
-
+        List<Statement> target = new LinkedList<Statement>();
+        String relationshipId = relationship.getDefinition().getId();
+        //assert this since inference may not be turned on
+        target.add(valueFactory.createStatement(entityResourceId, ontology.HAS_COMPOSITE_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
+        // adding incomplete statement to be completed later
+        target.add(valueFactory.createStatement(entityResourceId, ontology.findCompositeRelationshipURI(relationshipId), entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
+        try {
+            conn.add(target, context);
+        } catch (RepositoryException e) {
+            //TODO: Implement better error handling!!!
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
