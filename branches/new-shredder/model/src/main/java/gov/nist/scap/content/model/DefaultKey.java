@@ -30,7 +30,20 @@ class DefaultKey implements IKey {
 		this(id, fieldIds.toArray(new String[fieldIds.size()]), values.toArray(new String[values.size()]));
 	}
 
-	DefaultKey(String id, String[] fieldIds, String[] values) throws KeyException, KeyException {
+	DefaultKey(String id, String[] fieldIds, String[] values) throws KeyException {
+		if (id == null) {
+			throw new NullPointerException("id");
+		}
+		if (fieldIds == null) {
+			throw new NullPointerException("fieldIds");
+		} else if (fieldIds.length == 0) {
+			throw new IllegalArgumentException("fieldIds is empty");
+		}
+		if (values == null || values.length == 0) {
+			throw new NullPointerException("values");
+		} else if (values.length == 0) {
+			throw new IllegalArgumentException("values is empty");
+		}
 		this.id = id;
 		idToValueMap = new LinkedHashMap<String, String>();
 		for (int i = 0; i < fieldIds.length; i++) {
@@ -47,10 +60,18 @@ class DefaultKey implements IKey {
 		}
 	}
 
-	DefaultKey(String id, LinkedHashMap<String, String> idToValueMap) throws KeyException, KeyException {
+	DefaultKey(String id, LinkedHashMap<String, String> nameToValueMap) throws KeyException, KeyException {
+		if (id == null) {
+			throw new NullPointerException("id");
+		}
+		if (nameToValueMap == null) {
+			throw new NullPointerException("nameToValueMap");
+		} else if (nameToValueMap.size() == 0) {
+			throw new IllegalArgumentException("nameToValueMap");
+		}
 		this.id = id;
-		this.idToValueMap = idToValueMap;
-		for (Map.Entry<String, String> entry : idToValueMap.entrySet()) {
+		this.idToValueMap = nameToValueMap;
+		for (Map.Entry<String, String> entry : nameToValueMap.entrySet()) {
 			if (entry.getKey() == null) {
 				KeyException e = new KeyException("null field id for key '" + id + "'");
 				log.error("null key field", e);

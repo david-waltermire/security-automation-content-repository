@@ -128,7 +128,7 @@ public class XmlbeansRules implements IMetadataModel {
 	private void processExternalIdentifiers() {
 		if (rules.isSetExternalIdentifiers()) {
 			for (ExternalIdentifierType node : rules.getExternalIdentifiers().getExternalIdentifierList()) {
-				DefaultExternalIdentifier identifier = new DefaultExternalIdentifier(node.getId(), Pattern.compile(node.getPattern().getExpression()));
+				DefaultExternalIdentifier identifier = new DefaultExternalIdentifier(node.getId(), node.getNamespace().getValue(), Pattern.compile(node.getPattern().getExpression()));
 				externalIdentifiers.put(identifier.getId(), identifier);
 			}
 		}
