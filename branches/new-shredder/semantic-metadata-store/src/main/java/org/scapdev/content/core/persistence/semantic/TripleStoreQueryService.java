@@ -288,9 +288,9 @@ public class TripleStoreQueryService {
 		queryBuilder.append("{").append(topLevelPredicateVariableName).append("}").append(NEW_LINE);
 		// WHERE _topLevelPredicate = HAS_INDIRECT_REL OR HAS_DIRECT_REL
 		queryBuilder.append("WHERE").append(NEW_LINE);
-		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
+		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
 		queryBuilder.append("OR").append(NEW_LINE);
-		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
+		queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
 		
 		return queryBuilder.toString();
 	}
@@ -321,7 +321,7 @@ public class TripleStoreQueryService {
 		queryBuilder.append("<").append(ontology.HAS_ENTITY_TYPE.URI).append("> ");
 		queryBuilder.append("{").append(entityTypeVariable).append("}").append(";").append(NEW_LINE);
 		// hasIndirectRelationship {boundaryObject},
-		queryBuilder.append("<").append(ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI).append("> ");
+		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append("> ");
 		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(",").append(NEW_LINE);
 		// {boundaryObject} hasType {boundaryObjectType};
 		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(" ").append(NEW_LINE);
@@ -390,7 +390,7 @@ public class TripleStoreQueryService {
 		queryBuilder.append("SELECT ").append(relatedEntityVariableName).append(" ").append(NEW_LINE);
 		//_e hasDirectRelationshipTo relatedEntityURI
 		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} ");
-		queryBuilder.append("<").append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append(">");
+		queryBuilder.append("<").append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(">");
 		queryBuilder.append(" {").append(relatedEntityVariableName).append("}").append(NEW_LINE);
 		return queryBuilder.toString();
 	}
@@ -474,14 +474,14 @@ public class TripleStoreQueryService {
 				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
 		// {keyField} hasFieldId {fieldId};
 		queryBuilder.append(relatedKeyFieldVariable).append(" <")
-				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+				.append(ontology.HAS_FIELD_NAME.URI).append("> ")
 				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
 		// hasFieldValue {fieldVAlue}
 		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
 				.append(relatedKeyFieldValueVariable).append(NEW_LINE);
 		// FROM {owningEntity hasDirectRelationshipTo {relEntity},
 		queryBuilder.append("FROM {<").append(owningEntityURI).append(">} <")
-				.append(ontology.HAS_DIRECT_RELATIONSHIP_TO.URI).append("> ")
+				.append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append("> ")
 				.append(relatedEntityVariable).append(",").append(NEW_LINE);
 		// {relEntity} hasKey {relKey}
 		queryBuilder.append(relatedEntityVariable)
@@ -496,7 +496,7 @@ public class TripleStoreQueryService {
 				.append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
 		// {keyField} hasFieldId {fieldId};
 		queryBuilder.append(relatedKeyFieldVariable).append(" <")
-				.append(ontology.HAS_FIELD_TYPE.URI).append("> ")
+				.append(ontology.HAS_FIELD_NAME.URI).append("> ")
 				.append(relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
 		// hasFieldValue {fieldVAlue}
 		queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append("> ")
@@ -535,7 +535,7 @@ public class TripleStoreQueryService {
 			queryBuilder.append(" ").append(fieldNameDeclaration).append(",").append(NEW_LINE);
 			//_fieldx hasFieldType type
 			queryBuilder.append(fieldNameDeclaration);
-			queryBuilder.append(" <").append(ontology.HAS_FIELD_TYPE.URI).append(">");
+			queryBuilder.append(" <").append(ontology.HAS_FIELD_NAME.URI).append(">");
 			queryBuilder.append(" {\"").append(keyFieldEntry.getKey()).append("\"},").append(NEW_LINE);
 			//_fieldx hasFieldValue value
 			queryBuilder.append(fieldNameDeclaration);
