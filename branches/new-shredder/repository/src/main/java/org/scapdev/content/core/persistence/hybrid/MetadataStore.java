@@ -26,6 +26,8 @@ package org.scapdev.content.core.persistence.hybrid;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -56,12 +58,12 @@ public interface MetadataStore {
 
 	/**
 	 * 
-	 * @param indirectType
-	 * @param indirectIds
+	 * @param externalIdentifier
+	 * @param boundaryObjectIds a collection of non-namespace qualified identifiers
 	 * @param entityTypes filter results to only these entity types or no filtering if empty
 	 * @return
 	 */
-	Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
+	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
 	void persist(Map<String, IEntity<?>> contentIdToEntityMap);
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();

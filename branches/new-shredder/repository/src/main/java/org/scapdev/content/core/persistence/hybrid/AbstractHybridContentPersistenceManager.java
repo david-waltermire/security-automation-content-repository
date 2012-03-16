@@ -26,6 +26,8 @@ package org.scapdev.content.core.persistence.hybrid;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -64,8 +66,8 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	}
 
 
-	public Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType) {
-		return metadataStore.getKeysForIndirectIds(indirectType, indirectIds, entityType);
+	public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
+		return metadataStore.getKeysForBoundaryIdentifier(externalIdentifier, boundaryObjectIds, entityTypes);
 	}
 
 //	@Override

@@ -27,6 +27,8 @@ import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import info.aduna.iteration.Iteration;
@@ -186,10 +188,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
     }
 
     @Override
-    public Set<IKey> getKeysForIndirectIds(
-            String indirectType,
-            Collection<String> indirectIds,
-            Set<String> entityType) {
+    public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
