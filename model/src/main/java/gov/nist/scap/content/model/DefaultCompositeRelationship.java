@@ -3,18 +3,18 @@ package gov.nist.scap.content.model;
 import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 
 public class DefaultCompositeRelationship extends AbstractRelationship<ICompositeRelationshipDefinition> implements ICompositeRelationship {
-	private final IEntity<?> containingObject;
+	private final IEntity<?> childEntity;
 
 	public DefaultCompositeRelationship(
 			ICompositeRelationshipDefinition definition,
-			IEntity<?> owningEntity,
-			IEntity<?> containingObject) {
-		super(definition, owningEntity);
-		this.containingObject = containingObject;
+			IEntity<?> parentEntity,
+			IEntity<?> childEntity) {
+		super(definition, parentEntity);
+		this.childEntity = childEntity;
 	}
 
-	public IEntity<?> getContainingObject() {
-		return containingObject;
+	public IEntity<?> getChildEntity() {
+		return childEntity;
 	}
 
 	public void accept(IRelationshipVisitor visitor) {
