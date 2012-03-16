@@ -205,7 +205,7 @@ public class MetaDataOntology {
 	 * @param id
 	 * @return
 	 */
-	private String extractLabelFromRelId(String id) {
+	private static String extractLabelFromRelId(String id) {
 		int pos = id.lastIndexOf(":") + 1;
 		StringTokenizer tok = new StringTokenizer(id.substring(pos), "-");
 		StringBuilder labelBuilder = new StringBuilder();
