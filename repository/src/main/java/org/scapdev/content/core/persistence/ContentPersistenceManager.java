@@ -26,11 +26,14 @@ package org.scapdev.content.core.persistence;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
@@ -40,12 +43,12 @@ public interface ContentPersistenceManager {
 	IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) throws ProcessingException;
 	/**
 	 * 
-	 * @param indirectType
-	 * @param indirectIds
-	 * @param entityType the entity types to filter the results based on or empty if all results should be provided
+	 * @param externalIdentifier
+	 * @param boundaryObjectIds a collection of non-namespace qualified identifiers
+	 * @param entityTypes filter results to only these entity types or no filtering if empty
 	 * @return
 	 */
-	Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityType);
+	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
 	void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException;
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
