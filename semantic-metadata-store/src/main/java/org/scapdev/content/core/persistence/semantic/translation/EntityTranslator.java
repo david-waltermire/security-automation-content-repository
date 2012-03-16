@@ -163,7 +163,7 @@ public class EntityTranslator extends
 				BNode keyField = factory.createBNode();
 				target.add(factory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
 				target.add(factory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
-				target.add(factory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, factory.createLiteral(keyFieldEntry.getKey())));
+				target.add(factory.createStatement(keyField, ontology.HAS_FIELD_NAME.URI, factory.createLiteral(keyFieldEntry.getKey())));
 				target.add(factory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, factory.createLiteral(keyFieldEntry.getValue())));
 			}
 		}
@@ -180,7 +180,7 @@ public class EntityTranslator extends
 			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_TYPE.URI, factory.createLiteral(externalIdentifier.getId())));
 			target.add(factory.createStatement(boundaryObjectURI, ontology.HAS_BOUNDARY_OBJECT_VALUE.URI, factory.createLiteral(boundaryObjectValue)));
 			//assert this since inference may not be turned on
-			target.add(factory.createStatement(entityUri, ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI, boundaryObjectURI));
+			target.add(factory.createStatement(entityUri, ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI, boundaryObjectURI));
 			target.add(factory.createStatement(entityUri, ontology.findIndirectRelationshipURI(relationshipId), boundaryObjectURI));
 		}
 		
@@ -188,9 +188,9 @@ public class EntityTranslator extends
 		for (IKeyedRelationship relationship : entity.getKeyedRelationships()){
 			String relationshipId = relationship.getDefinition().getId();
 			//assert this since inference may not be turned on
-			target.add(entityUri, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, relationship.getKey());
+			target.add(entityUri, ontology.HAS_KEYED_RELATIONSHIP_TO.URI, relationship.getKey());
 			// adding incomplete statement to be completed later
-			target.add(entityUri, ontology.findDirectRelationshipURI(relationshipId), relationship.getKey());
+			target.add(entityUri, ontology.findKeyedRelationshipURI(relationshipId), relationship.getKey());
 		}
 		return target;
 	}

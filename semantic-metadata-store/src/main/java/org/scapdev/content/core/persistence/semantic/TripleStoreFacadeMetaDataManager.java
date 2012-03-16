@@ -86,7 +86,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
     private static final Logger log =
         Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
     private static final String BASE_URI =
-        "http://scap.nist.gov/cms/individuals#";
+        "http://scap.nist.gov/resource/content/individuals#";
 
     private Repository repository;
 

@@ -45,8 +45,9 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
         IExternalIdentifier externalIdentifier =
             relationship.getExternalIdentifier();
         String boundaryObjectValue = relationship.getValue();
+        
         //TODO: Fix this later
-        URI boundaryObjectURI = valueFactory.createURI("http://example.com/" + boundaryObjectValue);
+        URI boundaryObjectURI = valueFactory.createURI(externalIdentifier.getNamespace() + "#" + boundaryObjectValue);
         target.add(valueFactory.createStatement(
             boundaryObjectURI,
             RDF.TYPE,
@@ -66,7 +67,7 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
         // assert this since inference may not be turned on
         target.add(valueFactory.createStatement(
             entityResourceId,
-            ontology.HAS_INDIRECT_RELATIONSHIP_TO.URI,
+            ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI,
             boundaryObjectURI));
         target.add(valueFactory.createStatement(
             entityResourceId,
@@ -91,9 +92,9 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
         List<Statement> target = new LinkedList<Statement>();
         String relationshipId = relationship.getDefinition().getId();
         //assert this since inference may not be turned on
-        target.add(valueFactory.createStatement(entityResourceId, ontology.HAS_DIRECT_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
+        target.add(valueFactory.createStatement(entityResourceId, ontology.HAS_KEYED_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         // adding incomplete statement to be completed later
-        target.add(valueFactory.createStatement(entityResourceId, ontology.findDirectRelationshipURI(relationshipId), entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
+        target.add(valueFactory.createStatement(entityResourceId, ontology.findKeyedRelationshipURI(relationshipId), entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         try {
             conn.add(target, context);
         } catch (RepositoryException e) {

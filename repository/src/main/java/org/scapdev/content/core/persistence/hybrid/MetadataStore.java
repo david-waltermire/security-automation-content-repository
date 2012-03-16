@@ -62,7 +62,7 @@ public interface MetadataStore {
 	 * @return
 	 */
 	Set<IKey> getKeysForIndirectIds(String indirectType, Collection<String> indirectIds, Set<String> entityTypes);
-	void persist(Map<String, IEntity<?>> contentIdToEntityMap, IMetadataModel model);
+	void persist(Map<String, IEntity<?>> contentIdToEntityMap);
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }

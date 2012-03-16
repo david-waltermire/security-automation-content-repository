@@ -107,7 +107,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         target.add(valueFactory.createStatement(resourceId, ontology.HAS_KEY.URI, key));
 
 
-        //for now just use first key value as label
+        //TODO: for now just use first key value as label
         target.add(valueFactory.createStatement(resourceId, RDFS.LABEL, valueFactory.createLiteral(fieldNameToValueMap.values().iterator().next())));
 
         target.add(valueFactory.createStatement(key, ontology.HAS_KEY_TYPE.URI, valueFactory.createLiteral(entityKeyId)));
@@ -115,7 +115,8 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
             BNode keyField = valueFactory.createBNode();
             target.add(valueFactory.createStatement(keyField, RDF.TYPE, ontology.FIELD_CLASS.URI));
             target.add(valueFactory.createStatement(key, ontology.HAS_FIELD_DATA.URI, keyField));
-            target.add(valueFactory.createStatement(keyField, ontology.HAS_FIELD_TYPE.URI, valueFactory.createLiteral(keyFieldEntry.getKey())));
+            //TODO: has field type URI
+            target.add(valueFactory.createStatement(keyField, ontology.HAS_FIELD_NAME.URI, valueFactory.createLiteral(keyFieldEntry.getKey())));
             target.add(valueFactory.createStatement(keyField, ontology.HAS_FIELD_VALUE.URI, valueFactory.createLiteral(keyFieldEntry.getValue())));
         }
         return target;

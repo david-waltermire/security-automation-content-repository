@@ -69,7 +69,7 @@ class KeyStatementManager implements RegenerationStatementManager {
 			populateFieldEntry(statement);
 			return true;
 		}
-		if (predicate.equals(ontology.HAS_FIELD_TYPE.URI)){
+		if (predicate.equals(ontology.HAS_FIELD_NAME.URI)){
 			populateFieldType(statement);
 			return true;
 		}
