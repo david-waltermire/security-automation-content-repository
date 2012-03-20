@@ -151,16 +151,6 @@
 				<artifactId>content-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>rules-model</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-      <dependency>
-      	<groupId>${project.groupId}</groupId>
-       	<artifactId>shredder</artifactId>
-       	<version>${project.version}</version>
-			</dependency>
       <dependency>
       	<groupId>${project.groupId}</groupId>
        	<artifactId>eXist-db-persistence</artifactId>
