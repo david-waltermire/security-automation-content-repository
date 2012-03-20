@@ -24,7 +24,6 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -35,6 +34,7 @@ import java.util.Map;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 
 /**
  * <p>A manager to coordinate multiple IndirectRelationshipBuilders working in
@@ -90,10 +90,10 @@ class BoundaryObjectRelationshipStatementManager implements RegenerationStatemen
 	 * @param entity
 	 *            - to populate.
 	 */
-	public void populateEntity(IMutableEntity<?> entity){
+	public void populateEntity(EntityBuilder builder){
 		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
 			IBoundaryIdentifierRelationship indirectRelationship = indirectRelBuilder.build(ontology, entity);
-			entity.addRelationship(indirectRelationship);
+			builder.addRelationship(indirectRelationship);
 		}
 	}
 	

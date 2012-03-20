@@ -86,18 +86,18 @@ public class EntityTranslator extends
 		managers.add(new KeyedRelationshipStatementManager(ontology, factory, relatedEntityKeys));
 		managers.add(new KeyStatementManager(ontology));
 
-		EntityBuilder target = new EntityBuilder();
+		EntityBuilder builder = new EntityBuilder();
 		for (Statement statement : statements){
 			URI predicate = statement.getPredicate();
 			//first handle entity specific predicates
 			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
 				String contentId = statement.getObject().stringValue();
-				target.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
+				builder.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
 				continue;
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
 				String entityType = statement.getObject().stringValue();
-				target.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
+				builder.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
 				continue;
 			}
 
@@ -109,11 +109,11 @@ public class EntityTranslator extends
 			}
 		}
 
-		IMutableEntity<?> result = target.build();
-
 		for (RegenerationStatementManager statementManager : managers){
-			statementManager.populateEntity(result);
+			statementManager.populateEntity(builder);
 		}
+
+		IMutableEntity<?> result = builder.build();
 
 		@SuppressWarnings("unchecked")
 		T retval = (T)result;
