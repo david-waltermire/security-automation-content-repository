@@ -24,11 +24,9 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.AbstractRelationship;
-import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.IRelationshipVisitor;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
@@ -66,12 +64,13 @@ class KeyedRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IKeyedRelationship build(IMetadataModel model, IMutableEntity<?> entity){
+	IKeyedRelationship build(IMetadataModel model){
 		if (keyedRelationshipInfo == null || relatedEntityKey == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-		
-		IKeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, entity, relatedEntityKey);
+
+		// TODO: eliminate the use of this internal class if possible
+		IKeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, relatedEntityKey);
 		
 		return rel;
 	}
@@ -83,8 +82,8 @@ class KeyedRelationshipBuilder {
 		private IKey key;
 		
 		InternalKeyedRelationship(IKeyedRelationshipDefinition relationshipInfo,
-				IEntity<?> owningEntity, IKey key) {
-			super(relationshipInfo, owningEntity);
+				IKey key) {
+			super(relationshipInfo);
 			this.key = key;
 		}
 

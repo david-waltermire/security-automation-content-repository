@@ -21,6 +21,6 @@ public class KeyedRelationshipInfo {
 	}
 	
 	public void applyRelationship(IKeyedEntity<?> referencedEntity) {
-		containingEntity.addRelationship(new DefaultKeyedRelationship(definition, containingEntity, referencedEntity));
+		containingEntity.addRelationship(new DefaultKeyedRelationship(definition, referencedEntity));
 	}
 }

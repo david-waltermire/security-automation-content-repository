@@ -92,7 +92,7 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	 */
 	public void populateEntity(EntityBuilder builder){
 		for (BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder : boundaryIdentifierRelationships.values()){
-			IBoundaryIdentifierRelationship boundaryIdentifierRelBuilderRelationship = boundaryIdentifierRelBuilder.build(ontology, entity);
+			IBoundaryIdentifierRelationship boundaryIdentifierRelBuilderRelationship = boundaryIdentifierRelBuilder.build(ontology);
 			builder.addRelationship(boundaryIdentifierRelBuilderRelationship);
 		}
 	}
