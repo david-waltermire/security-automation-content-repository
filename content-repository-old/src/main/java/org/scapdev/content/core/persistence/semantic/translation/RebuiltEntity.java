@@ -77,7 +77,7 @@ class RebuiltEntity<DEFINITION extends IEntityDefinition> implements IEntity<DEF
 		return Collections.unmodifiableCollection(rels);
 	}
 
-	public Collection<IBoundaryIdentifierRelationship> getIndirectRelationships() {
+	public Collection<IBoundaryIdentifierRelationship> getBoundaryIdentifierRelationships() {
 		return Collections.unmodifiableCollection(indirectRelationships);
 	}
 	

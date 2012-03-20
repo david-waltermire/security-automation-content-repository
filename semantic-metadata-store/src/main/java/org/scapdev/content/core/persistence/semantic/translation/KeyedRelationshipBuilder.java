@@ -94,6 +94,7 @@ class KeyedRelationshipBuilder {
 
 		public IKeyedEntity<?> getReferencedEntity() {
 			// TODO: figure out how to provide this information
+			// Perhaps use a lazy fetch approach if the entity is not available?
 			throw new UnsupportedOperationException("implement");
 		}
 

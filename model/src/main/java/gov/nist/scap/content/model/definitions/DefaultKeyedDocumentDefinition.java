@@ -5,7 +5,7 @@ import javax.xml.namespace.QName;
 public class DefaultKeyedDocumentDefinition extends
 		AbstractKeyedDocumentDefinition {
 
-	public DefaultKeyedDocumentDefinition(ISchema schema, String id, QName name,
+	public DefaultKeyedDocumentDefinition(ISchemaDefinition schema, String id, QName name,
 			IKeyDefinition keyDefinition) {
 		super(schema, id, name, keyDefinition);
 	}

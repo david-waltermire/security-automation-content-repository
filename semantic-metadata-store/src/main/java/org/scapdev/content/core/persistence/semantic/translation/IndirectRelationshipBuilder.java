@@ -40,7 +40,6 @@ class IndirectRelationshipBuilder {
 	private String externalIdType;
 	
 	IndirectRelationshipBuilder() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	void setExternalIdValue(String externalIdValue) {

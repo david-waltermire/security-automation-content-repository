@@ -4,7 +4,7 @@ import javax.xml.namespace.QName;
 
 public class DefaultGeneratedDocumentDefinition extends AbstractDocumentDefinition implements IGeneratedDocumentDefinition {
 
-	public DefaultGeneratedDocumentDefinition(ISchema schema, String id, QName name) {
+	public DefaultGeneratedDocumentDefinition(ISchemaDefinition schema, String id, QName name) {
 		super(schema, id, name);
 	}
 

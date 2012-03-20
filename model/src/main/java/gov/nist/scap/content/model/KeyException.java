@@ -6,15 +6,8 @@ public class KeyException extends Exception {
 	/** the serial version UID */
 	private static final long serialVersionUID = 1L;
 
-	public KeyException() {
-	}
-
 	public KeyException(String message) {
 		super(message);
-	}
-
-	public KeyException(Throwable cause) {
-		super(cause);
 	}
 
 	public KeyException(String message, Throwable cause) {

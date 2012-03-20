@@ -25,7 +25,7 @@ package gov.nist.scap.content.model.definitions;
 
 import java.util.List;
 
-public class DefaultKeyRefDefinition implements IKeyRefDefinition {
+public class DefaultKeyRefDefinition implements IKeyRef {
 	private final KeyedSupport keyedSupport;
 	private final IKeyDefinition keyDefinition;
 
@@ -41,19 +41,4 @@ public class DefaultKeyRefDefinition implements IKeyRefDefinition {
 	public IKeyDefinition getKeyDefinition() {
 		return keyDefinition;
 	}
-
-//	private LinkedHashMap<String, String> getKeyValues(Object instance) throws ModelInstanceException {
-//		LinkedHashMap<String, String> fieldRefIdToValueMap = new LinkedHashMap<String, String>();
-//		for (FieldRefInfo fieldRefInfo : fields) {
-//			String value = fieldRefInfo.getValue(instance);
-//			fieldRefIdToValueMap.put(fieldRefInfo.getReferencedFieldInfo().getId(), value);
-//		}
-//		return fieldRefIdToValueMap;
-//	}
-//
-//	/** {@inheritDoc} */
-//	public Key newKey(Object instance) throws ModelInstanceException {
-//		// TODO: Handle key collections
-//		return new Key(getKeyInfo().getId(), getKeyValues(instance));
-//	}
 }

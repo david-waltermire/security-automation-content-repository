@@ -23,7 +23,7 @@ public class DefaultCompositeRelationshipDefinition extends AbstractRelationship
 	 * 		parameters are <code>null</code>
 	 * @throws IllegalArgumentException if the id or xpath arguments are empty
 	 */
-	public DefaultCompositeRelationshipDefinition(ISchema schema, String id, String xpath, ContentMapping contentMapping) throws XmlException {
+	public DefaultCompositeRelationshipDefinition(ISchemaDefinition schema, String id, String xpath, ContentMapping contentMapping) throws XmlException {
 		super(schema, id, xpath);
 
 		if (xpath == null) {

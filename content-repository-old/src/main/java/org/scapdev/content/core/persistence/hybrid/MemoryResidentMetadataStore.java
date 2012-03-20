@@ -90,7 +90,7 @@ public class MemoryResidentMetadataStore implements MetadataStore {
 	public void persist(IEntity<?> entity, String contentId) {
 		descriptorMap.put(entity.getKey(), entity);
 		
-		for (IBoundaryIdentifierRelationship relationship : entity.getIndirectRelationships()) {
+		for (IBoundaryIdentifierRelationship relationship : entity.getBoundaryIdentifierRelationships()) {
 			IExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
 			Map<String, List<IEntity<?>>> externalIdentifierValueToEntityMap = externalIdentifierToValueMap.get(externalIdentifier.getId());
 			if (externalIdentifierValueToEntityMap == null) {

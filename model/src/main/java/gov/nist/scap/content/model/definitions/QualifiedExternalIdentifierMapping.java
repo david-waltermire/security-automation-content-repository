@@ -20,7 +20,7 @@ public class QualifiedExternalIdentifierMapping implements IExternalIdentifierMa
 	}
 
 	public IExternalIdentifier resolveExternalIdentifier(XmlCursor cursor) {
-		String qualifier = retriever.getValue(cursor);
+		String qualifier = retriever.getValue(null, cursor);
 		return qualifierToExternalIdentifierMap.get(qualifier);
 	}
 

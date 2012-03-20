@@ -28,7 +28,22 @@
             <pattern expression="[c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9\._\-~%]*){0,6}"/>
         </external-identifier>
     </external-identifiers>
-    
+
+    <versioning-methods>
+        <versioning-method id="http://scap.nist.gov/resource/content/cms#versioning-method-serial">
+            <description>A ascending sequence number normally zero based.</description>
+        </versioning-method>
+        <versioning-method id="http://scap.nist.gov/resource/content/cms#versioning-method-decimal">
+            <description>A decimal value.</description>
+        </versioning-method>
+        <versioning-method id="http://scap.nist.gov/resource/content/cms#versioning-method-text">
+            <description>A textual value.</description>
+        </versioning-method>
+        <versioning-method id="http://scap.nist.gov/resource/content/cms#versioning-method-dot-delimited">
+            <description>A dot delimited textual value.</description>
+        </versioning-method>
+    </versioning-methods>
+
     <!-- SCAP 1.2 Datastream -->
     <schema id="http://scap.nist.gov/resource/content/source/1.2#schema" namespace="http://scap.nist.gov/schema/scap/source/1.2">
         <key id="http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection">
@@ -166,6 +181,12 @@
                 <xpath expression="./@id"/>
             </field>
         </key>
+
+        <key id="http://scap.nist.gov/resource/content/xccdf/1.2#key-tailoring">
+            <field name="benchmark-id">
+                <xpath expression="./@id"/>
+            </field>
+        </key>
         
         <key id="http://scap.nist.gov/resource/content/xccdf/1.2#key-profile">
             <field name="profile-id">
@@ -181,38 +202,54 @@
 
         <content-node id="http://scap.nist.gov/resource/content/xccdf/1.2#content-node-profile">
             <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-profile"/>
-            <version method="TEXT" use-parent-version-when-undefined="true">
+            <!-- TODO: add delimited method and optional delimiter -->
+            <version use-parent-version-when-undefined="true">
                 <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
             </version>
         </content-node>
         
         <content-node id="http://scap.nist.gov/resource/content/xccdf/1.2#content-node-rule">
             <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-item"/>
-            <version method="TEXT" use-parent-version-when-undefined="true">
+            <version use-parent-version-when-undefined="true">
                 <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
             </version>
         </content-node>
         
         <content-node id="http://scap.nist.gov/resource/content/xccdf/1.2#content-node-group">
             <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-item"/>
-            <version method="TEXT" use-parent-version-when-undefined="true">
+            <version use-parent-version-when-undefined="true">
                 <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
             </version>
         </content-node>
         
         <content-node id="http://scap.nist.gov/resource/content/xccdf/1.2#content-node-value">
             <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-item"/>
-            <version method="TEXT" use-parent-version-when-undefined="true">
+            <version use-parent-version-when-undefined="true">
                 <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
             </version>
         </content-node>
-
+        
         <indexed-document id="http://scap.nist.gov/resource/content/xccdf/1.2#document-benchmark" qname="xccdf:Benchmark">
             <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-benchmark"/>
-            <version method="TEXT">
+            <version>
                 <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
             </version>
         </indexed-document>
+        
+        <indexed-document id="http://scap.nist.gov/resource/content/xccdf/1.2#document-tailoring" qname="xccdf:Tailoring">
+            <key ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#key-tailoring"/>
+            <version>
+                <xpath expression="*[local-name()='version' and namespace-uri()='http://checklists.nist.gov/xccdf/1.2']/text()"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-text"/>
+            </version>
+        </indexed-document>
+
+        <!-- TODO: add indexed-document for external profile -->
 
         <composite-relationship id="http://scap.nist.gov/resource/content/xccdf/1.2#relationship-benchmark-profile-boundary">
             <entity-ref ref-id="http://scap.nist.gov/resource/content/xccdf/1.2#document-benchmark"/>
@@ -372,43 +409,73 @@
                 <xpath expression="./@id"/>
             </field>
         </key>
+
+        <property id="http://oval.mitre.org/resource/content/definition/5#property-definition-class"/>
+        <property id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
         
         <content-node id="http://oval.mitre.org/resource/content/definition/5#content-node-definition">
             <key ref-id="http://oval.mitre.org/resource/content/definition/5#key-definition"/>
-            <version method="SERIAL">
+            <version>
                 <xpath expression="@version"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-serial"/>
             </version>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-class">
+                <xpath expression="@class"/>
+            </property-ref>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <parent-property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
+            </property-ref>
         </content-node>
         
         <content-node id="http://oval.mitre.org/resource/content/definition/5#content-node-test">
             <key ref-id="http://oval.mitre.org/resource/content/definition/5#key-test"/>
-            <version method="SERIAL">
+            <version>
                 <xpath expression="@version"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-serial"/>
             </version>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <parent-property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
+            </property-ref>
         </content-node>
         
         <content-node id="http://oval.mitre.org/resource/content/definition/5#content-node-object">
             <key ref-id="http://oval.mitre.org/resource/content/definition/5#key-object"/>
-            <version method="SERIAL">
+            <version>
                 <xpath expression="@version"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-serial"/>
             </version>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <parent-property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
+            </property-ref>
         </content-node>
 
         <content-node id="http://oval.mitre.org/resource/content/definition/5#content-node-state">
             <key ref-id="http://oval.mitre.org/resource/content/definition/5#key-state"/>
-            <version method="SERIAL">
+            <version>
                 <xpath expression="@version"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-serial"/>
             </version>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <parent-property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
+            </property-ref>
         </content-node>
         
         <content-node id="http://oval.mitre.org/resource/content/definition/5#content-node-variable">
             <key ref-id="http://oval.mitre.org/resource/content/definition/5#key-variable"/>
-            <version method="SERIAL">
+            <version>
                 <xpath expression="@version"/>
+                <versioning-method ref-id="http://scap.nist.gov/resource/content/cms#versioning-method-serial"/>
             </version>
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <parent-property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"/>
+            </property-ref>
         </content-node>
         
-        <generated-document id="http://oval.mitre.org/resource/content/definition/5#document-oval-definitions" qname="oval:oval_definitions"/>
+        <generated-document id="http://oval.mitre.org/resource/content/definition/5#document-oval-definitions" qname="oval:oval_definitions">
+            <property-ref ref-id="http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version">
+                <xpath expression="*[local-name()='generator' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='schema_version' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-common-5']"/>
+            </property-ref>
+        </generated-document>
 
         <!-- oval-definitions relationships -->
         <composite-relationship id="http://oval.mitre.org/resource/content/definition/5#relationship-definitions-boundary">

@@ -2,9 +2,10 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns="http://scap.nist.gov/schema/content-rules/0.1"
     xmlns:tns="http://scap.nist.gov/schema/content-rules/0.1"
-    targetNamespace="http://scap.nist.gov/schema/content-rules/0.1"
-    elementFormDefault="qualified" attributeFormDefault="unqualified">
-    
+    targetNamespace="http://scap.nist.gov/schema/content-rules/0.1" elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <!-- TODO: verify that document qnames are unique -->
     <!-- ******************************************************************* -->
     <!-- * Rules                                                           * -->
     <!-- ******************************************************************* -->
@@ -18,6 +19,26 @@
             <xs:field xpath="@ref-id"/>
         </xs:keyref>
 
+        <xs:key name="VersioningMethodKey">
+            <xs:selector
+                xpath="tns:versioning-methods/tns:versioning-method|tns:schema/tns:versioning-methods/tns:versioning-method"/>
+            <xs:field xpath="@id"/>
+        </xs:key>
+        <xs:keyref name="VersioningMethodRefKey" refer="VersioningMethodKey">
+            <xs:selector xpath=".//tns:versioning-method"/>
+            <xs:field xpath="@ref-id"/>
+        </xs:keyref>
+        
+        <xs:key name="PropertyKey">
+            <xs:selector
+                xpath="tns:properties/tns:property|tns:schema/tns:property"/>
+            <xs:field xpath="@id"/>
+        </xs:key>
+        <xs:keyref name="PropertyRefKey" refer="PropertyKey">
+            <xs:selector xpath=".//tns:property-ref|.//tns:parent-property-ref"/>
+            <xs:field xpath="@ref-id"/>
+        </xs:keyref>
+        
         <xs:key name="SchemaKey">
             <xs:selector xpath="tns:schema"/>
             <xs:field xpath="@id"/>
@@ -28,37 +49,45 @@
             <xs:field xpath="@id"/>
         </xs:key>
 
-        <xs:keyref name="KeyRefRefIdKeyRef" refer="KeyKey" >
+        <xs:keyref name="KeyRefRefIdKeyRef" refer="KeyKey">
             <xs:selector xpath="tns:schema/tns:keyed-relationship/tns:key-ref"/>
             <xs:field xpath="@ref-id"/>
         </xs:keyref>
-        
+
         <xs:key name="EntityKey">
-            <xs:selector xpath="tns:schema/tns:indexed-document|tns:schema/tns:generated-document|tns:schema/tns:content-node"/>
+            <xs:selector
+                xpath="tns:schema/tns:indexed-document|tns:schema/tns:generated-document|tns:schema/tns:content-node"/>
             <xs:field xpath="@id"/>
         </xs:key>
         <xs:keyref name="EntityKeyRef" refer="EntityKey">
-            <xs:selector xpath=".//tns:content-mapping/tns:default|.//tns:content-mapping/tns:qname-mapping|.//tns:entity-ref"/>
+            <xs:selector
+                xpath=".//tns:content-mapping/tns:default|.//tns:content-mapping/tns:qname-mapping|.//tns:entity-ref"/>
             <xs:field xpath="@ref-id"/>
         </xs:keyref>
-        
+
         <xs:key name="RelationshipKey">
-            <xs:selector xpath="tns:schema/tns:boundary-relationship|tns:schema/tns:keyed-relationship"/>
+            <xs:selector
+                xpath="tns:schema/tns:boundary-relationship|tns:schema/tns:keyed-relationship"/>
             <xs:field xpath="@id"/>
         </xs:key>
     </xs:element>
     <xs:complexType name="RulesType">
         <xs:sequence>
             <xs:element ref="external-identifiers" minOccurs="0"/>
+            <xs:element ref="versioning-methods" minOccurs="0"/>
             <xs:element ref="schema" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * External identifiers                                            * -->
     <!-- ******************************************************************* -->
-    <!-- TODO: Insure that id-namespace is unique -->
-    <xs:element name="external-identifiers" type="ExternalIdentifiersType"/>
+    <xs:element name="external-identifiers" type="ExternalIdentifiersType">
+        <xs:unique name="NamespaceUnique">
+            <xs:selector xpath="tns:external-identifier"/>
+            <xs:field xpath="tns:namespace/@value"/>
+        </xs:unique>
+    </xs:element>
     <xs:complexType name="ExternalIdentifiersType">
         <xs:sequence>
             <xs:element ref="external-identifier" maxOccurs="unbounded"/>
@@ -84,7 +113,32 @@
             <xs:pattern value="[^#]+#external-identifier-.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
+    <!-- ******************************************************************* -->
+    <!-- * Versioning Methods                                              * -->
+    <!-- ******************************************************************* -->
+    <xs:element name="versioning-methods" type="VersioningMethodsType"/>
+
+    <xs:complexType name="VersioningMethodsType">
+        <xs:sequence>
+            <xs:element ref="versioning-method" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="versioning-method" type="VersioningMethodType"/>
+    <xs:complexType name="VersioningMethodType">
+        <xs:sequence>
+            <xs:element name="description" type="xs:normalizedString"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="VersioningMethodIdType" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="VersioningMethodIdType">
+        <xs:restriction base="DefinitionIdType">
+            <xs:pattern value="[^#]+#versioning-method-.+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <!-- ******************************************************************* -->
     <!-- * Schema                                                          * -->
     <!-- ******************************************************************* -->
@@ -93,15 +147,16 @@
             <xs:selector xpath="tns:key"/>
             <xs:field xpath="@id"/>
         </xs:key>
-        <xs:keyref name="SchemaFocusedKeyRefIdKeyRef" refer="SchemaFocusedKeyKey" >
+        <xs:keyref name="SchemaFocusedKeyRefIdKeyRef" refer="SchemaFocusedKeyKey">
             <xs:selector xpath="tns:indexed-document/tns:key|tns:content-node/tns:key"/>
             <xs:field xpath="@ref-id"/>
         </xs:keyref>
     </xs:element>
     <xs:complexType name="SchemaType">
         <xs:sequence>
+            <xs:element ref="versioning-methods" minOccurs="0"/>
             <xs:element ref="key" maxOccurs="unbounded"/>
-            <xs:element ref="key-ref" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="content-node" minOccurs="0" maxOccurs="unbounded"/>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="indexed-document"/>
@@ -116,7 +171,7 @@
         <xs:attribute name="id" type="SchemaIdType" use="required"/>
         <xs:attribute name="namespace" type="xs:anyURI" use="required"/>
     </xs:complexType>
-    
+
     <xs:simpleType name="SchemaIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#schema"/>
@@ -128,8 +183,8 @@
     <!-- ******************************************************************* -->
     <xs:element name="key" type="KeyType">
         <xs:unique name="FieldNameUnique">
-            <xs:selector xpath="tns:xpath-field|tns:delegate-field"></xs:selector>
-            <xs:field xpath="@name"></xs:field>
+            <xs:selector xpath="tns:xpath-field|tns:delegate-field"/>
+            <xs:field xpath="@name"/>
         </xs:unique>
     </xs:element>
     <xs:complexType name="KeyType">
@@ -137,14 +192,14 @@
             <xs:element ref="field" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="id" type="KeyIdType" use="required"/>
-    </xs:complexType>        
-    
+    </xs:complexType>
+
     <xs:simpleType name="KeyIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#key-.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:element name="field" type="FieldType"/>
     <xs:complexType name="FieldType">
         <xs:sequence>
@@ -156,10 +211,40 @@
         </xs:sequence>
         <xs:attribute name="name" type="KeyFieldNameType" use="required"/>
     </xs:complexType>
-    
+
     <xs:simpleType name="KeyFieldNameType">
         <xs:restriction base="xs:NCName"/>
     </xs:simpleType>
+    
+    <!-- ******************************************************************* -->
+    <!-- * Property                                                        * -->
+    <!-- ******************************************************************* -->
+    <xs:element name="property" type="PropertyType"/>
+    <xs:complexType name="PropertyType">
+        <xs:attribute name="id" type="PropertyIdType" use="required"/>
+    </xs:complexType>
+    
+    <xs:simpleType name="PropertyIdType">
+        <xs:restriction base="DefinitionIdType">
+            <xs:pattern value="[^#]+#property-.+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="property-ref" type="PropertyRefType"/>
+    <xs:complexType name="PropertyRefType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element ref="xpath"/>
+                <xs:element name="parent-property-ref">
+                    <xs:complexType>
+                        <xs:attribute name="ref-id" type="PropertyIdType" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:element ref="pattern" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="ref-id" type="PropertyIdType" use="required"/>
+    </xs:complexType>
 
     <!-- ******************************************************************* -->
     <!-- * Key References                                                  * -->
@@ -167,7 +252,7 @@
     <xs:complexType name="KeyRefType">
         <xs:attribute name="ref-id" type="KeyIdType" use="required"/>
     </xs:complexType>
-    
+
     <xs:complexType name="KeyFieldRefType">
         <xs:complexContent>
             <xs:extension base="KeyRefType">
@@ -175,7 +260,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
+
     <xs:element name="key-ref" type="KeyRefDefinitionType"/>
     <xs:complexType name="KeyRefDefinitionType">
         <xs:complexContent>
@@ -186,38 +271,32 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * Version                                                         * -->
     <!-- ******************************************************************* -->
-    <xs:simpleType name="VersionMethodType">
-        <xs:restriction base="xs:token">
-            <xs:enumeration value="SERIAL">
-                <xs:annotation>
-                    <xs:documentation>A ascending sequence number normally zero based.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="DECIMAL">
-                <xs:annotation>
-                    <xs:documentation>A decimal value.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="TEXT">
-                <xs:annotation>
-                    <xs:documentation>A textual value.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:element name="version" type="VersionType"/>
     <xs:complexType name="VersionType">
         <xs:sequence>
             <xs:element ref="xpath"/>
+            <xs:element name="versioning-method" type="VersioningMethodRefType"/>
         </xs:sequence>
-        <xs:attribute name="method" type="VersionMethodType" use="required"/>
-        <xs:attribute name="use-parent-version-when-undefined" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="use-parent-version-when-undefined" type="xs:boolean" use="optional"
+            default="false"/>
     </xs:complexType>
 
+    <xs:complexType name="VersioningMethodRefType">
+        <xs:attribute name="ref-id" type="VersioningMethodIdType" use="required"/>
+    </xs:complexType>
+    
+    <!-- ******************************************************************* -->
+    <!-- * Content Node                                                    * -->
+    <!-- ******************************************************************* -->
+    <xs:group name="EntityGroup">
+        <xs:sequence>
+        </xs:sequence>
+    </xs:group>
+    
     <!-- ******************************************************************* -->
     <!-- * Content Node                                                    * -->
     <!-- ******************************************************************* -->
@@ -226,16 +305,17 @@
         <xs:sequence>
             <xs:element name="key" type="KeyRefType"/>
             <xs:element ref="version" minOccurs="0"/>
+            <xs:element ref="property-ref" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="id" type="ContentNodeIdType" use="required"/>
     </xs:complexType>
-    
+
     <xs:simpleType name="ContentNodeIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#content-node-.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * Documents                                                       * -->
     <!-- ******************************************************************* -->
@@ -243,33 +323,37 @@
         <xs:attribute name="id" type="DocumentIdType" use="required"/>
         <xs:attribute name="qname" type="xs:QName" use="required"/>
     </xs:complexType>
-    
+
     <xs:simpleType name="DocumentIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#document-.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
-    <xs:element name="indexed-document" type="IndexedDocumentType" />
+
+    <xs:element name="indexed-document" type="IndexedDocumentType"/>
     <xs:complexType name="IndexedDocumentType">
         <xs:complexContent>
             <xs:extension base="DocumentType">
                 <xs:sequence>
                     <xs:element name="key" type="KeyRefType"/>
                     <xs:element ref="version" minOccurs="0"/>
+                    <xs:element ref="property-ref" minOccurs="0" maxOccurs="unbounded"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
-    <xs:element name="generated-document" type="GeneratedDocumentType" />
+
+    <xs:element name="generated-document" type="GeneratedDocumentType"/>
     <xs:complexType name="GeneratedDocumentType">
         <xs:complexContent>
             <xs:extension base="DocumentType">
+                <xs:sequence>
+                    <xs:element ref="property-ref" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * Relationships                                                   * -->
     <!-- ******************************************************************* -->
@@ -279,14 +363,14 @@
         </xs:sequence>
         <xs:attribute name="id" type="RelationshipIdType" use="required"/>
     </xs:complexType>
-    
+
     <xs:simpleType name="RelationshipIdType">
         <xs:restriction base="DefinitionIdType">
             <xs:pattern value="[^#]+#relationship-.+"/>
             <xs:pattern value="urn:scap-content:relationship:.+"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:element name="composite-relationship" type="CompositeRelationshipType"/>
     <xs:complexType name="CompositeRelationshipType">
         <xs:complexContent>
@@ -303,7 +387,8 @@
     <xs:complexType name="ContentMappingType">
         <xs:sequence>
             <xs:element name="default" type="EntityReferenceType" minOccurs="0"/>
-            <xs:element name="qname-mapping" type="EntityQNameMappingType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="qname-mapping" type="EntityQNameMappingType" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -330,7 +415,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
+
     <xs:element name="boundary-identifier-relationship" type="BoundaryIdentifierRelationshipType"/>
     <xs:complexType name="BoundaryIdentifierRelationshipType">
         <xs:complexContent>
@@ -366,7 +451,8 @@
     <xs:complexType name="QualifierMappingType">
         <xs:sequence>
             <xs:element ref="xpath"/>
-            <xs:element name="external-identifier" type="ExternalIdentifierRefMappingType" maxOccurs="unbounded"/>
+            <xs:element name="external-identifier" type="ExternalIdentifierRefMappingType"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -377,7 +463,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * General Complex types                                           * -->
     <!-- ******************************************************************* -->
@@ -390,18 +476,18 @@
     <xs:complexType name="RegexType">
         <xs:attribute name="expression" type="RegexExpressionType" use="required"/>
     </xs:complexType>
-    
+
     <!-- ******************************************************************* -->
     <!-- * General Simple types                                            * -->
     <!-- ******************************************************************* -->
     <xs:simpleType name="XPathExpressionType">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    
+
     <xs:simpleType name="RegexExpressionType">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    
+
     <xs:simpleType name="DefinitionIdType">
         <xs:restriction base="xs:anyURI">
             <xs:pattern value="http://[^#]+#.+"/>

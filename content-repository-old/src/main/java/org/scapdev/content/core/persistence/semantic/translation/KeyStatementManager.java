@@ -205,7 +205,6 @@ class KeyStatementManager implements RegenerationStatementManager {
 		private String fieldValue;
 		
 		Field() {
-			// TODO Auto-generated constructor stub
 		}
 		void setFieldId(String fieldId) {
 			this.fieldId = fieldId;

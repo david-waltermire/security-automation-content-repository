@@ -1,6 +1,6 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
-import gov.nist.scap.content.model.definitions.AbstractKeyedField;
+import gov.nist.scap.content.model.definitions.AbstractEntityDefinition;
 import gov.nist.scap.content.model.definitions.ContentMapping;
 import gov.nist.scap.content.model.definitions.DefaultBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.DefaultCompositeRelationshipDefinition;
@@ -10,10 +10,14 @@ import gov.nist.scap.content.model.definitions.DefaultGeneratedDocumentDefinitio
 import gov.nist.scap.content.model.definitions.DefaultKeyDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyRefDefinition;
 import gov.nist.scap.content.model.definitions.DefaultKeyedDocumentDefinition;
+import gov.nist.scap.content.model.definitions.DefaultKeyedField;
 import gov.nist.scap.content.model.definitions.DefaultKeyedRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.DefaultPropertyDefinition;
+import gov.nist.scap.content.model.definitions.DefaultPropertyRef;
 import gov.nist.scap.content.model.definitions.DefaultSchema;
 import gov.nist.scap.content.model.definitions.DefaultVersionDefinition;
-import gov.nist.scap.content.model.definitions.DelegatingKeyedField;
+import gov.nist.scap.content.model.definitions.DefaultVersioningMethodDefinition;
+import gov.nist.scap.content.model.definitions.DelegatingKeyFieldRetriever;
 import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
@@ -21,17 +25,21 @@ import gov.nist.scap.content.model.definitions.IDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
-import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedField;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IPropertyDefinition;
+import gov.nist.scap.content.model.definitions.IPropertyRef;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
-import gov.nist.scap.content.model.definitions.ISchema;
+import gov.nist.scap.content.model.definitions.ISchemaDefinition;
+import gov.nist.scap.content.model.definitions.IValueRetriever;
 import gov.nist.scap.content.model.definitions.IVersionDefinition;
+import gov.nist.scap.content.model.definitions.IVersioningMethodDefinition;
+import gov.nist.scap.content.model.definitions.ParentPropertyRetriever;
 import gov.nist.scap.content.model.definitions.QualifiedExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
 import gov.nist.scap.content.model.definitions.StaticExternalIdentifierMapping;
-import gov.nist.scap.content.model.definitions.XPathKeyedField;
+import gov.nist.scap.content.model.definitions.XPathRetriever;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.schema.contentRules.x01.BoundaryIdentifierRelationshipType;
 import gov.nist.scap.schema.contentRules.x01.CompositeRelationshipType;
@@ -48,13 +56,16 @@ import gov.nist.scap.schema.contentRules.x01.KeyFieldRefType;
 import gov.nist.scap.schema.contentRules.x01.KeyRefDefinitionType;
 import gov.nist.scap.schema.contentRules.x01.KeyType;
 import gov.nist.scap.schema.contentRules.x01.KeyedRelationshipType;
+import gov.nist.scap.schema.contentRules.x01.PropertyRefType;
+import gov.nist.scap.schema.contentRules.x01.PropertyType;
 import gov.nist.scap.schema.contentRules.x01.QualifierMappingType;
 import gov.nist.scap.schema.contentRules.x01.RelationshipType;
 import gov.nist.scap.schema.contentRules.x01.RulesDocument;
 import gov.nist.scap.schema.contentRules.x01.RulesType;
 import gov.nist.scap.schema.contentRules.x01.SchemaType;
-import gov.nist.scap.schema.contentRules.x01.VersionMethodType;
 import gov.nist.scap.schema.contentRules.x01.VersionType;
+import gov.nist.scap.schema.contentRules.x01.VersioningMethodType;
+import gov.nist.scap.schema.contentRules.x01.VersioningMethodsType;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,25 +84,13 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 
 public class XmlbeansRules implements IMetadataModel {
-	private static final Map<VersionMethodType.Enum, IVersionDefinition.Method> versionMethodEnumToVersionMethodMap;
-
-	static {
-		Map<VersionMethodType.Enum, IVersionDefinition.Method> mapping = new HashMap<VersionMethodType.Enum, IVersionDefinition.Method>();
-		mapping.put(VersionMethodType.DECIMAL, IVersionDefinition.Method.DECIMAL);
-		mapping.put(VersionMethodType.SERIAL, IVersionDefinition.Method.SERIAL);
-		mapping.put(VersionMethodType.TEXT, IVersionDefinition.Method.TEXT);
-		versionMethodEnumToVersionMethodMap = Collections.unmodifiableMap(mapping);
-	}
-
-	private static IVersionDefinition.Method map(VersionMethodType.Enum key) {
-		return versionMethodEnumToVersionMethodMap.get(key);
-	}
 
 	@SuppressWarnings("unused")
 	private final RulesDocument data;
 	private final RulesType rules;
 	private final Map<String, IExternalIdentifier> externalIdentifiers = new HashMap<String, IExternalIdentifier>();
-	private final Map<String, ISchema> schemas = new HashMap<String, ISchema>();
+	private final Map<String, IVersioningMethodDefinition> versioningMethods = new HashMap<String, IVersioningMethodDefinition>();
+	private final Map<String, ISchemaDefinition> schemas = new HashMap<String, ISchemaDefinition>();
 	private final Map<String, IKeyDefinition> keys = new HashMap<String, IKeyDefinition>();
 	private final Map<String, IContentNodeDefinition> nodes = new HashMap<String, IContentNodeDefinition>();
 	private final Map<String, IDocumentDefinition> documents = new HashMap<String, IDocumentDefinition>();
@@ -132,25 +131,43 @@ public class XmlbeansRules implements IMetadataModel {
 				externalIdentifiers.put(identifier.getId(), identifier);
 			}
 		}
+		if (rules.isSetVersioningMethods()) {
+			for (VersioningMethodType node : rules.getVersioningMethods().getVersioningMethodList()) {
+				DefaultVersioningMethodDefinition method = new DefaultVersioningMethodDefinition(node.getId());
+				versioningMethods.put(method.getId(), method);
+			}
+		}
 	}
 
 	private void processSchema() throws XmlException {
 		for (SchemaType schema : rules.getSchemaList()) {
 			DefaultSchema def = new DefaultSchema(schema.getId(), URI.create(schema.getNamespace()));
 			schemas.put(def.getId(), def);
+			if (schema.isSetVersioningMethods()) {
+				processVersioningMethods(def, schema.getVersioningMethods());
+			}
 			processKeys(def, schema.getKeyList());
+			processProperties(def, schema.getPropertyList());
 			processContentNodes(def, schema.getContentNodeList());
 			processDocuments(def, schema);
 		}
 
 		// Must process these after all keys have been processed
 		for (SchemaType schema : rules.getSchemaList()) {
-			ISchema def = schemas.get(schema.getId());
+			ISchemaDefinition def = schemas.get(schema.getId());
 			processRelationships(def, schema);
 		}
 	}
 
-	private void processKeys(ISchema schemaDef, List<KeyType> keyDataList) throws XmlException {
+	private static void processVersioningMethods(DefaultSchema def,
+			VersioningMethodsType versioningMethods) {
+		for (VersioningMethodType node : versioningMethods.getVersioningMethodList()) {
+			DefaultVersioningMethodDefinition method = new DefaultVersioningMethodDefinition(node.getId());
+			def.addVersioningMethodDefinition(method);
+		}
+	}
+
+	private void processKeys(ISchemaDefinition schemaDef, List<KeyType> keyDataList) {
 		for (KeyType key : keyDataList) {
 			String keyId = key.getId();
 			LinkedHashMap<String, IKeyedField> fields = getFields(key.newCursor());
@@ -160,48 +177,71 @@ public class XmlbeansRules implements IMetadataModel {
 		}
 	}
 
-	private void processContentNodes(ISchema schemaDef, List<ContentNodeType> nodeDataList) throws XmlException {
+	private static void processProperties(DefaultSchema def, List<PropertyType> properties) {
+		for (PropertyType property : properties) {
+			DefaultPropertyDefinition propDef = new DefaultPropertyDefinition(property.getId());
+			def.addProperty(propDef);
+		}
+	}
+
+	private void processContentNodes(ISchemaDefinition schemaDef, List<ContentNodeType> nodeDataList) throws XmlException {
 		for (ContentNodeType node : nodeDataList) {
 			IKeyDefinition keyDef = keys.get(node.getKey().getRefId());
 			DefaultContentNodeDefinition def = new DefaultContentNodeDefinition(schemaDef, node.getId(), keyDef);
 
 			if (node.isSetVersion()) {
-				IVersionDefinition versionDef = getVersion(node.getVersion());
+				IVersionDefinition versionDef = getVersion(schemaDef, node.getVersion());
 				def.setVersionDefinition(versionDef);
 			}
+
+			processPropertyRefs(def, node.getPropertyRefList(), schemaDef);
+
 			nodes.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}
 	}
 
-	private void processDocuments(ISchema schemaDef, SchemaType schema) throws XmlException {
+	private static void processPropertyRefs(AbstractEntityDefinition def,
+			List<PropertyRefType> propertyRefList, ISchemaDefinition schemaDef) {
+		for (PropertyRefType node : propertyRefList) {
+			IPropertyRef propertyRefDef = getPropertyRef(schemaDef, node);
+			def.addPropertyRefDefinition(propertyRefDef);
+		}
+	}
+
+	private void processDocuments(ISchemaDefinition schemaDef, SchemaType schema) throws XmlException {
 		for (IndexedDocumentType document : schema.getIndexedDocumentList()) {
 			IKeyDefinition keyDef = keys.get(document.getKey().getRefId());
 			DefaultKeyedDocumentDefinition def = new DefaultKeyedDocumentDefinition(schemaDef, document.getId(), document.getQname(), keyDef);
 
 			if (document.isSetVersion()) {
-				IVersionDefinition versionDef = getVersion(document.getVersion());
+				IVersionDefinition versionDef = getVersion(schemaDef, document.getVersion());
 				def.setVersionDefinition(versionDef);
 			}
+
+			processPropertyRefs(def, document.getPropertyRefList(), schemaDef);
 
 			documents.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}
 
 		for (GeneratedDocumentType document : schema.getGeneratedDocumentList()) {
-			IGeneratedDocumentDefinition def = new DefaultGeneratedDocumentDefinition(schemaDef, document.getId(), document.getQname());
+			DefaultGeneratedDocumentDefinition def = new DefaultGeneratedDocumentDefinition(schemaDef, document.getId(), document.getQname());
+
+			processPropertyRefs(def, document.getPropertyRefList(), schemaDef);
+
 			documents.put(def.getId(), def);
 			entities.put(def.getId(), def);
 		}
 	}
 
-	private void processRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
+	private void processRelationships(ISchemaDefinition schemaDef, SchemaType schema) throws XmlException {
 		processCompositeRelationships(schemaDef, schema);
 		processKeyedRelationships(schemaDef, schema);
 		processBoundaryIdentifierRelationships(schemaDef, schema);
 	}
 
-	private void processCompositeRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
+	private void processCompositeRelationships(ISchemaDefinition schemaDef, SchemaType schema) throws XmlException {
 		for (CompositeRelationshipType relationship : schema.getCompositeRelationshipList()) {
 
 			ContentMapping contentMapping = getContentMapping(relationship.getContentMapping());
@@ -212,7 +252,7 @@ public class XmlbeansRules implements IMetadataModel {
 		}
 	}
 
-	private void processKeyedRelationships(ISchema schemaDef, SchemaType schema) throws XmlException {
+	private void processKeyedRelationships(ISchemaDefinition schemaDef, SchemaType schema) throws XmlException {
 		for (KeyedRelationshipType relationship : schema.getKeyedRelationshipList()) {
 			KeyRefDefinitionType keyRef = relationship.getKeyRef();
 			LinkedHashMap<String, IKeyedField> fields = getFields(keyRef.newCursor());
@@ -228,7 +268,7 @@ public class XmlbeansRules implements IMetadataModel {
 		}
 	}
 
-	private void processBoundaryIdentifierRelationships(ISchema schemaDef,
+	private void processBoundaryIdentifierRelationships(ISchemaDefinition schemaDef,
 			SchemaType schema) throws XmlException {
 		for (BoundaryIdentifierRelationshipType relationship : schema.getBoundaryIdentifierRelationshipList()) {
 			String locationXpath = (relationship.isSetXpath() ? relationship.getXpath().getExpression() : null);
@@ -278,7 +318,7 @@ public class XmlbeansRules implements IMetadataModel {
 		return retval;
 	}
 
-	private static LinkedHashMap<String, IKeyedField> getFields(XmlCursor cursor) throws XmlException {
+	private static LinkedHashMap<String, IKeyedField> getFields(XmlCursor cursor) {
 
 		LinkedHashMap<String, IKeyedField> retval = new LinkedHashMap<String, IKeyedField>();
 		if (!cursor.toFirstChild()) {
@@ -289,22 +329,24 @@ public class XmlbeansRules implements IMetadataModel {
 			FieldType fieldData = (FieldType)cursor.getObject();
 			String name = fieldData.getName();
 
-			AbstractKeyedField field;
+			IValueRetriever retriever;
 			if (fieldData.isSetXpath()) {
 				String xpath = fieldData.getXpath().getExpression();
 //				Map<String, String> namespaces = new HashMap<String, String>();
 //				fieldData.newCursor().getAllNamespaces(namespaces);
 //				field = new XPathKeyedField(name, xpath, namespaces);
-				field = new XPathKeyedField(name, xpath);
+				retriever = new XPathRetriever(xpath);
 			} else if (fieldData.isSetKeyRef()) {
 				KeyFieldRefType keyFieldRef = fieldData.getKeyRef();
 				String delegateKeyId = keyFieldRef.getRefId();
 				String delegateKeyFieldName = keyFieldRef.getField();
-
-				field = new DelegatingKeyedField(name, delegateKeyId, delegateKeyFieldName);
+				
+				retriever = new DelegatingKeyFieldRetriever(delegateKeyId, delegateKeyFieldName);
 			} else {
 				throw new RuntimeException("unrecognized field definition");
 			}
+			DefaultKeyedField field = new DefaultKeyedField(name, retriever);
+
 			if (fieldData.isSetPattern()) {
 				field.setPattern(fieldData.getPattern().getExpression());
 			}
@@ -313,10 +355,34 @@ public class XmlbeansRules implements IMetadataModel {
 		return retval;
 	}
 
-	private static IVersionDefinition getVersion(VersionType version) throws XmlException {
-		IVersionDefinition.Method method = map(version.getMethod());
+	private IVersionDefinition getVersion(ISchemaDefinition schemaDef, VersionType version) throws XmlException {
+		IVersioningMethodDefinition method = getVersioningMethodById(schemaDef, version.getVersioningMethod().getRefId());
 		String xpath = version.getXpath().getExpression();
 		return new DefaultVersionDefinition(method, xpath, version.getUseParentVersionWhenUndefined());
+	}
+
+	private static IPropertyRef getPropertyRef(
+			ISchemaDefinition schemaDef,
+			PropertyRefType node) {
+		String propertyDefId = node.getRefId();
+		IPropertyDefinition propertyDef = schemaDef.getPropertyDefinitionById(propertyDefId);
+
+		IValueRetriever retriever;
+		if (node.isSetXpath()) {
+			String xpath = node.getXpath().getExpression();
+			retriever = new XPathRetriever(xpath);
+		} else if (node.isSetParentPropertyRef()) {
+			String parentPropertyRef = node.getParentPropertyRef().getRefId();
+			retriever = new ParentPropertyRetriever(parentPropertyRef);
+		} else {
+			throw new UnsupportedOperationException("Retriever construct is unsupported");
+		}
+
+		DefaultPropertyRef propertyRef = new DefaultPropertyRef(propertyDef, retriever);
+		if (node.isSetPattern()) {
+			propertyRef.setPattern(node.getPattern().getExpression());
+		}
+		return propertyRef;
 	}
 
 	public Collection<String> getCompositeRelationshipIds() {
@@ -339,15 +405,24 @@ public class XmlbeansRules implements IMetadataModel {
 		return retval;
 	}
 
+	public <T extends IEntityDefinition> T getEntityDefinitionById(String id) {
+		IEntityDefinition result = entities.get(id);
+		@SuppressWarnings("unchecked")
+		T retval = (T)result;
+		return retval;
+	}
+
 	public IExternalIdentifier getExternalIdentifierById(
 			String id) {
 		return externalIdentifiers.get(id);
 	}
 
-	public <T extends IEntityDefinition> T getEntityDefinitionById(String id) {
-		IEntityDefinition result = entities.get(id);
-		@SuppressWarnings("unchecked")
-		T retval = (T)result;
+	private IVersioningMethodDefinition getVersioningMethodById(
+			ISchemaDefinition schemaDef, String id) {
+		IVersioningMethodDefinition retval = versioningMethods.get(id);
+		if (retval == null) {
+			retval = schemaDef.getVersioningMethodById(id);
+		}
 		return retval;
 	}
 }

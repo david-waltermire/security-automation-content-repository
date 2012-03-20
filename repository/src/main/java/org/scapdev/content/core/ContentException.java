@@ -28,23 +28,12 @@ public class ContentException extends RuntimeException {
 	/** the serial version UID  */
 	private static final long serialVersionUID = 1L;
 
-	public ContentException() {
-		// TODO Auto-generated constructor stub
-	}
-
 	public ContentException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ContentException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ContentException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

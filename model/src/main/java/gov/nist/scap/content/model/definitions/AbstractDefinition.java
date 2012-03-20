@@ -1,29 +1,15 @@
 package gov.nist.scap.content.model.definitions;
 
 public abstract class AbstractDefinition implements IDefinition {
-	private final ISchema schema;
 	private final String id;
 
-	public AbstractDefinition(ISchema schema, String id) {
-		if (schema == null) {
-			throw new NullPointerException("schema");
-		}
-
+	public AbstractDefinition(String id) {
 		if (id == null) {
 			throw new NullPointerException("id");
 		} else if (id.isEmpty()) {
 			throw new IllegalArgumentException("id must not be empty");
 		}
-
-		this.schema = schema;
 		this.id = id;
-	}
-
-	/**
-	 * @return the schema
-	 */
-	public ISchema getSchema() {
-		return schema;
 	}
 
 	/**

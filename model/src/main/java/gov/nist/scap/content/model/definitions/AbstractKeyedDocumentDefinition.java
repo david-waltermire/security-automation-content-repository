@@ -6,7 +6,7 @@ public abstract class AbstractKeyedDocumentDefinition extends AbstractDocumentDe
 	private final IKeyDefinition keyDefinition;
 	private IVersionDefinition versionDefinition;
 
-	public AbstractKeyedDocumentDefinition(ISchema schema, String id, QName name, IKeyDefinition keyDefinition) {
+	public AbstractKeyedDocumentDefinition(ISchemaDefinition schema, String id, QName name, IKeyDefinition keyDefinition) {
 		super(schema, id, name);
 		if (keyDefinition == null) {
 			throw new NullPointerException("keyDefinition");

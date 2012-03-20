@@ -43,9 +43,10 @@ public class ExistDBContentRetriever implements ContentRetriever {
                 xmlObj = XmlObject.Factory.parse(sb.toString());
                 return xmlObj.newCursor();
             } catch (XmlException e) {
+            	// TODO: log exception
                 e.printStackTrace();
             } catch (XMLDBException e) {
-                // TODO Auto-generated catch block
+            	// TODO: log exception
                 e.printStackTrace();
             } finally {
                 if (res != null) {
