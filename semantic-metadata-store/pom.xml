@@ -38,6 +38,25 @@
 
   <dependencies>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>repository</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>rules-model</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>gov.nist.scap.content</groupId>
+      <artifactId>eXist-db-persistence</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -49,11 +68,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>gov.nist.scap.content</groupId>
-      <artifactId>eXist-db-persistence</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
@@ -84,23 +98,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>repository</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>rules-model</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -120,12 +117,18 @@
             <id>unpack-exist</id>
             <phase>process-resources</phase>
             <goals>
-              <goal>unpack-dependencies</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>eXist-db-persistence</includeArtifactIds>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>gov.nist.scap.content</groupId>
+                  <artifactId>eXist-db-persistence</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+              </artifactItems>
               <includes>conf.xml,exist-data/**/*</includes>
-              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+              <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
             </configuration>
           </execution>
           <execution>
@@ -196,7 +199,7 @@
                     <versionRange>[2.1,)</versionRange>
                     <goals>
                       <goal>copy</goal>
-                      <goal>unpack-dependencies</goal>
+                      <goal>unpack</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
