@@ -85,8 +85,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
     public void visit(ICompositeRelationship relationship) {
         List<Statement> target = new LinkedList<Statement>();
         String relationshipId = relationship.getDefinition().getId();
-        //this relationship is both keyed and composite, so assert both
-        target.add(valueFactory.createStatement(entityResourceId, ontology.HAS_KEYED_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         //assert this since inference may not be turned on
         target.add(valueFactory.createStatement(entityResourceId, ontology.HAS_COMPOSITE_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         // adding incomplete statement to be completed later
