@@ -24,26 +24,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
   <parent>
     <groupId>gov.nist.scap.content</groupId>
     <artifactId>master</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>semantic-metadata-store</artifactId>
 
   <packaging>jar</packaging>
   <name>semantic-metadata-store</name>
   <url>http://maven.apache.org</url>
 
-  <dependencies> 
-    
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<scope>test</scope>
-  	</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -52,57 +50,57 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-      <dependency>
-          <groupId>gov.nist.scap.content</groupId>
-          <artifactId>eXist-db-persistence</artifactId>
-          <scope>test</scope>
-      </dependency>
-  <dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-repository-api</artifactId>
-   	</dependency>
     <dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-repository-sail</artifactId>
-   	</dependency>
-   	<dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-sail-memory</artifactId>
-   	</dependency>
-   	<dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-repository-http</artifactId>
-   	</dependency>
-   	  <dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-queryresultio-binary</artifactId>
-   	  </dependency>
-   	  <dependency>
-    	<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-runtime</artifactId>
-   	  </dependency>
- 	<dependency>
-     	<!--  bridge to log4j from sesame log infrastructure -->
-   		<groupId>org.slf4j</groupId>
-   		<artifactId>slf4j-log4j12</artifactId>
-  	</dependency>
- 	<dependency>
- 		<groupId>${project.groupId}</groupId>
- 		<artifactId>model</artifactId>
- 		<version>${project.version}</version>
- 	</dependency>
- 	<dependency>
- 		<groupId>${project.groupId}</groupId>
- 		<artifactId>repository</artifactId>
- 		<version>${project.version}</version>
- 	</dependency>
+      <groupId>gov.nist.scap.content</groupId>
+      <artifactId>eXist-db-persistence</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-repository-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-repository-sail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-sail-memory</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-repository-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-queryresultio-binary</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <!--  bridge to log4j from sesame log infrastructure -->
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>repository</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>rules-model</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-      
+
   </dependencies>
   <build>
     <plugins>
@@ -113,64 +111,66 @@
           <argLine>-Xms256m -Xmx512m -Xss2m</argLine>
         </configuration>
       </plugin>
-        <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed"
+            -Dexist.home="${project.build.directory}/classes"</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
             <configuration>
-                <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed" -Dexist.home="${project.build.directory}/classes"</argLine>
+              <includeArtifactIds>eXist-db-persistence</includeArtifactIds>
+              <includes>conf.xml,exist-data/**/*</includes>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
             </configuration>
-        </plugin>
-        <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.4</version>
-            <executions>
-                <execution>
-                    <phase>process-resources</phase>
-                    <goals>
-                        <goal>unpack-dependencies</goal>
-                    </goals>
-                    <configuration>
-                        <includeArtifactIds>eXist-db-persistence</includeArtifactIds>
-                        <includes>conf.xml,exist-data/**/*</includes>
-                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                    </configuration>
-                </execution>
-            </executions>
-            <configuration>
-                <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed" -Dexist.home="${project.build.directory}/classes"</argLine>
-            </configuration>
-        </plugin>
-        
+          </execution>
+        </executions>
+        <configuration>
+          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed"
+            -Dexist.home="${project.build.directory}/classes"</argLine>
+        </configuration>
+      </plugin>
+
     </plugins>
-      <pluginManagement>
-          <plugins>
-              <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-              <plugin>
-                  <groupId>org.eclipse.m2e</groupId>
-                  <artifactId>lifecycle-mapping</artifactId>
-                  <version>1.0.0</version>
-                  <configuration>
-                      <lifecycleMappingMetadata>
-                          <pluginExecutions>
-                              <pluginExecution>
-                                  <pluginExecutionFilter>
-                                      <groupId>org.apache.maven.plugins</groupId>
-                                      <artifactId>maven-dependency-plugin</artifactId>
-                                      <versionRange>[2.1,)</versionRange>
-                                      <goals>
-                                          <goal>copy</goal>
-                                          <goal>unpack-dependencies</goal>                                          
-                                      </goals>
-                                  </pluginExecutionFilter>
-                                  <action>
-                                      <ignore></ignore>
-                                  </action>
-                              </pluginExecution>
-                          </pluginExecutions>
-                      </lifecycleMappingMetadata>
-                  </configuration>
-              </plugin>
-          </plugins>
-      </pluginManagement>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.1,)</versionRange>
+                    <goals>
+                      <goal>copy</goal>
+                      <goal>unpack-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore/>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <reporting>
@@ -181,4 +181,4 @@
       </plugin>
     </plugins>
   </reporting>
- </project>
+</project>
