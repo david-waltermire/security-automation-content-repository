@@ -89,7 +89,7 @@ class KeyedRelationshipStatementManager implements
 			URI relatedEntityURI = entry.getKey();
 			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
 			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
-			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(ontology, entity);
+			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(ontology);
 			builder.addRelationship(keyedRelationship);
 		}
 	}

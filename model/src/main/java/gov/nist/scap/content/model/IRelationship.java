@@ -16,10 +16,5 @@ import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
  * @see IEntityDefinition
  */
 public interface IRelationship<DEFINITION extends IRelationshipDefinition> extends IContentConstruct<DEFINITION> {
-	/**
-	 * Retrieves the entity that contains the relationship
-	 * @return the entity associated with the relationship
-	 */
-	IEntity<?> getOwningEntity();
 	void accept(IRelationshipVisitor visitor);
 }

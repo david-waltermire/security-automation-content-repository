@@ -25,9 +25,8 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
-import gov.nist.scap.content.model.IMutableEntity;
-import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 /**
@@ -64,13 +63,13 @@ class BoundaryIdentifierRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IBoundaryIdentifierRelationship build(IMetadataModel model, IMutableEntity<?> entity){
+	IBoundaryIdentifierRelationship build(IMetadataModel model){
 		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
 		
 		IExternalIdentifier externalIdentifier = model.getExternalIdentifierById(externalIdType);
-		IBoundaryIdentifierRelationship rel = new DefaultBoundaryIdentifierRelationship(relationshipDefinition, entity, externalIdentifier, externalIdValue);
+		IBoundaryIdentifierRelationship rel = new DefaultBoundaryIdentifierRelationship(relationshipDefinition, externalIdentifier, externalIdValue);
 		
 		return rel;
 	}

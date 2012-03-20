@@ -218,7 +218,7 @@ public class ContentProcessor {
 				// process the child node
 				IMutableEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
 
-				ICompositeRelationship relationship = new DefaultCompositeRelationship(definition, entity, childEntity);
+				ICompositeRelationship relationship = new DefaultCompositeRelationship(definition, childEntity);
 				// Add to the parent entity.  The child has a pointer back to
 				// the parent that can be used as well
 				entity.addRelationship(relationship);
@@ -232,7 +232,7 @@ public class ContentProcessor {
 			String value = valueRetriever.getValue(cursor);
 			IExternalIdentifier externalIdentifier = qualifierMapping.resolveExternalIdentifier(cursor);
 			if (externalIdentifier != null) {
-				entity.addRelationship(new DefaultBoundaryIdentifierRelationship(definition, entity, externalIdentifier, value));
+				entity.addRelationship(new DefaultBoundaryIdentifierRelationship(definition, externalIdentifier, value));
 			} else {
 				log.warn("Unable to extract boundary identifier relationship for value: "+value);
 			}

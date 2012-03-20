@@ -8,8 +8,8 @@ public class DefaultBoundaryIdentifierRelationship extends AbstractRelationship<
 	private final String value;
 
 	public DefaultBoundaryIdentifierRelationship(
-			IBoundaryIdentifierRelationshipDefinition definition, IEntity<?> owningEntity, IExternalIdentifier externalIdentifier, String value) {
-		super(definition, owningEntity);
+			IBoundaryIdentifierRelationshipDefinition definition, IExternalIdentifier externalIdentifier, String value) {
+		super(definition);
 		this.externalIdentifier = externalIdentifier;
 		this.value = value;
 	}

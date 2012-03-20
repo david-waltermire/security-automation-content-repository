@@ -8,9 +8,8 @@ public abstract class AbstractReferencingRelationship<DEFINITION extends IRelati
 
 	private final REFERENCE referencedEntity;
 
-	public AbstractReferencingRelationship(DEFINITION definition,
-			IEntity<?> owningEntity, REFERENCE referencedEntity) {
-		super(definition, owningEntity);
+	public AbstractReferencingRelationship(DEFINITION definition, REFERENCE referencedEntity) {
+		super(definition);
 		this.referencedEntity = referencedEntity;
 	}
 

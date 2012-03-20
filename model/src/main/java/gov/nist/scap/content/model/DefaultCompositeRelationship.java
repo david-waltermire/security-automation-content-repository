@@ -6,9 +6,8 @@ public class DefaultCompositeRelationship extends AbstractReferencingRelationshi
 
 	public DefaultCompositeRelationship(
 			ICompositeRelationshipDefinition definition,
-			IEntity<?> parentEntity,
 			IEntity<?> childEntity) {
-		super(definition, parentEntity, childEntity);
+		super(definition, childEntity);
 	}
 
 	public void accept(IRelationshipVisitor visitor) {
