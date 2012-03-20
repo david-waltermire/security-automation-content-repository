@@ -25,7 +25,6 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -37,6 +36,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 
 class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
@@ -84,13 +84,13 @@ class KeyedRelationshipStatementManager implements
 
 	
 	@Override
-	public void populateEntity(IMutableEntity<?> entity) {
+	public void populateEntity(EntityBuilder builder) {
 		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
 			URI relatedEntityURI = entry.getKey();
 			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
 			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
 			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(ontology, entity);
-			entity.addRelationship(keyedRelationship);
+			builder.addRelationship(keyedRelationship);
 		}
 	}
 
