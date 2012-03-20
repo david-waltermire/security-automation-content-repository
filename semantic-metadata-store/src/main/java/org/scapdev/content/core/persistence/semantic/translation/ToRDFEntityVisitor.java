@@ -74,6 +74,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         BNode context = valueFactory.createBNode();
         try {
             conn.add(createEntityStatements(resourceId, entity, entityMetadataMap.getContentId(entity)), context);
+            conn.add(createKeyRelationships(resourceId, entity.getKey().getId(), entity.getKey().getFieldNameToValueMap()), context);
         } catch (RepositoryException e) {
             //TODO: Implement better error handling!!!
             throw new RuntimeException(e);
@@ -96,6 +97,12 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         target.add(valueFactory.createStatement(resourceId, ontology.HAS_ENTITY_TYPE.URI, valueFactory.createLiteral(entity.getDefinition().getId())));
         if( entity.getParent() != null ) {
             target.add(valueFactory.createStatement(resourceId, ontology.HAS_PARENT_RELATIONSHIP_TO.URI, entityMetadataMap.getResourceURI(entity.getParent())));
+        }
+        if( entity.getVersion() != null ) {
+            BNode versionBNode = valueFactory.createBNode();
+            target.add(valueFactory.createStatement(resourceId, ontology.HAS_VERSION.URI, versionBNode));
+            target.add(valueFactory.createStatement(versionBNode, ontology.HAS_VERSION_TYPE.URI, valueFactory.createLiteral(entity.getVersion().getDefinition().getMethod().getId())));
+            target.add(valueFactory.createStatement(versionBNode, ontology.HAS_VERSION_VALUE.URI, valueFactory.createLiteral(entity.getVersion().getValue())));
         }
         return target;
     }

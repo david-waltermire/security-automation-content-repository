@@ -93,7 +93,7 @@ public class EntityTranslator extends
 			//first handle entity specific predicates
 			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
 				String contentId = statement.getObject().stringValue();
-				target.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId, model)));
+				target.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
 				continue;
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){

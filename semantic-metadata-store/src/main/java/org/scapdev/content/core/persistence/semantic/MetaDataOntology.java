@@ -23,6 +23,9 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -48,7 +51,7 @@ import org.openrdf.repository.RepositoryException;
  * TODO: figure out way to make model constructs final static; 
  * currently can't do this because valueFactory instance is required to create them.
  */
-public class MetaDataOntology {
+public class MetaDataOntology implements IMetadataModel {
 	private ValueFactory factory;
 	//TODO should we version this?
 	private static final String BASE_MODEL_URI = "http://scap.nist.gov/resource/content/model#";
@@ -90,11 +93,16 @@ public class MetaDataOntology {
 	/** the actual value of the boundary object (e.g., CCE-XXXX, CPE:/XXX:XXX */
 	public final Construct HAS_BOUNDARY_OBJECT_VALUE; 
 	
+    public final Construct HAS_VERSION; 
+    public final Construct HAS_VERSION_TYPE; 
+    public final Construct HAS_VERSION_VALUE; 
 	
 	//dynamic predicates
 	private Map<String, Construct> boundaryObjectRelationships = new HashMap<String, Construct>();
 	private Map<String, Construct> keyedRelationships = new HashMap<String, Construct>();
 	private Map<String, Construct> compositeRelationships = new HashMap<String, Construct>();
+	
+	private IMetadataModel javaModel = null;
     
 	MetaDataOntology(ValueFactory factory) {
 		this.factory = factory;
@@ -120,6 +128,9 @@ public class MetaDataOntology {
 		HAS_PARENT_RELATIONSHIP_TO = new Construct(genModelURI("hasParentRelationshipTo"), "hasParentRelationshipTo");
 		HAS_BOUNDARY_OBJECT_TYPE = new Construct(genModelURI("hasBoundaryObjectType"), "hasBoundaryObjectType");
 		HAS_BOUNDARY_OBJECT_VALUE = new Construct(genModelURI("hasBoundaryObjectValue"), "hasBoundaryObjectValue");
+	    HAS_VERSION = new Construct(genModelURI("hasVersion"), "hasVersion");
+	    HAS_VERSION_TYPE = new Construct(genModelURI("hasVersionType"), "hasVersionType");
+	    HAS_VERSION_VALUE = new Construct(genModelURI("hasVersionValue"), "hasVersionValue");
 	}
 	
 	/** helper method to load all model triples into triple store using given connection */
@@ -147,11 +158,17 @@ public class MetaDataOntology {
         statements.addAll(createPredicate(HAS_PARENT_RELATIONSHIP_TO.URI, HAS_PARENT_RELATIONSHIP_TO.LABEL));
 		statements.addAll(createPredicate(HAS_BOUNDARY_OBJECT_TYPE.URI, HAS_BOUNDARY_OBJECT_TYPE.LABEL));
 		statements.addAll(createPredicate(HAS_BOUNDARY_OBJECT_VALUE.URI, HAS_BOUNDARY_OBJECT_VALUE.LABEL));
-		
+
+        statements.addAll(createPredicate(HAS_VERSION.URI, HAS_VERSION.LABEL));
+        statements.addAll(createPredicate(HAS_VERSION_TYPE.URI, HAS_VERSION_TYPE.LABEL));
+        statements.addAll(createPredicate(HAS_VERSION_VALUE.URI, HAS_VERSION_VALUE.LABEL));
+
 		//assert dynamic predicates
 		statements.addAll(loadBoundaryObjectRelationships(javaModel.getBoundaryIndentifierRelationshipIds()));
 		statements.addAll(loadKeyedRelationships(javaModel.getKeyedRelationshipIds()));
         statements.addAll(loadCompositeRelationships(javaModel.getCompositeRelationshipIds()));
+        
+        this.javaModel = javaModel;
 		
 		conn.add(statements);
 	}
@@ -184,6 +201,53 @@ public class MetaDataOntology {
     public URI findCompositeRelationshipURI(String relId){
         return compositeRelationships.get(relId).URI;
     }
+
+    @Override
+    public Collection<String> getBoundaryIndentifierRelationshipIds() {
+        if( javaModel != null ) {
+            return javaModel.getBoundaryIndentifierRelationshipIds();
+        }
+        return null;
+    }
+    
+    @Override
+    public Collection<String> getCompositeRelationshipIds() {
+        if( javaModel != null ) {
+            return javaModel.getCompositeRelationshipIds();
+        }
+        return null;
+    }
+    
+    @Override
+    public IExternalIdentifier getExternalIdentifierById(String externalIdType) {
+        if( javaModel != null ) {
+            return javaModel.getExternalIdentifierById(externalIdType);
+        }
+        return null;
+    }
+    
+    @Override
+    public Collection<String> getKeyedRelationshipIds() {
+        if( javaModel != null ) {
+            return javaModel.getKeyedRelationshipIds();
+        }
+        return null;
+    }
+    
+    public <T extends IRelationshipDefinition> T getRelationshipDefinitionById(String keyedRelationshipId) {
+        if( javaModel != null ) {
+            return javaModel.getRelationshipDefinitionById(keyedRelationshipId);
+        }
+        return null;
+    }
+    
+    public <T extends IEntityDefinition> T getEntityDefinitionById(String entityType) {
+        if( javaModel != null ) {
+            return javaModel.getEntityDefinitionById(entityType);
+        }
+        return null;
+    }
+
 
 	/**
 	 * Populates map of all boundaryRelationship types.  Assumes each ID is a valid URN
