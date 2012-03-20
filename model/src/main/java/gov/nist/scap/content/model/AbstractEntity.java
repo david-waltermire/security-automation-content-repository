@@ -3,6 +3,7 @@ package gov.nist.scap.content.model;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -17,6 +18,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final List<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
 	private final List<IBoundaryIdentifierRelationship> boundaryIdentifierRelationships = new LinkedList<IBoundaryIdentifierRelationship>();
+    private final List<ICompositeRelationship> compositeRelationships = new LinkedList<ICompositeRelationship>();
 	private final Map<String, LinkedHashSet<String>> properties = new HashMap<String, LinkedHashSet<String>>();
 	private final IContentHandle contentHandle;
 	private final IMutableEntity<?> parent;
@@ -41,6 +43,11 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 
 	public List<IBoundaryIdentifierRelationship> getBoundaryIdentifierRelationships() {
 		return Collections.unmodifiableList(boundaryIdentifierRelationships);
+	}
+	
+	@Override
+	public Collection<? extends ICompositeRelationship> getCompositeRelationships() {
+        return Collections.unmodifiableList(compositeRelationships);
 	}
 
 	public IKey getKey(String keyId) {
@@ -99,7 +106,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 	}
 
 	public void visit(ICompositeRelationship relationship) {
-		// Do nothing
+	    compositeRelationships.add(relationship);
 	}
 
 	public void visit(IBoundaryIdentifierRelationship relationship) {

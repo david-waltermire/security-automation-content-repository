@@ -32,5 +32,10 @@ public class MockContentStore implements ContentStore {
         return resultMap;
     }
     
+    @Override
+    public ContentRetriever newContentRetriever(String contentId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
     public void shutdown() {};
 }

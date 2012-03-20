@@ -46,7 +46,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -62,9 +61,9 @@ public class TripleStoreQueryService {
 	
 	private MetaDataOntology ontology;
 	
-	public TripleStoreQueryService(Repository repository, MetaDataOntology ontology) {
-		this.factory = repository.getValueFactory();
-		this.ontology = ontology;
+	public TripleStoreQueryService(IPersistenceContext persistContext) {
+		this.factory = persistContext.getRepository().getValueFactory();
+		this.ontology = persistContext.getOntology();
 	}
 	
 	/**
@@ -147,7 +146,7 @@ public class TripleStoreQueryService {
 	 * @throws MalformedQueryException 
 	 * @throws RepositoryException 
 	 */
-	List<URI> findAllRelatedEntityURIs(URI owningEntityURI,
+	public List<URI> findAllRelatedEntityURIs(URI owningEntityURI,
 			RepositoryConnection conn) throws QueryEvaluationException,
 			RepositoryException, MalformedQueryException {
 		String relatedEntityVariableName = "_e";
@@ -553,7 +552,7 @@ public class TripleStoreQueryService {
 	 * @param conn
 	 * @return
 	 */
-	protected Resource findEntityContext(URI entityURI, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
+	public Resource findEntityContext(URI entityURI, RepositoryConnection conn) throws QueryEvaluationException, RepositoryException, MalformedQueryException {
 		StringBuilder queryBuilder = new StringBuilder();
 		String sourceVariableName = "source";
 		queryBuilder.append("SELECT source FROM CONTEXT ").append(sourceVariableName).append(" {<");

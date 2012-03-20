@@ -37,6 +37,11 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	 * @return a non-null collection
 	 */
 	Collection<? extends IBoundaryIdentifierRelationship> getBoundaryIdentifierRelationships();
+    /**
+     * Retrieves the composite relationships associated with this entity.
+     * @return a non-null collection
+     */
+    Collection<? extends ICompositeRelationship> getCompositeRelationships();
 	/**
 	 * Retrieves a ContentHandle that can be used to access the underlying XML
 	 * segment represented by the entity. 

@@ -43,10 +43,10 @@ import java.util.Set;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
+import org.scapdev.content.core.persistence.semantic.IPersistenceContext;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 
@@ -55,17 +55,21 @@ import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
  */
 public class EntityTranslator extends
 		AbstractSemanticTranslator{
-	private MetaDataOntology ontology;
-	
+    private final String baseURI;
+    private final IPersistenceContext persistContext;
+    private final MetaDataOntology ontology;
+    
 	/**
 	 * 
 	 * @param baseURI - - the base URI to use for all RDF individuals produced by this translator
 	 * @param ontology
 	 * @param factory
 	 */
-	public EntityTranslator(String baseURI, MetaDataOntology ontology, ValueFactory factory) {
-		super(baseURI, factory);
-		this.ontology = ontology;
+	public EntityTranslator(String baseURI, IPersistenceContext persistContext) {
+		super(baseURI, persistContext.getRepository().getValueFactory());
+		this.baseURI = baseURI;
+	    this.persistContext = persistContext;
+	    this.ontology = persistContext.getOntology();
 	}
 
 	/**
@@ -82,9 +86,10 @@ public class EntityTranslator extends
 	 */
 	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
-		managers.add(new BoundaryIdentifierRelationshipStatementManager(ontology));
-		managers.add(new KeyedRelationshipStatementManager(ontology, factory, relatedEntityKeys));
-		managers.add(new KeyStatementManager(ontology));
+		managers.add(new BoundaryIdentifierRelationshipStatementManager(persistContext.getOntology()));
+		managers.add(new KeyedRelationshipStatementManager(persistContext.getOntology(), factory, relatedEntityKeys));
+        managers.add(new CompositeRelationshipStatementManager(baseURI, persistContext));
+		managers.add(new KeyStatementManager(persistContext.getOntology()));
 
 		EntityBuilder builder = new EntityBuilder();
 		for (Statement statement : statements){

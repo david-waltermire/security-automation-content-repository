@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 
-public interface ContentStore {
+public interface ContentStore extends ContentRetrieverFactory {
 
 	XmlObject getContent(String contentId);
 	Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities);
