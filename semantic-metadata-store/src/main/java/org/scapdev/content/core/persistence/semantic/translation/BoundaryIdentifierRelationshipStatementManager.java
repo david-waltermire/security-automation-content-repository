@@ -46,8 +46,8 @@ import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//all IDs of boundaryObjectRelationships
-	private Collection<String> boundaryObjectRelationshipIds;
+	//all IDs of boundaryIdentifierRelationships
+	private Collection<String> boundaryIdentifierRelationshipIds;
 	
 	// key = boundary_boject_id....this map is what this class builds
 	private Map<String, BoundaryIdentifierRelationshipBuilder> boundaryIdentifierRelationships = new HashMap<String, BoundaryIdentifierRelationshipBuilder>();
@@ -55,17 +55,17 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	
 	BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
-		this.boundaryObjectRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
+		this.boundaryIdentifierRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
 	}
 	
 	/**
-	 * Scans triple and processes it if it is relevant to boundaryObjectRelationships
+	 * Scans triple and processes it if it is relevant to boundaryIdentifierRelationships
 	 * @param statement
 	 * @return true if triple was processed in some way, false if it was just ignored.
 	 */
 	public boolean scan(Statement statement){
 		URI predicate = statement.getPredicate();
-		if (boundaryObjectRelationshipIds.contains(predicate.stringValue())){
+		if (boundaryIdentifierRelationshipIds.contains(predicate.stringValue())){
 			// a triple containing an boundary id relationship predicate found
 			populateBoundaryObjectRelationshipInfo(ontology, statement);
 			return true;
@@ -91,9 +91,9 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	 *            - to populate.
 	 */
 	public void populateEntity(EntityBuilder builder){
-		for (BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder : boundaryIdentifierRelationships.values()){
-			IBoundaryIdentifierRelationship boundaryObjectRelBuilderRelationship = boundaryObjectRelBuilder.build(ontology, entity);
-			builder.addRelationship(boundaryObjectRelBuilderRelationship);
+		for (BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder : boundaryIdentifierRelationships.values()){
+			IBoundaryIdentifierRelationship boundaryIdentifierRelBuilderRelationship = boundaryIdentifierRelBuilder.build(ontology, entity);
+			builder.addRelationship(boundaryIdentifierRelBuilderRelationship);
 		}
 	}
 	
@@ -111,16 +111,16 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	 */
 	private void populateBoundaryObjectRelationshipInfo(IMetadataModel model, Statement statement){
 		// hit on an boundaryIdRelationship of some type
-		String boundaryObjectRelationshipId = statement.getPredicate().stringValue();
-		String boundaryObjectURI = statement.getObject().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
-		if (boundaryObjectRelBuilder == null){
-			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryObjectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryObjectRelationshipId));
-			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
+		String boundaryIdentifierRelationshipId = statement.getPredicate().stringValue();
+		String boundaryIdentifierURI = statement.getObject().stringValue();
+		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
+		if (boundaryIdentifierRelBuilder == null){
+			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryIdentifierRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
+			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		} else {
 			// can't be sure this was set before
-			boundaryObjectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryObjectRelationshipId));
+			boundaryIdentifierRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
 		}
 	}
 	
@@ -135,16 +135,16 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	 * 
 	 */
 	private void populateBoundaryObjectRelationshipExternalIdType(IMetadataModel model, Statement statement){
-		String boundaryObjectURI = statement.getSubject().stringValue();
-		String boundaryObjectType = statement.getObject().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
-		if (boundaryObjectRelBuilder == null){
-			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryObjectRelBuilder.setExternalIdType(boundaryObjectType);
-			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
+		String boundaryIdentifierURI = statement.getSubject().stringValue();
+		String boundaryIdentifierType = statement.getObject().stringValue();
+		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
+		if (boundaryIdentifierRelBuilder == null){
+			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
+			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		} else {
 			// can't be sure this was set before
-			boundaryObjectRelBuilder.setExternalIdType(boundaryObjectType);
+			boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
 		}
 	}
 	
@@ -159,16 +159,16 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	 * 
 	 */
 	private void populateBoundaryObjectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
-		String boundaryObjectURI = statement.getSubject().stringValue();
-		String boundaryObjectValue = statement.getObject().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
-		if (boundaryObjectRelBuilder == null){
-			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryObjectRelBuilder.setExternalIdValue(boundaryObjectValue);
-			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
+		String boundaryIdentifierURI = statement.getSubject().stringValue();
+		String boundaryIdentifierValue = statement.getObject().stringValue();
+		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
+		if (boundaryIdentifierRelBuilder == null){
+			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
+			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		} else {
 			// can't be sure this was set before
-			boundaryObjectRelBuilder.setExternalIdValue(boundaryObjectValue);
+			boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
 		}
 	}
 	
