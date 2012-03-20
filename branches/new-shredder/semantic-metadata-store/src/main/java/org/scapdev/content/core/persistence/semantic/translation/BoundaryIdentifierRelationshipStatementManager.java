@@ -37,11 +37,11 @@ import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 
 /**
- * <p>A manager to coordinate multiple IndirectRelationshipBuilders working in
- * parallel to build up all IndirectRelationships originating from a specific
+ * <p>A manager to coordinate multiple BoundaryIdentiferRelationshipBuilders working in
+ * parallel to build up all BoundaryIdentiferRelationships originating from a specific
  * entity.</p>
  * 
- * @see IndirectRelationshipBuilder
+ * @see BoundaryIdentiferRelationshipBuilder
  */
 class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
@@ -84,7 +84,7 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	/**
 	 * <p>
 	 * Called after all triples are processed to populate re-constituted entity
-	 * with the IndirectRelationships found in the graph.
+	 * with the BoundaryIdentiferRelationships found in the graph.
 	 * </p>
 	 * 
 	 * @param entity
@@ -116,11 +116,11 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
 		if (boundaryIdentifierRelBuilder == null){
 			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryIdentifierRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
+			boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
 			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		} else {
 			// can't be sure this was set before
-			boundaryIdentifierRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
+			boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
 		}
 	}
 	
