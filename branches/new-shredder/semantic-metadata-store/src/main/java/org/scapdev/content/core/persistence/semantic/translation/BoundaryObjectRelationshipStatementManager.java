@@ -43,7 +43,7 @@ import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
  * 
  * @see IndirectRelationshipBuilder
  */
-class IndirectRelationshipStatementManager implements RegenerationStatementManager {
+class BoundaryObjectRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
 	//all IDs of indirectRelationships
@@ -53,7 +53,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	private Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
 	
 	
-	IndirectRelationshipStatementManager(MetaDataOntology ontology) {
+	BoundaryObjectRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
 		this.indirectRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
 	}
@@ -67,15 +67,15 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 		URI predicate = statement.getPredicate();
 		if (indirectRelationshipIds.contains(predicate.stringValue())){
 			// a triple containing an indirect relationship predicate found
-			populateIndirectRelationshipInfo(ontology, statement);
+			populateBoundaryObjectRelationshipInfo(ontology, statement);
 			return true;
 		}
 		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI)){
-			populateIndirectRelationshipExternalIdType(ontology, statement);
+			populateBoundaryObjectRelationshipExternalIdType(ontology, statement);
 			return true;
 		}
 		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI)){
-			populateIndirectRelationshipExternalIdValue(ontology, statement);
+			populateBoundaryObjectRelationshipExternalIdValue(ontology, statement);
 			return true;
 		}
 		return false;
@@ -101,7 +101,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * <p>
 	 * Helper method to populate RelatioshipInfo based on the predicate found
 	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_INDIRECT_RELATIONSHIP.
+	 * is a subProperty of HAS_BOUNDARY_OBJECT_RELATIONSHIP.
 	 * </p>
 	 * 
 	 * @param model
@@ -109,7 +109,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * 
 	 * @see RelationshipInfo
 	 */
-	private void populateIndirectRelationshipInfo(IMetadataModel model, Statement statement){
+	private void populateBoundaryObjectRelationshipInfo(IMetadataModel model, Statement statement){
 		// hit on an indirectRelationship of some type
 		String indirectRelationshipId = statement.getPredicate().stringValue();
 		String boundaryObjectURI = statement.getObject().stringValue();
@@ -134,7 +134,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param statement
 	 * 
 	 */
-	private void populateIndirectRelationshipExternalIdType(IMetadataModel model, Statement statement){
+	private void populateBoundaryObjectRelationshipExternalIdType(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectType = statement.getObject().stringValue();
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
@@ -158,7 +158,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 * @param statement
 	 * 
 	 */
-	private void populateIndirectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
+	private void populateBoundaryObjectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectValue = statement.getObject().stringValue();
 		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
