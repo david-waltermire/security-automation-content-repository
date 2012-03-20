@@ -13,11 +13,9 @@ import gov.nist.scap.content.model.definitions.IPropertyDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 
@@ -28,7 +26,7 @@ public class EntityBuilder {
 	private IKey key;
 	private IMutableEntity<?> parent;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
-	private final Map<IPropertyDefinition, Set<String>> properties = new HashMap<IPropertyDefinition, Set<String>>();
+	private final Map<IPropertyDefinition, List<String>> properties = new HashMap<IPropertyDefinition, List<String>>();
 
 	public <T extends IEntityDefinition> void setEntityDefinition(T definition) throws ProcessingException {
 		internalBuilder = definition.accept(visitor);
@@ -78,9 +76,9 @@ public class EntityBuilder {
 		if (value == null) {
 			throw new NullPointerException("value");
 		}
-		Set<String> result = properties.get(definition);
+		List<String> result = properties.get(definition);
 		if (result == null) {
-			result = new HashSet<String>();
+			result = new LinkedList<String>();
 			properties.put(definition, result);
 		}
 		result.add(value);
@@ -91,8 +89,8 @@ public class EntityBuilder {
 		for (IRelationship<?> relationship : relationships) {
 			retval.addRelationship(relationship);
 		}
-		for (Map.Entry<IPropertyDefinition, Set<String>> entry : properties.entrySet()) {
-			retval.addProperty(entry.getKey(), entry.getValue());
+		for (Map.Entry<IPropertyDefinition, List<String>> entry : properties.entrySet()) {
+			retval.addProperty(entry.getKey().getId(), entry.getValue());
 		}
 		return retval;
 	}
