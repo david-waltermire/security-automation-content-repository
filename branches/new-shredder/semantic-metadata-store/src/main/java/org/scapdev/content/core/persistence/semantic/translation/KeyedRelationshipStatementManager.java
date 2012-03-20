@@ -42,9 +42,6 @@ class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//should be okay to store at class level since this should be created/destroyed within a single instance
-	private IMetadataModel model;
-	
 	//all IDs of directRelationships
 	private Collection<String> directRelationshipIds;
 	
@@ -66,12 +63,11 @@ class KeyedRelationshipStatementManager implements
 	 *            relatedKey (TODO: determine if there is another way to build
 	 *            out this part of the graph).
 	 */
-	KeyedRelationshipStatementManager(MetaDataOntology ontology, IMetadataModel model, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
+	KeyedRelationshipStatementManager(MetaDataOntology ontology, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
 		this.ontology = ontology;
-		this.model = model;
 		this.factory = factory;
 		this.relatedEntityKeys = relatedEntityKeys;
-		this.directRelationshipIds = model.getKeyedRelationshipIds();
+		this.directRelationshipIds = ontology.getKeyedRelationshipIds();
 	}
 	
 	@Override
@@ -79,7 +75,7 @@ class KeyedRelationshipStatementManager implements
 		URI predicate = statement.getPredicate();
 		if (directRelationshipIds.contains(predicate.stringValue())){
 			// a triple containing an indirect relationship predicate found
-			populateKeyedRelationshipInfo(model, statement);
+			populateKeyedRelationshipInfo(ontology, statement);
 			return true;
 		}
 		return false;
@@ -93,7 +89,7 @@ class KeyedRelationshipStatementManager implements
 			URI relatedEntityURI = entry.getKey();
 			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
 			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
-			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(model, entity);
+			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(ontology, entity);
 			entity.addRelationship(keyedRelationship);
 		}
 	}
@@ -118,11 +114,11 @@ class KeyedRelationshipStatementManager implements
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
 			keyedRelBuilder = new KeyedRelationshipBuilder(ontology);
-			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) model.getRelationshipDefinitionById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		} else {
 			// can't be sure this was set before
-			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)model.getRelationshipDefinitionById(keyedRelationshipId));
+			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)ontology.getRelationshipDefinitionById(keyedRelationshipId));
 		}
 		
 	}

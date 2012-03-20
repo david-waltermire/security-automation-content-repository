@@ -26,15 +26,14 @@
  */
 package org.scapdev.content.core.persistence.semantic.translation;
 
-import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -81,10 +80,10 @@ public class EntityTranslator extends
 	 * @return
 	 * @throws ProcessingException 
 	 */
-	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, IMetadataModel model, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
+	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
-		managers.add(new IndirectRelationshipStatementManager(ontology, model));
-		managers.add(new KeyedRelationshipStatementManager(ontology, model, factory, relatedEntityKeys));
+		managers.add(new IndirectRelationshipStatementManager(ontology));
+		managers.add(new KeyedRelationshipStatementManager(ontology, factory, relatedEntityKeys));
 		managers.add(new KeyStatementManager(ontology));
 
 		EntityBuilder target = new EntityBuilder();
@@ -98,7 +97,7 @@ public class EntityTranslator extends
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
 				String entityType = statement.getObject().stringValue();
-				target.setEntityDefinition(model.getEntityDefinitionById(entityType));
+				target.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
 				continue;
 			}
 

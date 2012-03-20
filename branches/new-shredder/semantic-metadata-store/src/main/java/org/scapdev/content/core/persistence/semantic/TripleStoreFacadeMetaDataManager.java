@@ -158,7 +158,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                             conn), conn);
                     return entityTranslator.translateToJava(
                         entityStatements,
-                        relatedEntityKeys
+                        relatedEntityKeys,
                         contentRetrieverFactory);
                 }
             } catch (MalformedQueryException e) {
@@ -180,8 +180,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
     @Override
     public IEntity<?> getEntity(
             String contentId,
-            ContentRetrieverFactory contentRetrieverFactory,
-            IMetadataModel model) {
+            ContentRetrieverFactory contentRetrieverFactory) {
         return null;
     }
 

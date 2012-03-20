@@ -40,7 +40,7 @@ import org.scapdev.content.core.ContentException;
 
 
 public interface ContentPersistenceManager {
-	IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) throws ProcessingException;
+	IKeyedEntity<?> getEntityByKey(IKey key) throws ProcessingException;
 	/**
 	 * 
 	 * @param externalIdentifier

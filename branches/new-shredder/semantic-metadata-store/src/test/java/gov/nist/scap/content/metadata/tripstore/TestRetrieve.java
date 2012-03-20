@@ -55,7 +55,7 @@ public class TestRetrieve {
         }
         
 
-        IKeyedEntity<?> entity = tsfdm.getEntity(key, ExistDBContentRetrieverFactory.getInstance(cs), xmlbeansRules);
+        IKeyedEntity<?> entity = tsfdm.getEntity(key, ExistDBContentRetrieverFactory.getInstance(cs));
         FileOutputStream fos = new FileOutputStream("testout.xml");
         fos.write(entity.getContentHandle().getCursor().xmlText().getBytes("UTF-8"));
         fos.flush();

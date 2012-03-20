@@ -46,9 +46,6 @@ import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 class IndirectRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//should be okay to store at class level since this should be created/destroyed within a single instance
-	private IMetadataModel model;
-	
 	//all IDs of indirectRelationships
 	private Collection<String> indirectRelationshipIds;
 	
@@ -56,10 +53,9 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	private Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
 	
 	
-	IndirectRelationshipStatementManager(MetaDataOntology ontology, IMetadataModel model) {
+	IndirectRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
-		this.model = model;
-		this.indirectRelationshipIds = model.getBoundaryIndentifierRelationshipIds();
+		this.indirectRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
 	}
 	
 	/**
@@ -71,15 +67,15 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 		URI predicate = statement.getPredicate();
 		if (indirectRelationshipIds.contains(predicate.stringValue())){
 			// a triple containing an indirect relationship predicate found
-			populateIndirectRelationshipInfo(model, statement);
+			populateIndirectRelationshipInfo(ontology, statement);
 			return true;
 		}
 		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI)){
-			populateIndirectRelationshipExternalIdType(model, statement);
+			populateIndirectRelationshipExternalIdType(ontology, statement);
 			return true;
 		}
 		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI)){
-			populateIndirectRelationshipExternalIdValue(model, statement);
+			populateIndirectRelationshipExternalIdValue(ontology, statement);
 			return true;
 		}
 		return false;
@@ -96,7 +92,7 @@ class IndirectRelationshipStatementManager implements RegenerationStatementManag
 	 */
 	public void populateEntity(IMutableEntity<?> entity){
 		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
-			IBoundaryIdentifierRelationship indirectRelationship = indirectRelBuilder.build(model, entity);
+			IBoundaryIdentifierRelationship indirectRelationship = indirectRelBuilder.build(ontology, entity);
 			entity.addRelationship(indirectRelationship);
 		}
 	}

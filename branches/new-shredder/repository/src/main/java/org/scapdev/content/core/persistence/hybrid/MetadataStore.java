@@ -29,7 +29,6 @@ import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.Map;
@@ -41,20 +40,18 @@ public interface MetadataStore {
 	 * 
 	 * @param key
 	 * @param contentRetrieverFactory
-	 * @param model
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 * @throws ProcessingException 
 	 */
-	IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model) throws ProcessingException;
+	IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException;
 
 	   /**
      * 
      * @param contentId
      * @param contentRetrieverFactory
-     * @param model
      * @return the entity if the content ID exists or <code>null</code> if it was not found
      */
-    IEntity<?> getEntity(String contentId, ContentRetrieverFactory contentRetrieverFactory, IMetadataModel model);
+    IEntity<?> getEntity(String contentId, ContentRetrieverFactory contentRetrieverFactory);
 
 	/**
 	 * 
