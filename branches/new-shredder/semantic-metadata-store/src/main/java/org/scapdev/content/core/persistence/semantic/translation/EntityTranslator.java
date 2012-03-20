@@ -93,14 +93,11 @@ public class EntityTranslator extends
 			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
 				String contentId = statement.getObject().stringValue();
 				builder.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
-				continue;
 			}
 			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
 				String entityType = statement.getObject().stringValue();
 				builder.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
-				continue;
 			}
-
 			//now handle rest of graph
 			for (RegenerationStatementManager statementManager : managers){
 				if (statementManager.scan(statement)){

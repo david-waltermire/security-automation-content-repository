@@ -108,13 +108,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-Xms256m -Xmx512m -Xss2m</argLine>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed"
+          <argLine>-Xms256m -Xmx512m -Xss2m -Djava.endorsed.dirs="${project.build.directory}/endorsed"
             -Dexist.home="${project.build.directory}/classes"</argLine>
         </configuration>
       </plugin>
@@ -123,6 +117,7 @@
         <version>2.4</version>
         <executions>
           <execution>
+            <id>unpack-exist</id>
             <phase>process-resources</phase>
             <goals>
               <goal>unpack-dependencies</goal>
@@ -133,13 +128,56 @@
               <outputDirectory>${project.build.directory}/classes</outputDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-endorsed</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                  <version>1.2</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>saxonhe</groupId>
+                  <artifactId>saxonhe</artifactId>
+                  <version>9.2.1.5</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>xalan</groupId>
+                  <artifactId>serializer</artifactId>
+                  <version>2.7.1</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>xalan</groupId>
+                  <artifactId>xalan</artifactId>
+                  <version>2.7.1</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>xerces</groupId>
+                  <artifactId>xercesImpl</artifactId>
+                  <version>2.11.0</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>xml-apis</groupId>
+                  <artifactId>xml-apis</artifactId>
+                  <version>1.4.01</version>
+                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
-        <configuration>
-          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed"
-            -Dexist.home="${project.build.directory}/classes"</argLine>
-        </configuration>
       </plugin>
-
+      
     </plugins>
     <pluginManagement>
       <plugins>

@@ -185,10 +185,4 @@
     	</plugins>
     </pluginManagement>
   </build>
-  <repositories>
-    <repository>
-      <id>project-local</id>
-      <url>file://${basedir}/lib</url>
-    </repository>
-  </repositories>
 </project>
