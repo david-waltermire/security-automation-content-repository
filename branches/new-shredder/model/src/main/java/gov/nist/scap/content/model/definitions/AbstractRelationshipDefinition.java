@@ -3,7 +3,7 @@ package gov.nist.scap.content.model.definitions;
 import org.apache.xmlbeans.XmlBeans;
 import org.apache.xmlbeans.XmlException;
 
-public abstract class AbstractRelationshipDefinition extends AbstractDefinition implements IRelationshipDefinition {
+public abstract class AbstractRelationshipDefinition extends AbstractSchemaRelatedDefinition implements IRelationshipDefinition {
 	/**
 	 * The xpath used to navigate to the XML element associated with this
 	 * relationship. This may be <code>null</code> if the relationship is at the
@@ -11,7 +11,7 @@ public abstract class AbstractRelationshipDefinition extends AbstractDefinition 
 	 */
 	private final String xpath;
 
-	public AbstractRelationshipDefinition(ISchema schema, String id, String xpath) throws XmlException {
+	public AbstractRelationshipDefinition(ISchemaDefinition schema, String id, String xpath) throws XmlException {
 		super(schema, id);
 
 		if (xpath != null && xpath.isEmpty()) {

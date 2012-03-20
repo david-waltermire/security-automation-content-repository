@@ -4,9 +4,9 @@ import org.apache.xmlbeans.XmlException;
 
 public class DefaultKeyedRelationshipDefinition extends AbstractRelationshipDefinition implements
 		IKeyedRelationshipDefinition {
-	private final IKeyRefDefinition keyRefDefinition;
+	private final IKeyRef keyRefDefinition;
 
-	public DefaultKeyedRelationshipDefinition(ISchema schema, String id, String xpath, IKeyRefDefinition keyRefDefinition) throws XmlException {
+	public DefaultKeyedRelationshipDefinition(ISchemaDefinition schema, String id, String xpath, IKeyRef keyRefDefinition) throws XmlException {
 		super(schema, id, xpath);
 
 		if (keyRefDefinition == null) {
@@ -16,7 +16,7 @@ public class DefaultKeyedRelationshipDefinition extends AbstractRelationshipDefi
 		this.keyRefDefinition = keyRefDefinition;
 	}
 
-	public IKeyRefDefinition getKeyRefDefinition() {
+	public IKeyRef getKeyRefDefinition() {
 		return keyRefDefinition;
 	}
 

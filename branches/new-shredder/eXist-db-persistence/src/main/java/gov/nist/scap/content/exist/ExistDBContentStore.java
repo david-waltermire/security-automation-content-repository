@@ -95,7 +95,7 @@ public class ExistDBContentStore implements ContentStore {
                 xc.insertAttributeWithValue("resource-id", resId);
                 resultResult.put(resId, ie);
             } catch (XMLDBException e) {
-                // TODO Auto-generated catch block
+            	// TODO: log exception
                 e.printStackTrace();
             } finally {
                 // dont forget to cleanup

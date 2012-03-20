@@ -20,39 +20,26 @@ public class ExistDBContentLexicalHandler implements LexicalHandler {
 
     @Override
     public void endCDATA() throws SAXException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void endDTD() throws SAXException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void endEntity(String name) throws SAXException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void startCDATA() throws SAXException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void startDTD(String name, String publicId, String systemId)
             throws SAXException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void startEntity(String name) throws SAXException {
-        // TODO Auto-generated method stub
-
     }
-
 }

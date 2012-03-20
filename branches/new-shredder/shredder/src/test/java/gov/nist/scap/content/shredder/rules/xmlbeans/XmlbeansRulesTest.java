@@ -18,6 +18,8 @@ import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -43,9 +45,16 @@ public class XmlbeansRulesTest {
 		RelationshipVisitor relationshipVisitor = new RelationshipVisitor();
 		for (IEntity<?> entity : entities) {
 			entity.accept(entityVisitor);
+			outputProperties(entity);
 			for (IRelationship<?> relationship : entity.getRelationships()) {
 				relationship.accept(relationshipVisitor);
 			}
+		}
+	}
+
+	private static void outputProperties(IEntity<?> entity) {
+		for (Map.Entry<String, ? extends Set<String>> entry : entity.getProperties().entrySet()) {
+			System.out.println("  Property: "+entry.getKey()+": "+entry.getValue().toString());
 		}
 	}
 
@@ -75,7 +84,6 @@ public class XmlbeansRulesTest {
 
 			System.out.println(qname.toString()+": "+entity.getDefinition().getId()+": "+entity.getKey().toString()+": "+ver);
 		}
-		
 	}
 
 	private static class RelationshipVisitor implements IRelationshipVisitor {

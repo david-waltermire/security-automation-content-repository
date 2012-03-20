@@ -151,7 +151,7 @@ public class EntityTranslator extends
 		// now handle all relationship information
 		
 		// handle indirect relationships first
-		for (IBoundaryIdentifierRelationship relationship : entity.getIndirectRelationships()) {
+		for (IBoundaryIdentifierRelationship relationship : entity.getBoundaryIdentifierRelationships()) {
 			String relationshipId = relationship.getDefinition().getId();
 			IExternalIdentifier externalIdentifier = relationship.getExternalIdentifier();
 			String boundaryObjectValue = relationship.getValue();

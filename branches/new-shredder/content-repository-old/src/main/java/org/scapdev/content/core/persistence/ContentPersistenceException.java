@@ -30,23 +30,12 @@ public class ContentPersistenceException extends ContentException {
 	/** the serial version UID  */
 	private static final long serialVersionUID = 1L;
 
-	public ContentPersistenceException() {
-		// TODO Auto-generated constructor stub
-	}
-
 	public ContentPersistenceException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ContentPersistenceException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ContentPersistenceException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

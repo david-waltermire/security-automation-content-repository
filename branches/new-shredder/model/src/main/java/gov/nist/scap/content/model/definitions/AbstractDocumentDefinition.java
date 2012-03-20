@@ -5,7 +5,7 @@ import javax.xml.namespace.QName;
 public abstract class AbstractDocumentDefinition extends AbstractEntityDefinition implements IDocumentDefinition {
 	private final QName name;
 
-	public AbstractDocumentDefinition(ISchema schema, String id, QName name) {
+	public AbstractDocumentDefinition(ISchemaDefinition schema, String id, QName name) {
 		super(schema, id);
 		this.name = name;
 	}

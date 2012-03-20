@@ -3,6 +3,9 @@ package gov.nist.scap.content.model;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This interface represents a distinct segment of XML that represents a concept
@@ -33,7 +36,7 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	 * Retrieves the indirect relationships associated with this entity.
 	 * @return a non-null collection
 	 */
-	Collection<? extends IBoundaryIdentifierRelationship> getIndirectRelationships();
+	Collection<? extends IBoundaryIdentifierRelationship> getBoundaryIdentifierRelationships();
 	/**
 	 * Retrieves a ContentHandle that can be used to access the underlying XML
 	 * segment represented by the entity. 
@@ -43,4 +46,7 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	IContentHandle getContentHandle();
 	void accept(IEntityVisitor visitor);
 	IVersion getVersion();
+	Map<String, ? extends Set<String>> getProperties();
+	List<String> getPropertyById(String id);
+	
 }

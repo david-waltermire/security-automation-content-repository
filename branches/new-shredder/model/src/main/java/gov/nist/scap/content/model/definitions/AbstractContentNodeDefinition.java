@@ -6,7 +6,7 @@ public abstract class AbstractContentNodeDefinition extends AbstractEntityDefini
 	private final IKeyDefinition keyDefinition;
 	private IVersionDefinition versionDefinition;
 
-	public AbstractContentNodeDefinition(ISchema schema, String id, IKeyDefinition keyDefinition) {
+	public AbstractContentNodeDefinition(ISchemaDefinition schema, String id, IKeyDefinition keyDefinition) {
 		super(schema, id);
 		if (keyDefinition == null) {
 			throw new NullPointerException("keyDefinition");

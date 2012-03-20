@@ -14,13 +14,11 @@ public class MockContentStore implements ContentStore {
 
     @Override
     public XmlObject getContent(String contentId) {
-        // TODO Auto-generated method stub
         return null;
     }
     
     @Override
     public ContentRetriever getContentRetriever(String contentId) {
-        // TODO Auto-generated method stub
         return null;
     }
     

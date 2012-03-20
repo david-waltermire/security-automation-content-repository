@@ -9,7 +9,7 @@ public class DefaultBoundaryIdentifierRelationshipDefinition extends
 	private final XPathRetriever valueRetriever;
 	private final IExternalIdentifierMapping qualifierMapping;
 
-	public DefaultBoundaryIdentifierRelationshipDefinition(ISchema schema, String id,
+	public DefaultBoundaryIdentifierRelationshipDefinition(ISchemaDefinition schema, String id,
 			String xpath, String valueXpath, IExternalIdentifierMapping qualifierMapping) throws XmlException {
 		super(schema, id, xpath);
 

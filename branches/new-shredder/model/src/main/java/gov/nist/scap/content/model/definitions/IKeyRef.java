@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Represents a key reference within an XML model.
  */
-public interface IKeyRefDefinition {
+public interface IKeyRef {
 	/**
 	 * Retrieves the key definition associated with this reference
 	 * 

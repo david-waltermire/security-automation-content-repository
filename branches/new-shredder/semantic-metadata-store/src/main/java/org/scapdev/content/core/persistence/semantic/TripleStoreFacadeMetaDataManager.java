@@ -353,53 +353,45 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             try {
                 os = new FileOutputStream("triples out.txt");
             } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
+                // TODO: log exception
                 e.printStackTrace();
             }
             
         }
         @Override
         public Repository getRepository() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public ValueFactory getValueFactory() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public boolean isOpen() throws RepositoryException {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void close() throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public Query prepareQuery(QueryLanguage ql, String query)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public Query prepareQuery(QueryLanguage ql, String query, String baseURI)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public TupleQuery prepareTupleQuery(QueryLanguage ql, String query)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -409,14 +401,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 String query,
                 String baseURI)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public GraphQuery prepareGraphQuery(QueryLanguage ql, String query)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -426,14 +416,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 String query,
                 String baseURI)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public BooleanQuery prepareBooleanQuery(QueryLanguage ql, String query)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -443,14 +431,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 String query,
                 String baseURI)
                 throws RepositoryException, MalformedQueryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public RepositoryResult<Resource> getContextIDs()
                 throws RepositoryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -461,7 +447,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 Value obj,
                 boolean includeInferred,
                 Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -472,7 +457,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 Value obj,
                 boolean includeInferred,
                 Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -481,7 +465,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 Statement st,
                 boolean includeInferred,
                 Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -494,52 +477,40 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 RDFHandler handler,
                 Resource... contexts)
                 throws RepositoryException, RDFHandlerException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void export(RDFHandler handler, Resource... contexts)
                 throws RepositoryException, RDFHandlerException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public long size(Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public boolean isEmpty() throws RepositoryException {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void setAutoCommit(boolean autoCommit)
                 throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public boolean isAutoCommit() throws RepositoryException {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void commit() throws RepositoryException {
-            // TODO Auto-generated method stub
             
         }
 
         @Override
         public void rollback() throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -549,8 +520,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 RDFFormat dataFormat,
                 Resource... contexts)
                 throws IOException, RDFParseException, RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -560,8 +529,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 RDFFormat dataFormat,
                 Resource... contexts)
                 throws IOException, RDFParseException, RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -571,8 +538,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 RDFFormat dataFormat,
                 Resource... contexts)
                 throws IOException, RDFParseException, RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -582,8 +547,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 RDFFormat dataFormat,
                 Resource... contexts)
                 throws IOException, RDFParseException, RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -595,7 +558,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             try {
                 os.write((subject.stringValue() + " " + predicate.stringValue() + " " + object.stringValue() + "\n").getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                // TODO: log exception
                 e.printStackTrace();
             }
             
@@ -607,7 +570,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             try {
                 os.write((st.getSubject().stringValue() + " " + st.getPredicate().stringValue() + " " + st.getObject().stringValue() + "\n").getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                // TODO: log exception
                 e.printStackTrace();
             }
             
@@ -621,7 +584,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 try {
                     os.write((st.getSubject().stringValue() + " " + st.getPredicate().stringValue() + " " + st.getObject().stringValue() + "\n").getBytes());
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
+                    // TODO: log exception
                     e.printStackTrace();
                 }
             }
@@ -631,8 +594,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
         public <E extends Exception> void add(
                 Iteration<? extends Statement, E> statements,
                 Resource... contexts) throws RepositoryException, E {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -641,69 +602,51 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                 URI predicate,
                 Value object,
                 Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void remove(Statement st, Resource... contexts)
                 throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void remove(
                 Iterable<? extends Statement> statements,
                 Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public <E extends Exception> void remove(
                 Iteration<? extends Statement, E> statements,
                 Resource... contexts) throws RepositoryException, E {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void clear(Resource... contexts) throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public RepositoryResult<Namespace> getNamespaces()
                 throws RepositoryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public String getNamespace(String prefix) throws RepositoryException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public void setNamespace(String prefix, String name)
                 throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void removeNamespace(String prefix) throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void clearNamespaces() throws RepositoryException {
-            // TODO Auto-generated method stub
-            
         }
         
     }

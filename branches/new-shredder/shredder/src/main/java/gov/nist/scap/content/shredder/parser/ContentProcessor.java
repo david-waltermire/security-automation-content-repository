@@ -1,10 +1,10 @@
 package gov.nist.scap.content.shredder.parser;
 
+import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.DefaultCompositeRelationship;
 import gov.nist.scap.content.model.DefaultContentNode;
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
 import gov.nist.scap.content.model.DefaultKeyedDocument;
-import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IContainer;
@@ -18,6 +18,7 @@ import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.ContentMapping;
+import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.IDocumentDefinition;
@@ -26,12 +27,13 @@ import gov.nist.scap.content.model.definitions.IEntityDefinitionVisitor;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IExternalIdentifierMapping;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
-import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
-import gov.nist.scap.content.model.definitions.IKeyRefDefinition;
+import gov.nist.scap.content.model.definitions.IKeyRef;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedField;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IPropertyDefinition;
+import gov.nist.scap.content.model.definitions.IPropertyRef;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinitionVisitor;
 import gov.nist.scap.content.model.definitions.IVersionDefinition;
@@ -76,6 +78,10 @@ public class ContentProcessor {
 				entity.setVersion(version);
 			}
 		}
+		processProperties(entity, cursor);
+
+		// Must processes everything before relationships, due to the recursion
+		// caused by CompositeRelationship processing
 		processRelationships(entity, cursor);
 
 		contentHandler.handle(entity);
@@ -126,7 +132,7 @@ public class ContentProcessor {
 		}
 	}
 
-	private static IKey getKey(IKeyDefinition keyDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+	private static IKey getKey(IKeyDefinition keyDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException {
 		List<? extends IKeyedField> fields = keyDefinition.getFields();
 
 		Map<String, String> fieldIdToValueMap = getFieldValues(fields, parentContext, cursor);
@@ -136,7 +142,7 @@ public class ContentProcessor {
 		return builder.toKey();
 	}
 
-	public static IKey getKey(IKeyRefDefinition keyRefDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+	public static IKey getKey(IKeyRef keyRefDefinition, IContainer<?> parentContext, XmlCursor cursor) throws KeyException {
 		List<? extends IKeyedField> fields = keyRefDefinition.getFields();
 		Map<String, String> referenceFieldIdToValueMap = getFieldValues(fields, parentContext, cursor);
 
@@ -147,12 +153,17 @@ public class ContentProcessor {
 		return builder.toKey();
 	}
 
-	private static LinkedHashMap<String, String> getFieldValues(List<? extends IKeyedField> fields, IContainer<?> parentContext, XmlCursor cursor) throws KeyException, ProcessingException {
+	private static LinkedHashMap<String, String> getFieldValues(List<? extends IKeyedField> fields, IContainer<?> parentContext, XmlCursor cursor) throws KeyException {
 		LinkedHashMap<String, String> fieldIdToValueMap = new LinkedHashMap<String, String>();
 
 		for (IKeyedField field : fields) {
 			String id = field.getName();
-			String value = field.getValue(parentContext, cursor);
+			String value;
+			try {
+				value = field.getValue(parentContext, cursor);
+			} catch (Exception e) {
+				throw new KeyException("unable to retrieve field: "+id, e);
+			}
 
 			if (value == null) {
 				throw new KeyException("null field '" + id + "'");
@@ -165,7 +176,22 @@ public class ContentProcessor {
 	private static IVersion processVersion(IVersionDefinition version, XmlCursor cursor) {
 		XPathRetriever valueRetriever = version.getXpath();
 		String value = valueRetriever.getValue(cursor);
-		return (value == null ? null : new DefaultVersion(version, value));
+		DefaultVersion retval = null;
+		if (value != null) {
+			retval = new  DefaultVersion(version, value);
+			retval.addVersioningMethodDefinition(version.getMethod());
+		}
+		return retval;
+	}
+
+	private static void processProperties(IMutableEntity<?> entity, XmlCursor cursor) throws ProcessingException {
+		for (IPropertyRef propertyRef : entity.getDefinition().getPropertyRefs()) {
+			IPropertyDefinition definition = propertyRef.getPropertyDefinition();
+			List<String> values = propertyRef.getValues(entity.getParent(), cursor);
+			if (values != null) {
+				entity.addProperty(definition.getId(), values);
+			}
+		}
 	}
 
 	private class ContentProcessingRelationshipDefinitionVisitor implements IRelationshipDefinitionVisitor {

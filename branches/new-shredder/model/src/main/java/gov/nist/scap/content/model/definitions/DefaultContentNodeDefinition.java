@@ -5,7 +5,7 @@ package gov.nist.scap.content.model.definitions;
 
 public class DefaultContentNodeDefinition extends AbstractContentNodeDefinition  {
 
-	public DefaultContentNodeDefinition(ISchema schema, String id, IKeyDefinition keyDefinition) {
+	public DefaultContentNodeDefinition(ISchemaDefinition schema, String id, IKeyDefinition keyDefinition) {
 		super(schema, id, keyDefinition);
 	}
 

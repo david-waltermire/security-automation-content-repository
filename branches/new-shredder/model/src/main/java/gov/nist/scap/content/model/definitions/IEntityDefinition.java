@@ -2,7 +2,7 @@ package gov.nist.scap.content.model.definitions;
 
 import java.util.Collection;
 
-public interface IEntityDefinition extends IDefinition {
+public interface IEntityDefinition extends ISchemaRelatedDefinition {
 	void addRelationship(IRelationshipDefinition relationship);
 //	/**
 //	 * Must call {@link org.apache.xmlbeans.XmlCursor#push()} before and
@@ -19,5 +19,6 @@ public interface IEntityDefinition extends IDefinition {
 
 	Collection<? extends IRelationshipDefinition> getRelationshipDefinitions();
 	IVersionDefinition getVersionDefinition();
+	Collection<? extends IPropertyRef> getPropertyRefs();
 	<T> T accept(IEntityDefinitionVisitor<T> visitor) throws ProcessingException;
 }
