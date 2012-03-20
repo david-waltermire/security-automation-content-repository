@@ -43,30 +43,30 @@ import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
  * 
  * @see IndirectRelationshipBuilder
  */
-class BoundaryObjectRelationshipStatementManager implements RegenerationStatementManager {
+class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//all IDs of indirectRelationships
-	private Collection<String> indirectRelationshipIds;
+	//all IDs of boundaryObjectRelationships
+	private Collection<String> boundaryObjectRelationshipIds;
 	
 	// key = boundary_boject_id....this map is what this class builds
-	private Map<String, IndirectRelationshipBuilder> indirectRelationships = new HashMap<String, IndirectRelationshipBuilder>();
+	private Map<String, BoundaryIdentifierRelationshipBuilder> boundaryIdentifierRelationships = new HashMap<String, BoundaryIdentifierRelationshipBuilder>();
 	
 	
-	BoundaryObjectRelationshipStatementManager(MetaDataOntology ontology) {
+	BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
-		this.indirectRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
+		this.boundaryObjectRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
 	}
 	
 	/**
-	 * Scans triple and processes it if it is relevant to indirectRelationships
+	 * Scans triple and processes it if it is relevant to boundaryObjectRelationships
 	 * @param statement
 	 * @return true if triple was processed in some way, false if it was just ignored.
 	 */
 	public boolean scan(Statement statement){
 		URI predicate = statement.getPredicate();
-		if (indirectRelationshipIds.contains(predicate.stringValue())){
-			// a triple containing an indirect relationship predicate found
+		if (boundaryObjectRelationshipIds.contains(predicate.stringValue())){
+			// a triple containing an boundary id relationship predicate found
 			populateBoundaryObjectRelationshipInfo(ontology, statement);
 			return true;
 		}
@@ -91,9 +91,9 @@ class BoundaryObjectRelationshipStatementManager implements RegenerationStatemen
 	 *            - to populate.
 	 */
 	public void populateEntity(EntityBuilder builder){
-		for (IndirectRelationshipBuilder indirectRelBuilder : indirectRelationships.values()){
-			IBoundaryIdentifierRelationship indirectRelationship = indirectRelBuilder.build(ontology, entity);
-			builder.addRelationship(indirectRelationship);
+		for (BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder : boundaryIdentifierRelationships.values()){
+			IBoundaryIdentifierRelationship boundaryObjectRelBuilderRelationship = boundaryObjectRelBuilder.build(ontology, entity);
+			builder.addRelationship(boundaryObjectRelBuilderRelationship);
 		}
 	}
 	
@@ -110,17 +110,17 @@ class BoundaryObjectRelationshipStatementManager implements RegenerationStatemen
 	 * @see RelationshipInfo
 	 */
 	private void populateBoundaryObjectRelationshipInfo(IMetadataModel model, Statement statement){
-		// hit on an indirectRelationship of some type
-		String indirectRelationshipId = statement.getPredicate().stringValue();
+		// hit on an boundaryIdRelationship of some type
+		String boundaryObjectRelationshipId = statement.getPredicate().stringValue();
 		String boundaryObjectURI = statement.getObject().stringValue();
-		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
-		if (indirectRelBuilder == null){
-			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(indirectRelationshipId));
-			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
+		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
+		if (boundaryObjectRelBuilder == null){
+			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryObjectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryObjectRelationshipId));
+			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(indirectRelationshipId));
+			boundaryObjectRelBuilder.setIndirectRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryObjectRelationshipId));
 		}
 	}
 	
@@ -137,14 +137,14 @@ class BoundaryObjectRelationshipStatementManager implements RegenerationStatemen
 	private void populateBoundaryObjectRelationshipExternalIdType(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectType = statement.getObject().stringValue();
-		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
-		if (indirectRelBuilder == null){
-			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setExternalIdType(boundaryObjectType);
-			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
+		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
+		if (boundaryObjectRelBuilder == null){
+			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryObjectRelBuilder.setExternalIdType(boundaryObjectType);
+			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setExternalIdType(boundaryObjectType);
+			boundaryObjectRelBuilder.setExternalIdType(boundaryObjectType);
 		}
 	}
 	
@@ -161,14 +161,14 @@ class BoundaryObjectRelationshipStatementManager implements RegenerationStatemen
 	private void populateBoundaryObjectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
 		String boundaryObjectURI = statement.getSubject().stringValue();
 		String boundaryObjectValue = statement.getObject().stringValue();
-		IndirectRelationshipBuilder indirectRelBuilder = indirectRelationships.get(boundaryObjectURI);
-		if (indirectRelBuilder == null){
-			indirectRelBuilder = new IndirectRelationshipBuilder();
-			indirectRelBuilder.setExternalIdValue(boundaryObjectValue);
-			indirectRelationships.put(boundaryObjectURI, indirectRelBuilder);
+		BoundaryIdentifierRelationshipBuilder boundaryObjectRelBuilder = boundaryIdentifierRelationships.get(boundaryObjectURI);
+		if (boundaryObjectRelBuilder == null){
+			boundaryObjectRelBuilder = new BoundaryIdentifierRelationshipBuilder();
+			boundaryObjectRelBuilder.setExternalIdValue(boundaryObjectValue);
+			boundaryIdentifierRelationships.put(boundaryObjectURI, boundaryObjectRelBuilder);
 		} else {
 			// can't be sure this was set before
-			indirectRelBuilder.setExternalIdValue(boundaryObjectValue);
+			boundaryObjectRelBuilder.setExternalIdValue(boundaryObjectValue);
 		}
 	}
 	

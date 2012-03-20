@@ -82,7 +82,7 @@ public class EntityTranslator extends
 	 */
 	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
-		managers.add(new BoundaryObjectRelationshipStatementManager(ontology));
+		managers.add(new BoundaryIdentifierRelationshipStatementManager(ontology));
 		managers.add(new KeyedRelationshipStatementManager(ontology, factory, relatedEntityKeys));
 		managers.add(new KeyStatementManager(ontology));
 
