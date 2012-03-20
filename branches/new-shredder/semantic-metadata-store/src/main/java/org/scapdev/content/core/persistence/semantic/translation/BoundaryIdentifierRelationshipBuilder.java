@@ -34,12 +34,12 @@ import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
  * Builder for constructing IndirectRelationships
  *
  */
-class IndirectRelationshipBuilder {
+class BoundaryIdentifierRelationshipBuilder {
 	private IBoundaryIdentifierRelationshipDefinition relationshipDefinition;
 	private String externalIdValue;
 	private String externalIdType;
 	
-	IndirectRelationshipBuilder() {
+	BoundaryIdentifierRelationshipBuilder() {
 	}
 	
 	void setExternalIdValue(String externalIdValue) {
