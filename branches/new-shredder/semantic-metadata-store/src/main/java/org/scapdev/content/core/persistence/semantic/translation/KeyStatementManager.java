@@ -30,6 +30,8 @@ import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 
 import java.util.LinkedHashMap;
 
@@ -38,195 +40,188 @@ import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
 
 /**
- * <p>A manager to coordinate the building of Key from triples originating from a specific
- * entity.</p>
+ * <p>
+ * A manager to coordinate the building of Key from triples originating from a
+ * specific entity.
+ * </p>
  * 
- * @see Key
+ * @see IKey
  */
 class KeyStatementManager implements RegenerationStatementManager {
-	private MetaDataOntology ontology;
-	
-	//TODO: Fix this later
-	//private KeyBuilder builder = new KeyBuilder();
-    private KeyBuilder builder;
-	
-	private LinkedHashMap<String, Field> fieldUriToFieldMap = new LinkedHashMap<String, Field>();
-	
-	KeyStatementManager(MetaDataOntology ontology) {
-		this.ontology = ontology;
-	}
-	
-	public boolean scan(Statement statement){
-		URI predicate = statement.getPredicate();
-		if (predicate.equals(ontology.HAS_KEY.URI)){
-			return true;  // return true to claim ownership of statement, nothing to do though
-		}
-		if (predicate.equals(ontology.HAS_KEY_TYPE.URI)){
-			populateKeyType(statement);
-			return true;
-		}
-		if (predicate.equals(ontology.HAS_FIELD_DATA.URI)){
-			populateFieldEntry(statement);
-			return true;
-		}
-		if (predicate.equals(ontology.HAS_FIELD_NAME.URI)){
-			populateFieldType(statement);
-			return true;
-		}
-		if (predicate.equals(ontology.HAS_FIELD_VALUE.URI)){
-			populateFieldValue(statement);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * <p>
-	 * Called after all triples are processed to populate re-constituted entity
-	 * with the Key found in the graph.
-	 * </p>
-	 * 
-	 * @param entity
-	 *            - to populate.
-	 */
-	public void populateEntity(IMutableEntity<?> entity){
-		populateFields();
-		//TODO: Fix this later
-        //IKey key = builder.toKey();
-	    //entity.setKey(key);
-	}
+    private MetaDataOntology ontology;
+    private String hasEntityType;
+    private String hasKeyType;
 
-	/**
-	 * Call to produce the key without populating any entity. TOOD: if this is a
-	 * normal behavior pattern it should be added to interface.
-	 * 
-	 * @return
-	 */
-	IKey produceKey(){
-		populateFields();
-		try {
-			return builder.toKey();
-		} catch (KeyException e) {
-			throw new IncompleteBuildStateException(e);
-		}
-	}
-	
-	
-	private void populateFields(){
-		for (Field field : fieldUriToFieldMap.values()){
-			builder.addField(field.getFieldId(), field.getFieldValue());
-		}
-	}
+    private LinkedHashMap<String, Field> fieldUriToFieldMap =
+        new LinkedHashMap<String, Field>();
 
-	
-	/**
-	 * <p>
-	 * Helper method to populate KeyType (or ID) based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is HAS_KEY_TYPE.
-	 * </p>
-	 * 
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
-	private void populateKeyType(Statement statement){
-		String keyType = statement.getObject().stringValue();
-		builder.setId(keyType);
-	}
-	
-	/**
-	 * <p>
-	 * Helper method to populate a single fieldEntry based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is HAS_FIELD_DATA.
-	 * </p>
-	 * 
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
-	private void populateFieldEntry(Statement statement){
-		String fieldURI = statement.getObject().stringValue();
-		Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
-		if (fieldEntry == null){
-			fieldUriToFieldMap.put(fieldURI, new Field());
-		}
-	}
-	
-	/**
-	 * <p>
-	 * Helper method to populate a field type based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_FIELD_TYPE.
-	 * </p>
-	 * 
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
-	private void populateFieldType(Statement statement){
-		String fieldURI = statement.getSubject().stringValue();
-		String fieldType = statement.getObject().stringValue();
-		Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
-		if (fieldEntry == null){
-			fieldEntry = new Field();
-			fieldEntry.setFieldId(fieldType);
-			fieldUriToFieldMap.put(fieldURI, fieldEntry);
-		} else {
-			//can't assume it was set already
-			fieldEntry.setFieldId(fieldType);
-		}
-	}
-	
-	/**
-	 * <p>
-	 * Helper method to populate a field value based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_FIELD_VALUE.
-	 * </p>
-	 * 
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
-	private void populateFieldValue(Statement statement){
-		String fieldURI = statement.getSubject().stringValue();
-		String fieldValue = statement.getObject().stringValue();
-		Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
-		if (fieldEntry == null){
-			fieldEntry = new Field();
-			fieldEntry.setFieldValue(fieldValue);
-			fieldUriToFieldMap.put(fieldURI, fieldEntry);
-		} else {
-			//can't assume it was set already
-			fieldEntry.setFieldValue(fieldValue);
-		}
-	}
-	
-	private static class Field {
-		private String fieldId;
-		private String fieldValue;
-		
-		Field() {
-			// TODO Auto-generated constructor stub
-		}
-		void setFieldId(String fieldId) {
-			this.fieldId = fieldId;
-		}
-		
-		String getFieldId() {
-			return fieldId;
-		}
-		
-		void setFieldValue(String fieldValue) {
-			this.fieldValue = fieldValue;
-		}
-		
-		String getFieldValue() {
-			return fieldValue;
-		}
-		
-	}
-	
+    KeyStatementManager(MetaDataOntology ontology) {
+        this.ontology = ontology;
+    }
+
+    public boolean scan(Statement statement) {
+        URI predicate = statement.getPredicate();
+        if (predicate.equals(ontology.HAS_KEY.URI)) {
+            return true; // return true to claim ownership of statement, nothing
+                         // to do though
+        }
+        if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)) {
+            hasEntityType = statement.getObject().stringValue();
+            return true;
+        }
+        if (predicate.equals(ontology.HAS_KEY_TYPE.URI)) {
+            hasKeyType = statement.getObject().stringValue();
+            return true;
+        }
+        if (predicate.equals(ontology.HAS_FIELD_DATA.URI)) {
+            populateFieldEntry(statement);
+            return true;
+        }
+        if (predicate.equals(ontology.HAS_FIELD_NAME.URI)) {
+            populateFieldType(statement);
+            return true;
+        }
+        if (predicate.equals(ontology.HAS_FIELD_VALUE.URI)) {
+            populateFieldValue(statement);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * <p>
+     * Called after all triples are processed to populate re-constituted entity
+     * with the Key found in the graph.
+     * </p>
+     * 
+     * @param entity - to populate.
+     */
+    public void populateEntity(IMutableEntity<?> entity) {
+        //populateFields();
+        // TODO: Fix this later
+        // IKey key = builder.toKey();
+        // entity.setKey(key);
+    }
+
+    /**
+     * Call to produce the key without populating any entity. TOOD: if this is a
+     * normal behavior pattern it should be added to interface.
+     * 
+     * @return
+     */
+    IKey produceKey() {
+        IEntityDefinition ied = ontology.getEntityDefinitionById(hasEntityType);
+        if (ied instanceof IKeyedEntityDefinition) {
+            KeyBuilder builder =
+                new KeyBuilder(
+                    ((IKeyedEntityDefinition)ied).getKeyDefinition().getFields());
+            builder.setId(hasKeyType);
+            populateFields(builder);
+            try {
+                return builder.toKey();
+            } catch (KeyException e) {
+                throw new IncompleteBuildStateException(e);
+            }
+        }
+        throw new IncompleteBuildStateException("Attempted to build key of a non-keyed type");
+    }
+
+    private void populateFields(KeyBuilder builder) {
+        for (Field field : fieldUriToFieldMap.values()) {
+            builder.addField(field.getFieldId(), field.getFieldValue());
+        }
+    }
+
+    /**
+     * <p>
+     * Helper method to populate a single fieldEntry based on the predicate
+     * found within the triple. Assumes Statement passed in contains a predicate
+     * that is HAS_FIELD_DATA.
+     * </p>
+     * 
+     * @param statement
+     * @see RelationshipInfo
+     */
+    private void populateFieldEntry(Statement statement) {
+        String fieldURI = statement.getObject().stringValue();
+        Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
+        if (fieldEntry == null) {
+            fieldUriToFieldMap.put(fieldURI, new Field());
+        }
+    }
+
+    /**
+     * <p>
+     * Helper method to populate a field type based on the predicate found
+     * within the triple. Assumes Statement passed in contains a predicate that
+     * is a subProperty of HAS_FIELD_TYPE.
+     * </p>
+     * 
+     * @param statement
+     * @see RelationshipInfo
+     */
+    private void populateFieldType(Statement statement) {
+        String fieldURI = statement.getSubject().stringValue();
+        String fieldType = statement.getObject().stringValue();
+        Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
+        if (fieldEntry == null) {
+            fieldEntry = new Field();
+            fieldEntry.setFieldId(fieldType);
+            fieldUriToFieldMap.put(fieldURI, fieldEntry);
+        } else {
+            // can't assume it was set already
+            fieldEntry.setFieldId(fieldType);
+        }
+    }
+
+    /**
+     * <p>
+     * Helper method to populate a field value based on the predicate found
+     * within the triple. Assumes Statement passed in contains a predicate that
+     * is a subProperty of HAS_FIELD_VALUE.
+     * </p>
+     * 
+     * @param statement
+     * @see RelationshipInfo
+     */
+    private void populateFieldValue(Statement statement) {
+        String fieldURI = statement.getSubject().stringValue();
+        String fieldValue = statement.getObject().stringValue();
+        Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
+        if (fieldEntry == null) {
+            fieldEntry = new Field();
+            fieldEntry.setFieldValue(fieldValue);
+            fieldUriToFieldMap.put(fieldURI, fieldEntry);
+        } else {
+            // can't assume it was set already
+            fieldEntry.setFieldValue(fieldValue);
+        }
+    }
+
+    private static class Field {
+        private String fieldId;
+        private String fieldValue;
+
+        Field() {
+            // TODO Auto-generated constructor stub
+        }
+
+        void setFieldId(String fieldId) {
+            this.fieldId = fieldId;
+        }
+
+        String getFieldId() {
+            return fieldId;
+        }
+
+        void setFieldValue(String fieldValue) {
+            this.fieldValue = fieldValue;
+        }
+
+        String getFieldValue() {
+            return fieldValue;
+        }
+
+    }
+
 }

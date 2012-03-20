@@ -23,8 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 public interface ContentRetrieverFactory {
-	ContentRetriever newContentRetriever(String contentId, IMetadataModel model);
+	ContentRetriever newContentRetriever(String contentId);
 }

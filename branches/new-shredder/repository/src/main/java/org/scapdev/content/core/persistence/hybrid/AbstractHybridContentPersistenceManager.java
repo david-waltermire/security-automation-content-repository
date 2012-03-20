@@ -57,7 +57,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		metadataStore.persist(contentIdToEntityMap);
 	}
 
-	public ContentRetriever newContentRetriever(String contentId, IMetadataModel model) {
+	public ContentRetriever newContentRetriever(String contentId) {
 		return contentStore.getContentRetriever(contentId);
 	}
 

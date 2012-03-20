@@ -141,8 +141,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
     @Override
     public IKeyedEntity<?> getEntity(
             IKey key,
-            ContentRetrieverFactory contentRetrieverFactory,
-            IMetadataModel model) throws ProcessingException {
+            ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
@@ -159,8 +158,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
                             conn), conn);
                     return entityTranslator.translateToJava(
                         entityStatements,
-                        relatedEntityKeys,
-                        model,
+                        relatedEntityKeys
                         contentRetrieverFactory);
                 }
             } catch (MalformedQueryException e) {
@@ -189,31 +187,31 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
     @Override
     public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
-        try {
-            RepositoryConnection conn = repository.getConnection();
-            try {
-                List<URI> entityURIs =
-                    queryService.findEntityUrisFromBoundaryObjectIds(
-                        indirectType,
-                        indirectIds,
-                        entityType,
-                        conn);
-                return new HashSet<IKey>(
-                    findEntityKeys(entityURIs, conn).values());
-
-            } catch (MalformedQueryException e) {
-                log.error(e);
-                throw new RuntimeException(e);
-            } catch (QueryEvaluationException e2) {
-                log.error(e2);
-                throw new RuntimeException(e2);
-            } finally {
-                conn.close();
-            }
-
-        } catch (RepositoryException e) {
-            log.error(e);
-        }
+//        try {
+//            RepositoryConnection conn = repository.getConnection();
+//            try {
+//                List<URI> entityURIs =
+//                    queryService.findEntityUrisFromBoundaryObjectIds(
+//                        indirectType,
+//                        indirectIds,
+//                        entityType,
+//                        conn);
+//                return new HashSet<IKey>(
+//                    findEntityKeys(entityURIs, conn).values());
+//
+//            } catch (MalformedQueryException e) {
+//                log.error(e);
+//                throw new RuntimeException(e);
+//            } catch (QueryEvaluationException e2) {
+//                log.error(e2);
+//                throw new RuntimeException(e2);
+//            } finally {
+//                conn.close();
+//            }
+//
+//        } catch (RepositoryException e) {
+//            log.error(e);
+//        }
         return null;
     }
 
@@ -240,8 +238,8 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             Map<String, IEntity<?>> contentIdToEntityMap) {
         try {
             //TODO change this back
-            //RepositoryConnection conn = repository.getConnection();
-            RepositoryConnection conn = new RepositoryConnectionTest();
+            RepositoryConnection conn = repository.getConnection();
+            //RepositoryConnection conn = new RepositoryConnectionTest();
             try {
 
                 IEntityVisitor entityVisitor = new ToRDFEntityVisitor(factory, ontology, new DefaultURIToEntityMap(factory, BASE_URI, contentIdToEntityMap), conn);
@@ -312,7 +310,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
     @Override
     public void shutdown() {
-        // TODO: Implement me
+        try {
+            repository.getConnection().close();
+        } catch (RepositoryException e) {
+            log.error(e);
+        }
     }
     
     private class DefaultURIToEntityMap implements EntityMetadataMap {
@@ -343,7 +345,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
         
     }
     
-    //TODO remove this...it's for testing only
+//    //TODO remove this...it's for testing only
     private class RepositoryConnectionTest implements RepositoryConnection {
 
         OutputStream os;
