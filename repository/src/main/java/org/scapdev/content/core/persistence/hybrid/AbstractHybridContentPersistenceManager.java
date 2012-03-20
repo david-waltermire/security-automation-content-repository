@@ -48,8 +48,8 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		this.contentStore = contentStore;
 	}
 
-	public IKeyedEntity<?> getEntityByKey(IKey key, IMetadataModel model) throws ProcessingException {
-		return generateKeyedEntity(key, model);
+	public IKeyedEntity<?> getEntityByKey(IKey key) throws ProcessingException {
+		return generateKeyedEntity(key);
 	}
 
 	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) {
@@ -61,8 +61,8 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return contentStore.getContentRetriever(contentId);
 	}
 
-	private IKeyedEntity<?> generateKeyedEntity(IKey key, IMetadataModel model) throws ProcessingException {
-		return metadataStore.getEntity(key, this, model);
+	private IKeyedEntity<?> generateKeyedEntity(IKey key) throws ProcessingException {
+		return metadataStore.getEntity(key, this);
 	}
 
 
