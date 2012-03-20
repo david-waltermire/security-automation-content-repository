@@ -1,10 +1,11 @@
 package gov.nist.scap.content.metadata.tripstore;
 
-import gov.nist.scap.content.exist.ExistDBContentRetrieverFactory;
 import gov.nist.scap.content.exist.ExistDBContentStore;
+import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
@@ -12,7 +13,6 @@ import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
 
-import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -41,7 +41,7 @@ public class TestRetrieve {
         ExistDBContentStore cs = new ExistDBContentStore();
         Map<String, IEntity<?>> result = cs.persist(entities);
 
-        TripleStoreFacadeMetaDataManager tsfdm = TripleStoreFacadeMetaDataManager.getInstance();
+        TripleStoreFacadeMetaDataManager tsfdm = TripleStoreFacadeMetaDataManager.getInstance(cs);
         tsfdm.loadModel(xmlbeansRules);
         tsfdm.persist(result);
 
@@ -55,12 +55,26 @@ public class TestRetrieve {
         }
         
 
-        IKeyedEntity<?> entity = tsfdm.getEntity(key, ExistDBContentRetrieverFactory.getInstance(cs));
-        FileOutputStream fos = new FileOutputStream("testout.xml");
-        fos.write(entity.getContentHandle().getCursor().xmlText().getBytes("UTF-8"));
-        fos.flush();
-        fos.close();
+        IKeyedEntity<?> entity = tsfdm.getEntity(key);
+
+        for( Map.Entry<String, String> entry : entity.getKey().getFieldNameToValueMap().entrySet() ) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+        for( IKeyedRelationship rel : entity.getKeyedRelationships() ) {
+            for( Map.Entry<String, String> entry : rel.getReferencedEntity().getKey().getFieldNameToValueMap().entrySet() ) {
+                System.out.println(entry.getKey() + " : " + entry.getValue());
+            }
+        }
+        //TODO need to populate parent
+        for( ICompositeRelationship rel : entity.getCompositeRelationships() ) {
+            System.out.println(rel.getReferencedEntity().getDefinition().getId());
+        }
         
+//        FileOutputStream fos = new FileOutputStream("testout.xml");
+//        fos.write(entity.getContentHandle().getCursor().xmlText().getBytes("UTF-8"));
+//        fos.flush();
+//        fos.close();
+//        
         
 
     }

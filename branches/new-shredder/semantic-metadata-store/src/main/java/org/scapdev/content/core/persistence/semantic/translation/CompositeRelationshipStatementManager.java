@@ -24,7 +24,9 @@
 package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.ICompositeRelationship;
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -33,7 +35,7 @@ import java.util.Map;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
+import org.scapdev.content.core.persistence.semantic.IPersistenceContext;
 import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 import org.scapdev.content.core.persistence.semantic.entity.EntityProxy;
 
@@ -43,7 +45,8 @@ import org.scapdev.content.core.persistence.semantic.entity.EntityProxy;
  * @see CompositeRelationshipBuilder
  */
 class CompositeRelationshipStatementManager implements RegenerationStatementManager {
-	private MetaDataOntology ontology;
+	private final String baseURI;
+    private final IPersistenceContext persistContext;
 	
 	//all IDs of compositeIdentifierRelationships
 	private Collection<String> compositeRelationshipIds;
@@ -51,10 +54,13 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	// key = boundary_boject_id....this map is what this class builds
 	private Map<String, CompositeRelationshipBuilder> compositeRelationships = new HashMap<String, CompositeRelationshipBuilder>();
 	
+    
 	
-	CompositeRelationshipStatementManager(MetaDataOntology ontology) {
-		this.ontology = ontology;
-		this.compositeRelationshipIds = ontology.getCompositeRelationshipIds();
+	CompositeRelationshipStatementManager(String baseURI,
+        IPersistenceContext persistContext) {
+	    this.baseURI = baseURI;
+	    this.persistContext = persistContext;
+	    this.compositeRelationshipIds = persistContext.getOntology().getCompositeRelationshipIds();
 	}
 	
 	/**
@@ -65,7 +71,7 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	public boolean scan(Statement statement){
 		URI predicate = statement.getPredicate();
 		if (compositeRelationshipIds.contains(predicate.stringValue())){
-			populateCompositeRelationshipInfo(ontology, statement);
+			populateCompositeRelationshipInfo(persistContext.getOntology(), statement);
 			return true;
 		}
 		return false;
@@ -82,7 +88,7 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	 */
 	public void populateEntity(EntityBuilder builder){
 		for (CompositeRelationshipBuilder compositeRelBuilder : compositeRelationships.values()){
-			ICompositeRelationship compositeRelBuilderRelationship = compositeRelBuilder.build(ontology);
+			ICompositeRelationship compositeRelBuilderRelationship = compositeRelBuilder.build(persistContext.getOntology());
 			builder.addRelationship(compositeRelBuilderRelationship);
 		}
 	}
@@ -107,7 +113,7 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 		if (compositeRelBuilder == null){
 			compositeRelBuilder = new CompositeRelationshipBuilder();
 			compositeRelBuilder.setCompositeRelationshipInfo((ICompositeRelationshipDefinition)model.getRelationshipDefinitionById(compositeRelationshipId));
-			compositeRelBuilder.setRelatedEntity(new EntityProxy());
+			compositeRelBuilder.setRelatedEntity(new EntityProxy<IEntityDefinition,IEntity<IEntityDefinition>>(baseURI,persistContext,persistContext.getRepository().getValueFactory().createURI(compositeURI)));
 			compositeRelationships.put(compositeURI, compositeRelBuilder);
 		}
 	}

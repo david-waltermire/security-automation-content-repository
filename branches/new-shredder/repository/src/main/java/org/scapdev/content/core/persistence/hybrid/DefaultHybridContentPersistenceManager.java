@@ -23,30 +23,8 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
-import org.scapdev.content.util.ServiceLoaderUtil;
-
-
-
 public class DefaultHybridContentPersistenceManager extends AbstractHybridContentPersistenceManager {
-	public static final String METADATA_STORE_FACTORY = "repository.content.hybrid.metadata-manager-factory";
-	public static final String CONTENT_STORE_FACTORY = "repository.content.hybrid.content-manager-factory";
-
-	public DefaultHybridContentPersistenceManager() {
-		super(getMetadataStore(), getContentStore());
-	}
-
 	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		super(metadataStore, contentStore);
-	}
-
-	//TODO: update the nulls to whatever the default implements are to be
-	private static MetadataStore getMetadataStore() {
-		MetadataStoreFactory factory = ServiceLoaderUtil.load(MetadataStoreFactory.class, METADATA_STORE_FACTORY, null, DefaultHybridContentPersistenceManager.class.getClassLoader());
-		return factory.newMetadataStore();
-	}
-
-	private static ContentStore getContentStore() {
-		ContentStoreFactory factory = ServiceLoaderUtil.load(ContentStoreFactory.class, CONTENT_STORE_FACTORY, null, DefaultHybridContentPersistenceManager.class.getClassLoader());
-		return factory.newContentStore();
 	}
 }

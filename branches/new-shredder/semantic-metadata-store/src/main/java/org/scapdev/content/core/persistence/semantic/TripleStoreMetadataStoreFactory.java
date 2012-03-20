@@ -23,13 +23,14 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.semantic;
 
+import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
 import org.scapdev.content.core.persistence.hybrid.MetadataStoreFactory;
 
 public class TripleStoreMetadataStoreFactory implements MetadataStoreFactory {
 
 	@Override
-	public MetadataStore newMetadataStore() {
-		return TripleStoreFacadeMetaDataManager.getInstance();
+	public MetadataStore newMetadataStore(ContentRetrieverFactory contentRetrieverFactory) {
+		return TripleStoreFacadeMetaDataManager.getInstance(contentRetrieverFactory);
 	}
 }

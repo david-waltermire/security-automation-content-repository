@@ -39,11 +39,10 @@ public interface MetadataStore {
 	/**
 	 * 
 	 * @param key
-	 * @param contentRetrieverFactory
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 * @throws ProcessingException 
 	 */
-	IKeyedEntity<?> getEntity(IKey key, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException;
+	IKeyedEntity<?> getEntity(IKey key) throws ProcessingException;
 
 	   /**
      * 

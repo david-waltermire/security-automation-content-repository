@@ -24,5 +24,5 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 public interface MetadataStoreFactory {
-	MetadataStore newMetadataStore();
+	MetadataStore newMetadataStore(ContentRetrieverFactory contentRetrieverFactory);
 }

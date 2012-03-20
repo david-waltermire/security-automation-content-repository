@@ -15,6 +15,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.exist.xmldb.DatabaseInstanceManager;
 import org.exist.xmldb.EXistResource;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
+import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
@@ -31,6 +32,8 @@ public class ExistDBContentStore implements ContentStore {
     private static final String PASSWORD = "test123";
     public static final String WRAPPER_ELEMENT = "abcdefghijklm";
 
+    private final ContentRetrieverFactory contentRetrieverFactory;
+    
     private Collection col = null;
 
     public ExistDBContentStore()
@@ -45,6 +48,8 @@ public class ExistDBContentStore implements ContentStore {
 
         col = getOrCreateCollection(COLLECTION);
         col.setProperty(OutputKeys.INDENT, "no");
+        
+        contentRetrieverFactory = ExistDBContentRetrieverFactory.getInstance(this);
 
     }
 
@@ -190,6 +195,11 @@ public class ExistDBContentStore implements ContentStore {
             return getOrCreateCollection(collectionUri, ++pathSegmentOffset);
         }
         return col;
+    }
+    
+    @Override
+    public ContentRetriever newContentRetriever(String contentId) {
+        return contentRetrieverFactory.newContentRetriever(contentId);
     }
 
 }

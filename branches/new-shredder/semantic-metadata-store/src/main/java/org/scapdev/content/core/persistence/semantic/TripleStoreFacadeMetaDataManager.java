@@ -29,6 +29,7 @@ import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import info.aduna.iteration.Iteration;
@@ -75,8 +76,8 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
+import org.scapdev.content.core.persistence.semantic.entity.KeyedEntityProxy;
 import org.scapdev.content.core.persistence.semantic.translation.EntityMetadataMap;
-import org.scapdev.content.core.persistence.semantic.translation.EntityTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
 import org.scapdev.content.core.persistence.semantic.translation.ToRDFEntityVisitor;
 
@@ -84,7 +85,7 @@ import org.scapdev.content.core.persistence.semantic.translation.ToRDFEntityVisi
  * At this point this is just going to be a facade into the triple store REST
  * interfaces
  */
-public class TripleStoreFacadeMetaDataManager implements MetadataStore {
+public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersistenceContext {
     private static final Logger log =
         Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
     private static final String BASE_URI =
@@ -98,11 +99,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
     private TripleStoreQueryService queryService;
 
-    EntityTranslator entityTranslator;
-
     private boolean modelLoaded = false;
+    
+    private ContentRetrieverFactory contentRetrieverFactory;
 
-    private TripleStoreFacadeMetaDataManager() {
+    
+    private TripleStoreFacadeMetaDataManager(ContentRetrieverFactory contentRetrieverFactory) {
         // NOTE: this type is non-inferencing, see
         // http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more
         // detail
@@ -116,17 +118,16 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             repository.initialize();
             factory = repository.getValueFactory();
             ontology = new MetaDataOntology(factory);
-            queryService = new TripleStoreQueryService(repository, ontology);
-            entityTranslator =
-                new EntityTranslator(BASE_URI, ontology, factory);
+            queryService = new TripleStoreQueryService(this);
+            this.contentRetrieverFactory = contentRetrieverFactory; 
         } catch (RepositoryException e) {
             log.error("Exception iniitalizing triple store", e);
         }
 
     }
     
-    public static TripleStoreFacadeMetaDataManager getInstance() {
-        return new TripleStoreFacadeMetaDataManager();
+    public static TripleStoreFacadeMetaDataManager getInstance(ContentRetrieverFactory contentRetrieverFactory) {
+        return new TripleStoreFacadeMetaDataManager(contentRetrieverFactory);
     }
     
     public void loadModel(IMetadataModel model) throws RepositoryException {
@@ -140,26 +141,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
 
     @Override
     public IKeyedEntity<?> getEntity(
-            IKey key,
-            ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
+            IKey key) throws ProcessingException {
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
                 URI entityURI = queryService.findEntityURI(key, conn);
                 if (entityURI != null) {
-                    Set<Statement> entityStatements =
-                        getEntityStatements(entityURI, conn);
-                    // need to find the entityKeys from the
-                    // KeyedRelationship...these are not included in
-                    // owningEntityContext on persist
-                    Map<URI, IKey> relatedEntityKeys =
-                        findEntityKeys(queryService.findAllRelatedEntityURIs(
-                            entityURI,
-                            conn), conn);
-                    return entityTranslator.translateToJava(
-                        entityStatements,
-                        relatedEntityKeys,
-                        contentRetrieverFactory);
+                    return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(BASE_URI, this, entityURI);
                 }
             } catch (MalformedQueryException e) {
                 log.error(e);
@@ -342,6 +330,21 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore {
             return factory.createURI(baseURI + contentId);
         }
         
+    }
+    
+    @Override
+    public ContentRetrieverFactory getContentRetrieverFactory() {
+        return contentRetrieverFactory;
+    }
+    
+    @Override
+    public MetaDataOntology getOntology() {
+        return ontology;
+    }
+    
+    @Override
+    public Repository getRepository() {
+        return repository;
     }
     
 //    //TODO remove this...it's for testing only

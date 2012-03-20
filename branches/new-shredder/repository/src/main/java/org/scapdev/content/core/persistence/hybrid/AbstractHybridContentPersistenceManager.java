@@ -62,13 +62,21 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 	}
 
 	private IKeyedEntity<?> generateKeyedEntity(IKey key) throws ProcessingException {
-		return metadataStore.getEntity(key, this);
+		return metadataStore.getEntity(key);
 	}
 
 
 	public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
 		return metadataStore.getKeysForBoundaryIdentifier(externalIdentifier, boundaryObjectIds, entityTypes);
 	}
+	
+    public MetadataStore getMetadataStore() {
+       return metadataStore;
+    }
+
+    public ContentStore getContentStore() {
+        return contentStore;
+    }
 
 //	@Override
 //	public Map<String, ? extends EntityStatistic> getEntityStatistics(

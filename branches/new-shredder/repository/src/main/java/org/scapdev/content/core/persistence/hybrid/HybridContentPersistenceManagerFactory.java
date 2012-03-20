@@ -24,14 +24,34 @@
 package org.scapdev.content.core.persistence.hybrid;
 
 import org.scapdev.content.core.persistence.ContentPersistenceManagerFactory;
+import org.scapdev.content.util.ServiceLoaderUtil;
 
 public class HybridContentPersistenceManagerFactory implements ContentPersistenceManagerFactory {
-	public HybridContentPersistenceManager newContentPersistenceManager() {
-		return new DefaultHybridContentPersistenceManager();
+	
+    public static final String METADATA_STORE_FACTORY = "repository.content.hybrid.metadata-manager-factory";
+    public static final String CONTENT_STORE_FACTORY = "repository.content.hybrid.content-manager-factory";
+
+
+    public HybridContentPersistenceManager newContentPersistenceManager() {
+        ContentStore cs = newContentStore();
+        MetadataStore ms = newMetadataStore(cs);
+        return new DefaultHybridContentPersistenceManager(ms, cs);
 	}
 
 	@SuppressWarnings("static-method")
 	public HybridContentPersistenceManager newHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		return new DefaultHybridContentPersistenceManager(metadataStore, contentStore);
 	}
+	
+	   //TODO: update the nulls to whatever the default implements are to be
+    static MetadataStore newMetadataStore(ContentStore cs) {
+        MetadataStoreFactory factory = ServiceLoaderUtil.load(MetadataStoreFactory.class, METADATA_STORE_FACTORY, null, DefaultHybridContentPersistenceManager.class.getClassLoader());
+        return factory.newMetadataStore(cs);
+    }
+
+    static ContentStore newContentStore() {
+        ContentStoreFactory factory = ServiceLoaderUtil.load(ContentStoreFactory.class, CONTENT_STORE_FACTORY, null, DefaultHybridContentPersistenceManager.class.getClassLoader());
+        return factory.newContentStore();
+    }
+
 }
