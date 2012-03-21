@@ -51,6 +51,7 @@ class KeyStatementManager implements RegenerationStatementManager {
     private MetaDataOntology ontology;
     private String hasEntityType;
     private String hasKeyType;
+    private boolean hasKey = false;
 
     private LinkedHashMap<String, Field> fieldUriToFieldMap =
         new LinkedHashMap<String, Field>();
@@ -62,6 +63,7 @@ class KeyStatementManager implements RegenerationStatementManager {
     public boolean scan(Statement statement) {
         URI predicate = statement.getPredicate();
         if (predicate.equals(ontology.HAS_KEY.URI)) {
+            hasKey = true;
             return true; // return true to claim ownership of statement, nothing
                          // to do though
         }
@@ -97,7 +99,8 @@ class KeyStatementManager implements RegenerationStatementManager {
      * @param entity - to populate.
      */
     public void populateEntity(EntityBuilder builder) {
-    	builder.setKey(produceKey());
+        if( hasKey )
+            builder.setKey(produceKey());
     }
 
     /**

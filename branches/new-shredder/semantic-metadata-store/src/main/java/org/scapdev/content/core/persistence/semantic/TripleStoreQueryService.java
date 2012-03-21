@@ -24,8 +24,12 @@
 package org.scapdev.content.core.persistence.semantic;
 
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -182,17 +186,22 @@ public class TripleStoreQueryService {
 	 * @throws MalformedQueryException
 	 * @throws QueryEvaluationException
 	 */
-	List<URI> findEntityUrisFromBoundaryObjectIds(String boudaryObjectType, Collection<String> boundaryObjectValues, Set<String> entityTypes, RepositoryConnection conn) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+	Map<String, List<URI>> findEntityUrisFromBoundaryObjectIds(IExternalIdentifier externalIdentifier, Collection<String> boundaryIdentifierValues, Set<? extends IEntityDefinition> entityTypes, RepositoryConnection conn) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
 		String entityURIVariableName = "_e";
-		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelatedBoundaryObjectSearchString(boudaryObjectType, boundaryObjectValues, entityTypes, entityURIVariableName));
+		String boundaryIdVariableName = "_boundaryObjectValue";
+		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, generateRelatedBoundaryObjectSearchString(externalIdentifier.getId(), boundaryIdentifierValues, entityTypes, boundaryIdVariableName, entityURIVariableName));
 	    TupleQueryResult result = tupleQuery.evaluate();
-	    List<URI> relatedEntityURIs = new LinkedList<URI>();
+	    Map<String, List<URI>> relatedEntityURIs = new HashMap<String, List<URI>>();
 	    try {
 		    BindingSet resultSet = null;
 		    while (result.hasNext()){
 		    	resultSet = result.next(); 
+		    	Value boundaryId = resultSet.getValue(boundaryIdVariableName);
 		    	Value entityURI = resultSet.getValue(entityURIVariableName);
-		    	relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
+		    	if( !relatedEntityURIs.containsKey(boundaryId.stringValue()) ) {
+		    	    relatedEntityURIs.put(boundaryId.stringValue(), new LinkedList<URI>());
+		    	}
+		    	relatedEntityURIs.get(boundaryId.stringValue()).add(factory.createURI(entityURI.stringValue()));
 		    }
 	    } finally {
 	    	result.close();
@@ -307,35 +316,41 @@ public class TripleStoreQueryService {
 	 * @return
 	 */
 	private String generateRelatedBoundaryObjectSearchString(
-			String boudaryObjectType, Collection<String> boundaryObjectValues,
-			Set<String> entityTypes, String entityURIVariableName) {
+			String boudaryObjectType, 
+			Collection<String> boundaryIdentifierValues,
+			Set<? extends IEntityDefinition> entityTypes,
+			String boundaryIdVariableName,
+			String entityURIVariableName) {
 		String entityTypeVariable = "entityType";
 		String boundaryObjectVariable = "boundaryObject";
-		String boundaryObjectValueVariable = "boundaryObjectValue";
 		
 		StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(NEW_LINE);
+		queryBuilder.append("SELECT ").append(boundaryIdVariableName).append(", ").append(entityURIVariableName).append(" ").append(NEW_LINE);
 		//_e hasEntityType {entityType};
 		queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
-		queryBuilder.append("<").append(ontology.HAS_ENTITY_TYPE.URI).append("> ");
+		queryBuilder.append("  <").append(ontology.HAS_ENTITY_TYPE.URI).append("> ");
 		queryBuilder.append("{").append(entityTypeVariable).append("}").append(";").append(NEW_LINE);
 		// hasIndirectRelationship {boundaryObject},
-		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append("> ");
+		queryBuilder.append("  <").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append("> ");
 		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(",").append(NEW_LINE);
 		// {boundaryObject} hasType {boundaryObjectType};
-		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(" ").append(NEW_LINE);
+		queryBuilder.append("{").append(boundaryObjectVariable).append("}").append(" ");
 		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI).append("> ");
 		queryBuilder.append("{\"").append(boudaryObjectType).append("\"};").append(NEW_LINE);
 		// hasValue {boundaryObjectValue} 
 		queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI).append("> ");
-		queryBuilder.append("{").append(boundaryObjectValueVariable).append("}").append(" ").append(NEW_LINE);
+		queryBuilder.append("{").append(boundaryIdVariableName).append("}").append(" ").append(NEW_LINE);
 		// WHERE
 		queryBuilder.append("WHERE").append(NEW_LINE);
 		if (!entityTypes.isEmpty()){
-			queryBuilder.append(entityTypeVariable).append(" IN ").append(convertStringSetForInClause(entityTypes)).append(NEW_LINE);
-			queryBuilder.append(" AND ").append(NEW_LINE);
+		    Collection<String> target = new HashSet<String>();
+		    for( IEntityDefinition ied : entityTypes ) {
+		        target.add(ied.getId());
+		    }
+			queryBuilder.append(entityTypeVariable).append(" IN ").append(convertStringSetForInClause(target)).append(NEW_LINE);
+			queryBuilder.append("AND").append(NEW_LINE);
 		}
-		queryBuilder.append(boundaryObjectValueVariable).append(" IN ").append(convertStringSetForInClause(boundaryObjectValues)).append(NEW_LINE);
+		queryBuilder.append(boundaryIdVariableName).append(" IN ").append(convertStringSetForInClause(boundaryIdentifierValues)).append(NEW_LINE);
 		
 		return queryBuilder.toString();
 	}

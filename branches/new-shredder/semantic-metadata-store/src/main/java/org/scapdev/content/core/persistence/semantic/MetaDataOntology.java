@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.openrdf.model.BNode;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -103,9 +104,13 @@ public class MetaDataOntology implements IMetadataModel {
 	private Map<String, Construct> compositeRelationships = new HashMap<String, Construct>();
 	
 	private IMetadataModel javaModel = null;
+	
+	private BNode context;
     
 	MetaDataOntology(ValueFactory factory) {
 		this.factory = factory;
+		context = factory.createBNode();
+
 		
 		// define classes
 		ENTITY_CLASS = new Construct(genModelURI("entity"), "entity");
@@ -170,7 +175,7 @@ public class MetaDataOntology implements IMetadataModel {
         
         this.javaModel = javaModel;
 		
-		conn.add(statements);
+		conn.add(statements, context);
 	}
 	
 

@@ -46,6 +46,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,7 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
+import org.scapdev.content.core.persistence.semantic.entity.EntityProxy;
 import org.scapdev.content.core.persistence.semantic.entity.KeyedEntityProxy;
 import org.scapdev.content.core.persistence.semantic.translation.EntityMetadataMap;
 import org.scapdev.content.core.persistence.semantic.translation.KeyTranslator;
@@ -85,7 +87,8 @@ import org.scapdev.content.core.persistence.semantic.translation.ToRDFEntityVisi
  * At this point this is just going to be a facade into the triple store REST
  * interfaces
  */
-public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersistenceContext {
+public class TripleStoreFacadeMetaDataManager implements MetadataStore,
+        IPersistenceContext {
     private static final Logger log =
         Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
     private static final String BASE_URI =
@@ -100,11 +103,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
     private TripleStoreQueryService queryService;
 
     private boolean modelLoaded = false;
-    
+
     private ContentRetrieverFactory contentRetrieverFactory;
 
-    
-    private TripleStoreFacadeMetaDataManager(ContentRetrieverFactory contentRetrieverFactory) {
+    private TripleStoreFacadeMetaDataManager(
+            ContentRetrieverFactory contentRetrieverFactory) {
         // NOTE: this type is non-inferencing, see
         // http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more
         // detail
@@ -119,35 +122,39 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
             factory = repository.getValueFactory();
             ontology = new MetaDataOntology(factory);
             queryService = new TripleStoreQueryService(this);
-            this.contentRetrieverFactory = contentRetrieverFactory; 
+            this.contentRetrieverFactory = contentRetrieverFactory;
         } catch (RepositoryException e) {
             log.error("Exception iniitalizing triple store", e);
         }
 
     }
-    
-    public static TripleStoreFacadeMetaDataManager getInstance(ContentRetrieverFactory contentRetrieverFactory) {
+
+    public static TripleStoreFacadeMetaDataManager getInstance(
+            ContentRetrieverFactory contentRetrieverFactory) {
         return new TripleStoreFacadeMetaDataManager(contentRetrieverFactory);
     }
-    
+
     public void loadModel(IMetadataModel model) throws RepositoryException {
         if (!modelLoaded) {
             ontology.loadModel(repository.getConnection(), model);
             modelLoaded = true;
         } else {
-            throw new IllegalStateException("The model has already been loaded.");
+            throw new IllegalStateException(
+                "The model has already been loaded.");
         }
     }
 
     @Override
-    public IKeyedEntity<?> getEntity(
-            IKey key) throws ProcessingException {
+    public IKeyedEntity<?> getEntity(IKey key) throws ProcessingException {
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
                 URI entityURI = queryService.findEntityURI(key, conn);
                 if (entityURI != null) {
-                    return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(BASE_URI, this, entityURI);
+                    return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
+                        BASE_URI,
+                        this,
+                        entityURI);
                 }
             } catch (MalformedQueryException e) {
                 log.error(e);
@@ -166,39 +173,63 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
     }
 
     @Override
-    public IEntity<?> getEntity(
-            String contentId,
-            ContentRetrieverFactory contentRetrieverFactory) {
+    public IEntity<?> getEntity(String contentId) {
+        try {
+            RepositoryConnection conn = repository.getConnection();
+            try {
+                URI entityURI =
+                    queryService.findEntityURIbyContentId(contentId, conn);
+                if (entityURI != null) {
+                    return new EntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
+                        BASE_URI,
+                        this,
+                        entityURI);
+                }
+            } catch (MalformedQueryException e) {
+                log.error(e);
+                throw new RuntimeException(e);
+            } catch (QueryEvaluationException e2) {
+                log.error(e2);
+                throw new RuntimeException(e2);
+            } finally {
+                conn.close();
+            }
+
+        } catch (RepositoryException e) {
+            log.error(e);
+        }
         return null;
     }
 
     @Override
-    public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
-//        try {
-//            RepositoryConnection conn = repository.getConnection();
-//            try {
-//                List<URI> entityURIs =
-//                    queryService.findEntityUrisFromBoundaryObjectIds(
-//                        indirectType,
-//                        indirectIds,
-//                        entityType,
-//                        conn);
-//                return new HashSet<IKey>(
-//                    findEntityKeys(entityURIs, conn).values());
-//
-//            } catch (MalformedQueryException e) {
-//                log.error(e);
-//                throw new RuntimeException(e);
-//            } catch (QueryEvaluationException e2) {
-//                log.error(e2);
-//                throw new RuntimeException(e2);
-//            } finally {
-//                conn.close();
-//            }
-//
-//        } catch (RepositoryException e) {
-//            log.error(e);
-//        }
+    public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(
+            IExternalIdentifier externalIdentifier,
+            Collection<String> boundaryObjectIds,
+            Set<? extends IEntityDefinition> entityTypes) {
+        try {
+            RepositoryConnection conn = repository.getConnection();
+            try {
+                Map<String, List<URI>> entityURIs =
+                    queryService.findEntityUrisFromBoundaryObjectIds(
+                        externalIdentifier,
+                        boundaryObjectIds,
+                        entityTypes,
+                        conn);
+                return findEntityKeys(entityURIs, conn);
+
+            } catch (MalformedQueryException e) {
+                log.error(e);
+                throw new RuntimeException(e);
+            } catch (QueryEvaluationException e2) {
+                log.error(e2);
+                throw new RuntimeException(e2);
+            } finally {
+                conn.close();
+            }
+
+        } catch (RepositoryException e) {
+            log.error(e);
+        }
         return null;
     }
 
@@ -221,15 +252,21 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
      * </p>
      */
     @Override
-    public void persist(
-            Map<String, IEntity<?>> contentIdToEntityMap) {
+    public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
         try {
-            //TODO change this back
+            // TODO change this back
             RepositoryConnection conn = repository.getConnection();
-            //RepositoryConnection conn = new RepositoryConnectionTest();
+            // RepositoryConnection conn = new RepositoryConnectionTest();
             try {
 
-                IEntityVisitor entityVisitor = new ToRDFEntityVisitor(factory, ontology, new DefaultURIToEntityMap(factory, BASE_URI, contentIdToEntityMap), conn);
+                IEntityVisitor entityVisitor =
+                    new ToRDFEntityVisitor(
+                        factory,
+                        ontology,
+                        new DefaultURIToEntityMap(
+                            factory,
+                            BASE_URI,
+                            contentIdToEntityMap), conn);
                 for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet()) {
                     entry.getValue().accept(entityVisitor);
                 }
@@ -242,7 +279,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
         }
     }
 
-
     /**
      * Helper method to generate keys for all entities
      * 
@@ -253,23 +289,28 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
      * @throws QueryEvaluationException
      * @throws RepositoryException
      */
-    private Map<URI, IKey> findEntityKeys(
-            List<URI> entityURIs,
+    private Map<String, Set<? extends IKey>> findEntityKeys(
+            Map<String, List<URI>> entityURIs,
             RepositoryConnection conn)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
         KeyTranslator keyTranslator =
             new KeyTranslator(BASE_URI, ontology, factory);
-        Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
-        for (URI entityURI : entityURIs) {
-            Set<Statement> entityStatements =
-                getEntityStatements(entityURI, conn);
-            // TODO: may want to refactor to only pass translator key
-            // statements, but this will work
-            IKey entityKey = keyTranslator.translateToJava(entityStatements);
-            entityURIToKeyMap.put(entityURI, entityKey);
+        Map<String, Set<? extends IKey>> boundaryIdToKeyMap = new HashMap<String, Set<? extends IKey>>();
+        for (Map.Entry<String, List<URI>> entry : entityURIs.entrySet()) {
+            Set<IKey> map = new HashSet<IKey>();
+            boundaryIdToKeyMap.put(entry.getKey(), map);
+            for (URI entityURI : entry.getValue()) {
+                Set<Statement> entityStatements =
+                    getEntityStatements(entityURI, conn);
+                // TODO: may want to refactor to only pass translator key
+                // statements, but this will work
+                IKey entityKey =
+                    keyTranslator.translateToJava(entityStatements);
+                map.add(entityKey);
+            }
         }
-        return entityURIToKeyMap;
+        return boundaryIdToKeyMap;
     }
 
     /**
@@ -294,7 +335,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
             new HashSet<Statement>());
     }
 
-
     @Override
     public void shutdown() {
         try {
@@ -303,355 +343,52 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore, IPersist
             log.error(e);
         }
     }
-    
+
     private class DefaultURIToEntityMap implements EntityMetadataMap {
-        
-        private final Map<IEntity<?>, String> entityToContentIdMap = new HashMap<IEntity<?>, String>();
+
+        private final Map<IEntity<?>, String> entityToContentIdMap =
+            new HashMap<IEntity<?>, String>();
         private final String baseURI;
-        
-        
-        public DefaultURIToEntityMap(ValueFactory factory, String baseURI, Map<String, IEntity<?>> contentIdToEntityMap) {
-             for( Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet() ) {
-                 entityToContentIdMap.put(entry.getValue(),entry.getKey());
-             }
-             this.baseURI = baseURI;
+
+        public DefaultURIToEntityMap(
+                ValueFactory factory,
+                String baseURI,
+                Map<String, IEntity<?>> contentIdToEntityMap) {
+            for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet()) {
+                entityToContentIdMap.put(entry.getValue(), entry.getKey());
+            }
+            this.baseURI = baseURI;
         }
+
         @Override
         public URI getResourceURI(IEntity<?> entity) {
             return generateResourceId(entityToContentIdMap.get(entity));
         }
-        
+
         @Override
         public String getContentId(IEntity<?> entity) {
             return entityToContentIdMap.get(entity);
         }
-        
+
         private URI generateResourceId(String contentId) {
             return factory.createURI(baseURI + contentId);
         }
-        
+
     }
-    
+
     @Override
     public ContentRetrieverFactory getContentRetrieverFactory() {
         return contentRetrieverFactory;
     }
-    
+
     @Override
     public MetaDataOntology getOntology() {
         return ontology;
     }
-    
+
     @Override
     public Repository getRepository() {
         return repository;
-    }
-    
-//    //TODO remove this...it's for testing only
-    private class RepositoryConnectionTest implements RepositoryConnection {
-
-        OutputStream os;
-        
-        public RepositoryConnectionTest() {
-            try {
-                os = new FileOutputStream("triples out.txt");
-            } catch (FileNotFoundException e) {
-                // TODO: log exception
-                e.printStackTrace();
-            }
-            
-        }
-        @Override
-        public Repository getRepository() {
-            return null;
-        }
-
-        @Override
-        public ValueFactory getValueFactory() {
-            return null;
-        }
-
-        @Override
-        public boolean isOpen() throws RepositoryException {
-            return false;
-        }
-
-        @Override
-        public void close() throws RepositoryException {
-        }
-
-        @Override
-        public Query prepareQuery(QueryLanguage ql, String query)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public Query prepareQuery(QueryLanguage ql, String query, String baseURI)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public TupleQuery prepareTupleQuery(QueryLanguage ql, String query)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public TupleQuery prepareTupleQuery(
-                QueryLanguage ql,
-                String query,
-                String baseURI)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public GraphQuery prepareGraphQuery(QueryLanguage ql, String query)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public GraphQuery prepareGraphQuery(
-                QueryLanguage ql,
-                String query,
-                String baseURI)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public BooleanQuery prepareBooleanQuery(QueryLanguage ql, String query)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public BooleanQuery prepareBooleanQuery(
-                QueryLanguage ql,
-                String query,
-                String baseURI)
-                throws RepositoryException, MalformedQueryException {
-            return null;
-        }
-
-        @Override
-        public RepositoryResult<Resource> getContextIDs()
-                throws RepositoryException {
-            return null;
-        }
-
-        @Override
-        public RepositoryResult<Statement> getStatements(
-                Resource subj,
-                URI pred,
-                Value obj,
-                boolean includeInferred,
-                Resource... contexts) throws RepositoryException {
-            return null;
-        }
-
-        @Override
-        public boolean hasStatement(
-                Resource subj,
-                URI pred,
-                Value obj,
-                boolean includeInferred,
-                Resource... contexts) throws RepositoryException {
-            return false;
-        }
-
-        @Override
-        public boolean hasStatement(
-                Statement st,
-                boolean includeInferred,
-                Resource... contexts) throws RepositoryException {
-            return false;
-        }
-
-        @Override
-        public void exportStatements(
-                Resource subj,
-                URI pred,
-                Value obj,
-                boolean includeInferred,
-                RDFHandler handler,
-                Resource... contexts)
-                throws RepositoryException, RDFHandlerException {
-        }
-
-        @Override
-        public void export(RDFHandler handler, Resource... contexts)
-                throws RepositoryException, RDFHandlerException {
-        }
-
-        @Override
-        public long size(Resource... contexts) throws RepositoryException {
-            return 0;
-        }
-
-        @Override
-        public boolean isEmpty() throws RepositoryException {
-            return false;
-        }
-
-        @Override
-        public void setAutoCommit(boolean autoCommit)
-                throws RepositoryException {
-        }
-
-        @Override
-        public boolean isAutoCommit() throws RepositoryException {
-            return false;
-        }
-
-        @Override
-        public void commit() throws RepositoryException {
-            
-        }
-
-        @Override
-        public void rollback() throws RepositoryException {
-        }
-
-        @Override
-        public void add(
-                InputStream in,
-                String baseURI,
-                RDFFormat dataFormat,
-                Resource... contexts)
-                throws IOException, RDFParseException, RepositoryException {
-        }
-
-        @Override
-        public void add(
-                Reader reader,
-                String baseURI,
-                RDFFormat dataFormat,
-                Resource... contexts)
-                throws IOException, RDFParseException, RepositoryException {
-        }
-
-        @Override
-        public void add(
-                URL url,
-                String baseURI,
-                RDFFormat dataFormat,
-                Resource... contexts)
-                throws IOException, RDFParseException, RepositoryException {
-        }
-
-        @Override
-        public void add(
-                File file,
-                String baseURI,
-                RDFFormat dataFormat,
-                Resource... contexts)
-                throws IOException, RDFParseException, RepositoryException {
-        }
-
-        @Override
-        public void add(
-                Resource subject,
-                URI predicate,
-                Value object,
-                Resource... contexts) throws RepositoryException {
-            try {
-                os.write((subject.stringValue() + " " + predicate.stringValue() + " " + object.stringValue() + "\n").getBytes());
-            } catch (IOException e) {
-                // TODO: log exception
-                e.printStackTrace();
-            }
-            
-        }
-
-        @Override
-        public void add(Statement st, Resource... contexts)
-                throws RepositoryException {
-            try {
-                os.write((st.getSubject().stringValue() + " " + st.getPredicate().stringValue() + " " + st.getObject().stringValue() + "\n").getBytes());
-            } catch (IOException e) {
-                // TODO: log exception
-                e.printStackTrace();
-            }
-            
-        }
-
-        @Override
-        public void add(
-                Iterable<? extends Statement> statements,
-                Resource... contexts) throws RepositoryException {
-            for( Statement st : statements ) {
-                try {
-                    os.write((st.getSubject().stringValue() + " " + st.getPredicate().stringValue() + " " + st.getObject().stringValue() + "\n").getBytes());
-                } catch (IOException e) {
-                    // TODO: log exception
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        public <E extends Exception> void add(
-                Iteration<? extends Statement, E> statements,
-                Resource... contexts) throws RepositoryException, E {
-        }
-
-        @Override
-        public void remove(
-                Resource subject,
-                URI predicate,
-                Value object,
-                Resource... contexts) throws RepositoryException {
-        }
-
-        @Override
-        public void remove(Statement st, Resource... contexts)
-                throws RepositoryException {
-        }
-
-        @Override
-        public void remove(
-                Iterable<? extends Statement> statements,
-                Resource... contexts) throws RepositoryException {
-        }
-
-        @Override
-        public <E extends Exception> void remove(
-                Iteration<? extends Statement, E> statements,
-                Resource... contexts) throws RepositoryException, E {
-        }
-
-        @Override
-        public void clear(Resource... contexts) throws RepositoryException {
-        }
-
-        @Override
-        public RepositoryResult<Namespace> getNamespaces()
-                throws RepositoryException {
-            return null;
-        }
-
-        @Override
-        public String getNamespace(String prefix) throws RepositoryException {
-            return null;
-        }
-
-        @Override
-        public void setNamespace(String prefix, String name)
-                throws RepositoryException {
-        }
-
-        @Override
-        public void removeNamespace(String prefix) throws RepositoryException {
-        }
-
-        @Override
-        public void clearNamespaces() throws RepositoryException {
-        }
-        
     }
 
 }
