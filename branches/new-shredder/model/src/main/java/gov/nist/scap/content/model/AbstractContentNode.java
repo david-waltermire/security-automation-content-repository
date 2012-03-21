@@ -6,7 +6,7 @@ public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDef
 	private final IKey key;
 	private IVersion version;
 
-	public AbstractContentNode(IContentNodeDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) {
+	public AbstractContentNode(IContentNodeDefinition definition, IKey key, IContentHandle contentHandle, IContainer<?> parent) {
 		super(definition, contentHandle, parent);
 		this.key = key;
 	}

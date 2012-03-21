@@ -2,6 +2,7 @@ package org.scapdev.content.core.persistence.semantic.entity;
 
 import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.ICompositeRelationship;
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
@@ -76,7 +77,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     }
 
     @Override
-    public IEntity<?> getParent() {
+    public IContainer<?> getParent() {
         loadEntity();
         return entity.getParent();
     }

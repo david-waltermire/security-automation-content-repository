@@ -25,8 +25,10 @@ package org.scapdev.content.core.persistence.semantic.translation;
 
 import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
+import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
@@ -38,6 +40,7 @@ import org.openrdf.model.URI;
 import org.scapdev.content.core.persistence.semantic.IPersistenceContext;
 import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 import org.scapdev.content.core.persistence.semantic.entity.EntityProxy;
+import org.scapdev.content.core.persistence.semantic.entity.KeyedEntityProxy;
 
 /**
  * <p>A manager to build up composite relationships</p>
@@ -53,6 +56,8 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	
 	// key = boundary_boject_id....this map is what this class builds
 	private Map<String, CompositeRelationshipBuilder> compositeRelationships = new HashMap<String, CompositeRelationshipBuilder>();
+	
+	private URI parentEntityURI = null;
 	
     
 	
@@ -73,6 +78,8 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 		if (compositeRelationshipIds.contains(predicate.stringValue())){
 			populateCompositeRelationshipInfo(persistContext.getOntology(), statement);
 			return true;
+		} else if ( predicate.equals(persistContext.getOntology().HAS_PARENT_RELATIONSHIP_TO.URI) ) {
+	        parentEntityURI = (URI)statement.getObject();
 		}
 		return false;
 	}
@@ -91,6 +98,7 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 			ICompositeRelationship compositeRelBuilderRelationship = compositeRelBuilder.build(persistContext.getOntology());
 			builder.addRelationship(compositeRelBuilderRelationship);
 		}
+		builder.setParent(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(baseURI, persistContext, parentEntityURI));
 	}
 	
 	/**

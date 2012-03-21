@@ -1,6 +1,7 @@
 package org.scapdev.content.core.persistence.semantic.entity;
 
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
@@ -17,7 +18,7 @@ class GeneratedDocumentInternalBuilder extends AbstractInternalBuilder<IGenerate
 	public IMutableEntity<IGeneratedDocumentDefinition> build(
 			IKey key,
 			ContentRetriever contentRetriever,
-			IMutableEntity<?> parent) {
+			IContainer<?> parent) {
 		if (key != null) {
 			throw new IllegalStateException("key is unsupported by this entity type");
 		}

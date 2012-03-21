@@ -1,5 +1,6 @@
 package org.scapdev.content.core.persistence.semantic.entity;
 
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableEntity;
@@ -24,7 +25,7 @@ public class EntityBuilder {
 	private IInternalBuilder internalBuilder;
 	private ContentRetriever contentRetriever;
 	private IKey key;
-	private IMutableEntity<?> parent;
+	private IContainer<?> parent;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final Map<IPropertyDefinition, List<String>> properties = new HashMap<IPropertyDefinition, List<String>>();
 
@@ -58,7 +59,7 @@ public class EntityBuilder {
 		return parent;
 	}
 
-	public void setParent(IMutableEntity<?> parent) {
+	public void setParent(IContainer<?> parent) {
 		if (this.parent != null) {
 			throw new IllegalStateException("parent has already been set");
 		}

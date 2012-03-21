@@ -5,7 +5,7 @@ import gov.nist.scap.content.model.definitions.IGeneratedDocumentDefinition;
 
 public class DefaultGeneratedDocument extends AbstractEntity<IGeneratedDocumentDefinition> implements IMutableGeneratedDocument {
 
-	public DefaultGeneratedDocument(IGeneratedDocumentDefinition definition, IContentHandle contentHandle, IMutableEntity<?> parent) {
+	public DefaultGeneratedDocument(IGeneratedDocumentDefinition definition, IContentHandle contentHandle, IContainer<?> parent) {
 		super(definition, contentHandle, parent);
 	}
 

@@ -1,6 +1,7 @@
 package org.scapdev.content.core.persistence.semantic.entity;
 
 import gov.nist.scap.content.model.DefaultContentNode;
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
@@ -17,7 +18,7 @@ class ContentNodeInternalBuilder extends AbstractInternalBuilder<IContentNodeDef
 	public IMutableEntity<IContentNodeDefinition> build(
 			IKey key,
 			ContentRetriever contentRetriever,
-			IMutableEntity<?> parent) {
+			IContainer<?> parent) {
 		DefaultContentNode retval = new DefaultContentNode(getEntityDefinition(), key, contentRetriever, parent);
 		return retval;
 	}

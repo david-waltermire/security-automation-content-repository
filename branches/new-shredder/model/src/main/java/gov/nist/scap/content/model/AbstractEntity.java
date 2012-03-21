@@ -21,9 +21,9 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
     private final List<ICompositeRelationship> compositeRelationships = new LinkedList<ICompositeRelationship>();
 	private final Map<String, LinkedHashSet<String>> properties = new HashMap<String, LinkedHashSet<String>>();
 	private final IContentHandle contentHandle;
-	private final IMutableEntity<?> parent;
+	private final IContainer<?> parent;
 
-	public AbstractEntity(DEFINITION definition, IContentHandle contentHandle, IMutableEntity<?> parent) {
+	public AbstractEntity(DEFINITION definition, IContentHandle contentHandle, IContainer<?> parent) {
 		this.contentDefinition = definition;
 		this.contentHandle = contentHandle;
 		this.parent = parent;
@@ -54,7 +54,7 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		return (getParent() == null ? null : getParent().getKey(keyId));
 	}
 
-	public IMutableEntity<?> getParent() {
+	public IContainer<?> getParent() {
 		return parent;
 	}
 

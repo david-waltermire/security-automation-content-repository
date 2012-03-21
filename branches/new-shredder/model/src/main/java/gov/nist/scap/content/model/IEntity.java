@@ -21,7 +21,7 @@ public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentC
 	 * XML infoset, if one exists.
 	 * @return the parent entity or <code>null</code> if none exists
 	 */
-	IEntity<?> getParent();
+	IContainer<?> getParent();
 	/**
 	 * Retrieves the relationships associated with this entity.
 	 * @return a non-null collection
