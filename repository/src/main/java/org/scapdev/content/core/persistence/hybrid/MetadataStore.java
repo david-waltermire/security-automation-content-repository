@@ -50,7 +50,7 @@ public interface MetadataStore {
      * @param contentRetrieverFactory
      * @return the entity if the content ID exists or <code>null</code> if it was not found
      */
-    IEntity<?> getEntity(String contentId, ContentRetrieverFactory contentRetrieverFactory);
+    IEntity<?> getEntity(String contentId);
 
 	/**
 	 * 
