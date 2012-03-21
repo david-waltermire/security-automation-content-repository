@@ -9,7 +9,7 @@ public class DefaultKeyedDocument extends AbstractEntity<IKeyedDocumentDefinitio
 	private final IKey key;
 	private IVersion version;
 
-	public DefaultKeyedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IMutableEntity<?> parent) {
+	public DefaultKeyedDocument(IKeyedDocumentDefinition definition, IKey key, IContentHandle contentHandle, IContainer<?> parent) {
 		super(definition, contentHandle, parent);
 		this.key = key;
 	}

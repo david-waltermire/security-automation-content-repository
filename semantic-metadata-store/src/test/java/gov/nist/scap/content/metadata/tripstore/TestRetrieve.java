@@ -47,10 +47,18 @@ public class TestRetrieve {
 
         //Now retrieve
         IKey key = null;
-        if( xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection") instanceof IKeyedEntityDefinition ) {
-            KeyBuilder kb = new KeyBuilder(((IKeyedEntityDefinition )xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection")).getKeyDefinition().getFields());
-            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection");
+//        if( xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection") instanceof IKeyedEntityDefinition ) {
+//            KeyBuilder kb = new KeyBuilder(((IKeyedEntityDefinition )xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection")).getKeyDefinition().getFields());
+//            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection");
+//            kb.addField("datastream-collection-id", "scap_gov.nist_collection_Win7-54-1.2.0.0.zip");
+//            key = kb.toKey();
+//        }
+        if( xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream") instanceof IKeyedEntityDefinition ) {
+            KeyBuilder kb = new KeyBuilder(((IKeyedEntityDefinition )xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream")).getKeyDefinition().getFields());
+            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream");
             kb.addField("datastream-collection-id", "scap_gov.nist_collection_Win7-54-1.2.0.0.zip");
+            kb.addField("datastream-id", "scap_gov.nist_datastream_Win7-54-1.2.0.0.zip");
+            
             key = kb.toKey();
         }
         
@@ -68,6 +76,13 @@ public class TestRetrieve {
         //TODO need to populate parent
         for( ICompositeRelationship rel : entity.getCompositeRelationships() ) {
             System.out.println(rel.getReferencedEntity().getDefinition().getId());
+        }
+        if( entity.getParent() != null ) {
+            if( entity.getParent().getKey("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection") != null ) {
+                for( Map.Entry<String, String> entry : entity.getParent().getKey("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection").getFieldNameToValueMap().entrySet() ) {
+                    System.out.println(entry.getKey() + " : " + entry.getValue());
+                }
+            }
         }
         
 //        FileOutputStream fos = new FileOutputStream("testout.xml");

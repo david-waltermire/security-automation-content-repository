@@ -1,6 +1,7 @@
 package org.scapdev.content.core.persistence.semantic.entity;
 
 import gov.nist.scap.content.model.DefaultKeyedDocument;
+import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
@@ -17,7 +18,7 @@ class KeyedDocumentInternalBuilder extends AbstractInternalBuilder<IKeyedDocumen
 	public IMutableEntity<IKeyedDocumentDefinition> build(
 			IKey key,
 			ContentRetriever contentRetriever,
-			IMutableEntity<?> parent) {
+			IContainer<?> parent) {
 		DefaultKeyedDocument retval = new DefaultKeyedDocument(getEntityDefinition(), key, contentRetriever, parent);
 		return retval;
 	}
