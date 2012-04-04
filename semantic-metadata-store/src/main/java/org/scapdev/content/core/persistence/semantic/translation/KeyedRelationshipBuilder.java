@@ -31,17 +31,12 @@ import gov.nist.scap.content.model.IRelationshipVisitor;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
-import org.scapdev.content.core.persistence.semantic.MetaDataOntology;
-
 //TODO: need to handle rebuilding the KEY AND ENTITY!!!!
 class KeyedRelationshipBuilder {
 	private IKeyedRelationshipDefinition keyedRelationshipInfo;
 	
 	private IKey relatedEntityKey;
 	
-	
-	KeyedRelationshipBuilder(MetaDataOntology ontology) {
-	}
 	
 	void setKeyedRelationshipInfo(IKeyedRelationshipDefinition keyedRelationshipInfo) {
 		this.keyedRelationshipInfo = keyedRelationshipInfo;

@@ -1,5 +1,6 @@
 package org.scapdev.content.core.persistence.semantic.entity;
 
+import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
@@ -25,12 +26,15 @@ public class EntityBuilder {
 	private IInternalBuilder internalBuilder;
 	private ContentRetriever contentRetriever;
 	private IKey key;
+	private String versionValue;
 	private IContainer<?> parent;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final Map<IPropertyDefinition, List<String>> properties = new HashMap<IPropertyDefinition, List<String>>();
+	private IEntityDefinition definition;
 
-	public <T extends IEntityDefinition> void setEntityDefinition(T definition) throws ProcessingException {
+	public void setEntityDefinition(IEntityDefinition definition) throws ProcessingException {
 		internalBuilder = definition.accept(visitor);
+		this.definition = definition;
 	}
 
 	public ContentRetriever getContentRetriever() {
@@ -53,6 +57,10 @@ public class EntityBuilder {
 			throw new IllegalStateException("key has already been set");
 		}
 		this.key = key;
+	}
+	
+	public void setVersionValue(String version) {
+	    this.versionValue = version;
 	}
 
 	public IEntity<?> getParent() {
@@ -92,6 +100,9 @@ public class EntityBuilder {
 		}
 		for (Map.Entry<IPropertyDefinition, List<String>> entry : properties.entrySet()) {
 			retval.addProperty(entry.getKey().getId(), entry.getValue());
+		}
+		if( definition.getVersionDefinition() != null ) {
+		    retval.setVersion(new DefaultVersion(definition.getVersionDefinition(), versionValue));
 		}
 		return retval;
 	}

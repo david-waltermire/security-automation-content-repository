@@ -113,11 +113,12 @@ class KeyedRelationshipStatementManager implements
 		URI relatedEntityURI = factory.createURI(statement.getObject().stringValue());
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
-			keyedRelBuilder = new KeyedRelationshipBuilder(ontology);
+			keyedRelBuilder = new KeyedRelationshipBuilder();
 			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		} else {
 			// can't be sure this was set before
+		    //TODO figure out the comment above
 			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)ontology.getRelationshipDefinitionById(keyedRelationshipId));
 		}
 		
