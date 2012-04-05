@@ -11,6 +11,13 @@ import org.openrdf.repository.RepositoryException;
 
 public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends IKeyedEntity<T>> extends EntityProxy<T, ENTITY> implements IKeyedEntity<T>, IContainer<T> {
 
+    /**
+     * constructor specifying a contentId
+     * @param baseURI the base URI of the entity
+     * @param persistContext the persistence context
+     * @param contentId the contentId of the entity
+     * @throws RepositoryException error accessing repository
+     */
     public KeyedEntityProxy(
             String baseURI,
             IPersistenceContext persistContext,
@@ -18,6 +25,13 @@ public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends I
         super(baseURI, persistContext, contentId);
     }
 
+    /**
+     * constructor specifying a resource ID
+     * @param baseURI the base URI of the entity
+     * @param persistContext the persistence context
+     * @param resourceId the resourceId of the entity
+     * @throws RepositoryException error accessing repository
+     */
     public KeyedEntityProxy(
             String baseURI,
             IPersistenceContext persistContext,
