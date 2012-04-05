@@ -257,7 +257,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             RepositoryConnection conn)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
-        KeyTranslator keyTranslator = new KeyTranslator(ontology, factory);
+        KeyTranslator keyTranslator = new KeyTranslator(ontology);
         Map<String, Set<? extends IKey>> boundaryIdToKeyMap =
             new HashMap<String, Set<? extends IKey>>();
         for (Map.Entry<String, List<URI>> entry : entityURIs.entrySet()) {

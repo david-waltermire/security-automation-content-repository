@@ -29,6 +29,9 @@ package gov.nist.scap.content.semantic.exceptions;
 public class IncompleteBuildStateException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
+
+	// CHECKSTYLE:OFF
+	
 	public IncompleteBuildStateException() {
 		super();
 	}

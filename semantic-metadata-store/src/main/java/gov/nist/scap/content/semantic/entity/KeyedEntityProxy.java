@@ -38,7 +38,6 @@ public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends I
     
     /**
      * constructor specifying a key
-     * @param baseURI the base URI of the entity
      * @param persistContext the persistence context
      * @param key the key of the entity
      * @throws RepositoryException error accessing repository

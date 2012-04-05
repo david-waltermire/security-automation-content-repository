@@ -30,6 +30,13 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
     private final EntityMetadataMap entityMetadataMap;
     private final RepositoryConnection conn;
     
+    /**
+     * default constructor
+     * @param valueFactory the value factory
+     * @param ontology the ontology
+     * @param entityMetadataMap a callback to get entity information 
+     * @param conn a repository connection
+     */
     public ToRDFEntityVisitor(ValueFactory valueFactory, MetaDataOntology ontology, EntityMetadataMap entityMetadataMap, RepositoryConnection conn) {
         this.valueFactory = valueFactory;
         this.ontology = ontology;

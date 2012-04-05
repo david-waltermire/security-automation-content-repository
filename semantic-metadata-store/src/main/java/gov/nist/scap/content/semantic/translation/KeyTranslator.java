@@ -30,27 +30,22 @@ import gov.nist.scap.content.semantic.managers.KeyStatementManager;
 import java.util.Set;
 
 import org.openrdf.model.Statement;
-import org.openrdf.model.ValueFactory;
 
-public class KeyTranslator extends AbstractSemanticTranslator {
+public class KeyTranslator {
 	private MetaDataOntology ontology;
 	
 	/**
-	 * 
-	 * @param ontology
-	 * @param factory
+	 * default constructor
+	 * @param ontology the metadata ontology
 	 */
-	public KeyTranslator(MetaDataOntology ontology, ValueFactory factory) {
-		super(factory);
+	public KeyTranslator(MetaDataOntology ontology) {
 		this.ontology = ontology;
 	}
 	
 	/**
-	 * 
-	 * @param statements - RDF statements representing at least a single key (may be more, but duplicate statements should not exist)
-	 * @param model
-	 * @param contentRetrieverFactory
-	 * @return
+	 * translate a set of statements into a Key
+	 * @param statements RDF statements representing at least a single key (may be more, but duplicate statements should not exist)
+	 * @return the generated key
 	 */
 	public IKey translateToJava(Set<Statement> statements) {
 		KeyStatementManager statementManager = new KeyStatementManager(ontology);

@@ -60,18 +60,17 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 	
 	private URI parentEntityURI = null;
 	
-    
+    /**
+     * the default constructor
+     * @param persistContext the persistence context
+     */
 	
 	public CompositeRelationshipStatementManager(IPersistenceContext persistContext) {
 	    this.persistContext = persistContext;
 	    this.compositeRelationshipIds = persistContext.getOntology().getCompositeRelationshipIds();
 	}
 	
-	/**
-	 * Scans triple and processes it if it is relevant to compositeRelationships
-	 * @param statement
-	 * @return true if triple was processed in some way, false if it was just ignored.
-	 */
+	@Override
 	public boolean scan(Statement statement){
 		URI predicate = statement.getPredicate();
 		if (compositeRelationshipIds.contains(predicate.stringValue())){
@@ -87,16 +86,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 		return false;
 	}
 	
-	/**
-	 * <p>
-	 * Called after all triples are processed to populate re-constituted entity
-	 * with the IndirectRelationships found in the graph.
-	 * </p>
-	 * 
-	 * @param entity
-	 *            - to populate.
-	 * @throws RepositoryException 
-	 */
+	@Override
 	public void populateEntity(EntityBuilder builder){
 		for (CompositeRelationshipBuilder compositeRelBuilder : compositeRelationships.values()){
 			ICompositeRelationship compositeRelBuilderRelationship = compositeRelBuilder.build(persistContext.getOntology());
@@ -109,19 +99,6 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
         }
 	}
 	
-	/**
-	 * <p>
-	 * Helper method to populate RelatioshipInfo based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_BOUNDARY_OBJECT_RELATIONSHIP.
-	 * </p>
-	 * 
-	 * @param model
-	 * @param statement
-	 * @throws RepositoryException 
-	 * 
-	 * @see RelationshipInfo
-	 */
 	private void populateCompositeRelationshipInfo(IMetadataModel model, Statement statement) throws RepositoryException{
 		// hit on an boundaryIdRelationship of some type
 		String compositeRelationshipId = statement.getPredicate().stringValue();
@@ -129,10 +106,10 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 		CompositeRelationshipBuilder compositeRelBuilder = compositeRelationships.get(compositeURI);
 		if (compositeRelBuilder == null){
 			compositeRelBuilder = new CompositeRelationshipBuilder();
-			compositeRelBuilder.setCompositeRelationshipInfo((ICompositeRelationshipDefinition)model.getRelationshipDefinitionById(compositeRelationshipId));
-			compositeRelBuilder.setRelatedEntity(new EntityProxy<IEntityDefinition,IEntity<IEntityDefinition>>(persistContext,persistContext.getRepository().getValueFactory().createURI(compositeURI)));
-			compositeRelationships.put(compositeURI, compositeRelBuilder);
+            compositeRelationships.put(compositeURI, compositeRelBuilder);
 		}
+        compositeRelBuilder.setCompositeRelationshipInfo((ICompositeRelationshipDefinition)model.getRelationshipDefinitionById(compositeRelationshipId));
+        compositeRelBuilder.setRelatedEntity(new EntityProxy<IEntityDefinition,IEntity<IEntityDefinition>>(persistContext,persistContext.getRepository().getValueFactory().createURI(compositeURI)));
 	}
 	
 }

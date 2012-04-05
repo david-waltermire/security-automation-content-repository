@@ -38,7 +38,6 @@ import java.util.Map;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
 
 public class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
@@ -50,21 +49,18 @@ public class KeyedRelationshipStatementManager implements
 	// keys of all relatedEntities
 	private Map<URI, IKey> relatedEntityKeys;
 	
-	private ValueFactory factory;
-	
 	// key = relatedEntityURI....this map is what this class builds
 	private Map<URI, KeyedRelationshipBuilder> keyedRelationships = new HashMap<URI, KeyedRelationshipBuilder>();
 
 	private IPersistenceContext ipc;
+
 	/**
-	 * 
-	 * @param ontology
-	 * @param factory
-	 * @param relatedEntityKeys
+	 * The default constructor
+	 * @param ipc the persistence context
+	 * @param relatedEntityKeys all of the keys that are related to this entity via a HAS_KEYED_RELATIONSHIP
 	 */
-	public KeyedRelationshipStatementManager(IPersistenceContext ipc, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
+	public KeyedRelationshipStatementManager(IPersistenceContext ipc, Map<URI, IKey> relatedEntityKeys) {
 		this.ontology = ipc.getOntology();
-		this.factory = factory;
 		this.relatedEntityKeys = relatedEntityKeys;
 		this.directRelationshipIds = ontology.getKeyedRelationshipIds();
 		this.ipc = ipc;
@@ -81,8 +77,6 @@ public class KeyedRelationshipStatementManager implements
 		return false;
 	}
 	
-
-	
 	@Override
 	public void populateEntity(EntityBuilder builder) {
 		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
@@ -94,29 +88,18 @@ public class KeyedRelationshipStatementManager implements
 		}
 	}
 
-	/**
-	 * <p>
-	 * Helper method to populate RelatioshipInfo based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_DIRECT_RELATIONSHIP.
-	 * </p>
-	 * 
-	 * @param model
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
 	private void populateKeyedRelationshipInfo(IMetadataModel model2,
 			Statement statement) {
 		// hit on an keyedRelationship (called directRelationship in ontology) of some type
 		String keyedRelationshipId = statement.getPredicate().stringValue();
-		URI relatedEntityURI = factory.createURI(statement.getObject().stringValue());
+		// this cast is okay because the statement has been vetted before getting here
+		URI relatedEntityURI = (URI)statement.getObject();
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
 			keyedRelBuilder = new KeyedRelationshipBuilder(ipc);
-			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
-			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
+            keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
 		}
+        keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
 	}
 
 

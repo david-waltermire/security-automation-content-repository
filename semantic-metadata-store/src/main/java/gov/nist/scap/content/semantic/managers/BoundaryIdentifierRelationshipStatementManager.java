@@ -54,6 +54,10 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
 	private Map<String, BoundaryIdentifierRelationshipBuilder> boundaryIdentifierRelationships = new HashMap<String, BoundaryIdentifierRelationshipBuilder>();
 	
 	
+	/**
+	 * the default constructor
+	 * @param ontology the metadata ontology
+	 */
 	public BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
 		this.boundaryIdentifierRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
@@ -61,7 +65,7 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
 	
 	/**
 	 * Scans triple and processes it if it is relevant to boundaryIdentifierRelationships
-	 * @param statement
+	 * @param statement the statement to scan
 	 * @return true if triple was processed in some way, false if it was just ignored.
 	 */
 	public boolean scan(Statement statement){
@@ -88,8 +92,7 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
 	 * with the BoundaryIdentiferRelationships found in the graph.
 	 * </p>
 	 * 
-	 * @param entity
-	 *            - to populate.
+	 * @param builder the entity builder to populate
 	 */
 	public void populateEntity(EntityBuilder builder){
 		for (BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder : boundaryIdentifierRelationships.values()){
@@ -98,79 +101,37 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
 		}
 	}
 	
-	/**
-	 * <p>
-	 * Helper method to populate RelatioshipInfo based on the predicate found
-	 * within the triple. Assumes Statement passed in contains a predicate that
-	 * is a subProperty of HAS_BOUNDARY_OBJECT_RELATIONSHIP.
-	 * </p>
-	 * 
-	 * @param model
-	 * @param statement
-	 * 
-	 * @see RelationshipInfo
-	 */
 	private void populateBoundaryObjectRelationshipInfo(IMetadataModel model, Statement statement){
-		// hit on an boundaryIdRelationship of some type
+        String boundaryIdentifierURI = statement.getObject().stringValue();
 		String boundaryIdentifierRelationshipId = statement.getPredicate().stringValue();
-		String boundaryIdentifierURI = statement.getObject().stringValue();
 		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
 		if (boundaryIdentifierRelBuilder == null){
 			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
-			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		} else {
-			// can't be sure this was set before
-			boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
+            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		}
+        boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
 	}
 	
-	/**
-	 * <p>
-	 * Helper method to populate ExternalIdType based on the provided triple .
-	 * Assumes Statement passed in contains a HAS_BOUNDARY_OBJECT_TYPE predicate.
-	 * </p>
-	 * 
-	 * @param model
-	 * @param statement
-	 * 
-	 */
 	private void populateBoundaryObjectRelationshipExternalIdType(IMetadataModel model, Statement statement){
 		String boundaryIdentifierURI = statement.getSubject().stringValue();
 		String boundaryIdentifierType = statement.getObject().stringValue();
 		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
 		if (boundaryIdentifierRelBuilder == null){
 			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
-			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		} else {
-			// can't be sure this was set before
-			boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
+            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		}
+        boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
 	}
 	
-	/**
-	 * <p>
-	 * Helper method to populate ExternalIdValue based on the provided triple .
-	 * Assumes Statement passed in contains a HAS_BOUNDARY_OBJECT_VALUE predicate.
-	 * </p>
-	 * 
-	 * @param model
-	 * @param statement
-	 * 
-	 */
 	private void populateBoundaryObjectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
 		String boundaryIdentifierURI = statement.getSubject().stringValue();
 		String boundaryIdentifierValue = statement.getObject().stringValue();
 		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
 		if (boundaryIdentifierRelBuilder == null){
 			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-			boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
-			boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		} else {
-			// can't be sure this was set before
-			boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
+            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
 		}
+        boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
 	}
 	
 }
