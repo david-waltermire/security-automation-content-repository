@@ -24,7 +24,7 @@
 /**
  * 
  */
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.KeyBuilder;
@@ -33,6 +33,7 @@ import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
+import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
 import java.util.LinkedHashMap;
 
@@ -47,7 +48,7 @@ import org.openrdf.model.URI;
  * 
  * @see IKey
  */
-class KeyStatementManager implements RegenerationStatementManager {
+public class KeyStatementManager implements RegenerationStatementManager {
     private MetaDataOntology ontology;
     private String hasEntityType;
     private String hasKeyType;
@@ -56,7 +57,7 @@ class KeyStatementManager implements RegenerationStatementManager {
     private LinkedHashMap<String, Field> fieldUriToFieldMap =
         new LinkedHashMap<String, Field>();
 
-    KeyStatementManager(MetaDataOntology ontology) {
+    public KeyStatementManager(MetaDataOntology ontology) {
         this.ontology = ontology;
     }
 
@@ -109,7 +110,7 @@ class KeyStatementManager implements RegenerationStatementManager {
      * 
      * @return
      */
-    IKey produceKey() {
+    public IKey produceKey() {
         IEntityDefinition ied = ontology.getEntityDefinitionById(hasEntityType);
         if (ied instanceof IKeyedEntityDefinition) {
             KeyBuilder builder =

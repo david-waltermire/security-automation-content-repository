@@ -25,6 +25,7 @@ package gov.nist.scap.content.semantic.translation;
 
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.semantic.MetaDataOntology;
+import gov.nist.scap.content.semantic.managers.KeyStatementManager;
 
 import java.util.Set;
 

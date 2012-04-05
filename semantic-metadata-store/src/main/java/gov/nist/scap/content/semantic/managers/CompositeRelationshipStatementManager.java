@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IEntity;
@@ -31,6 +31,7 @@ import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.IPersistenceContext;
+import gov.nist.scap.content.semantic.builders.CompositeRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 import gov.nist.scap.content.semantic.entity.EntityProxy;
 import gov.nist.scap.content.semantic.entity.KeyedEntityProxy;
@@ -48,7 +49,7 @@ import org.openrdf.repository.RepositoryException;
  * 
  * @see CompositeRelationshipBuilder
  */
-class CompositeRelationshipStatementManager implements RegenerationStatementManager {
+public class CompositeRelationshipStatementManager implements RegenerationStatementManager {
 	private final String baseURI;
     private final IPersistenceContext persistContext;
 	
@@ -62,7 +63,7 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	
     
 	
-	CompositeRelationshipStatementManager(String baseURI,
+	public CompositeRelationshipStatementManager(String baseURI,
         IPersistenceContext persistContext) {
 	    this.baseURI = baseURI;
 	    this.persistContext = persistContext;
