@@ -39,6 +39,10 @@ public class VersionStatementManager implements RegenerationStatementManager {
     final private Set<URI> versionStatements;
     private String versionValue;
     
+    /**
+     * the default constructor
+     * @param persistContext the persistence context
+     */
     public VersionStatementManager(IPersistenceContext persistContext) {
 	    this.persistContext = persistContext;
 	    final IPersistenceContext pc = persistContext;
@@ -63,6 +67,7 @@ public class VersionStatementManager implements RegenerationStatementManager {
 		return false;
 	}
 	
+	@Override
 	public void populateEntity(EntityBuilder builder){
 	    builder.setVersionValue(versionValue);
 	}

@@ -28,7 +28,6 @@ package gov.nist.scap.content.semantic.translation;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
@@ -51,68 +50,68 @@ import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 /**
  * Translates entities across the different modeling languages.
  */
-public class EntityTranslator extends
-		AbstractSemanticTranslator{
+public class EntityTranslator {
     private final IPersistenceContext persistContext;
     private final MetaDataOntology ontology;
-    
-	/**
-	 * 
-	 * @param ontology
-	 * @param factory
-	 */
-	public EntityTranslator(IPersistenceContext persistContext) {
-		super(persistContext.getRepository().getValueFactory());
-	    this.persistContext = persistContext;
-	    this.ontology = persistContext.getOntology();
-	}
 
-	/**
-	 * 
-	 * @param statements
-	 *            - all statements to constitute entity
-	 * @param relatedEntityStatements
-	 *            - all statement to constitute relatedEntityKeys from
-	 *            KeyedRelationships
-	 * @param model
-	 * @param contentRetrieverFactory
-	 * @return
-	 * @throws ProcessingException 
-	 */
-	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
-		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
-		managers.add(new BoundaryIdentifierRelationshipStatementManager(persistContext.getOntology()));
-		managers.add(new KeyedRelationshipStatementManager(persistContext, factory, relatedEntityKeys));
+
+    /**
+     * default constructor
+     * @param persistContext The persistence context
+     */
+    public EntityTranslator(IPersistenceContext persistContext) {
+        this.persistContext = persistContext;
+        this.ontology = persistContext.getOntology();
+    }
+
+    /**
+     * translate statements and related keys into an entity
+     * @param statements all statements to constitute entity
+     * @param relatedEntityKeys all statement to constitute relatedEntityKeys
+     *            from KeyedRelationships
+     * @param contentRetrieverFactory the content retriever factory
+     * @param <T> some extension of IEntity
+     * @return the constructed entity
+     */
+    public <T extends IEntity<?>> T translateToJava(
+            Set<Statement> statements,
+            Map<URI, IKey> relatedEntityKeys,
+            ContentRetrieverFactory contentRetrieverFactory) {
+        List<RegenerationStatementManager> managers =
+            new LinkedList<RegenerationStatementManager>();
+        managers.add(new BoundaryIdentifierRelationshipStatementManager(
+            persistContext.getOntology()));
+        managers.add(new KeyedRelationshipStatementManager(
+            persistContext,
+            relatedEntityKeys));
         managers.add(new CompositeRelationshipStatementManager(persistContext));
-		managers.add(new KeyStatementManager(persistContext.getOntology()));
-		managers.add(new VersionStatementManager(persistContext));
+        managers.add(new KeyStatementManager(persistContext.getOntology()));
+        managers.add(new VersionStatementManager(persistContext));
 
-		EntityBuilder builder = new EntityBuilder();
-		for (Statement statement : statements){
-			URI predicate = statement.getPredicate();
-			//first handle entity specific predicates
-			if (predicate.equals(ontology.HAS_CONTENT_ID.URI)){
-				String contentId = statement.getObject().stringValue();
-				builder.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
-			}
-			if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)){
-				String entityType = statement.getObject().stringValue();
-				builder.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
-			}
-			//now handle rest of graph
-			for (RegenerationStatementManager statementManager : managers){
-				if (statementManager.scan(statement)){
-					continue;
-				}
-			}
-		}
+        EntityBuilder builder = new EntityBuilder();
+        for (Statement statement : statements) {
+            URI predicate = statement.getPredicate();
+            // first handle entity specific predicates
+            if (predicate.equals(ontology.HAS_CONTENT_ID.URI)) {
+                String contentId = statement.getObject().stringValue();
+                builder.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
+            }
+            if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)) {
+                String entityType = statement.getObject().stringValue();
+                builder.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
+            }
+            // now handle rest of graph
+            for (RegenerationStatementManager statementManager : managers) {
+                if (statementManager.scan(statement)) {
+                    continue;
+                }
+            }
+        }
 
-		for (RegenerationStatementManager statementManager : managers){
-			statementManager.populateEntity(builder);
-		}
+        for (RegenerationStatementManager statementManager : managers) {
+            statementManager.populateEntity(builder);
+        }
 
-		@SuppressWarnings("unchecked")
-		T retval = (T)builder.build();
-		return retval;
-	}
+        return builder.build();
+    }
 }

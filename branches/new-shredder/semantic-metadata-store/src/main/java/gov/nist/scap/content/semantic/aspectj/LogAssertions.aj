@@ -1,6 +1,7 @@
 package gov.nist.scap.content.semantic.aspectj;
 
 import org.apache.log4j.Logger;
+import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -25,12 +26,14 @@ public aspect LogAssertions {
         }
     }
 
+    @SuppressAjWarnings
     before(Resource subject, URI predicate, Value object, Resource[] contexts): call(void org.openrdf.repository.RepositoryConnection.add(Resource, URI, Value, Resource...)) && args(subject, predicate, object, contexts) {
         if (log.isTraceEnabled()) {
             logStatement(subject, predicate, object, contexts);
         }
     }
 
+    @SuppressAjWarnings
     before(Statement st, Resource[] contexts): call(void org.openrdf.repository.RepositoryConnection.add(Statement, Resource...)) && args(st, contexts) {
         if (log.isTraceEnabled()) {
             logStatement(

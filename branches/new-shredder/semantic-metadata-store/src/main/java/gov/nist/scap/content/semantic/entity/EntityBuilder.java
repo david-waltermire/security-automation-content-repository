@@ -33,14 +33,18 @@ public class EntityBuilder {
 	private final Map<IPropertyDefinition, List<String>> properties = new HashMap<IPropertyDefinition, List<String>>();
 	private IEntityDefinition definition;
 
-	public void setEntityDefinition(IEntityDefinition definition) throws ProcessingException {
+	/**
+	 * set the entity definition
+	 * @param definition the entity definition
+	 */
+	public void setEntityDefinition(IEntityDefinition definition) {
 		this.definition = definition;
 	}
 
-	public ContentRetriever getContentRetriever() {
-		return contentRetriever;
-	}
-
+	/**
+	 * set the content retriever
+	 * @param contentRetriever the content retriever
+	 */
 	public void setContentRetriever(ContentRetriever contentRetriever) {
 		if (this.contentRetriever != null) {
 			throw new IllegalStateException("contentRetriever has already been set");
@@ -48,10 +52,10 @@ public class EntityBuilder {
 		this.contentRetriever = contentRetriever;
 	}
 
-	public IKey getKey() {
-		return key;
-	}
-
+	/**
+	 * set the key
+	 * @param key the key
+	 */
 	public void setKey(IKey key) {
 		if (this.key != null) {
 			throw new IllegalStateException("key has already been set");
@@ -59,14 +63,21 @@ public class EntityBuilder {
 		this.key = key;
 	}
 	
+	/**
+	 * set the version value
+	 * @param version the version value
+	 */
 	public void setVersionValue(String version) {
+        if (this.versionValue != null) {
+            throw new IllegalStateException("version value has already been set");
+        }
 	    this.versionValue = version;
 	}
 
-	public IEntity<?> getParent() {
-		return parent;
-	}
-
+	/**
+	 * set the parent entity
+	 * @param parent the parent entity
+	 */
 	public void setParent(IContainer<?> parent) {
 		if (this.parent != null) {
 			throw new IllegalStateException("parent has already been set");
@@ -74,10 +85,19 @@ public class EntityBuilder {
 		this.parent = parent;
 	}
 
+	/**
+	 * add relationship to entity
+	 * @param relationship relationship to add
+	 */
 	public void addRelationship(IRelationship<?> relationship) {
 		this.relationships.add(relationship);
 	}
 
+	/**
+	 * add property to entity
+	 * @param definition definition of property
+	 * @param value value of property
+	 */
 	public void addProperty(IPropertyDefinition definition, String value) {
 		if (definition == null) {
 			throw new NullPointerException("definition");
@@ -93,32 +113,43 @@ public class EntityBuilder {
 		result.add(value);
 	}
 
-	public IEntity<?> build() {
+	/**
+	 * build the entity
+	 * @param <T> the result type
+	 * @return the built entity
+	 */
+	public <T extends IEntity<?>> T build() {
 	    try {
-            return this.definition.accept(new EntityDefinitionVisitor());
+            return this.definition.accept(new EntityDefinitionVisitor<T>());
         } catch (ProcessingException e) {
             throw new RuntimeException(e);
         }
 	}
 
-	private class EntityDefinitionVisitor implements IEntityDefinitionVisitor<IEntity<?>> {
+	private class EntityDefinitionVisitor<T extends IEntity<?>> implements IEntityDefinitionVisitor<T> {
 
-		public IEntity<?> visit(IGeneratedDocumentDefinition definition) {
+		public T visit(IGeneratedDocumentDefinition definition) {
 		    DefaultGeneratedDocument dgd = new DefaultGeneratedDocument(definition, contentRetriever, parent);
 		    setCommonInfo(dgd);
-		    return dgd;
+	        @SuppressWarnings("unchecked")
+		    T retVal = (T)dgd;
+		    return retVal;
 		}
 
-		public IEntity<?> visit(IKeyedDocumentDefinition definition) {
+		public T visit(IKeyedDocumentDefinition definition) {
 		    DefaultKeyedDocument dkd = new DefaultKeyedDocument(definition, key, contentRetriever, parent);
 		    setCommonInfo(dkd);
-		    return dkd;
+	        @SuppressWarnings("unchecked")
+		    T retVal = (T)dkd;
+	        return retVal;
 		}
 
-		public IEntity<?> visit(IContentNodeDefinition definition) {
+		public T visit(IContentNodeDefinition definition) {
 			DefaultContentNode dcn = new DefaultContentNode(definition, key, contentRetriever, parent);
 			setCommonInfo(dcn);
-			return dcn;
+		     @SuppressWarnings("unchecked")
+			 T retVal = (T)dcn;
+		     return retVal;
 		}
 		
 		private void setCommonInfo(IMutableEntity<?> ime) {

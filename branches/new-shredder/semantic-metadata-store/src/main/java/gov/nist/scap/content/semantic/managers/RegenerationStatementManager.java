@@ -42,7 +42,7 @@ public interface RegenerationStatementManager {
 	/**
 	 * Scans triple and processes it if it is relevant to the manager
 	 * 
-	 * @param statement
+	 * @param statement the statement to process
 	 * @return true if triple was processed in some way, false if it was just
 	 *         ignored.
 	 */
@@ -54,8 +54,7 @@ public interface RegenerationStatementManager {
 	 * with information that the builder compiled
 	 * </p>
 	 * 
-	 * @param builder
-	 *            - to populate.
+	 * @param builder the builder to populate.
 	 */
     public void populateEntity(EntityBuilder builder);
 	

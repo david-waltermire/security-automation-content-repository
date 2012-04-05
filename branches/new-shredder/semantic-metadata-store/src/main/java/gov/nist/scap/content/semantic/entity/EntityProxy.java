@@ -11,7 +11,6 @@ import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
-import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.TripleStoreQueryService;
 import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
@@ -29,8 +28,6 @@ import java.util.Set;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -45,6 +42,11 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
 
     private EntityTranslator entityTranslator;
 
+    /**
+     * The base constructor to be call from other constructors
+     * @param persistContext the persistence context
+     * @throws RepositoryException error accessing the repository
+     */
     protected EntityProxy(IPersistenceContext persistContext)
             throws RepositoryException {
         queryService = new TripleStoreQueryService(persistContext);
@@ -52,6 +54,12 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         this.persistContext = persistContext;
     }
 
+    /**
+     * use this constructor to make an entity based on the content id
+     * @param persistenceContext the persistence context
+     * @param contentId the content id of the entity to construct
+     * @throws RepositoryException error accessing the repository
+     */
     public EntityProxy(
             IPersistenceContext persistenceContext,
             String contentId) throws RepositoryException {
@@ -59,6 +67,12 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         this.contentId = contentId;
     }
 
+    /**
+     * use this constructor to make an entity based on the resource URI
+     * @param persistenceContext the persistence context
+     * @param resourceId the resource URI of the entity to construct
+     * @throws RepositoryException error accessing the repository
+     */
     public EntityProxy(
             IPersistenceContext persistenceContext,
             URI resourceId) throws RepositoryException {
@@ -132,6 +146,9 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         return entity.getPropertyById(id);
     }
 
+    /**
+     * call this method to load an entity from the triple store
+     */
     protected void loadEntity() {
         if (entity == null) {
 
@@ -171,8 +188,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                 }
             } catch (RepositoryException e) {
                 throw new RuntimeException(e);
-            } catch (ProcessingException e) {
-                throw new RuntimeException(e);
             }
 
         }
@@ -190,23 +205,12 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         return result;
     }
 
-    /**
-     * Helper method to generate keys for all entities
-     * 
-     * @param entityURIs
-     * @param conn
-     * @return
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
-     * @throws RepositoryException
-     */
     private Map<URI, IKey> findEntityKeys(
             List<URI> entityURIs,
             RepositoryConnection conn) throws RepositoryException {
         KeyTranslator keyTranslator =
             new KeyTranslator(
-                persistContext.getOntology(),
-                persistContext.getRepository().getValueFactory());
+                persistContext.getOntology());
         Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
         for (URI entityURI : entityURIs) {
             Set<Statement> entityStatements =
