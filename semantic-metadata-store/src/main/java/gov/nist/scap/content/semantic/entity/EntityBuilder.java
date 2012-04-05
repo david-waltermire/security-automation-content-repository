@@ -1,5 +1,8 @@
 package gov.nist.scap.content.semantic.entity;
 
+import gov.nist.scap.content.model.DefaultContentNode;
+import gov.nist.scap.content.model.DefaultGeneratedDocument;
+import gov.nist.scap.content.model.DefaultKeyedDocument;
 import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IEntity;
@@ -22,8 +25,6 @@ import java.util.Map;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 
 public class EntityBuilder {
-	private static final EntityDefinitionVisitor visitor = new EntityDefinitionVisitor();
-	private IInternalBuilder internalBuilder;
 	private ContentRetriever contentRetriever;
 	private IKey key;
 	private String versionValue;
@@ -33,7 +34,6 @@ public class EntityBuilder {
 	private IEntityDefinition definition;
 
 	public void setEntityDefinition(IEntityDefinition definition) throws ProcessingException {
-		internalBuilder = definition.accept(visitor);
 		this.definition = definition;
 	}
 
@@ -93,35 +93,44 @@ public class EntityBuilder {
 		result.add(value);
 	}
 
-	public IMutableEntity<?> build() {
-		IMutableEntity<?> retval = internalBuilder.build(key, getContentRetriever(), parent);
-		for (IRelationship<?> relationship : relationships) {
-			retval.addRelationship(relationship);
-		}
-		for (Map.Entry<IPropertyDefinition, List<String>> entry : properties.entrySet()) {
-			retval.addProperty(entry.getKey().getId(), entry.getValue());
-		}
-		if( definition.getVersionDefinition() != null ) {
-		    retval.setVersion(new DefaultVersion(definition.getVersionDefinition(), versionValue));
-		}
-		return retval;
+	public IEntity<?> build() {
+	    try {
+            return this.definition.accept(new EntityDefinitionVisitor());
+        } catch (ProcessingException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
-	private static class EntityDefinitionVisitor implements IEntityDefinitionVisitor<AbstractInternalBuilder<?>> {
+	private class EntityDefinitionVisitor implements IEntityDefinitionVisitor<IEntity<?>> {
 
-		public AbstractInternalBuilder<?> visit(IGeneratedDocumentDefinition definition)
-				throws ProcessingException {
-			return new GeneratedDocumentInternalBuilder(definition);
+		public IEntity<?> visit(IGeneratedDocumentDefinition definition) {
+		    DefaultGeneratedDocument dgd = new DefaultGeneratedDocument(definition, contentRetriever, parent);
+		    setCommonInfo(dgd);
+		    return dgd;
 		}
 
-		public AbstractInternalBuilder<?> visit(IKeyedDocumentDefinition definition)
-				throws ProcessingException {
-			return new KeyedDocumentInternalBuilder(definition);
+		public IEntity<?> visit(IKeyedDocumentDefinition definition) {
+		    DefaultKeyedDocument dkd = new DefaultKeyedDocument(definition, key, contentRetriever, parent);
+		    setCommonInfo(dkd);
+		    return dkd;
 		}
 
-		public AbstractInternalBuilder<?> visit(IContentNodeDefinition definition)
-				throws ProcessingException {
-			return new ContentNodeInternalBuilder(definition);
+		public IEntity<?> visit(IContentNodeDefinition definition) {
+			DefaultContentNode dcn = new DefaultContentNode(definition, key, contentRetriever, parent);
+			setCommonInfo(dcn);
+			return dcn;
+		}
+		
+		private void setCommonInfo(IMutableEntity<?> ime) {
+	        for (IRelationship<?> relationship : relationships) {
+	            ime.addRelationship(relationship);
+	        }
+	        for (Map.Entry<IPropertyDefinition, List<String>> entry : properties.entrySet()) {
+	            ime.addProperty(entry.getKey().getId(), entry.getValue());
+	        }
+	        if( definition.getVersionDefinition() != null ) {
+	            ime.setVersion(new DefaultVersion(definition.getVersionDefinition(), versionValue));
+	        }
 		}
 	}
 }
