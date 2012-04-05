@@ -109,7 +109,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     /**
      * get an instance of this manager
-     * @param contentRetrieverFactory a factory to create content retrievers (relative to the persistence store)
+     * 
+     * @param contentRetrieverFactory a factory to create content retrievers
+     *            (relative to the persistence store)
      * @return this manager
      */
     public static TripleStoreFacadeMetaDataManager getInstance(
@@ -119,11 +121,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     /**
      * must be called before using the manager
+     * 
      * @param model the metadata model to load into the ontology
      * @throws RepositoryException error whiling accessing the repository
      */
     public void loadModel(IMetadataModel model) throws RepositoryException {
-        //TODO consider moving this to the constructor
+        // TODO consider moving this to the constructor
         if (!modelLoaded) {
             ontology.loadModel(repository.getConnection(), model);
             modelLoaded = true;
@@ -138,13 +141,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
-                URI entityURI = queryService.findEntityURI(key);
-                if (entityURI != null) {
-                    return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                        BASE_URI,
-                        this,
-                        entityURI);
-                }
+                return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
+                    this,
+                    key);
             } finally {
                 conn.close();
             }
@@ -164,7 +163,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                     queryService.findEntityURIbyContentId(contentId);
                 if (entityURI != null) {
                     return new EntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                        BASE_URI,
                         this,
                         entityURI);
                 }
@@ -259,9 +257,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             RepositoryConnection conn)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
-        KeyTranslator keyTranslator =
-            new KeyTranslator(BASE_URI, ontology, factory);
-        Map<String, Set<? extends IKey>> boundaryIdToKeyMap = new HashMap<String, Set<? extends IKey>>();
+        KeyTranslator keyTranslator = new KeyTranslator(ontology, factory);
+        Map<String, Set<? extends IKey>> boundaryIdToKeyMap =
+            new HashMap<String, Set<? extends IKey>>();
         for (Map.Entry<String, List<URI>> entry : entityURIs.entrySet()) {
             Set<IKey> map = new HashSet<IKey>();
             boundaryIdToKeyMap.put(entry.getKey(), map);
@@ -283,8 +281,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             RepositoryConnection conn)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
-        Resource entityContextURI =
-            queryService.findEntityContext(entityURI);
+        Resource entityContextURI = queryService.findEntityContext(entityURI);
         // no need to run inferencing here
         return Iterations.addAll(
             conn.getStatements(null, null, null, false, entityContextURI),

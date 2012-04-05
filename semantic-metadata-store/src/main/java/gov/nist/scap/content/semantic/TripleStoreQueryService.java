@@ -26,6 +26,7 @@ package gov.nist.scap.content.semantic;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -86,7 +87,7 @@ public class TripleStoreQueryService {
      * @return URI of entity associated with key, or null if no entity is found
      * @throws RepositoryException error while executing query
      */
-    URI findEntityURI(IKey key) throws RepositoryException {
+    public URI findEntityURI(IKey key) throws RepositoryException {
         try {
             String entityURIVariableName = "_e";
             TupleQuery tupleQuery =
@@ -660,18 +661,6 @@ public class TripleStoreQueryService {
             throw new RepositoryException(e);
         }
 
-    }
-
-    static class NonUniqueResultException extends RuntimeException {
-
-        private static final long serialVersionUID = -7092645040241605667L;
-
-        /**
-         * default constructor
-         */
-        public NonUniqueResultException() {
-            super();
-        }
     }
 
 }

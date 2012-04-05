@@ -14,6 +14,7 @@ import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.TripleStoreQueryService;
+import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
 import gov.nist.scap.content.semantic.translation.EntityTranslator;
 import gov.nist.scap.content.semantic.translation.KeyTranslator;
 import info.aduna.iteration.Iterations;
@@ -33,40 +34,35 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
-public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>> implements IEntity<T> {
+public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
+        implements IEntity<T> {
 
     protected ENTITY entity;
     private String contentId;
-    private URI resourceId;
-    private String baseURI;
-    private IPersistenceContext persistContext;
-    private TripleStoreQueryService queryService;
+    protected URI resourceId;
+    protected IPersistenceContext persistContext;
+    protected TripleStoreQueryService queryService;
 
     private EntityTranslator entityTranslator;
 
-    private EntityProxy(
-            String baseURI,
-            IPersistenceContext persistContext) throws RepositoryException {
+    protected EntityProxy(IPersistenceContext persistContext)
+            throws RepositoryException {
         queryService = new TripleStoreQueryService(persistContext);
-        entityTranslator =
-            new EntityTranslator(baseURI, persistContext);
-        this.baseURI = baseURI;
+        entityTranslator = new EntityTranslator(persistContext);
         this.persistContext = persistContext;
     }
 
     public EntityProxy(
-            String baseURI,
             IPersistenceContext persistenceContext,
             String contentId) throws RepositoryException {
-        this(baseURI, persistenceContext);
+        this(persistenceContext);
         this.contentId = contentId;
     }
 
     public EntityProxy(
-            String baseURI,
             IPersistenceContext persistenceContext,
             URI resourceId) throws RepositoryException {
-        this(baseURI, persistenceContext);
+        this(persistenceContext);
         this.resourceId = resourceId;
     }
 
@@ -105,6 +101,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         loadEntity();
         return entity.getCompositeRelationships();
     }
+
     @Override
     public IContentHandle getContentHandle() {
         loadEntity();
@@ -138,13 +135,23 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     protected void loadEntity() {
         if (entity == null) {
 
-            if (contentId != null) {
-
-            }
-
             RepositoryConnection conn;
             try {
                 conn = persistContext.getRepository().getConnection();
+
+                if (contentId != null) {
+                    Set<Statement> result =
+                            Iterations.addAll(
+                                conn.getStatements(null, persistContext.getOntology().HAS_CONTENT_ID.URI, persistContext.getRepository().getValueFactory().createLiteral(contentId), false),
+                                new HashSet<Statement>());
+                    if( result.size() == 0 ) {
+                        throw new NullPointerException(
+                            "EntityProxy could not load the entity URI from " + contentId);
+                    } else if ( result.size() > 1 ) {
+                        throw new NonUniqueResultException();
+                    }
+                    resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
+                } 
                 Set<Statement> entityStatements =
                     getEntityStatements(resourceId, conn);
                 Map<URI, IKey> relatedEntityKeys =
@@ -156,8 +163,11 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                         entityStatements,
                         relatedEntityKeys,
                         persistContext.getContentRetrieverFactory());
-                if( entity == null ) {
-                    throw new NullPointerException("EntityProxy could not load the entity " + resourceId != null ? resourceId.toString() : contentId);
+
+                if (entity == null) {
+                    throw new NullPointerException(
+                        "EntityProxy could not load the entity " + contentId != null
+                            ? contentId : resourceId.stringValue());
                 }
             } catch (RepositoryException e) {
                 throw new RuntimeException(e);
@@ -168,25 +178,15 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         }
     }
 
-    /**
-     * Uses context to get all triples associated with entityURI
-     * 
-     * @param entityUri
-     * @return
-     * @throws RepositoryException
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
-     */
     private Set<Statement> getEntityStatements(
             URI entityURI,
-            RepositoryConnection conn)
-            throws RepositoryException {
-        Resource entityContextURI =
-            queryService.findEntityContext(entityURI);
+            RepositoryConnection conn) throws RepositoryException {
+        Resource entityContextURI = queryService.findEntityContext(entityURI);
         // no need to run inferencing here
-        Set<Statement> result = Iterations.addAll(
-            conn.getStatements(null, null, null, false, entityContextURI),
-            new HashSet<Statement>()); 
+        Set<Statement> result =
+            Iterations.addAll(
+                conn.getStatements(null, null, null, false, entityContextURI),
+                new HashSet<Statement>());
         return result;
     }
 
@@ -202,10 +202,11 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
      */
     private Map<URI, IKey> findEntityKeys(
             List<URI> entityURIs,
-            RepositoryConnection conn)
-            throws RepositoryException {
+            RepositoryConnection conn) throws RepositoryException {
         KeyTranslator keyTranslator =
-            new KeyTranslator(baseURI, persistContext.getOntology(), persistContext.getRepository().getValueFactory());
+            new KeyTranslator(
+                persistContext.getOntology(),
+                persistContext.getRepository().getValueFactory());
         Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
         for (URI entityURI : entityURIs) {
             Set<Statement> entityStatements =

@@ -50,7 +50,6 @@ import org.openrdf.repository.RepositoryException;
  * @see CompositeRelationshipBuilder
  */
 public class CompositeRelationshipStatementManager implements RegenerationStatementManager {
-	private final String baseURI;
     private final IPersistenceContext persistContext;
 	
 	//all IDs of compositeIdentifierRelationships
@@ -63,9 +62,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 	
     
 	
-	public CompositeRelationshipStatementManager(String baseURI,
-        IPersistenceContext persistContext) {
-	    this.baseURI = baseURI;
+	public CompositeRelationshipStatementManager(IPersistenceContext persistContext) {
 	    this.persistContext = persistContext;
 	    this.compositeRelationshipIds = persistContext.getOntology().getCompositeRelationshipIds();
 	}
@@ -106,7 +103,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 			builder.addRelationship(compositeRelBuilderRelationship);
 		}
 		try {
-            builder.setParent(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(baseURI, persistContext, parentEntityURI));
+            builder.setParent(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(persistContext, parentEntityURI));
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
@@ -133,7 +130,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 		if (compositeRelBuilder == null){
 			compositeRelBuilder = new CompositeRelationshipBuilder();
 			compositeRelBuilder.setCompositeRelationshipInfo((ICompositeRelationshipDefinition)model.getRelationshipDefinitionById(compositeRelationshipId));
-			compositeRelBuilder.setRelatedEntity(new EntityProxy<IEntityDefinition,IEntity<IEntityDefinition>>(baseURI,persistContext,persistContext.getRepository().getValueFactory().createURI(compositeURI)));
+			compositeRelBuilder.setRelatedEntity(new EntityProxy<IEntityDefinition,IEntity<IEntityDefinition>>(persistContext,persistContext.getRepository().getValueFactory().createURI(compositeURI)));
 			compositeRelationships.put(compositeURI, compositeRelBuilder);
 		}
 	}

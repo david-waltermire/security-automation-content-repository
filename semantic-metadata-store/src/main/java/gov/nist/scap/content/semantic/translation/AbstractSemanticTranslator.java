@@ -32,8 +32,6 @@ import org.openrdf.model.ValueFactory;
  */
 public abstract class AbstractSemanticTranslator {
 	
-	private final String baseURI;
-	
 	protected final ValueFactory factory;
 	
 	/**
@@ -41,16 +39,8 @@ public abstract class AbstractSemanticTranslator {
 	 * @param baseURI - the base URI to use for all RDF individuals produced by this translator
 	 * @param factory
 	 */
-	public AbstractSemanticTranslator(String baseURI, ValueFactory factory) {
-		this.baseURI = baseURI;
+	public AbstractSemanticTranslator(ValueFactory factory) {
 		this.factory = factory;
 	}
 	
-	protected final URI genInstanceURI(String specificPart){
-		return factory.createURI(baseURI + specificPart);
-	}
-	
-
-	
-
 }

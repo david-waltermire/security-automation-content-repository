@@ -11,34 +11,44 @@ import org.openrdf.repository.RepositoryException;
 
 public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends IKeyedEntity<T>> extends EntityProxy<T, ENTITY> implements IKeyedEntity<T>, IContainer<T> {
 
+    private IKey key;
     /**
      * constructor specifying a contentId
-     * @param baseURI the base URI of the entity
      * @param persistContext the persistence context
      * @param contentId the contentId of the entity
      * @throws RepositoryException error accessing repository
      */
     public KeyedEntityProxy(
-            String baseURI,
             IPersistenceContext persistContext,
             String contentId) throws RepositoryException {
-        super(baseURI, persistContext, contentId);
+        super(persistContext, contentId);
     }
 
     /**
      * constructor specifying a resource ID
-     * @param baseURI the base URI of the entity
      * @param persistContext the persistence context
      * @param resourceId the resourceId of the entity
      * @throws RepositoryException error accessing repository
      */
     public KeyedEntityProxy(
-            String baseURI,
             IPersistenceContext persistContext,
             URI resourceId) throws RepositoryException {
-        super(baseURI, persistContext, resourceId);
+        super(persistContext, resourceId);
     }
     
+    /**
+     * constructor specifying a key
+     * @param baseURI the base URI of the entity
+     * @param persistContext the persistence context
+     * @param key the key of the entity
+     * @throws RepositoryException error accessing repository
+     */
+    public KeyedEntityProxy(
+            IPersistenceContext persistContext,
+            IKey key) throws RepositoryException {
+        super(persistContext);
+        this.key = key;
+    }
     
     @Override
     public IKey getKey() {
@@ -55,6 +65,21 @@ public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends I
             retval = getParent().getKey(keyId);
         }
         return retval;
+    }
+    
+    @Override
+    protected void loadEntity() {
+        if (entity == null) {
+            if( key != null ) {
+                try {
+                    resourceId = queryService.findEntityURI(key);
+                } catch (RepositoryException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            super.loadEntity();
+        }
+
     }
     
 }

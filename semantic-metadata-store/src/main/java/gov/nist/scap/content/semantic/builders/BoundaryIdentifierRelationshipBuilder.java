@@ -39,27 +39,35 @@ public class BoundaryIdentifierRelationshipBuilder {
 	private String externalIdValue;
 	private String externalIdType;
 	
+	/**
+	 * set the boundary object value
+	 * @param externalIdValue boundary object value
+	 */
 	public void setExternalIdValue(String externalIdValue) {
 		this.externalIdValue = externalIdValue;
 	}
 	
+	/**
+	 * set the boundary object relationship definition
+	 * @param relationshipDefinition boundary object relationship definition
+	 */
 	public void setBoundaryIdentiferRelationshipInfo(IBoundaryIdentifierRelationshipDefinition relationshipDefinition) {
 		this.relationshipDefinition = relationshipDefinition;
 	}
 	
+	/**
+	 * set the boundary object type
+	 * @param externalIdType boundary object type
+	 */
 	public void setExternalIdType(String externalIdType) {
 		this.externalIdType = externalIdType;
 	}
 
 	/**
-	 * Will build an instance of an boundaryIdentifer relationship. NOTE: the client must
-	 * add the newly created relationship to the owning entity directly after
-	 * calling this method.
+	 * Will build an instance of an boundaryIdentifer relationship.
 	 * 
-	 * @param model
-	 * @param entity
-	 *            - the owningEntity of the relationship
-	 * @return
+	 * @param model the metadata model
+	 * @return a boundary object relationship to be added to the owning entity
 	 */
 	public IBoundaryIdentifierRelationship build(IMetadataModel model){
 		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){

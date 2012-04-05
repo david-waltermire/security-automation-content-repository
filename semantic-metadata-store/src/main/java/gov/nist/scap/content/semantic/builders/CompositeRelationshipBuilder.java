@@ -38,23 +38,26 @@ public class CompositeRelationshipBuilder {
 	private ICompositeRelationshipDefinition relationshipDefinition;
     private IEntity<?> relatedEntity;
 	
+    /**
+     * set the composite relationship definition
+     * @param relationshipDefinition composite relationship definition
+     */
     public void setCompositeRelationshipInfo(ICompositeRelationshipDefinition relationshipDefinition) {
 		this.relationshipDefinition = relationshipDefinition;
 	}
 	
+    /**
+     * set the target entity of a composite relationship (the child)
+     * @param relatedEntity the target entity of a composite relationship (the child)
+     */
     public void setRelatedEntity(IEntity<?> relatedEntity) {
         this.relatedEntity = relatedEntity;
     }
 
 	/**
-	 * Will build an instance of an indirect relationship. NOTE: the client must
-	 * add the newly created relationship to the owning entity directly after
-	 * calling this method.
-	 * 
-	 * @param model
-	 * @param entity
-	 *            - the owningEntity of the relationship
-	 * @return
+	 * Will build an instance of a composite relationship (parent to child)
+	 * @param model the metadata model
+	 * @return the composite relationship to be added to the parent owning entity
 	 */
     public ICompositeRelationship build(IMetadataModel model){
 		if (relationshipDefinition == null || relatedEntity == null){
