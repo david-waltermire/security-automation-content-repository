@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.IPersistenceContext;
@@ -33,13 +33,13 @@ import java.util.Set;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
-class VersionStatementManager implements RegenerationStatementManager {
+public class VersionStatementManager implements RegenerationStatementManager {
     private final IPersistenceContext persistContext;
 	
     final private Set<URI> versionStatements;
     private String versionValue;
     
-	VersionStatementManager(IPersistenceContext persistContext) {
+    public VersionStatementManager(IPersistenceContext persistContext) {
 	    this.persistContext = persistContext;
 	    final IPersistenceContext pc = persistContext;
 	    versionStatements = new HashSet<URI>() {

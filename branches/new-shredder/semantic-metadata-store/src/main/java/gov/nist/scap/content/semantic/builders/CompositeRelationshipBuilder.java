@@ -21,40 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.builders;
 
-import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
-import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
-import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
-import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.DefaultCompositeRelationship;
+import gov.nist.scap.content.model.ICompositeRelationship;
+import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.definitions.ICompositeRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
+import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
 /**
- * Builder for constructing BoundaryIdentiferRelationships
+ * Builder for constructing CompositeRelationships
  *
  */
-class BoundaryIdentifierRelationshipBuilder {
-	private IBoundaryIdentifierRelationshipDefinition relationshipDefinition;
-	private String externalIdValue;
-	private String externalIdType;
+public class CompositeRelationshipBuilder {
+	private ICompositeRelationshipDefinition relationshipDefinition;
+    private IEntity<?> relatedEntity;
 	
-	BoundaryIdentifierRelationshipBuilder() {
-	}
-	
-	void setExternalIdValue(String externalIdValue) {
-		this.externalIdValue = externalIdValue;
-	}
-	
-	void setBoundaryIdentiferRelationshipInfo(IBoundaryIdentifierRelationshipDefinition relationshipDefinition) {
+    public void setCompositeRelationshipInfo(ICompositeRelationshipDefinition relationshipDefinition) {
 		this.relationshipDefinition = relationshipDefinition;
 	}
 	
-	void setExternalIdType(String externalIdType) {
-		this.externalIdType = externalIdType;
-	}
+    public void setRelatedEntity(IEntity<?> relatedEntity) {
+        this.relatedEntity = relatedEntity;
+    }
 
 	/**
-	 * Will build an instance of an boundaryIdentifer relationship. NOTE: the client must
+	 * Will build an instance of an indirect relationship. NOTE: the client must
 	 * add the newly created relationship to the owning entity directly after
 	 * calling this method.
 	 * 
@@ -63,13 +56,12 @@ class BoundaryIdentifierRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IBoundaryIdentifierRelationship build(IMetadataModel model){
-		if (relationshipDefinition == null || externalIdValue == null || externalIdType == null){
+    public ICompositeRelationship build(IMetadataModel model){
+		if (relationshipDefinition == null || relatedEntity == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
 		
-		IExternalIdentifier externalIdentifier = model.getExternalIdentifierById(externalIdType);
-		IBoundaryIdentifierRelationship rel = new DefaultBoundaryIdentifierRelationship(relationshipDefinition, externalIdentifier, externalIdValue);
+		ICompositeRelationship rel = new DefaultCompositeRelationship(relationshipDefinition, relatedEntity);
 		
 		return rel;
 	}

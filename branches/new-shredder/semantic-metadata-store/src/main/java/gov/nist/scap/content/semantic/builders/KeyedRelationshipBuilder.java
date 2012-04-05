@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.builders;
 
 import gov.nist.scap.content.model.AbstractRelationship;
 import gov.nist.scap.content.model.IKey;
@@ -30,19 +30,20 @@ import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationshipVisitor;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
+import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
 //TODO: need to handle rebuilding the KEY AND ENTITY!!!!
-class KeyedRelationshipBuilder {
+public class KeyedRelationshipBuilder {
 	private IKeyedRelationshipDefinition keyedRelationshipInfo;
 	
 	private IKey relatedEntityKey;
 	
 	
-	void setKeyedRelationshipInfo(IKeyedRelationshipDefinition keyedRelationshipInfo) {
+	public void setKeyedRelationshipInfo(IKeyedRelationshipDefinition keyedRelationshipInfo) {
 		this.keyedRelationshipInfo = keyedRelationshipInfo;
 	}
 	
-	void setRelatedEntityKey(IKey relatedEntityKey) {
+	public void setRelatedEntityKey(IKey relatedEntityKey) {
 		this.relatedEntityKey = relatedEntityKey;
 	}
 
@@ -59,7 +60,7 @@ class KeyedRelationshipBuilder {
 	 *            - the owningEntity of the relationship
 	 * @return
 	 */
-	IKeyedRelationship build(IMetadataModel model){
+	public IKeyedRelationship build(IMetadataModel model){
 		if (keyedRelationshipInfo == null || relatedEntityKey == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}

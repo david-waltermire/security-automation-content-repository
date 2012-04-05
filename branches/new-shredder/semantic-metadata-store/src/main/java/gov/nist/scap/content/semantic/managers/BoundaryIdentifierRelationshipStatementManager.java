@@ -21,12 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.MetaDataOntology;
+import gov.nist.scap.content.semantic.builders.BoundaryIdentifierRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
 import java.util.Collection;
@@ -43,7 +44,7 @@ import org.openrdf.model.URI;
  * 
  * @see BoundaryIdentiferRelationshipBuilder
  */
-class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
+public class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
 	//all IDs of boundaryIdentifierRelationships
@@ -53,7 +54,7 @@ class BoundaryIdentifierRelationshipStatementManager implements RegenerationStat
 	private Map<String, BoundaryIdentifierRelationshipBuilder> boundaryIdentifierRelationships = new HashMap<String, BoundaryIdentifierRelationshipBuilder>();
 	
 	
-	BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
+	public BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
 		this.ontology = ontology;
 		this.boundaryIdentifierRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
 	}

@@ -28,11 +28,16 @@ package gov.nist.scap.content.semantic.translation;
 
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
+import gov.nist.scap.content.semantic.managers.BoundaryIdentifierRelationshipStatementManager;
+import gov.nist.scap.content.semantic.managers.CompositeRelationshipStatementManager;
+import gov.nist.scap.content.semantic.managers.KeyStatementManager;
+import gov.nist.scap.content.semantic.managers.KeyedRelationshipStatementManager;
+import gov.nist.scap.content.semantic.managers.RegenerationStatementManager;
+import gov.nist.scap.content.semantic.managers.VersionStatementManager;
 
 import java.util.LinkedList;
 import java.util.List;

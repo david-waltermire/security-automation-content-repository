@@ -2,7 +2,7 @@
  * The MIT License
  * 
  * Copyright (c) 2011 Paul Cichonski
- * 
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -21,43 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
-
-import gov.nist.scap.content.semantic.entity.EntityBuilder;
-
-import org.openrdf.model.Statement;
+package gov.nist.scap.content.semantic.exceptions;
 
 /**
- * 
- * <p>
- * Manages all triples associated with a given type, with the objective of
- * both processing those triples, and eventually rebuilding an instance of the type out
- * of them.
- * </p>
- * 
- * 
- * @see MetadataModel
+ * Exception thrown by builders if the build() method is called without all required data.
  */
-interface RegenerationStatementManager {
-	/**
-	 * Scans triple and processes it if it is relevant to the manager
-	 * 
-	 * @param statement
-	 * @return true if triple was processed in some way, false if it was just
-	 *         ignored.
-	 */
-	boolean scan(Statement statement);
+public class IncompleteBuildStateException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+	public IncompleteBuildStateException() {
+		super();
+	}
 	
-	/**
-	 * <p>
-	 * Called after all triples are processed to populate the builder
-	 * with information that the builder compiled
-	 * </p>
-	 * 
-	 * @param builder
-	 *            - to populate.
-	 */
-	void populateEntity(EntityBuilder builder);
-	
-	
+	public IncompleteBuildStateException(String message) {
+		super(message);
+	}
+
+	public IncompleteBuildStateException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public IncompleteBuildStateException(Throwable cause) {
+		super(cause);
+	}
 }

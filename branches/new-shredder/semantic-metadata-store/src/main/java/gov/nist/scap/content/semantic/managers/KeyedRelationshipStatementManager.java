@@ -21,13 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package gov.nist.scap.content.semantic.translation;
+package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.MetaDataOntology;
+import gov.nist.scap.content.semantic.builders.KeyedRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
 import java.util.Collection;
@@ -38,7 +39,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 
-class KeyedRelationshipStatementManager implements
+public class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
@@ -59,7 +60,7 @@ class KeyedRelationshipStatementManager implements
 	 * @param factory
 	 * @param relatedEntityKeys
 	 */
-	KeyedRelationshipStatementManager(MetaDataOntology ontology, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
+	public KeyedRelationshipStatementManager(MetaDataOntology ontology, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
 		this.ontology = ontology;
 		this.factory = factory;
 		this.relatedEntityKeys = relatedEntityKeys;
