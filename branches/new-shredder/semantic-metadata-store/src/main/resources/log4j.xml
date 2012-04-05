@@ -33,7 +33,7 @@
 
 
   <logger name="org.scapdev.content.core.aspectj" additivity="false">
-    <level value="INFO"/>
+    <level value="TRACE"/>
     <appender-ref ref="statements"/>
   </logger>
 

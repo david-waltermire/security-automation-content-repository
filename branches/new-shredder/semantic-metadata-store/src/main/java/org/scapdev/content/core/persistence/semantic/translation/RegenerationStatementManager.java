@@ -39,7 +39,7 @@ import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
  */
 interface RegenerationStatementManager {
 	/**
-	 * Scans triple and processes it if it is relevant to indirectRelationships
+	 * Scans triple and processes it if it is relevant to the manager
 	 * 
 	 * @param statement
 	 * @return true if triple was processed in some way, false if it was just
@@ -49,9 +49,8 @@ interface RegenerationStatementManager {
 	
 	/**
 	 * <p>
-	 * Called after all triples are processed to populate re-constituted entity
-	 * with the built instance (or instances depending on relationship) of type
-	 * found in the graph.
+	 * Called after all triples are processed to populate the builder
+	 * with information that the builder compiled
 	 * </p>
 	 * 
 	 * @param builder
