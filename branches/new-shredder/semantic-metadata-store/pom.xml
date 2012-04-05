@@ -52,11 +52,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>gov.nist.scap.content</groupId>
-      <artifactId>eXist-db-persistence</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -98,89 +93,38 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.6.11</version>
+    </dependency>    
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-Xms256m -Xmx512m -Xss2m -Djava.endorsed.dirs="${project.build.directory}/endorsed"
-            -Dexist.home="${project.build.directory}/classes"</argLine>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <version>1.4</version>
         <executions>
           <execution>
-            <id>unpack-exist</id>
-            <phase>process-resources</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>compile</goal>
             </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>gov.nist.scap.content</groupId>
-                  <artifactId>eXist-db-persistence</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-              </artifactItems>
-              <includes>conf.xml,exist-data/**/*</includes>
-              <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-endorsed</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
-                  <version>1.2</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>saxonhe</groupId>
-                  <artifactId>saxonhe</artifactId>
-                  <version>9.2.1.5</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>xalan</groupId>
-                  <artifactId>serializer</artifactId>
-                  <version>2.7.1</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>xalan</groupId>
-                  <artifactId>xalan</artifactId>
-                  <version>2.7.1</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>xerces</groupId>
-                  <artifactId>xercesImpl</artifactId>
-                  <version>2.11.0</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>xml-apis</groupId>
-                  <artifactId>xml-apis</artifactId>
-                  <version>1.4.01</version>
-                  <outputDirectory>${project.build.directory}/endorsed</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
           </execution>
         </executions>
-      </plugin>
-      
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <sources>
+            <source>
+              <basedir>src/main/java</basedir>
+              <includes>
+                <include>**/*.aj</include>
+              </includes>
+            </source>
+          </sources>          
+        </configuration>
+      </plugin>    
     </plugins>
     <pluginManagement>
       <plugins>
