@@ -54,6 +54,7 @@ class VersionStatementManager implements RegenerationStatementManager {
 
 	}
 	
+	@Override
 	public boolean scan(Statement statement){
 		if (versionStatements.contains(statement.getPredicate())){
 			populateVersionInfo(persistContext.getOntology(), statement);
