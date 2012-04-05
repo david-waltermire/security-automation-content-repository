@@ -32,7 +32,7 @@
   </appender>
 
 
-  <logger name="org.scapdev.content.core.aspectj" additivity="false">
+  <logger name="gov.nist.scap.content.semantic.aspectj" additivity="false">
     <level value="TRACE"/>
     <appender-ref ref="statements"/>
   </logger>

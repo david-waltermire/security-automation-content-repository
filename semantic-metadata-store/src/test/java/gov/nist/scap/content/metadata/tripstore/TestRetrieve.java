@@ -8,6 +8,7 @@ import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
+import gov.nist.scap.content.semantic.TripleStoreFacadeMetaDataManager;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
@@ -22,7 +23,6 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
-import org.scapdev.content.core.persistence.semantic.TripleStoreFacadeMetaDataManager;
 
 public class TestRetrieve {
 
