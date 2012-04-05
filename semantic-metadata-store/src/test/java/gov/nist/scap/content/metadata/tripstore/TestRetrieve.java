@@ -1,6 +1,5 @@
 package gov.nist.scap.content.metadata.tripstore;
 
-import gov.nist.scap.content.exist.ExistDBContentStore;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
@@ -18,16 +17,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.Assert;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scapdev.content.core.persistence.hybrid.ContentStore;
 import org.scapdev.content.core.persistence.semantic.TripleStoreFacadeMetaDataManager;
 
 public class TestRetrieve {
 
-    @Test
-    public void testGetEntity() throws Exception {
+    private static XmlbeansRules xmlbeansRules;
+    private static TripleStoreFacadeMetaDataManager tsfdm;
+    private static Map<String, IEntity<?>> resultMap;
 
-        XmlbeansRules xmlbeansRules =
-            new XmlbeansRules(this.getClass().getResourceAsStream(
+    @BeforeClass
+    public static void setupSemanticStore() throws Exception {
+        xmlbeansRules =
+            new XmlbeansRules(TestRetrieve.class.getResourceAsStream(
                 "/test-rules.xml"));
 
         String testFile = "scap-data-stream-multi-signatures.xml";
@@ -37,43 +43,37 @@ public class TestRetrieve {
         DataExtractingContentHandler handler =
             new DataExtractingContentHandler();
         shredder.shred(
-            this.getClass().getResourceAsStream("/" + testFile),
+            TestRetrieve.class.getResourceAsStream("/" + testFile),
             handler);
         Collection<? extends IEntity<?>> entities = handler.getEntities();
-        ExistDBContentStore cs = new ExistDBContentStore();
-        Map<String, IEntity<?>> result = cs.persist(entities);
+        ContentStore cs = new MockContentStore();
+        resultMap = cs.persist(entities);
 
-        TripleStoreFacadeMetaDataManager tsfdm =
-            TripleStoreFacadeMetaDataManager.getInstance(cs);
+        tsfdm = TripleStoreFacadeMetaDataManager.getInstance(cs);
         tsfdm.loadModel(xmlbeansRules);
-        tsfdm.persist(result);
+        tsfdm.persist(resultMap);
+    }
 
-        // Now retrieve
-        IKey key = null;
-//        if (xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection") instanceof IKeyedEntityDefinition) {
-//            KeyBuilder kb =
-//                new KeyBuilder(
-//                    ((IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection")).getKeyDefinition().getFields());
-//            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection");
-//            kb.addField(
-//                "datastream-collection-id",
-//                "scap_gov.nist_collection_Win7-54-1.2.0.0.zip");
-//            key = kb.toKey();
-//        }
-//        if (xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream") instanceof IKeyedEntityDefinition) {
-//            KeyBuilder kb =
-//                new KeyBuilder(
-//                    ((IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream")).getKeyDefinition().getFields());
-//            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream");
-//            kb.addField(
-//                "datastream-collection-id",
-//                "scap_gov.nist_collection_Win7-54-1.2.0.0.zip");
-//            kb.addField(
-//                "datastream-id",
-//                "scap_gov.nist_datastream_Win7-54-1.2.0.0.zip");
-//
-//            key = kb.toKey();
-//        }
+    @Test
+    public void testGetByKey() throws Exception {
+
+        IKey dsKey = null;
+        if (xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream") instanceof IKeyedEntityDefinition) {
+            KeyBuilder kb =
+                new KeyBuilder(
+                    ((IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/source/1.2#content-node-datastream")).getKeyDefinition().getFields());
+            kb.setId("http://scap.nist.gov/resource/content/source/1.2#key-datastream");
+            kb.addField(
+                "datastream-collection-id",
+                "scap_gov.nist_collection_Win7-54-1.2.0.0.zip");
+            kb.addField(
+                "datastream-id",
+                "scap_gov.nist_datastream_Win7-54-1.2.0.0.zip");
+
+            dsKey = kb.toKey();
+        }
+
+        IKey xccdfProfileKey = null;
         if (xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/xccdf/1.2#content-node-profile") instanceof IKeyedEntityDefinition) {
             KeyBuilder kb =
                 new KeyBuilder(
@@ -83,69 +83,50 @@ public class TestRetrieve {
                 "profile-id",
                 "xccdf_gov.nist_profile_united_states_government_configuration_baseline_version_1.2.0.0");
 
-            key = kb.toKey();
+            xccdfProfileKey = kb.toKey();
         }
 
-        IKeyedEntity<?> entity = tsfdm.getEntity(key);
-        System.out.println(entity.getVersion().getValue());
-        
-        
-        //
-        // for( Map.Entry<String, String> entry :
-        // entity.getKey().getFieldNameToValueMap().entrySet() ) {
-        // System.out.println(entry.getKey() + " : " + entry.getValue());
-        // }
-        // for( IKeyedRelationship rel : entity.getKeyedRelationships() ) {
-        // for( Map.Entry<String, String> entry :
-        // rel.getReferencedEntity().getKey().getFieldNameToValueMap().entrySet()
-        // ) {
-        // System.out.println(entry.getKey() + " : " + entry.getValue());
-        // }
-        // }
-        // //TODO need to populate parent
-        // for( ICompositeRelationship rel : entity.getCompositeRelationships()
-        // ) {
-        // System.out.println(rel.getReferencedEntity().getDefinition().getId());
-        // }
-        // if( entity.getParent() != null ) {
-        // if(
-        // entity.getParent().getKey("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection")
-        // != null ) {
-        // for( Map.Entry<String, String> entry :
-        // entity.getParent().getKey("http://scap.nist.gov/resource/content/source/1.2#key-datastream-collection").getFieldNameToValueMap().entrySet()
-        // ) {
-        // System.out.println(entry.getKey() + " : " + entry.getValue());
-        // }
-        // }
-        // }
+        IKeyedEntity<?> dsEntity = tsfdm.getEntity(dsKey);
+        IKeyedEntity<?> xccdfPEntity = tsfdm.getEntity(xccdfProfileKey);
 
-        // TODO revisit why I can't iterate through all without crashing
-//        Assert.assertNotSame(0, result.size());
-//        for (Map.Entry<String, IEntity<?>> entry : result.entrySet()) {
-//            IEntity<?> entity = tsfdm.getEntity(entry.getKey());
-//            Assert.assertTrue(entry.getValue().getDefinition().getId().equals(
-//                entity.getDefinition().getId()));
-//            System.out.println(entry.getValue().getDefinition().getId());
-//            break;
-//        }
-
+        Assert.assertEquals("v1.2.0.0", xccdfPEntity.getVersion().getValue());
+        Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsKey("datastream-collection-id"));
+        Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsKey("datastream-id"));
+        Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsValue("scap_gov.nist_collection_Win7-54-1.2.0.0.zip"));
+        Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsValue("scap_gov.nist_datastream_Win7-54-1.2.0.0.zip"));
+        
+        Assert.assertNotNull(dsEntity.getParent());
+    }
+    
+    
+    @Test
+    public void testGetCVE() throws Exception {
         IExternalIdentifier ied =
-            xmlbeansRules.getExternalIdentifierById("http://cve.mitre.org/resource/content/cve#external-identifier-cve");
-        Collection<String> externalIds = new HashSet<String>();
-        externalIds.add("CVE-2009-2510");
-        externalIds.add("CVE-2009-2524");
-        Set<IEntityDefinition> defs = new HashSet<IEntityDefinition>();
-        defs.add(xmlbeansRules.getEntityDefinitionById("http://oval.mitre.org/resource/content/definition/5#content-node-definition"));
-        Map<String, Set<? extends IKey>> keys =
-            tsfdm.getKeysForBoundaryIdentifier(ied, externalIds, defs);
-        for (Map.Entry<String, Set<? extends IKey>> entry : keys.entrySet()) {
-            System.out.println(entry.getKey());
-            for (IKey keyVal : entry.getValue()) {
-                for (Map.Entry<String, String> keyEntry : keyVal.getFieldNameToValueMap().entrySet()) {
-                    System.out.println(keyEntry.getKey() + " : "
-                        + keyEntry.getValue());
+                xmlbeansRules.getExternalIdentifierById("http://cve.mitre.org/resource/content/cve#external-identifier-cve");
+            Collection<String> externalIds = new HashSet<String>();
+            externalIds.add("CVE-2009-2510");
+            externalIds.add("CVE-2009-2524");
+            Set<IEntityDefinition> defs = new HashSet<IEntityDefinition>();
+            defs.add(xmlbeansRules.getEntityDefinitionById("http://oval.mitre.org/resource/content/definition/5#content-node-definition"));
+            Map<String, Set<? extends IKey>> keys =
+                tsfdm.getKeysForBoundaryIdentifier(ied, externalIds, defs);
+            for (Map.Entry<String, Set<? extends IKey>> entry : keys.entrySet()) {
+                for (IKey keyVal : entry.getValue()) {
+                    keyVal.getFieldNameToValueMap().containsKey("definition-id");
+                    keyVal.getFieldNameToValueMap().containsValue("oval:gov.nist.USGCB.patch:def:11593");
+                    keyVal.getFieldNameToValueMap().containsValue("oval:gov.nist.USGCB.patch:def:11590");
                 }
             }
+    }
+
+    @Test
+    public void loadAllEntities() throws Exception {
+        Assert.assertNotSame(0, resultMap.size());
+        for (Map.Entry<String, IEntity<?>> entry : resultMap.entrySet()) {
+            IEntity<?> entity = tsfdm.getEntity(entry.getKey());
+            Assert.assertTrue(entry.getValue().getDefinition().getId().equals(
+                entity.getDefinition().getId()));
         }
     }
+
 };

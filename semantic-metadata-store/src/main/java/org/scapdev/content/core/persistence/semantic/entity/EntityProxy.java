@@ -189,9 +189,10 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         Resource entityContextURI =
             queryService.findEntityContext(entityURI, conn);
         // no need to run inferencing here
-        return Iterations.addAll(
+        Set<Statement> result = Iterations.addAll(
             conn.getStatements(null, null, null, false, entityContextURI),
-            new HashSet<Statement>());
+            new HashSet<Statement>()); 
+        return result;
     }
 
     /**

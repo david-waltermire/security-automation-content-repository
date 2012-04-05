@@ -41,6 +41,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
@@ -572,8 +573,8 @@ public class TripleStoreQueryService {
 		String sourceVariableName = "source";
 		queryBuilder.append("SELECT source FROM CONTEXT ").append(sourceVariableName).append(" {<");
 		queryBuilder.append(entityURI).append(">} ");
-		queryBuilder.append("<").append(ontology.HAS_KEY.URI).append("> ");
-		queryBuilder.append("{_key}");
+		queryBuilder.append("<").append(RDF.TYPE).append("> ");
+        queryBuilder.append("{<").append(ontology.ENTITY_CLASS.URI).append(">} ");
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SERQL, queryBuilder.toString());
 	    TupleQueryResult result = tupleQuery.evaluate();
 	    BindingSet resultSet = null;
