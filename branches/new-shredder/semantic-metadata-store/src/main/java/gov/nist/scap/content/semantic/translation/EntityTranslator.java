@@ -109,10 +109,8 @@ public class EntityTranslator extends
 			statementManager.populateEntity(builder);
 		}
 
-		IMutableEntity<?> result = builder.build();
-
 		@SuppressWarnings("unchecked")
-		T retval = (T)result;
+		T retval = (T)builder.build();
 		return retval;
 	}
 }
