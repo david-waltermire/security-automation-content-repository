@@ -107,12 +107,23 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     }
 
+    /**
+     * get an instance of this manager
+     * @param contentRetrieverFactory a factory to create content retrievers (relative to the persistence store)
+     * @return this manager
+     */
     public static TripleStoreFacadeMetaDataManager getInstance(
             ContentRetrieverFactory contentRetrieverFactory) {
         return new TripleStoreFacadeMetaDataManager(contentRetrieverFactory);
     }
 
+    /**
+     * must be called before using the manager
+     * @param model the metadata model to load into the ontology
+     * @throws RepositoryException error whiling accessing the repository
+     */
     public void loadModel(IMetadataModel model) throws RepositoryException {
+        //TODO consider moving this to the constructor
         if (!modelLoaded) {
             ontology.loadModel(repository.getConnection(), model);
             modelLoaded = true;
@@ -127,19 +138,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
-                URI entityURI = queryService.findEntityURI(key, conn);
+                URI entityURI = queryService.findEntityURI(key);
                 if (entityURI != null) {
                     return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
                         BASE_URI,
                         this,
                         entityURI);
                 }
-            } catch (MalformedQueryException e) {
-                log.error(e);
-                throw new RuntimeException(e);
-            } catch (QueryEvaluationException e2) {
-                log.error(e2);
-                throw new RuntimeException(e2);
             } finally {
                 conn.close();
             }
@@ -156,19 +161,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             RepositoryConnection conn = repository.getConnection();
             try {
                 URI entityURI =
-                    queryService.findEntityURIbyContentId(contentId, conn);
+                    queryService.findEntityURIbyContentId(contentId);
                 if (entityURI != null) {
                     return new EntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
                         BASE_URI,
                         this,
                         entityURI);
                 }
-            } catch (MalformedQueryException e) {
-                log.error(e);
-                throw new RuntimeException(e);
-            } catch (QueryEvaluationException e2) {
-                log.error(e2);
-                throw new RuntimeException(e2);
             } finally {
                 conn.close();
             }
@@ -211,8 +210,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         return null;
     }
 
-    /**
-     * <p>
+    /*
      * TODO: NOTE: there is an issue in some cases where an Entity will be sent
      * in containing duplicate relationships. At present only the first of the
      * set of duplicates is added; from the context of the triple store this is
@@ -227,7 +225,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
      * since the metamodel does not capture this extra context the relationships
      * just appear to be exactly the same. WE NEED TO FIGURE OUT HOW TO HANDLE
      * THIS.
-     * </p>
      */
     @Override
     public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
@@ -257,16 +254,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         }
     }
 
-    /**
-     * Helper method to generate keys for all entities
-     * 
-     * @param entityURIs
-     * @param conn
-     * @return
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
-     * @throws RepositoryException
-     */
     private Map<String, Set<? extends IKey>> findEntityKeys(
             Map<String, List<URI>> entityURIs,
             RepositoryConnection conn)
@@ -291,22 +278,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         return boundaryIdToKeyMap;
     }
 
-    /**
-     * Uses context to get all triples associated with entityURI
-     * 
-     * @param entityUri
-     * @return
-     * @throws RepositoryException
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
-     */
     private Set<Statement> getEntityStatements(
             URI entityURI,
             RepositoryConnection conn)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
         Resource entityContextURI =
-            queryService.findEntityContext(entityURI, conn);
+            queryService.findEntityContext(entityURI);
         // no need to run inferencing here
         return Iterations.addAll(
             conn.getStatements(null, null, null, false, entityContextURI),

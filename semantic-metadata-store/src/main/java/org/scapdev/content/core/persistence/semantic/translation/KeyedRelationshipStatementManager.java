@@ -56,12 +56,8 @@ class KeyedRelationshipStatementManager implements
 	/**
 	 * 
 	 * @param ontology
-	 * @param model
 	 * @param factory
 	 * @param relatedEntityKeys
-	 *            - need these in order to create KeyedRelationships with the
-	 *            relatedKey (TODO: determine if there is another way to build
-	 *            out this part of the graph).
 	 */
 	KeyedRelationshipStatementManager(MetaDataOntology ontology, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
 		this.ontology = ontology;

@@ -6,6 +6,7 @@ import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.persistence.semantic.IPersistenceContext;
 
 public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends IKeyedEntity<T>> extends EntityProxy<T, ENTITY> implements IKeyedEntity<T>, IContainer<T> {
@@ -13,14 +14,14 @@ public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends I
     public KeyedEntityProxy(
             String baseURI,
             IPersistenceContext persistContext,
-            String contentId) {
+            String contentId) throws RepositoryException {
         super(baseURI, persistContext, contentId);
     }
 
     public KeyedEntityProxy(
             String baseURI,
             IPersistenceContext persistContext,
-            URI resourceId) {
+            URI resourceId) throws RepositoryException {
         super(baseURI, persistContext, resourceId);
     }
     

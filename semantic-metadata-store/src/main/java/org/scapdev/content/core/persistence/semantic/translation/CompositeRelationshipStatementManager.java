@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.persistence.semantic.IPersistenceContext;
 import org.scapdev.content.core.persistence.semantic.entity.EntityBuilder;
 import org.scapdev.content.core.persistence.semantic.entity.EntityProxy;
@@ -76,7 +77,11 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	public boolean scan(Statement statement){
 		URI predicate = statement.getPredicate();
 		if (compositeRelationshipIds.contains(predicate.stringValue())){
-			populateCompositeRelationshipInfo(persistContext.getOntology(), statement);
+			try {
+                populateCompositeRelationshipInfo(persistContext.getOntology(), statement);
+            } catch (RepositoryException e) {
+                throw new RuntimeException(e);
+            }
 			return true;
 		} else if ( predicate.equals(persistContext.getOntology().HAS_PARENT_RELATIONSHIP_TO.URI) ) {
 	        parentEntityURI = (URI)statement.getObject();
@@ -92,13 +97,18 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	 * 
 	 * @param entity
 	 *            - to populate.
+	 * @throws RepositoryException 
 	 */
 	public void populateEntity(EntityBuilder builder){
 		for (CompositeRelationshipBuilder compositeRelBuilder : compositeRelationships.values()){
 			ICompositeRelationship compositeRelBuilderRelationship = compositeRelBuilder.build(persistContext.getOntology());
 			builder.addRelationship(compositeRelBuilderRelationship);
 		}
-		builder.setParent(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(baseURI, persistContext, parentEntityURI));
+		try {
+            builder.setParent(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(baseURI, persistContext, parentEntityURI));
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
 	}
 	
 	/**
@@ -110,10 +120,11 @@ class CompositeRelationshipStatementManager implements RegenerationStatementMana
 	 * 
 	 * @param model
 	 * @param statement
+	 * @throws RepositoryException 
 	 * 
 	 * @see RelationshipInfo
 	 */
-	private void populateCompositeRelationshipInfo(IMetadataModel model, Statement statement){
+	private void populateCompositeRelationshipInfo(IMetadataModel model, Statement statement) throws RepositoryException{
 		// hit on an boundaryIdRelationship of some type
 		String compositeRelationshipId = statement.getPredicate().stringValue();
 		String compositeURI = statement.getObject().stringValue();

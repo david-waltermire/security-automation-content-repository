@@ -107,6 +107,10 @@ public class MetaDataOntology implements IMetadataModel {
 	
 	private BNode context;
     
+	/**
+	 * default constructor
+	 * @param factory the value factory
+	 */
 	MetaDataOntology(ValueFactory factory) {
 		this.factory = factory;
 		context = factory.createBNode();
@@ -138,7 +142,12 @@ public class MetaDataOntology implements IMetadataModel {
 	    HAS_VERSION_VALUE = new Construct(genModelURI("hasVersionValue"), "hasVersionValue");
 	}
 	
-	/** helper method to load all model triples into triple store using given connection */
+	/**
+	 * helper method to load all model triples into triple store using given connection
+	 * @param conn respository connection
+	 * @param javaModel the model to load
+	 * @throws RepositoryException error accessing the repository
+	 */
 	void loadModel(RepositoryConnection conn, IMetadataModel javaModel) throws RepositoryException {
 		// add statements
 		List<Statement> statements = new LinkedList<Statement>();
@@ -182,8 +191,8 @@ public class MetaDataOntology implements IMetadataModel {
 	
 	/**
 	 * Returns the model construct representing the predicate associated with the given relationship ID.
-	 * @param relId
-	 * @return
+	 * @param relId the ID of the relationship
+	 * @return URI of the predicate
 	 */
 	public URI findIndirectRelationshipURI(String relId){
 		return boundaryObjectRelationships.get(relId).URI;
@@ -191,8 +200,8 @@ public class MetaDataOntology implements IMetadataModel {
 	
 	/**
 	 * Returns the model construct representing the predicate associated with the given relationship ID.
-	 * @param relId
-	 * @return
+     * @param relId the ID of the relationship
+     * @return URI of the predicate
 	 */
 	public URI findKeyedRelationshipURI(String relId){
 		return keyedRelationships.get(relId).URI;
@@ -200,8 +209,8 @@ public class MetaDataOntology implements IMetadataModel {
 
 	   /**
      * Returns the model construct representing the predicate associated with the given relationship ID.
-     * @param relId
-     * @return
+     * @param relId the ID of the relationship
+     * @return URI of the predicate
      */
     public URI findCompositeRelationshipURI(String relId){
         return compositeRelationships.get(relId).URI;
@@ -239,13 +248,15 @@ public class MetaDataOntology implements IMetadataModel {
         return null;
     }
     
+    @Override
     public <T extends IRelationshipDefinition> T getRelationshipDefinitionById(String keyedRelationshipId) {
         if( javaModel != null ) {
             return javaModel.getRelationshipDefinitionById(keyedRelationshipId);
         }
         return null;
     }
-    
+
+    @Override
     public <T extends IEntityDefinition> T getEntityDefinitionById(String entityType) {
         if( javaModel != null ) {
             return javaModel.getEntityDefinitionById(entityType);
@@ -254,10 +265,6 @@ public class MetaDataOntology implements IMetadataModel {
     }
 
 
-	/**
-	 * Populates map of all boundaryRelationship types.  Assumes each ID is a valid URN
-	 * @param indirectRelationshipIds
-	 */
 	private List<Statement> loadBoundaryObjectRelationships(Collection<String> boundaryObjectRelationshipIds){
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : boundaryObjectRelationshipIds){
@@ -270,10 +277,6 @@ public class MetaDataOntology implements IMetadataModel {
 		return statements;
 	}
 	
-	/**
-	 * Populates map of all keyedRelationship types.  Assumes each ID is a valid URN
-	 * @param keyedRelationshipIds
-	 */
 	private List<Statement> loadKeyedRelationships(Collection<String> keyedRelationshipIds){
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : keyedRelationshipIds){
@@ -286,10 +289,6 @@ public class MetaDataOntology implements IMetadataModel {
 		return statements;
 	}
 
-	   /**
-     * Populates map of all compositeRelationship types.  Assumes each ID is a valid URN
-     * @param compositeRelationshipIds
-     */
     private List<Statement> loadCompositeRelationships(Collection<String> compositeRelationshipIds){
         List<Statement> statements = new LinkedList<Statement>();
         for (String id : compositeRelationshipIds){
@@ -302,13 +301,6 @@ public class MetaDataOntology implements IMetadataModel {
         return statements;
     }
 
-	/**
-	 * Helper method to extract RDFish label from ID of form:
-	 * "urn:scap-content:relationship:org.mitre.oval:object-component"
-	 * 
-	 * @param id
-	 * @return
-	 */
 	private static String extractLabelFromRelId(String id) {
 		int pos = id.lastIndexOf(":") + 1;
 		StringTokenizer tok = new StringTokenizer(id.substring(pos), "-");
@@ -344,6 +336,11 @@ public class MetaDataOntology implements IMetadataModel {
 		public final URI URI;
 		public final String LABEL;
 		
+		/**
+		 * default constructor
+		 * @param uri uri
+		 * @param label label
+		 */
 		public Construct(URI uri, String label) {
 			this.URI = uri;
 			this.LABEL = label;

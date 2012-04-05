@@ -29,7 +29,7 @@ import org.scapdev.content.core.persistence.hybrid.MetadataStoreFactory;
 
 public class TripleStoreMetadataStoreFactory implements MetadataStoreFactory {
 
-	@Override
+    @Override
 	public MetadataStore newMetadataStore(ContentRetrieverFactory contentRetrieverFactory) {
 		return TripleStoreFacadeMetaDataManager.getInstance(contentRetrieverFactory);
 	}

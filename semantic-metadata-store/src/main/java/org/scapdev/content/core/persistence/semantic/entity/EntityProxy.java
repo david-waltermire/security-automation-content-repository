@@ -46,7 +46,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
 
     private EntityProxy(
             String baseURI,
-            IPersistenceContext persistContext) {
+            IPersistenceContext persistContext) throws RepositoryException {
         queryService = new TripleStoreQueryService(persistContext);
         entityTranslator =
             new EntityTranslator(baseURI, persistContext);
@@ -57,7 +57,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     public EntityProxy(
             String baseURI,
             IPersistenceContext persistenceContext,
-            String contentId) {
+            String contentId) throws RepositoryException {
         this(baseURI, persistenceContext);
         this.contentId = contentId;
     }
@@ -65,7 +65,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     public EntityProxy(
             String baseURI,
             IPersistenceContext persistenceContext,
-            URI resourceId) {
+            URI resourceId) throws RepositoryException {
         this(baseURI, persistenceContext);
         this.resourceId = resourceId;
     }
@@ -149,7 +149,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                     getEntityStatements(resourceId, conn);
                 Map<URI, IKey> relatedEntityKeys =
                     findEntityKeys(
-                        queryService.findAllRelatedEntityURIs(resourceId, conn),
+                        queryService.findAllRelatedEntityURIs(resourceId),
                         conn);
                 entity =
                     entityTranslator.translateToJava(
@@ -160,10 +160,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                     throw new NullPointerException("EntityProxy could not load the entity " + resourceId != null ? resourceId.toString() : contentId);
                 }
             } catch (RepositoryException e) {
-                throw new RuntimeException(e);
-            } catch (QueryEvaluationException e) {
-                throw new RuntimeException(e);
-            } catch (MalformedQueryException e) {
                 throw new RuntimeException(e);
             } catch (ProcessingException e) {
                 throw new RuntimeException(e);
@@ -184,10 +180,9 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     private Set<Statement> getEntityStatements(
             URI entityURI,
             RepositoryConnection conn)
-            throws RepositoryException, QueryEvaluationException,
-            MalformedQueryException {
+            throws RepositoryException {
         Resource entityContextURI =
-            queryService.findEntityContext(entityURI, conn);
+            queryService.findEntityContext(entityURI);
         // no need to run inferencing here
         Set<Statement> result = Iterations.addAll(
             conn.getStatements(null, null, null, false, entityContextURI),
@@ -208,8 +203,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     private Map<URI, IKey> findEntityKeys(
             List<URI> entityURIs,
             RepositoryConnection conn)
-            throws RepositoryException, QueryEvaluationException,
-            MalformedQueryException {
+            throws RepositoryException {
         KeyTranslator keyTranslator =
             new KeyTranslator(baseURI, persistContext.getOntology(), persistContext.getRepository().getValueFactory());
         Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
