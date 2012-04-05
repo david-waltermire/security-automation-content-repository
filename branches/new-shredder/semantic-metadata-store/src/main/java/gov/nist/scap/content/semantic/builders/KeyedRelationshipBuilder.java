@@ -23,26 +23,45 @@
  ******************************************************************************/
 package gov.nist.scap.content.semantic.builders;
 
-import gov.nist.scap.content.model.AbstractRelationship;
+import gov.nist.scap.content.model.DefaultKeyedRelationship;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
-import gov.nist.scap.content.model.IRelationshipVisitor;
+import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
+import gov.nist.scap.content.semantic.IPersistenceContext;
+import gov.nist.scap.content.semantic.entity.KeyedEntityProxy;
 import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
-//TODO: need to handle rebuilding the KEY AND ENTITY!!!!
+import org.openrdf.repository.RepositoryException;
+
 public class KeyedRelationshipBuilder {
 	private IKeyedRelationshipDefinition keyedRelationshipInfo;
 	
 	private IKey relatedEntityKey;
+	private IPersistenceContext ipc;
 	
+	/**
+	 * default constructor
+	 * @param ipc the persistence context
+	 */
+	public KeyedRelationshipBuilder(IPersistenceContext ipc) {
+	    this.ipc = ipc;
+	}
 	
+	/**
+	 * set the definition of the relationship
+	 * @param keyedRelationshipInfo the definition of the relationship
+	 */
 	public void setKeyedRelationshipInfo(IKeyedRelationshipDefinition keyedRelationshipInfo) {
 		this.keyedRelationshipInfo = keyedRelationshipInfo;
 	}
 	
+	/**
+	 * set the target entity key
+	 * @param relatedEntityKey the target entity key
+	 */
 	public void setRelatedEntityKey(IKey relatedEntityKey) {
 		this.relatedEntityKey = relatedEntityKey;
 	}
@@ -51,52 +70,19 @@ public class KeyedRelationshipBuilder {
 	
 	
 	/**
-	 * Will build an instance of an keyed relationship. NOTE: the client must
-	 * add the newly created relationship to the owning entity directly after
-	 * calling this method.
+	 * Will build an instance of an keyed relationship.
 	 * 
-	 * @param model
-	 * @param entity
-	 *            - the owningEntity of the relationship
-	 * @return
+	 * @param model the metadata mode
+	 * @return the relationship that must be added to the owning entity
 	 */
 	public IKeyedRelationship build(IMetadataModel model){
 		if (keyedRelationshipInfo == null || relatedEntityKey == null){
 			throw new IncompleteBuildStateException("Not all values are populated");
 		}
-
-		// TODO: eliminate the use of this internal class if possible
-		IKeyedRelationship rel = new InternalKeyedRelationship(keyedRelationshipInfo, relatedEntityKey);
-		
-		return rel;
-	}
-	
-	private static class InternalKeyedRelationship extends
-			AbstractRelationship<IKeyedRelationshipDefinition> implements
-			IKeyedRelationship {
-		//key of related entity
-		private IKey key;
-		
-		InternalKeyedRelationship(IKeyedRelationshipDefinition relationshipInfo,
-				IKey key) {
-			super(relationshipInfo);
-			this.key = key;
-		}
-
-		public IKey getKey() {
-			return key;
-		}
-
-		public IKeyedEntity<?> getReferencedEntity() {
-			// TODO: figure out how to provide this information
-			// Perhaps use a lazy fetch approach if the entity is not available?
-			throw new UnsupportedOperationException("implement");
-		}
-
-		public void accept(IRelationshipVisitor visitor) {
-			visitor.visit(this);
-		}
-
-		
+		try {
+            return new DefaultKeyedRelationship(keyedRelationshipInfo, new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(ipc, relatedEntityKey));
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
 	}
 }

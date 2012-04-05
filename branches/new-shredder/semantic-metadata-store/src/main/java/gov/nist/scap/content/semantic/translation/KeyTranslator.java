@@ -37,12 +37,11 @@ public class KeyTranslator extends AbstractSemanticTranslator {
 	
 	/**
 	 * 
-	 * @param baseURI - - the base URI to use for all RDF individuals produced by this translator
 	 * @param ontology
 	 * @param factory
 	 */
-	public KeyTranslator(String baseURI, MetaDataOntology ontology, ValueFactory factory) {
-		super(baseURI, factory);
+	public KeyTranslator(MetaDataOntology ontology, ValueFactory factory) {
+		super(factory);
 		this.ontology = ontology;
 	}
 	

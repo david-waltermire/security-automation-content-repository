@@ -53,19 +53,16 @@ import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
  */
 public class EntityTranslator extends
 		AbstractSemanticTranslator{
-    private final String baseURI;
     private final IPersistenceContext persistContext;
     private final MetaDataOntology ontology;
     
 	/**
 	 * 
-	 * @param baseURI - - the base URI to use for all RDF individuals produced by this translator
 	 * @param ontology
 	 * @param factory
 	 */
-	public EntityTranslator(String baseURI, IPersistenceContext persistContext) {
-		super(baseURI, persistContext.getRepository().getValueFactory());
-		this.baseURI = baseURI;
+	public EntityTranslator(IPersistenceContext persistContext) {
+		super(persistContext.getRepository().getValueFactory());
 	    this.persistContext = persistContext;
 	    this.ontology = persistContext.getOntology();
 	}
@@ -85,8 +82,8 @@ public class EntityTranslator extends
 	public <T extends IEntity<?>> T translateToJava(Set<Statement> statements, Map<URI, IKey> relatedEntityKeys, ContentRetrieverFactory contentRetrieverFactory) throws ProcessingException {
 		List<RegenerationStatementManager> managers = new LinkedList<RegenerationStatementManager>(); 
 		managers.add(new BoundaryIdentifierRelationshipStatementManager(persistContext.getOntology()));
-		managers.add(new KeyedRelationshipStatementManager(persistContext.getOntology(), factory, relatedEntityKeys));
-        managers.add(new CompositeRelationshipStatementManager(baseURI, persistContext));
+		managers.add(new KeyedRelationshipStatementManager(persistContext, factory, relatedEntityKeys));
+        managers.add(new CompositeRelationshipStatementManager(persistContext));
 		managers.add(new KeyStatementManager(persistContext.getOntology()));
 		managers.add(new VersionStatementManager(persistContext));
 

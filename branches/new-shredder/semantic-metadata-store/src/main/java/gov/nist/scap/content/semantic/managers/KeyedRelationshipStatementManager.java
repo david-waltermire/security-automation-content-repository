@@ -27,6 +27,7 @@ import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
+import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.builders.KeyedRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
@@ -54,17 +55,19 @@ public class KeyedRelationshipStatementManager implements
 	// key = relatedEntityURI....this map is what this class builds
 	private Map<URI, KeyedRelationshipBuilder> keyedRelationships = new HashMap<URI, KeyedRelationshipBuilder>();
 
+	private IPersistenceContext ipc;
 	/**
 	 * 
 	 * @param ontology
 	 * @param factory
 	 * @param relatedEntityKeys
 	 */
-	public KeyedRelationshipStatementManager(MetaDataOntology ontology, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
-		this.ontology = ontology;
+	public KeyedRelationshipStatementManager(IPersistenceContext ipc, ValueFactory factory, Map<URI, IKey> relatedEntityKeys) {
+		this.ontology = ipc.getOntology();
 		this.factory = factory;
 		this.relatedEntityKeys = relatedEntityKeys;
 		this.directRelationshipIds = ontology.getKeyedRelationshipIds();
+		this.ipc = ipc;
 	}
 	
 	@Override
@@ -110,15 +113,10 @@ public class KeyedRelationshipStatementManager implements
 		URI relatedEntityURI = factory.createURI(statement.getObject().stringValue());
 		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
 		if (keyedRelBuilder == null){
-			keyedRelBuilder = new KeyedRelationshipBuilder();
+			keyedRelBuilder = new KeyedRelationshipBuilder(ipc);
 			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
 			keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
-		} else {
-			// can't be sure this was set before
-		    //TODO figure out the comment above
-			keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)ontology.getRelationshipDefinitionById(keyedRelationshipId));
 		}
-		
 	}
 
 
