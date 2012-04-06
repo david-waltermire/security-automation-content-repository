@@ -331,7 +331,11 @@ public class MetaDataOntology implements IMetadataModel {
 		return factory.createURI(BASE_MODEL_URI + specificPart);
 	}
 	
-	//simple way to group a things URI and label together
+	/**
+	 * A grouping of URIs and labels
+	 * @author Adam Halbardier
+	 *
+	 */
 	public static class Construct {
 		public final URI URI;
 		public final String LABEL;

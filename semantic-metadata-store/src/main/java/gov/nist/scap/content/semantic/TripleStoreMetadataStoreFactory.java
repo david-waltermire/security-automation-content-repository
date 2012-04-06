@@ -27,6 +27,11 @@ import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
 import org.scapdev.content.core.persistence.hybrid.MetadataStoreFactory;
 
+/**
+ * Generates new metadata stores
+ * @author Adam Halbardier
+ *
+ */
 public class TripleStoreMetadataStoreFactory implements MetadataStoreFactory {
 
     @Override

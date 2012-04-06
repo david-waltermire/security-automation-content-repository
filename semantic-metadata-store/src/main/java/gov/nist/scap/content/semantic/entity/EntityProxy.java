@@ -33,6 +33,15 @@ import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
+/**
+ * An implementation of IEntity that lazy loads the entity from the triple
+ * store. This allows construction of an entity without loading all of its
+ * statements ahead of time.
+ * 
+ * @author Adam Halbardier
+ * @param <T> the entity defintiion
+ * @param <ENTITY> the IEntity subclass, if applicable
+ */
 public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         implements IEntity<T> {
 
@@ -43,12 +52,16 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     protected TripleStoreQueryService queryService;
 
     private EntityTranslator entityTranslator;
-    
-    //Set the minimum size of the cache in the constructor
-    private static Map<URI, SoftReference<IEntity<?>>> inMemWeakCache = new SoftHashMap<URI, SoftReference<IEntity<?>>>(100);
+
+    // Set the minimum size of the cache in the constructor
+    private static Map<URI, SoftReference<IEntity<?>>> inMemWeakCache =
+        new SoftHashMap<URI, SoftReference<IEntity<?>>>(100);
+
+    private static Map<URI, Object> monitorObjects = new HashMap<URI, Object>();
 
     /**
      * The base constructor to be call from other constructors
+     * 
      * @param persistContext the persistence context
      * @throws RepositoryException error accessing the repository
      */
@@ -61,26 +74,26 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
 
     /**
      * use this constructor to make an entity based on the content id
+     * 
      * @param persistenceContext the persistence context
      * @param contentId the content id of the entity to construct
      * @throws RepositoryException error accessing the repository
      */
-    public EntityProxy(
-            IPersistenceContext persistenceContext,
-            String contentId) throws RepositoryException {
+    public EntityProxy(IPersistenceContext persistenceContext, String contentId)
+            throws RepositoryException {
         this(persistenceContext);
         this.contentId = contentId;
     }
 
     /**
      * use this constructor to make an entity based on the resource URI
+     * 
      * @param persistenceContext the persistence context
      * @param resourceId the resource URI of the entity to construct
      * @throws RepositoryException error accessing the repository
      */
-    public EntityProxy(
-            IPersistenceContext persistenceContext,
-            URI resourceId) throws RepositoryException {
+    public EntityProxy(IPersistenceContext persistenceContext, URI resourceId)
+            throws RepositoryException {
         this(persistenceContext);
         this.resourceId = resourceId;
     }
@@ -160,58 +173,103 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
             RepositoryConnection conn;
             try {
                 conn = persistContext.getRepository().getConnection();
-                if( resourceId == null && contentId != null ) {
+                if (resourceId == null && contentId != null) {
                     loadResourceIdFromContentId(contentId, conn);
                 }
 
-                // at this point, resourceId should be loaded...check if the entity already exists in cache
-                SoftReference<IEntity<?>> sr = inMemWeakCache.get(resourceId);
-                if( sr != null ) {
-                    @SuppressWarnings("unchecked")
-                    ENTITY e = (ENTITY)sr.get();
-                    if( e != null ) {
-                        entity = e;
-                        return;
+                // Need to make the cache thread-safe. Start off by creating a
+                // monitor object for the resource we're loading. We cannot
+                // synchronize on URI because the objects may (will?) be
+                // different for different entity proxies, even though the URI
+                // is the same, so we create an arbitrary object and associate
+                // it with the URI. This much we thread-safe for all URIs, so
+                // synchronize on the class object.
+                Object monitorObject;
+                synchronized (EntityProxy.class) {
+                    monitorObject = monitorObjects.get(resourceId);
+                    if (monitorObject == null) {
+                        monitorObject = new Object();
+                        monitorObjects.put(resourceId, monitorObject);
                     }
                 }
 
-                Set<Statement> entityStatements =
-                    getEntityStatements(resourceId, conn);
-                Map<URI, IKey> relatedEntityKeys =
-                    findEntityKeys(
-                        queryService.findAllRelatedEntityURIs(resourceId),
-                        conn);
-                entity =
-                    entityTranslator.translateToJava(
-                        entityStatements,
-                        relatedEntityKeys,
-                        persistContext.getContentRetrieverFactory());
+                // Now we have the monitor object for a specific URI value
+                // (whether just created, or existing), so we synchronize on it.
+                // This block can run concurrently for different URIs, which is
+                // important because this block is costly to run, so we want to
+                // optimize as much as possible. The goal here is to prevent the
+                // same entity from getting loaded simultaneously, while
+                // allowing different entities to load at the same time.
+                synchronized (monitorObject) {
 
-                if (entity == null) {
-                    throw new NullPointerException(
-                        "EntityProxy could not load the entity " + contentId != null
-                            ? contentId : resourceId.stringValue());
+                    // at this point, resourceId should be loaded...check if the
+                    // entity already exists in cache
+                    SoftReference<IEntity<?>> sr =
+                        inMemWeakCache.get(resourceId);
+                    if (sr != null) {
+                        @SuppressWarnings("unchecked")
+                        ENTITY e = (ENTITY)sr.get();
+                        if (e != null) {
+                            entity = e;
+                            // We're now finished, so remove the monitor object. This
+                            // isn't essential, but it does allow the monitor object to
+                            // be garbage collected, reducing the memory footprint.
+                            monitorObjects.remove(resourceId);
+                            return;
+                        }
+                    }
+
+                    Set<Statement> entityStatements =
+                        getEntityStatements(resourceId, conn);
+                    Map<URI, IKey> relatedEntityKeys =
+                        findEntityKeys(
+                            queryService.findAllRelatedEntityURIs(resourceId),
+                            conn);
+                    entity =
+                        entityTranslator.translateToJava(
+                            entityStatements,
+                            relatedEntityKeys,
+                            persistContext.getContentRetrieverFactory());
+
+                    if (entity == null) {
+                        throw new NullPointerException(
+                            "EntityProxy could not load the entity "
+                                + contentId != null ? contentId
+                                : resourceId.stringValue());
+                    }
+                    inMemWeakCache.put(
+                        resourceId,
+                        new SoftReference<IEntity<?>>(entity));
+                    // We're now finished, so remove the monitor object. This
+                    // isn't essential, but it does allow the monitor object to
+                    // be garbage collected, reducing the memory footprint.
+                    monitorObjects.remove(resourceId);
                 }
-                inMemWeakCache.put(resourceId, new SoftReference<IEntity<?>>(entity));
+
             } catch (RepositoryException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-    
-    private void loadResourceIdFromContentId(String contentId, RepositoryConnection conn) throws RepositoryException {
-            Set<Statement> result =
-                    Iterations.addAll(
-                        conn.getStatements(null, persistContext.getOntology().HAS_CONTENT_ID.URI, persistContext.getRepository().getValueFactory().createLiteral(contentId), false),
-                        new HashSet<Statement>());
-            if( result.size() == 0 ) {
-                throw new NullPointerException(
-                    "EntityProxy could not load the entity URI from " + contentId);
-            } else if ( result.size() > 1 ) {
-                throw new NonUniqueResultException();
-            }
-            resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
-        
+
+    private void loadResourceIdFromContentId(
+            String contentId,
+            RepositoryConnection conn) throws RepositoryException {
+        Set<Statement> result =
+            Iterations.addAll(conn.getStatements(
+                null,
+                persistContext.getOntology().HAS_CONTENT_ID.URI,
+                persistContext.getRepository().getValueFactory().createLiteral(
+                    contentId),
+                false), new HashSet<Statement>());
+        if (result.size() == 0) {
+            throw new NullPointerException(
+                "EntityProxy could not load the entity URI from " + contentId);
+        } else if (result.size() > 1) {
+            throw new NonUniqueResultException();
+        }
+        resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
+
     }
 
     private Set<Statement> getEntityStatements(
@@ -230,8 +288,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
             List<URI> entityURIs,
             RepositoryConnection conn) throws RepositoryException {
         KeyTranslator keyTranslator =
-            new KeyTranslator(
-                persistContext.getOntology());
+            new KeyTranslator(persistContext.getOntology());
         Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
         for (URI entityURI : entityURIs) {
             Set<Statement> entityStatements =
