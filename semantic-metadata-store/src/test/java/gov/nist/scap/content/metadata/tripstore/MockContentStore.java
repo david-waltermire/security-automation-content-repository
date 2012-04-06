@@ -39,6 +39,7 @@ public class MockContentStore implements ContentStore {
         return new InternalContentRetriver(resultMap.get(contentId).getContentHandle().getCursor());
     }
     
+    @Override
     public void shutdown() {};
     
     private class InternalContentRetriver implements ContentRetriever {
