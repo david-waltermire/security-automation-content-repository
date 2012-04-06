@@ -3,10 +3,19 @@ package gov.nist.scap.content.exist;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+/**
+ * Use this class to write out comments when parsing with SAX
+ * @author Adam Halbardier
+ *
+ */
 public class ExistDBContentLexicalHandler implements LexicalHandler {
 
     private StringBuilder sb;
 
+    /**
+     * default constructor
+     * @param sb the string builder buffer to add to
+     */
     public ExistDBContentLexicalHandler(StringBuilder sb) {
         this.sb = sb;
     }

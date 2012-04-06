@@ -11,12 +11,22 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 
+/**
+ * An eXist-db implementation of content retriever
+ * @author Adam Halbardier
+ *
+ */
 public class ExistDBContentRetriever implements ContentRetriever {
 
     private Collection col;
     private String contentId;
     private XmlObject xmlObj;
 
+    /**
+     * default constructor
+     * @param col the collection to retrieve content from
+     * @param contentId the id of the content to retrieve
+     */
     public ExistDBContentRetriever(Collection col, String contentId) {
         this.col = col;
         this.contentId = contentId;
