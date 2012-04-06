@@ -86,7 +86,7 @@ public class ContentStoreTest {
     public void validateSignatures(InputStream is) throws Exception {
         ValidateSigConfig config =
                 new ValidateSigConfig.Builder().content(
-                    new BufferedInputStream(is)).publicKey(
+                    new BufferedInputStream(is)).trustedPublicKey(
                     getPublicKey()).build();
 
             List<ISignatureValidationResult> listSVR =
