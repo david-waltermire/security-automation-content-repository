@@ -31,6 +31,11 @@ import java.util.Set;
 
 import org.openrdf.model.Statement;
 
+/**
+ * Used to produce a key from a set of entity statements
+ * @author Adam Halbardier
+ *
+ */
 public class KeyTranslator {
 	private MetaDataOntology ontology;
 	

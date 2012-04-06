@@ -39,6 +39,11 @@ import java.util.Map;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
+/**
+ * Used to process statements to reconstruct a keyed relationship
+ * @author Adam Halbardier
+ *
+ */
 public class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
 	private MetaDataOntology ontology;

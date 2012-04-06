@@ -19,6 +19,12 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
+/**
+ * Used to persist statements to the triple store about relationships. One
+ * instance of this class is needed per owning entity (not per relationship).
+ * 
+ * @author Adam Halbardier
+ */
 public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
 
     private final ValueFactory valueFactory;
