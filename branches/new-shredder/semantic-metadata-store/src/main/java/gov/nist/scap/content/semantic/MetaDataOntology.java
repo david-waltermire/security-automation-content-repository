@@ -91,7 +91,7 @@ public class MetaDataOntology implements IMetadataModel {
     public final Construct HAS_PARENT_RELATIONSHIP_TO; 
     /** the type of the boundaryObject (or externalId in terms of java model)...TODO: this type relationship should be turned into a class heiarchy.  */
 	public final Construct HAS_BOUNDARY_OBJECT_TYPE; 
-	/** the actual value of the boundary object (e.g., CCE-XXXX, CPE:/XXX:XXX */
+	/** the actual value of the boundary object (e.g., CCE-XXXXX-X, CPE:/... */
 	public final Construct HAS_BOUNDARY_OBJECT_VALUE; 
 	
     public final Construct HAS_VERSION; 
@@ -268,7 +268,7 @@ public class MetaDataOntology implements IMetadataModel {
 	private List<Statement> loadBoundaryObjectRelationships(Collection<String> boundaryObjectRelationshipIds){
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : boundaryObjectRelationshipIds){
-			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
+			//this assumes a URN will be accepted as a valid URI.
 			Construct relationshipConstruct = new Construct(factory.createURI(id), extractLabelFromRelId(id));
 			boundaryObjectRelationships.put(id, relationshipConstruct);
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI));
@@ -280,7 +280,7 @@ public class MetaDataOntology implements IMetadataModel {
 	private List<Statement> loadKeyedRelationships(Collection<String> keyedRelationshipIds){
 		List<Statement> statements = new LinkedList<Statement>();
 		for (String id : keyedRelationshipIds){
-			//this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
+			//this assumes a URN will be accepted as a valid URI.
 			Construct relationshipConstruct = new Construct(factory.createURI(id), extractLabelFromRelId(id));
 			keyedRelationships.put(id, relationshipConstruct);
 			statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_KEYED_RELATIONSHIP_TO.URI));
@@ -292,7 +292,7 @@ public class MetaDataOntology implements IMetadataModel {
     private List<Statement> loadCompositeRelationships(Collection<String> compositeRelationshipIds){
         List<Statement> statements = new LinkedList<Statement>();
         for (String id : compositeRelationshipIds){
-            //this assumes a URN will be accepted as a valid URI.  TODO: make label more readable
+            //this assumes a URN will be accepted as a valid URI.
             Construct relationshipConstruct = new Construct(factory.createURI(id), extractLabelFromRelId(id));
             compositeRelationships.put(id, relationshipConstruct);
             statements.add(factory.createStatement(relationshipConstruct.URI, RDFS.SUBPROPERTYOF, HAS_COMPOSITE_RELATIONSHIP_TO.URI));
