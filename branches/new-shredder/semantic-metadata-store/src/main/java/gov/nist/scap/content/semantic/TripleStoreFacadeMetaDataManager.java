@@ -227,9 +227,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     @Override
     public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
         try {
-            // TODO change this back
             RepositoryConnection conn = repository.getConnection();
-            // RepositoryConnection conn = new RepositoryConnectionTest();
             try {
 
                 IEntityVisitor entityVisitor =
