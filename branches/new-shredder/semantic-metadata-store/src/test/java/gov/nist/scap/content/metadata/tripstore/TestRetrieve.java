@@ -30,6 +30,10 @@ public class TestRetrieve {
     private static TripleStoreFacadeMetaDataManager tsfdm;
     private static Map<String, IEntity<?>> resultMap;
 
+    /**
+     * Set up the tests by persisting an SCAP data stream
+     * @throws Exception general error
+     */
     @BeforeClass
     public static void setupSemanticStore() throws Exception {
         xmlbeansRules =
@@ -54,6 +58,10 @@ public class TestRetrieve {
         tsfdm.persist(resultMap);
     }
 
+    /**
+     * Test that information is retrievable by key
+     * @throws Exception general exception
+     */
     @Test
     public void testGetByKey() throws Exception {
 
@@ -98,7 +106,10 @@ public class TestRetrieve {
         Assert.assertNotNull(dsEntity.getParent());
     }
     
-    
+    /**
+     * Test that information is retrievable by boundary id
+     * @throws Exception general exception
+     */
     @Test
     public void testGetCVE() throws Exception {
         IExternalIdentifier ied =
@@ -119,6 +130,10 @@ public class TestRetrieve {
             }
     }
 
+    /**
+     * Test that every single proxy object loads without error
+     * @throws Exception general exception
+     */
     @Test
     public void loadAllEntities() throws Exception {
         Assert.assertNotSame(0, resultMap.size());
