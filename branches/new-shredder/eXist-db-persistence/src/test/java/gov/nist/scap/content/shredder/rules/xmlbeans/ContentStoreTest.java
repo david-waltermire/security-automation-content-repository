@@ -33,11 +33,20 @@ import org.apache.xmlbeans.XmlCursor;
 import org.junit.Test;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
 
+/**
+ * Smoke test that the content store works
+ * @author Adam Halbardier
+ *
+ */
 public class ContentStoreTest {
 
     private static final String ALIAS = "test";
     private static final String PASSWORD = "123456";
 
+    /**
+     * smoke test that exist-db content store works
+     * @throws Exception general error
+     */
     @Test
     public void testContentStore() throws Exception {
 
@@ -83,7 +92,7 @@ public class ContentStoreTest {
 
     }
 
-    public void validateSignatures(InputStream is) throws Exception {
+    private void validateSignatures(InputStream is) throws Exception {
         ValidateSigConfig config =
                 new ValidateSigConfig.Builder().content(
                     new BufferedInputStream(is)).trustedPublicKey(
@@ -114,13 +123,13 @@ public class ContentStoreTest {
         return file;
     }
 
-    public PublicKey getPublicKey()
+    private PublicKey getPublicKey()
             throws KeyStoreException, NoSuchAlgorithmException,
             CertificateException, IOException {
         return getKeystore().getCertificate(ALIAS).getPublicKey();
     }
 
-    public KeyStore getKeystore()
+    private KeyStore getKeystore()
             throws KeyStoreException, NoSuchAlgorithmException,
             CertificateException, IOException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
