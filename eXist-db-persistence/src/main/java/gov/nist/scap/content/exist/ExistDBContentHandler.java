@@ -13,6 +13,11 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 
+/**
+ * The SAX content handler for reading decomposed entities from eXist-db
+ * @author Adam Halbardier
+ *
+ */
 public class ExistDBContentHandler implements ContentHandler {
 
     private Collection col;
@@ -24,6 +29,12 @@ public class ExistDBContentHandler implements ContentHandler {
 
     private StringBuilder sb;
 
+    /**
+     * default constructor
+     * @param col the collection
+     * @param resourceId the resource id to process
+     * @param sb the string builder buffer to add to
+     */
     public ExistDBContentHandler(
             Collection col,
             String resourceId,

@@ -12,6 +12,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlCursor.TokenType;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.exist.xmldb.DatabaseImpl;
 import org.exist.xmldb.DatabaseInstanceManager;
 import org.exist.xmldb.EXistResource;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
@@ -24,6 +25,11 @@ import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.CollectionManagementService;
 import org.xmldb.api.modules.XMLResource;
 
+/**
+ * An eXist-db implementation of ContentStore
+ * @author Adam Halbardier
+ *
+ */
 public class ExistDBContentStore implements ContentStore {
 
     private static final String URI = "xmldb:exist:///db/";
@@ -36,13 +42,13 @@ public class ExistDBContentStore implements ContentStore {
     
     private Collection col = null;
 
+    /**
+     * default constructor
+     * @throws XMLDBException error with the database 
+     */
     public ExistDBContentStore()
-            throws ClassNotFoundException, XMLDBException,
-            InstantiationException, IllegalAccessException {
-        final String driver = "org.exist.xmldb.DatabaseImpl";
-        // initialize database driver
-        Class<?> cl = Class.forName(driver);
-        Database database = (Database)cl.newInstance();
+            throws XMLDBException {
+        Database database = new DatabaseImpl();;
         database.setProperty("create-database", "true");
         DatabaseManager.registerDatabase(database);
 
