@@ -57,7 +57,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     private static Map<URI, SoftReference<IEntity<?>>> inMemWeakCache =
         new SoftHashMap<URI, SoftReference<IEntity<?>>>(100);
 
-    private static Map<URI, Object> monitorObjects = new HashMap<URI, Object>();
+    private static Map<URI, Object> monitorObjects = new SoftHashMap<URI, Object>();
 
     /**
      * The base constructor to be call from other constructors
@@ -201,7 +201,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                 // same entity from getting loaded simultaneously, while
                 // allowing different entities to load at the same time.
                 synchronized (monitorObject) {
-
                     // at this point, resourceId should be loaded...check if the
                     // entity already exists in cache
                     SoftReference<IEntity<?>> sr =
@@ -211,10 +210,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                         ENTITY e = (ENTITY)sr.get();
                         if (e != null) {
                             entity = e;
-                            // We're now finished, so remove the monitor object. This
-                            // isn't essential, but it does allow the monitor object to
-                            // be garbage collected, reducing the memory footprint.
-                            monitorObjects.remove(resourceId);
                             return;
                         }
                     }
@@ -240,10 +235,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                     inMemWeakCache.put(
                         resourceId,
                         new SoftReference<IEntity<?>>(entity));
-                    // We're now finished, so remove the monitor object. This
-                    // isn't essential, but it does allow the monitor object to
-                    // be garbage collected, reducing the memory footprint.
-                    monitorObjects.remove(resourceId);
                 }
 
             } catch (RepositoryException e) {

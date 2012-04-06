@@ -9,6 +9,13 @@ import gov.nist.scap.content.semantic.IPersistenceContext;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 
+/**
+ * A variant of EntityProxy that supports keys
+ * @author Adam Halbardier
+ *
+ * @param <T> the entity defintion
+ * @param <ENTITY> the keyed entity type
+ */
 public class KeyedEntityProxy<T extends IKeyedEntityDefinition, ENTITY extends IKeyedEntity<T>> extends EntityProxy<T, ENTITY> implements IKeyedEntity<T>, IContainer<T> {
 
     private IKey key;

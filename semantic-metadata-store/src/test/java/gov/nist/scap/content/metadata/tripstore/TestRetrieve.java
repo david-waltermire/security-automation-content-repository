@@ -148,5 +148,4 @@ public class TestRetrieve {
                 entity.getDefinition().getId()));
         }
     }
-
 };

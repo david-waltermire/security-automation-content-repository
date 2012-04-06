@@ -33,6 +33,11 @@ import java.util.Set;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
+/**
+ * Used to process statements to reconstruct a version
+ * @author Adam Halbardier
+ *
+ */
 public class VersionStatementManager implements RegenerationStatementManager {
     private final IPersistenceContext persistContext;
 	
