@@ -22,7 +22,7 @@
          the following appenders write to files  
     -->
   <appender name="statements" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="statements.log"/>
+    <param name="File" value="target/statements.log"/>
     <param name="MaxFileSize" value="20MB"/>
     <param name="MaxBackupIndex" value="3"/>
     <param name="Encoding" value="UTF-8"/>
@@ -33,7 +33,7 @@
 
 
   <logger name="gov.nist.scap.content.semantic.aspectj" additivity="false">
-    <level value="INFO"/>
+    <level value="TRACE"/>
     <appender-ref ref="statements"/>
   </logger>
 
