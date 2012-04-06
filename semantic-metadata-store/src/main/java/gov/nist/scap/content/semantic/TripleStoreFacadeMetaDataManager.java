@@ -264,8 +264,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             for (URI entityURI : entry.getValue()) {
                 Set<Statement> entityStatements =
                     getEntityStatements(entityURI, conn);
-                // TODO: may want to refactor to only pass translator key
-                // statements, but this will work
                 IKey entityKey =
                     keyTranslator.translateToJava(entityStatements);
                 map.add(entityKey);

@@ -47,9 +47,6 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
     @Override
     public void visit(IContentNode entity) {
         URI resourceId = entityMetadataMap.getResourceURI(entity);
-        //TODO: Why use a BNode as context?
-        //Why use a different context for each entity?
-        //Should each statement be associated with the entity, and set of entities?
 
         BNode context = valueFactory.createBNode();
         try {

@@ -62,7 +62,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
             relationship.getExternalIdentifier();
         String boundaryObjectValue = relationship.getValue();
 
-        // TODO: Fix this later
         URI boundaryObjectURI =
             valueFactory.createURI(externalIdentifier.getNamespace() + "#"
                 + boundaryObjectValue);
