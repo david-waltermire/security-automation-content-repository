@@ -12,12 +12,14 @@ import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.semantic.IPersistenceContext;
+import gov.nist.scap.content.semantic.SoftHashMap;
 import gov.nist.scap.content.semantic.TripleStoreQueryService;
 import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
 import gov.nist.scap.content.semantic.translation.EntityTranslator;
 import gov.nist.scap.content.semantic.translation.KeyTranslator;
 import info.aduna.iteration.Iterations;
 
+import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +43,9 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     protected TripleStoreQueryService queryService;
 
     private EntityTranslator entityTranslator;
+    
+    //Set the minimum size of the cache in the constructor
+    private static Map<URI, SoftReference<IEntity<?>>> inMemWeakCache = new SoftHashMap<URI, SoftReference<IEntity<?>>>(100);
 
     /**
      * The base constructor to be call from other constructors
@@ -155,20 +160,21 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
             RepositoryConnection conn;
             try {
                 conn = persistContext.getRepository().getConnection();
+                if( resourceId == null && contentId != null ) {
+                    loadResourceIdFromContentId(contentId, conn);
+                }
 
-                if (contentId != null) {
-                    Set<Statement> result =
-                            Iterations.addAll(
-                                conn.getStatements(null, persistContext.getOntology().HAS_CONTENT_ID.URI, persistContext.getRepository().getValueFactory().createLiteral(contentId), false),
-                                new HashSet<Statement>());
-                    if( result.size() == 0 ) {
-                        throw new NullPointerException(
-                            "EntityProxy could not load the entity URI from " + contentId);
-                    } else if ( result.size() > 1 ) {
-                        throw new NonUniqueResultException();
+                // at this point, resourceId should be loaded...check if the entity already exists in cache
+                SoftReference<IEntity<?>> sr = inMemWeakCache.get(resourceId);
+                if( sr != null ) {
+                    @SuppressWarnings("unchecked")
+                    ENTITY e = (ENTITY)sr.get();
+                    if( e != null ) {
+                        entity = e;
+                        return;
                     }
-                    resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
-                } 
+                }
+
                 Set<Statement> entityStatements =
                     getEntityStatements(resourceId, conn);
                 Map<URI, IKey> relatedEntityKeys =
@@ -186,11 +192,26 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                         "EntityProxy could not load the entity " + contentId != null
                             ? contentId : resourceId.stringValue());
                 }
+                inMemWeakCache.put(resourceId, new SoftReference<IEntity<?>>(entity));
             } catch (RepositoryException e) {
                 throw new RuntimeException(e);
             }
-
         }
+    }
+    
+    private void loadResourceIdFromContentId(String contentId, RepositoryConnection conn) throws RepositoryException {
+            Set<Statement> result =
+                    Iterations.addAll(
+                        conn.getStatements(null, persistContext.getOntology().HAS_CONTENT_ID.URI, persistContext.getRepository().getValueFactory().createLiteral(contentId), false),
+                        new HashSet<Statement>());
+            if( result.size() == 0 ) {
+                throw new NullPointerException(
+                    "EntityProxy could not load the entity URI from " + contentId);
+            } else if ( result.size() > 1 ) {
+                throw new NonUniqueResultException();
+            }
+            resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
+        
     }
 
     private Set<Statement> getEntityStatements(
