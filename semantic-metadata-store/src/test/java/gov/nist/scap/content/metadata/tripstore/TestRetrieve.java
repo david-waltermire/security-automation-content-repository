@@ -41,6 +41,9 @@ public class TestRetrieve {
      */
     @BeforeClass
     public static void setupSemanticStore() throws Exception {
+        System.setProperty(TripleStoreFacadeMetaDataManager.TRIPLE_STORE_DIR, "target/triple-store-folder");
+        System.setProperty(TripleStoreFacadeMetaDataManager.RULES_FILE, "/test-rules.xml");
+        //TODO Need to rework this because the rules may be in the triple store already 
         xmlbeansRules =
             new XmlbeansRules(TestRetrieve.class.getResourceAsStream(
                 "/test-rules.xml"));
@@ -59,7 +62,6 @@ public class TestRetrieve {
         resultMap = cs.persist(entities);
 
         tsfdm = TripleStoreFacadeMetaDataManager.getInstance(cs);
-        tsfdm.loadModel(xmlbeansRules);
         tsfdm.persist(resultMap);
     }
 

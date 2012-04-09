@@ -31,14 +31,19 @@ import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.entity.EntityProxy;
 import gov.nist.scap.content.semantic.entity.KeyedEntityProxy;
 import gov.nist.scap.content.semantic.translation.EntityMetadataMap;
 import gov.nist.scap.content.semantic.translation.KeyTranslator;
 import gov.nist.scap.content.semantic.translation.ToRDFEntityVisitor;
+import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
 import info.aduna.iteration.Iterations;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +52,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -67,6 +73,14 @@ import org.scapdev.content.core.persistence.hybrid.MetadataStore;
  */
 public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         IPersistenceContext {
+
+    public static final String TRIPLE_STORE_DIR =
+        TripleStoreFacadeMetaDataManager.class.getCanonicalName()
+            + ".TripleStoreDir";
+    public static final String RULES_FILE =
+        TripleStoreFacadeMetaDataManager.class.getCanonicalName()
+            + ".RulesFile";
+
     private static final Logger log =
         Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
     private static final String BASE_URI =
@@ -80,8 +94,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     private TripleStoreQueryService queryService;
 
-    private boolean modelLoaded = false;
-
     private ContentRetrieverFactory contentRetrieverFactory;
 
     private TripleStoreFacadeMetaDataManager(
@@ -90,7 +102,33 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         // http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more
         // detail
         try {
-            repository = new SailRepository(new MemoryStore());
+            String tripleStoreDir = System.getProperty(TRIPLE_STORE_DIR);
+            boolean loadRules = false;
+            if (tripleStoreDir != null) {
+                File f = new File(tripleStoreDir);
+                if (!f.exists()) {
+                    if (!f.mkdir()) {
+                        throw new RuntimeException(
+                            "Could not access or create triple store directory");
+                    }
+                }
+                if (!f.isDirectory()) {
+                    throw new RuntimeException(
+                        "Triple store directory is not a directory");
+                }
+
+                if (f.list().length == 0) {
+                    loadRules = true;
+                }
+                MemoryStore ms = new MemoryStore(new File(tripleStoreDir));
+                // prevent file lock issues
+                ms.setSyncDelay(1000L);
+                repository = new SailRepository(ms);
+
+            } else {
+                repository = new SailRepository(new MemoryStore());
+                loadRules = true;
+            }
 
             // repository = new
             // HTTPRepository("http://localhost:8080/openrdf-sesame",
@@ -101,7 +139,40 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             ontology = new MetaDataOntology(factory);
             queryService = new TripleStoreQueryService(this);
             this.contentRetrieverFactory = contentRetrieverFactory;
+
+            String rulesPath = System.getProperty(RULES_FILE);
+            InputStream is;
+            if (rulesPath == null) {
+                throw new RuntimeException("System property must be set: "
+                    + RULES_FILE);
+            }
+            if (rulesPath.startsWith("/")) {
+                is =
+                    TripleStoreFacadeMetaDataManager.class.getResourceAsStream(rulesPath);
+                if (is == null) {
+                    throw new RuntimeException(
+                        "Could not find file on class path: " + rulesPath);
+                }
+            } else {
+                File f = new File(rulesPath);
+                if (!f.exists()) {
+                    throw new RuntimeException("File does not exist: "
+                        + f.getCanonicalPath());
+                }
+                is = new BufferedInputStream(new FileInputStream(f));
+            }
+            XmlbeansRules xmlbeansRules = new XmlbeansRules(is);
+
+            if (loadRules) {
+                ontology.loadModel(repository.getConnection(), xmlbeansRules);
+            } else {
+                ontology.loadModel(null, xmlbeansRules);
+            }
         } catch (RepositoryException e) {
+            log.error("Exception iniitalizing triple store", e);
+        } catch (XmlException e) {
+            log.error("Exception iniitalizing triple store", e);
+        } catch (IOException e) {
             log.error("Exception iniitalizing triple store", e);
         }
 
@@ -117,23 +188,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     public static TripleStoreFacadeMetaDataManager getInstance(
             ContentRetrieverFactory contentRetrieverFactory) {
         return new TripleStoreFacadeMetaDataManager(contentRetrieverFactory);
-    }
-
-    /**
-     * must be called before using the manager
-     * 
-     * @param model the metadata model to load into the ontology
-     * @throws RepositoryException error whiling accessing the repository
-     */
-    public void loadModel(IMetadataModel model) throws RepositoryException {
-        // TODO consider moving this to the constructor
-        if (!modelLoaded) {
-            ontology.loadModel(repository.getConnection(), model);
-            modelLoaded = true;
-        } else {
-            throw new IllegalStateException(
-                "The model has already been loaded.");
-        }
     }
 
     @Override
