@@ -113,7 +113,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
             entityResourceId,
             ontology.HAS_COMPOSITE_RELATIONSHIP_TO.URI,
             entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
-        // adding incomplete statement to be completed later
         target.add(valueFactory.createStatement(
             entityResourceId,
             ontology.findCompositeRelationshipURI(relationshipId),
@@ -135,7 +134,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
             entityResourceId,
             ontology.HAS_KEYED_RELATIONSHIP_TO.URI,
             entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
-        // adding incomplete statement to be completed later
         target.add(valueFactory.createStatement(
             entityResourceId,
             ontology.findKeyedRelationshipURI(relationshipId),
