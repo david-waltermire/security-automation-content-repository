@@ -96,18 +96,20 @@ public class TripleStoreQueryService {
                     generateEntitySearchQuery(key, entityURIVariableName));
             TupleQueryResult result = tupleQuery.evaluate();
             try {
-                BindingSet resultSet = null;
+                String returnVal = null;
                 int resultSize = 0;
                 while (result.hasNext()) {
                     if (resultSize > 1) {
                         throw new NonUniqueResultException();
                     }
-                    resultSet = result.next();
-                    resultSize++;
+                    String val = result.next().getValue(entityURIVariableName).stringValue();
+                    if( !val.equals(returnVal) ) {
+                        returnVal = result.next().getValue(entityURIVariableName).stringValue();
+                        resultSize++;
+                    }
                 }
-                if (resultSet != null) {
-                    Value entityURI = resultSet.getValue(entityURIVariableName);
-                    return factory.createURI(entityURI.stringValue());
+                if (returnVal != null) {
+                    return factory.createURI(returnVal);
                 }
             } finally {
                 result.close();

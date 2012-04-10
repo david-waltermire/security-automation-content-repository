@@ -44,6 +44,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +58,7 @@ import org.apache.xmlbeans.XmlException;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -63,6 +66,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
@@ -123,10 +127,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 MemoryStore ms = new MemoryStore(new File(tripleStoreDir));
                 // prevent file lock issues
                 ms.setSyncDelay(1000L);
-                repository = new SailRepository(ms);
+                repository =
+                    new SailRepository(new ForwardChainingRDFSInferencer(ms));
 
             } else {
-                repository = new SailRepository(new MemoryStore());
+                repository =
+                    new SailRepository(new ForwardChainingRDFSInferencer(
+                        new MemoryStore()));
                 loadRules = true;
             }
 
@@ -178,6 +185,38 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     }
 
+    //TODO delete this method
+    public void writeOutAllStatements (OutputStream os) throws RepositoryException, UnsupportedEncodingException, IOException {
+        Set<Statement> result =
+                Iterations.addAll(
+                    repository.getConnection().getStatements(null, null, null, true),
+                    new HashSet<Statement>());
+        for( Statement s : result ) {
+            logStatement(
+                s.getSubject(),
+                s.getPredicate(),
+                s.getObject(),
+                s.getContext(), os);
+        }
+
+    }
+
+    //TODO delete this method
+    private void logStatement(
+            Resource subject,
+            URI predicate,
+            Value object,
+            Resource context, OutputStream os) throws UnsupportedEncodingException, IOException {
+        StringBuilder sb = new StringBuilder();
+        if (context != null) {
+            sb.append("[" + context + "] ");
+        }
+        sb.append(subject.stringValue() + " " + predicate.stringValue() + " "
+            + object.stringValue());
+        os.write((sb.toString() + "\n").getBytes("UTF-8"));
+    }
+
+    
     /**
      * get an instance of this manager
      * 
@@ -244,7 +283,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                         boundaryObjectIds,
                         entityTypes,
                         conn);
-                return findEntityKeys(entityURIs, conn);
+                return findEntityKeys(entityURIs, this);
 
             } catch (MalformedQueryException e) {
                 log.error(e);
@@ -306,7 +345,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     private Map<String, Set<? extends IKey>> findEntityKeys(
             Map<String, List<URI>> entityURIs,
-            RepositoryConnection conn)
+            IPersistenceContext ipc)
             throws RepositoryException, QueryEvaluationException,
             MalformedQueryException {
         KeyTranslator keyTranslator = new KeyTranslator(ontology);
@@ -316,26 +355,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             Set<IKey> map = new HashSet<IKey>();
             boundaryIdToKeyMap.put(entry.getKey(), map);
             for (URI entityURI : entry.getValue()) {
-                Set<Statement> entityStatements =
-                    getEntityStatements(entityURI, conn);
                 IKey entityKey =
-                    keyTranslator.translateToJava(entityStatements);
+                    keyTranslator.translateToJava(ipc, entityURI);
                 map.add(entityKey);
             }
         }
         return boundaryIdToKeyMap;
-    }
-
-    private Set<Statement> getEntityStatements(
-            URI entityURI,
-            RepositoryConnection conn)
-            throws RepositoryException, QueryEvaluationException,
-            MalformedQueryException {
-        Resource entityContextURI = queryService.findEntityContext(entityURI);
-        // no need to run inferencing here
-        return Iterations.addAll(
-            conn.getStatements(null, null, null, false, entityContextURI),
-            new HashSet<Statement>());
     }
 
     @Override

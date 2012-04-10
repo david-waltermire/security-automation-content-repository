@@ -24,12 +24,12 @@
 package gov.nist.scap.content.semantic.translation;
 
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.managers.KeyStatementManager;
 
-import java.util.Set;
-
-import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * Used to produce a key from a set of entity statements
@@ -52,14 +52,8 @@ public class KeyTranslator {
 	 * @param statements RDF statements representing at least a single key (may be more, but duplicate statements should not exist)
 	 * @return the generated key
 	 */
-	public IKey translateToJava(Set<Statement> statements) {
-		KeyStatementManager statementManager = new KeyStatementManager(ontology);
-		
-		for (Statement statement : statements){
-			if (statementManager.scan(statement)){
-				continue;
-			}
-		}
+	public IKey translateToJava(IPersistenceContext ipc, URI owningEntityURI) throws RepositoryException {
+		KeyStatementManager statementManager = new KeyStatementManager(ipc, owningEntityURI);
 		
 		return statementManager.produceKey();
 	}

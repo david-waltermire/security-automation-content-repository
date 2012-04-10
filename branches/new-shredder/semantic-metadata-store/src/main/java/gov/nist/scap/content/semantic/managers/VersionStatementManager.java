@@ -23,15 +23,18 @@
  ******************************************************************************/
 package gov.nist.scap.content.semantic.managers;
 
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.IPersistenceContext;
+import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * Used to process statements to reconstruct a version
@@ -39,51 +42,51 @@ import org.openrdf.model.URI;
  *
  */
 public class VersionStatementManager implements RegenerationStatementManager {
-    private final IPersistenceContext persistContext;
+    private final IPersistenceContext ipc;
+    private final MetaDataOntology ontology;
+    private final URI owningEntityURI;
 	
-    final private Set<URI> versionStatements;
-    private String versionValue;
-    
     /**
      * the default constructor
-     * @param persistContext the persistence context
+     * @param ipc the persistence context
      */
-    public VersionStatementManager(IPersistenceContext persistContext) {
-	    this.persistContext = persistContext;
-	    final IPersistenceContext pc = persistContext;
-	    versionStatements = new HashSet<URI>() {
-            private static final long serialVersionUID = -5931621244275620673L;
-
-            {
-	               add(pc.getOntology().HAS_VERSION.URI);
-	               add(pc.getOntology().HAS_VERSION_TYPE.URI);
-	               add(pc.getOntology().HAS_VERSION_VALUE.URI);
-	        }
-	    };
-
+    public VersionStatementManager(IPersistenceContext ipc, URI owningEntityURI) {
+	    this.ipc = ipc;
+	    this.owningEntityURI = owningEntityURI;
+	    this.ontology = ipc.getOntology();
 	}
 	
 	@Override
-	public boolean scan(Statement statement){
-		if (versionStatements.contains(statement.getPredicate())){
-			populateVersionInfo(persistContext.getOntology(), statement);
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public void populateEntity(EntityBuilder builder){
-	    builder.setVersionValue(versionValue);
-	}
-	
-    private void populateVersionInfo(IMetadataModel model2,
-            Statement statement) {
-        String type = statement.getPredicate().stringValue();
-        if( persistContext.getOntology().HAS_VERSION_VALUE.URI.stringValue().equals(type) ) {
-            //there's only ever 1 version
-            //TODO does version type need to be read from the triple store?
-            versionValue = statement.getObject().stringValue();
+	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+        //TODO does version type need to be read from the triple store?
+
+	    try {
+    	    StringBuilder queryBuilder = new StringBuilder();
+            String versionType = "_versionType";
+            String versionValue = "_versionValue";
+            queryBuilder.append("SELECT DISTINCT ").append(versionType).append(", ").append(versionValue).append(" FROM ").append("\n");
+            queryBuilder.append("{<").append(owningEntityURI).append(">} ").append("<").append(ontology.HAS_VERSION.URI).append(">").append(" {_versionBNode},").append("\n");
+            queryBuilder.append("{_versionBNode}").append("<").append(ontology.HAS_VERSION_TYPE.URI).append(">").append(" {").append(versionType).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_VERSION_VALUE.URI).append(">").append(" {").append(versionValue).append("}").append("\n");
+            TupleQuery tupleQuery =
+                ipc.getRepository().getConnection().prepareTupleQuery(
+                    QueryLanguage.SERQL,
+                    queryBuilder.toString());
+            TupleQueryResult result = tupleQuery.evaluate();
+            BindingSet resultSet = null;
+            while (result.hasNext()) {
+                if( resultSet != null ) {
+                    throw new RepositoryException("Entity has more than 1 version! Entity: " + owningEntityURI);
+                }
+                resultSet = result.next();
+                builder.setVersionValue(resultSet.getValue(versionValue).stringValue());
+            }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
         }
-    }
+
+
+	}
 }

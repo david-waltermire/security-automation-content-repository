@@ -6,7 +6,6 @@ import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
-import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.IVersion;
@@ -16,18 +15,15 @@ import gov.nist.scap.content.semantic.SoftHashMap;
 import gov.nist.scap.content.semantic.TripleStoreQueryService;
 import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
 import gov.nist.scap.content.semantic.translation.EntityTranslator;
-import gov.nist.scap.content.semantic.translation.KeyTranslator;
 import info.aduna.iteration.Iterations;
 
 import java.lang.ref.SoftReference;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
@@ -214,17 +210,8 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
                         }
                     }
 
-                    Set<Statement> entityStatements =
-                        getEntityStatements(resourceId, conn);
-                    Map<URI, IKey> relatedEntityKeys =
-                        findEntityKeys(
-                            queryService.findAllRelatedEntityURIs(resourceId),
-                            conn);
                     entity =
-                        entityTranslator.translateToJava(
-                            entityStatements,
-                            relatedEntityKeys,
-                            persistContext.getContentRetrieverFactory());
+                        entityTranslator.translateToJava(resourceId, persistContext.getContentRetrieverFactory());
 
                     if (entity == null) {
                         throw new NullPointerException(
@@ -261,33 +248,6 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
         }
         resourceId = (URI)((Statement)result.toArray()[0]).getSubject();
 
-    }
-
-    private Set<Statement> getEntityStatements(
-            URI entityURI,
-            RepositoryConnection conn) throws RepositoryException {
-        Resource entityContextURI = queryService.findEntityContext(entityURI);
-        // no need to run inferencing here
-        Set<Statement> result =
-            Iterations.addAll(
-                conn.getStatements(null, null, null, false, entityContextURI),
-                new HashSet<Statement>());
-        return result;
-    }
-
-    private Map<URI, IKey> findEntityKeys(
-            List<URI> entityURIs,
-            RepositoryConnection conn) throws RepositoryException {
-        KeyTranslator keyTranslator =
-            new KeyTranslator(persistContext.getOntology());
-        Map<URI, IKey> entityURIToKeyMap = new HashMap<URI, IKey>();
-        for (URI entityURI : entityURIs) {
-            Set<Statement> entityStatements =
-                getEntityStatements(entityURI, conn);
-            IKey entityKey = keyTranslator.translateToJava(entityStatements);
-            entityURIToKeyMap.put(entityURI, entityKey);
-        }
-        return entityURIToKeyMap;
     }
 
 }
