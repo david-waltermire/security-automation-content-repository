@@ -25,7 +25,7 @@ package gov.nist.scap.content.semantic.managers;
 
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
-import org.openrdf.model.Statement;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * 
@@ -40,23 +40,15 @@ import org.openrdf.model.Statement;
  */
 public interface RegenerationStatementManager {
 	/**
-	 * Scans triple and processes it if it is relevant to the manager
-	 * 
-	 * @param statement the statement to process
-	 * @return true if triple was processed in some way, false if it was just
-	 *         ignored.
-	 */
-    public boolean scan(Statement statement);
-	
-	/**
 	 * <p>
 	 * Called after all triples are processed to populate the builder
 	 * with information that the builder compiled
 	 * </p>
 	 * 
 	 * @param builder the builder to populate.
+	 * @throws RepositoryException error accessing repository
 	 */
-    public void populateEntity(EntityBuilder builder);
+    public void populateEntity(EntityBuilder builder) throws RepositoryException;
 	
 	
 }

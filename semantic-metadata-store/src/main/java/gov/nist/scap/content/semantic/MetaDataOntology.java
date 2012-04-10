@@ -28,7 +28,10 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,45 +68,46 @@ public class MetaDataOntology implements IMetadataModel {
     public final Construct FIELD_CLASS;
     /** same as 'externalId' from java model */
     public final Construct BOUNDARY_OBJECT_CLASS;
+    public final Construct VERSION_CLASS;
 
     // ** relationships in model **
     /** persistence ID of an entity */
-    public final Construct HAS_CONTENT_ID;
+    public final Predicate HAS_CONTENT_ID;
     /** type of entity. TODO: this should be refactored into type hiearchy */
-    public final Construct HAS_ENTITY_TYPE;
+    public final Predicate HAS_ENTITY_TYPE;
     /** key of an entity */
-    public final Construct HAS_KEY;
+    public final Predicate HAS_KEY;
     /** type of key.....this should be refactored into a class heiarch??? */
-    public final Construct HAS_KEY_TYPE;
+    public final Predicate HAS_KEY_TYPE;
     /** n-ary relationship between a key and the field_id/value */
-    public final Construct HAS_FIELD_DATA;
+    public final Predicate HAS_FIELD_DATA;
     /** name of a key field */
-    public final Construct HAS_FIELD_NAME;
+    public final Predicate HAS_FIELD_NAME;
     /** value of a field (for a specific field type). */
-    public final Construct HAS_FIELD_VALUE;
+    public final Predicate HAS_FIELD_VALUE;
     /** range should always be a boundary object */
-    public final Construct HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO;
+    public final Predicate HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO;
     /** entity to entity relationship */
-    public final Construct HAS_KEYED_RELATIONSHIP_TO;
+    public final Predicate HAS_KEYED_RELATIONSHIP_TO;
     /** Composite relationships are always parent to child right now */
-    public final Construct HAS_COMPOSITE_RELATIONSHIP_TO;
+    public final Predicate HAS_COMPOSITE_RELATIONSHIP_TO;
     /**
      * Not actually a different type of relationship from the Java model, but
      * the inverse of child
      */
-    public final Construct HAS_PARENT_RELATIONSHIP_TO;
+    public final Predicate HAS_PARENT_RELATIONSHIP_TO;
     /**
      * the type of the boundaryObject (or externalId in terms of java
      * model)...TODO: this type relationship should be turned into a class
      * heiarchy.
      */
-    public final Construct HAS_BOUNDARY_OBJECT_TYPE;
+    public final Predicate HAS_BOUNDARY_OBJECT_TYPE;
     /** the actual value of the boundary object (e.g., CCE-XXXXX-X, CPE:/... */
-    public final Construct HAS_BOUNDARY_OBJECT_VALUE;
+    public final Predicate HAS_BOUNDARY_OBJECT_VALUE;
 
-    public final Construct HAS_VERSION;
-    public final Construct HAS_VERSION_TYPE;
-    public final Construct HAS_VERSION_VALUE;
+    public final Predicate HAS_VERSION;
+    public final Predicate HAS_VERSION_TYPE;
+    public final Predicate HAS_VERSION_VALUE;
 
     // dynamic predicates
     private Map<String, Construct> boundaryObjectRelationships =
@@ -132,56 +136,77 @@ public class MetaDataOntology implements IMetadataModel {
         FIELD_CLASS = new Construct(genModelURI("Field"), "Field");
         BOUNDARY_OBJECT_CLASS =
             new Construct(genModelURI("BoundaryObject"), "Boundary Object");
+        VERSION_CLASS = new Construct(genModelURI("Version"), "Version");
 
-        // define relationships
+        // base entity info
         HAS_CONTENT_ID =
-            new Construct(genModelURI("hasContentId"), "hasContentId");
+            new Predicate(genModelURI("hasContentId"), "hasContentId").addDomain(ENTITY_CLASS);
         HAS_ENTITY_TYPE =
-            new Construct(genModelURI("hasEntityType"), "hasEntityType");
-        HAS_KEY = new Construct(genModelURI("hasKey"), "hasKey");
-        HAS_KEY_TYPE = new Construct(genModelURI("hasKeyType"), "hasKeyType");
-        HAS_FIELD_DATA =
-            new Construct(genModelURI("hasFieldData"), "hasFieldData");
-        HAS_FIELD_NAME =
-            new Construct(genModelURI("hasFieldName"), "hasFieldName");
-        HAS_FIELD_VALUE =
-            new Construct(genModelURI("hasFieldValue"), "hasFieldValue");
+            new Predicate(genModelURI("hasEntityType"), "hasEntityType").addDomain(ENTITY_CLASS);
+
+        // relationships
         HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO =
-            new Construct(
+            new Predicate(
                 genModelURI("hasBoundaryObjectRelationshipTo"),
                 "hasBoundaryObjectRelationshipTo");
         HAS_KEYED_RELATIONSHIP_TO =
-            new Construct(
+            new Predicate(
                 genModelURI("hasKeyedRelationshipTo"),
-                "hasKeyedRelationshipTo");
+                "hasKeyedRelationshipTo").addDomain(ENTITY_CLASS).addRange(
+                ENTITY_CLASS);
         HAS_COMPOSITE_RELATIONSHIP_TO =
-            new Construct(
+            new Predicate(
                 genModelURI("hasChildRelationshipTo"),
-                "hasChildRelationshipTo");
+                "hasChildRelationshipTo").addDomain(ENTITY_CLASS).addRange(
+                ENTITY_CLASS);
         HAS_PARENT_RELATIONSHIP_TO =
-            new Construct(
+            new Predicate(
                 genModelURI("hasParentRelationshipTo"),
-                "hasParentRelationshipTo");
+                "hasParentRelationshipTo").addDomain(ENTITY_CLASS).addRange(
+                ENTITY_CLASS);
+
+        // key
+        HAS_KEY =
+            new Predicate(genModelURI("hasKey"), "hasKey").addDomain(
+                ENTITY_CLASS).addRange(KEY_CLASS);
+        HAS_KEY_TYPE =
+            new Predicate(genModelURI("hasKeyType"), "hasKeyType").addDomain(KEY_CLASS);
+
+        // field
+        HAS_FIELD_DATA =
+            new Predicate(genModelURI("hasFieldData"), "hasFieldData").addDomain(
+                KEY_CLASS).addRange(FIELD_CLASS);
+        HAS_FIELD_NAME =
+            new Predicate(genModelURI("hasFieldName"), "hasFieldName").addDomain(FIELD_CLASS);
+        HAS_FIELD_VALUE =
+            new Predicate(genModelURI("hasFieldValue"), "hasFieldValue").addDomain(FIELD_CLASS);
+
+        // boundary object
         HAS_BOUNDARY_OBJECT_TYPE =
-            new Construct(
+            new Predicate(
                 genModelURI("hasBoundaryObjectType"),
-                "hasBoundaryObjectType");
+                "hasBoundaryObjectType").addDomain(BOUNDARY_OBJECT_CLASS);
         HAS_BOUNDARY_OBJECT_VALUE =
-            new Construct(
+            new Predicate(
                 genModelURI("hasBoundaryObjectValue"),
-                "hasBoundaryObjectValue");
-        HAS_VERSION = new Construct(genModelURI("hasVersion"), "hasVersion");
+                "hasBoundaryObjectValue").addDomain(BOUNDARY_OBJECT_CLASS);
+
+        // version
+        HAS_VERSION =
+            new Predicate(genModelURI("hasVersion"), "hasVersion").addDomain(
+                ENTITY_CLASS).addRange(VERSION_CLASS);
         HAS_VERSION_TYPE =
-            new Construct(genModelURI("hasVersionType"), "hasVersionType");
+            new Predicate(genModelURI("hasVersionType"), "hasVersionType").addDomain(VERSION_CLASS);
         HAS_VERSION_VALUE =
-            new Construct(genModelURI("hasVersionValue"), "hasVersionValue");
+            new Predicate(genModelURI("hasVersionValue"), "hasVersionValue").addDomain(VERSION_CLASS);
     }
 
     /**
      * helper method to load all model triples into triple store using given
      * connection
      * 
-     * @param conn respository connection, pass in null if the statements have already been persisted
+     * @param conn respository connection, pass in null if the statements have
+     *            already been persisted
      * @param javaModel the model to load
      * @throws RepositoryException error accessing the repository
      */
@@ -196,66 +221,42 @@ public class MetaDataOntology implements IMetadataModel {
         statements.addAll(loadCompositeRelationships(javaModel.getCompositeRelationshipIds()));
 
         if (conn != null) {
-            // add statements
 
-            // assert Classes
-            statements.addAll(createClass(ENTITY_CLASS.URI, ENTITY_CLASS.LABEL));
-            statements.addAll(createClass(KEY_CLASS.URI, KEY_CLASS.LABEL));
-            statements.addAll(createClass(FIELD_CLASS.URI, FIELD_CLASS.LABEL));
-            statements.addAll(createClass(
-                BOUNDARY_OBJECT_CLASS.URI,
-                BOUNDARY_OBJECT_CLASS.LABEL));
-
-            // assert Predicates
-            statements.addAll(createPredicate(
-                HAS_CONTENT_ID.URI,
-                HAS_CONTENT_ID.LABEL));
-            statements.addAll(createPredicate(
-                HAS_ENTITY_TYPE.URI,
-                HAS_ENTITY_TYPE.LABEL));
-            statements.addAll(createPredicate(HAS_KEY.URI, HAS_KEY.LABEL));
-            statements.addAll(createPredicate(
-                HAS_KEY_TYPE.URI,
-                HAS_KEY_TYPE.LABEL));
-            statements.addAll(createPredicate(
-                HAS_FIELD_DATA.URI,
-                HAS_FIELD_DATA.LABEL));
-            statements.addAll(createPredicate(
-                HAS_FIELD_NAME.URI,
-                HAS_FIELD_NAME.LABEL));
-            statements.addAll(createPredicate(
-                HAS_FIELD_VALUE.URI,
-                HAS_FIELD_VALUE.LABEL));
-            statements.addAll(createPredicate(
-                HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI,
-                HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.LABEL));
-            statements.addAll(createPredicate(
-                HAS_KEYED_RELATIONSHIP_TO.URI,
-                HAS_KEYED_RELATIONSHIP_TO.LABEL));
-            statements.addAll(createPredicate(
-                HAS_COMPOSITE_RELATIONSHIP_TO.URI,
-                HAS_COMPOSITE_RELATIONSHIP_TO.LABEL));
-            statements.addAll(createPredicate(
-                HAS_PARENT_RELATIONSHIP_TO.URI,
-                HAS_PARENT_RELATIONSHIP_TO.LABEL));
-            statements.addAll(createPredicate(
-                HAS_BOUNDARY_OBJECT_TYPE.URI,
-                HAS_BOUNDARY_OBJECT_TYPE.LABEL));
-            statements.addAll(createPredicate(
-                HAS_BOUNDARY_OBJECT_VALUE.URI,
-                HAS_BOUNDARY_OBJECT_VALUE.LABEL));
-
-            statements.addAll(createPredicate(
-                HAS_VERSION.URI,
-                HAS_VERSION.LABEL));
-            statements.addAll(createPredicate(
-                HAS_VERSION_TYPE.URI,
-                HAS_VERSION_TYPE.LABEL));
-            statements.addAll(createPredicate(
-                HAS_VERSION_VALUE.URI,
-                HAS_VERSION_VALUE.LABEL));
-
-
+            try {
+                for (Field f : this.getClass().getFields()) {
+                    if (Modifier.isFinal(f.getModifiers())
+                        && Modifier.isPublic(f.getModifiers())) {
+                        if (f.getType().equals(Construct.class)) {
+                            statements.add(factory.createStatement(
+                                ((Construct)f.get(this)).URI,
+                                RDF.TYPE,
+                                RDFS.CLASS));
+                        } else if (f.getType().equals(Predicate.class)) {
+                            Predicate p = (Predicate)f.get(this);
+                            statements.add(factory.createStatement(
+                                p.URI,
+                                RDF.TYPE,
+                                RDF.PROPERTY));
+                            for( Construct c : p.getDomain() ) {
+                                statements.add(factory.createStatement(
+                                    p.URI,
+                                    RDFS.DOMAIN,
+                                    c.URI));
+                            }
+                            for( Construct c : p.getRange() ) {
+                                statements.add(factory.createStatement(
+                                    p.URI,
+                                    RDFS.RANGE,
+                                    c.URI));
+                            }
+                        }
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("misconfigured ontology...",e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("misconfigured ontology...",e);
+            }
             conn.add(statements, context);
         }
     }
@@ -355,10 +356,6 @@ public class MetaDataOntology implements IMetadataModel {
                 relationshipConstruct.URI,
                 RDFS.SUBPROPERTYOF,
                 HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI));
-            statements.add(factory.createStatement(
-                relationshipConstruct.URI,
-                RDFS.LABEL,
-                factory.createLiteral(relationshipConstruct.LABEL)));
         }
         return statements;
     }
@@ -375,10 +372,6 @@ public class MetaDataOntology implements IMetadataModel {
                 relationshipConstruct.URI,
                 RDFS.SUBPROPERTYOF,
                 HAS_KEYED_RELATIONSHIP_TO.URI));
-            statements.add(factory.createStatement(
-                relationshipConstruct.URI,
-                RDFS.LABEL,
-                factory.createLiteral(relationshipConstruct.LABEL)));
         }
         return statements;
     }
@@ -395,10 +388,6 @@ public class MetaDataOntology implements IMetadataModel {
                 relationshipConstruct.URI,
                 RDFS.SUBPROPERTYOF,
                 HAS_COMPOSITE_RELATIONSHIP_TO.URI));
-            statements.add(factory.createStatement(
-                relationshipConstruct.URI,
-                RDFS.LABEL,
-                factory.createLiteral(relationshipConstruct.LABEL)));
         }
         return statements;
     }
@@ -413,29 +402,6 @@ public class MetaDataOntology implements IMetadataModel {
             labelBuilder.append(WordUtils.capitalize(element));
         }
         return labelBuilder.toString();
-    }
-
-    private List<Statement> createClass(URI classUri, String label) {
-        List<Statement> statements = new LinkedList<Statement>();
-        statements.add(factory.createStatement(classUri, RDF.TYPE, RDFS.CLASS));
-        statements.add(factory.createStatement(
-            classUri,
-            RDFS.LABEL,
-            factory.createLiteral(label)));
-        return statements;
-    }
-
-    private List<Statement> createPredicate(URI predicateUri, String label) {
-        List<Statement> statements = new LinkedList<Statement>();
-        statements.add(factory.createStatement(
-            predicateUri,
-            RDF.TYPE,
-            RDF.PROPERTY));
-        statements.add(factory.createStatement(
-            predicateUri,
-            RDFS.LABEL,
-            factory.createLiteral(label)));
-        return statements;
     }
 
     private URI genModelURI(String specificPart) {
@@ -457,9 +423,42 @@ public class MetaDataOntology implements IMetadataModel {
          * @param uri uri
          * @param label label
          */
-        public Construct(URI uri, String label) {
+        private Construct(URI uri, String label) {
             this.URI = uri;
             this.LABEL = label;
         }
+    }
+
+    /**
+     * Add domain and range to Construct
+     * 
+     * @author Adam Halbardier
+     */
+    public static class Predicate extends Construct {
+        private List<Construct> domain = new LinkedList<Construct>();
+        private List<Construct> range = new LinkedList<Construct>();
+
+        private Predicate(URI uri, String label) {
+            super(uri, label);
+        }
+
+        private Predicate addDomain(Construct c) {
+            domain.add(c);
+            return this;
+        }
+
+        private Predicate addRange(Construct c) {
+            range.add(c);
+            return this;
+        }
+
+        private List<Construct> getDomain() {
+            return Collections.unmodifiableList(domain);
+        }
+
+        private List<Construct> getRange() {
+            return Collections.unmodifiableList(range);
+        }
+
     }
 }

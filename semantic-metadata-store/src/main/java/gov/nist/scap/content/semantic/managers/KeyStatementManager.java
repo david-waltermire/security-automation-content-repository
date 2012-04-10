@@ -31,14 +31,22 @@ import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
+import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
-import java.util.LinkedHashMap;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * <p>
@@ -50,57 +58,31 @@ import org.openrdf.model.URI;
  */
 public class KeyStatementManager implements RegenerationStatementManager {
     private MetaDataOntology ontology;
-    private String hasEntityType;
-    private String hasKeyType;
-    private boolean hasKey = false;
+    
+    private IPersistenceContext ipc;
+    
+    private URI owningEntityURI;
+    
+    private String keyType = null;
 
-    private LinkedHashMap<String, Field> fieldUriToFieldMap =
-        new LinkedHashMap<String, Field>();
+    private String entityType = null;
+
+    private Set<Field> fieldSet = new HashSet<Field>();
 
     /**
-     * the default constructor
-     * @param ontology the metadata model
+     * The default constructor
+     * @param ipc the persistence context
+     * @param owningEntityURI the owning entity of the relationship
      */
-    public KeyStatementManager(MetaDataOntology ontology) {
-        this.ontology = ontology;
+    public KeyStatementManager(IPersistenceContext ipc, URI owningEntityURI) {
+        this.ontology = ipc.getOntology();
+        this.ipc = ipc;
+        this.owningEntityURI = owningEntityURI;
     }
 
     @Override
-    public boolean scan(Statement statement) {
-        URI predicate = statement.getPredicate();
-        if (predicate.equals(ontology.HAS_KEY.URI)) {
-            hasKey = true;
-            return true; // return true to claim ownership of statement, nothing
-                         // to do though
-        }
-        if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)) {
-            hasEntityType = statement.getObject().stringValue();
-            return true;
-        }
-        if (predicate.equals(ontology.HAS_KEY_TYPE.URI)) {
-            hasKeyType = statement.getObject().stringValue();
-            return true;
-        }
-        if (predicate.equals(ontology.HAS_FIELD_DATA.URI)) {
-            // do nothing because of the context, we're only processing 1 entity
-            // anyway, so this statements doesn't provide an value
-            return true;
-        }
-        if (predicate.equals(ontology.HAS_FIELD_NAME.URI)) {
-            populateFieldType(statement);
-            return true;
-        }
-        if (predicate.equals(ontology.HAS_FIELD_VALUE.URI)) {
-            populateFieldValue(statement);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void populateEntity(EntityBuilder builder) {
-        if (hasKey)
-            builder.setKey(produceKey());
+    public void populateEntity(EntityBuilder builder) throws RepositoryException {
+        builder.setKey(produceKey());
     }
 
     /**
@@ -108,66 +90,85 @@ public class KeyStatementManager implements RegenerationStatementManager {
      * 
      * @return the produced key
      */
-    public IKey produceKey() {
-        IEntityDefinition ied = ontology.getEntityDefinitionById(hasEntityType);
-        if (ied instanceof IKeyedEntityDefinition) {
-            KeyBuilder builder =
-                new KeyBuilder(
-                    ((IKeyedEntityDefinition)ied).getKeyDefinition().getFields());
-            builder.setId(hasKeyType);
-            populateFields(builder);
-            try {
-                return builder.toKey();
-            } catch (KeyException e) {
-                throw new IncompleteBuildStateException(e);
+    public IKey produceKey() throws RepositoryException {
+
+        try {
+            StringBuilder queryBuilder = new StringBuilder();
+            String entityTypeVar = "_entityType";
+            String keyTypeVar = "_keyType";
+            String fieldName = "_fieldName";
+            String fieldValue = "_fieldValue";
+            queryBuilder.append("SELECT DISTINCT ").append(entityTypeVar).append(", ").append(keyTypeVar).append(", ").append(fieldName).append(", ").append(fieldValue).append(" FROM ").append("\n");
+            queryBuilder.append("{<").append(owningEntityURI).append(">} ").append("<").append(ontology.HAS_ENTITY_TYPE.URI).append(">").append(" {").append(entityTypeVar).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_KEY.URI).append(">").append(" {_keyBNode},").append("\n");
+            queryBuilder.append("{_keyBNode}").append("<").append(ontology.HAS_KEY_TYPE.URI).append(">").append(" {").append(keyTypeVar).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append(">").append(" {_fieldBNode},").append("\n");
+            queryBuilder.append("{_fieldBNode}").append("<").append(ontology.HAS_FIELD_NAME.URI).append(">").append(" {").append(fieldName).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append(">").append(" {").append(fieldValue).append("}").append("\n");
+            TupleQuery tupleQuery =
+                ipc.getRepository().getConnection().prepareTupleQuery(
+                    QueryLanguage.SERQL,
+                    queryBuilder.toString());
+            TupleQueryResult result = tupleQuery.evaluate();
+            BindingSet resultSet = null;
+            
+            while (result.hasNext()) {
+                resultSet = result.next();
+                if( keyType == null ) {
+                    keyType = resultSet.getValue(keyTypeVar).stringValue();
+                } else if( !keyType.equals(resultSet.getValue(keyTypeVar).stringValue()) ){
+                    throw new RepositoryException("Found 2 key types for the same entity. Entity " + owningEntityURI.stringValue());
+                }
+                if( entityType == null ) {
+                    entityType = resultSet.getValue(entityTypeVar).stringValue();
+                } else if( !entityType.equals(resultSet.getValue(entityTypeVar).stringValue()) ){
+                    throw new RepositoryException("Found 2 entity types for the same entity. Entity " + owningEntityURI.stringValue());
+                }
+                fieldSet.add(new Field(resultSet.getValue(fieldName).stringValue(), resultSet.getValue(fieldValue).stringValue()));
             }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
         }
-        throw new IncompleteBuildStateException(
-            "Attempted to build key of a non-keyed type");
+
+        if( entityType != null ) {
+            IEntityDefinition ied = ontology.getEntityDefinitionById(entityType);
+            if (ied instanceof IKeyedEntityDefinition) {
+                KeyBuilder builder =
+                    new KeyBuilder(
+                        ((IKeyedEntityDefinition)ied).getKeyDefinition().getFields());
+                builder.setId(keyType);
+                populateFields(builder);
+                try {
+                    return builder.toKey();
+                } catch (KeyException e) {
+                    throw new IncompleteBuildStateException(e);
+                }
+            }
+            throw new IncompleteBuildStateException(
+                "Attempted to build key of a non-keyed type");
+        }
+        return null;
     }
 
     private void populateFields(KeyBuilder builder) {
-        for (Field field : fieldUriToFieldMap.values()) {
+        for (Field field : fieldSet) {
             builder.addField(field.getFieldId(), field.getFieldValue());
         }
     }
 
-    private void populateFieldType(Statement statement) {
-        String fieldURI = statement.getSubject().stringValue();
-        String fieldType = statement.getObject().stringValue();
-        Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
-        if (fieldEntry == null) {
-            fieldEntry = new Field();
-            fieldUriToFieldMap.put(fieldURI, fieldEntry);
-        }
-        fieldEntry.setFieldId(fieldType);
-    }
-
-    private void populateFieldValue(Statement statement) {
-        String fieldURI = statement.getSubject().stringValue();
-        String fieldValue = statement.getObject().stringValue();
-        Field fieldEntry = fieldUriToFieldMap.get(fieldURI);
-        if (fieldEntry == null) {
-            fieldEntry = new Field();
-            fieldUriToFieldMap.put(fieldURI, fieldEntry);
-        }
-        fieldEntry.setFieldValue(fieldValue);
-    }
-
     private static class Field {
-        private String fieldId;
-        private String fieldValue;
+        private final String fieldId;
+        private final String fieldValue;
 
-        void setFieldId(String fieldId) {
+        Field(String fieldId, String fieldValue) {
             this.fieldId = fieldId;
+            this.fieldValue = fieldValue;
         }
 
         String getFieldId() {
             return fieldId;
-        }
-
-        void setFieldValue(String fieldValue) {
-            this.fieldValue = fieldValue;
         }
 
         String getFieldValue() {

@@ -18,8 +18,6 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -146,10 +144,6 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         List<Statement> target = new LinkedList<Statement>();
         target.add(valueFactory.createStatement(
             resourceId,
-            RDF.TYPE,
-            ontology.ENTITY_CLASS.URI));
-        target.add(valueFactory.createStatement(
-            resourceId,
             ontology.HAS_CONTENT_ID.URI,
             valueFactory.createLiteral(contentId)));
         // Shouldn't this be a URI to the type?
@@ -192,19 +186,9 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         BNode key = valueFactory.createBNode();
         // Is there a specific key ID? Probably not
         target.add(valueFactory.createStatement(
-            key,
-            RDF.TYPE,
-            ontology.KEY_CLASS.URI));
-        target.add(valueFactory.createStatement(
             resourceId,
             ontology.HAS_KEY.URI,
             key));
-
-        // TODO: for now just use first key value as label
-        target.add(valueFactory.createStatement(
-            resourceId,
-            RDFS.LABEL,
-            valueFactory.createLiteral(fieldNameToValueMap.values().iterator().next())));
 
         target.add(valueFactory.createStatement(
             key,
@@ -213,14 +197,9 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         for (Map.Entry<String, String> keyFieldEntry : fieldNameToValueMap.entrySet()) {
             BNode keyField = valueFactory.createBNode();
             target.add(valueFactory.createStatement(
-                keyField,
-                RDF.TYPE,
-                ontology.FIELD_CLASS.URI));
-            target.add(valueFactory.createStatement(
                 key,
                 ontology.HAS_FIELD_DATA.URI,
                 keyField));
-            // TODO: has field type URI
             target.add(valueFactory.createStatement(
                 keyField,
                 ontology.HAS_FIELD_NAME.URI,

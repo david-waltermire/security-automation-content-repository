@@ -13,6 +13,9 @@ import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,7 +44,7 @@ public class TestRetrieve {
      */
     @BeforeClass
     public static void setupSemanticStore() throws Exception {
-        System.setProperty(TripleStoreFacadeMetaDataManager.TRIPLE_STORE_DIR, "target/triple-store-folder");
+//        System.setProperty(TripleStoreFacadeMetaDataManager.TRIPLE_STORE_DIR, "target/triple-store-folder");
         System.setProperty(TripleStoreFacadeMetaDataManager.RULES_FILE, "/test-rules.xml");
         //TODO Need to rework this because the rules may be in the triple store already 
         xmlbeansRules =
@@ -63,6 +66,12 @@ public class TestRetrieve {
 
         tsfdm = TripleStoreFacadeMetaDataManager.getInstance(cs);
         tsfdm.persist(resultMap);
+        
+        //TODO delete this line
+        OutputStream os = new BufferedOutputStream(new FileOutputStream("statements-repo.log"));
+        tsfdm.writeOutAllStatements(os);
+        os.flush();
+        os.close();
     }
 
     /**

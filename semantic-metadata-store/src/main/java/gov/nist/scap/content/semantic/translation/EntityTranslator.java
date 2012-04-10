@@ -27,7 +27,6 @@
 package gov.nist.scap.content.semantic.translation;
 
 import gov.nist.scap.content.model.IEntity;
-import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
@@ -40,11 +39,15 @@ import gov.nist.scap.content.semantic.managers.VersionStatementManager;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 
 /**
@@ -65,47 +68,48 @@ public class EntityTranslator {
     }
 
     /**
-     * translate statements and related keys into an entity
-     * @param statements all statements to constitute entity
-     * @param relatedEntityKeys all statement to constitute relatedEntityKeys
-     *            from KeyedRelationships
-     * @param contentRetrieverFactory the content retriever factory
      * @param <T> some extension of IEntity
      * @return the constructed entity
      */
-    public <T extends IEntity<?>> T translateToJava(
-            Set<Statement> statements,
-            Map<URI, IKey> relatedEntityKeys,
-            ContentRetrieverFactory contentRetrieverFactory) {
+    public <T extends IEntity<?>> T translateToJava(URI entityURI, ContentRetrieverFactory crf) throws RepositoryException {
         List<RegenerationStatementManager> managers =
             new LinkedList<RegenerationStatementManager>();
         managers.add(new BoundaryIdentifierRelationshipStatementManager(
-            persistContext.getOntology()));
+            persistContext, entityURI));
         managers.add(new KeyedRelationshipStatementManager(
             persistContext,
-            relatedEntityKeys));
-        managers.add(new CompositeRelationshipStatementManager(persistContext));
-        managers.add(new KeyStatementManager(persistContext.getOntology()));
-        managers.add(new VersionStatementManager(persistContext));
+            entityURI));
+        managers.add(new CompositeRelationshipStatementManager(persistContext, entityURI));
+        managers.add(new KeyStatementManager(persistContext, entityURI));
+        managers.add(new VersionStatementManager(persistContext, entityURI));
 
         EntityBuilder builder = new EntityBuilder();
-        for (Statement statement : statements) {
-            URI predicate = statement.getPredicate();
-            // first handle entity specific predicates
-            if (predicate.equals(ontology.HAS_CONTENT_ID.URI)) {
-                String contentId = statement.getObject().stringValue();
-                builder.setContentRetriever((contentRetrieverFactory.newContentRetriever(contentId)));
-            }
-            if (predicate.equals(ontology.HAS_ENTITY_TYPE.URI)) {
-                String entityType = statement.getObject().stringValue();
-                builder.setEntityDefinition(ontology.getEntityDefinitionById(entityType));
-            }
-            // now handle rest of graph
-            for (RegenerationStatementManager statementManager : managers) {
-                if (statementManager.scan(statement)) {
-                    continue;
+        try {
+
+            StringBuilder queryBuilder = new StringBuilder();
+            String entityType = "_entityType";
+            String contentId = "_contentId";
+            queryBuilder.append("SELECT DISTINCT ").append(entityType).append(", ").append(contentId).append(" FROM ").append("\n");
+            queryBuilder.append("{<").append(entityURI).append(">} <").append(ontology.HAS_ENTITY_TYPE.URI).append("> {").append(entityType).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_CONTENT_ID.URI).append("> {").append(contentId).append("}").append("\n");
+            TupleQuery tupleQuery =
+                persistContext.getRepository().getConnection().prepareTupleQuery(
+                    QueryLanguage.SERQL,
+                    queryBuilder.toString());
+            TupleQueryResult result = tupleQuery.evaluate();
+            BindingSet resultSet = null;
+            while (result.hasNext()) {
+                if( resultSet != null ) {
+                    throw new RepositoryException("Entity has more than 1 content id or entity type! Entity " + entityURI.stringValue());
                 }
+                resultSet = result.next();
+                builder.setContentRetriever((crf.newContentRetriever(resultSet.getValue(contentId).stringValue())));
+                builder.setEntityDefinition(ontology.getEntityDefinitionById(resultSet.getValue(entityType).stringValue()));
             }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
         }
 
         for (RegenerationStatementManager statementManager : managers) {

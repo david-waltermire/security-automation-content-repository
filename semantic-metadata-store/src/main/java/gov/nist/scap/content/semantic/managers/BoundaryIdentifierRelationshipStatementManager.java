@@ -23,19 +23,21 @@
  ******************************************************************************/
 package gov.nist.scap.content.semantic.managers;
 
-import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.definitions.IBoundaryIdentifierRelationshipDefinition;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
+import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.builders.BoundaryIdentifierRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * <p>A manager to coordinate multiple BoundaryIdentiferRelationshipBuilders working in
@@ -47,91 +49,55 @@ import org.openrdf.model.URI;
 public class BoundaryIdentifierRelationshipStatementManager implements RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//all IDs of boundaryIdentifierRelationships
-	private Collection<String> boundaryIdentifierRelationshipIds;
+	private URI owningEntityURI;
 	
-	// key = boundary_boject_id....this map is what this class builds
-	private Map<String, BoundaryIdentifierRelationshipBuilder> boundaryIdentifierRelationships = new HashMap<String, BoundaryIdentifierRelationshipBuilder>();
+	private IPersistenceContext ipc;
 	
-	
+
 	/**
 	 * the default constructor
-	 * @param ontology the metadata ontology
+	 * @param ipc the persistence context
+	 * @param owningEntityURI the entity being built
 	 */
-	public BoundaryIdentifierRelationshipStatementManager(MetaDataOntology ontology) {
-		this.ontology = ontology;
-		this.boundaryIdentifierRelationshipIds = ontology.getBoundaryIndentifierRelationshipIds();
+	public BoundaryIdentifierRelationshipStatementManager(IPersistenceContext ipc, URI owningEntityURI) {
+		this.ipc = ipc;
+	    this.ontology = ipc.getOntology();
+		this.owningEntityURI = owningEntityURI;
 	}
 	
-	/**
-	 * Scans triple and processes it if it is relevant to boundaryIdentifierRelationships
-	 * @param statement the statement to scan
-	 * @return true if triple was processed in some way, false if it was just ignored.
-	 */
-	public boolean scan(Statement statement){
-		URI predicate = statement.getPredicate();
-		if (boundaryIdentifierRelationshipIds.contains(predicate.stringValue())){
-			// a triple containing an boundary id relationship predicate found
-			populateBoundaryObjectRelationshipInfo(ontology, statement);
-			return true;
-		}
-		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI)){
-			populateBoundaryObjectRelationshipExternalIdType(ontology, statement);
-			return true;
-		}
-		if (predicate.equals(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI)){
-			populateBoundaryObjectRelationshipExternalIdValue(ontology, statement);
-			return true;
-		}
-		return false;
+	@Override
+	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+        try {
+            StringBuilder queryBuilder = new StringBuilder();
+            String relType = "_relType";
+            String bType = "_bType";
+            String bValue = "_bValue";
+            queryBuilder.append("SELECT DISTINCT ").append(relType).append(", ").append(bType).append(", ").append(bValue).append(" FROM ").append("\n");
+            queryBuilder.append("{<").append(owningEntityURI).append(">} ").append(relType).append(" {_boundaryIdURI},").append("\n");
+            queryBuilder.append("{").append(relType).append("} ").append("<").append(RDFS.SUBPROPERTYOF).append(">").append(" {<").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append(">},").append("\n");
+            queryBuilder.append("{_boundaryIdURI} ").append("<").append(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI).append(">").append(" {").append(bType).append("};").append("\n");
+            queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI).append(">").append(" {").append(bValue).append("}").append("\n");
+            TupleQuery tupleQuery =
+                ipc.getRepository().getConnection().prepareTupleQuery(
+                    QueryLanguage.SERQL,
+                    queryBuilder.toString());
+            TupleQueryResult result = tupleQuery.evaluate();
+            BindingSet resultSet = null;
+            while (result.hasNext()) {
+                resultSet = result.next();
+                // the reasoner treats this as a subproperty of itself
+                if( !ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI.stringValue().equals(resultSet.getValue(relType).stringValue()) ) {
+                    BoundaryIdentifierRelationshipBuilder birb = new BoundaryIdentifierRelationshipBuilder();
+                    birb.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)ontology.getRelationshipDefinitionById(resultSet.getValue(relType).stringValue()));
+                    birb.setExternalIdType(resultSet.getValue(bType).stringValue());
+                    birb.setExternalIdValue(resultSet.getValue(bValue).stringValue());
+                    builder.addRelationship(birb.build(ontology));
+                }
+            }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
 	}
-	
-	/**
-	 * <p>
-	 * Called after all triples are processed to populate re-constituted entity
-	 * with the BoundaryIdentiferRelationships found in the graph.
-	 * </p>
-	 * 
-	 * @param builder the entity builder to populate
-	 */
-	public void populateEntity(EntityBuilder builder){
-		for (BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder : boundaryIdentifierRelationships.values()){
-			IBoundaryIdentifierRelationship boundaryIdentifierRelBuilderRelationship = boundaryIdentifierRelBuilder.build(ontology);
-			builder.addRelationship(boundaryIdentifierRelBuilderRelationship);
-		}
-	}
-	
-	private void populateBoundaryObjectRelationshipInfo(IMetadataModel model, Statement statement){
-        String boundaryIdentifierURI = statement.getObject().stringValue();
-		String boundaryIdentifierRelationshipId = statement.getPredicate().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
-		if (boundaryIdentifierRelBuilder == null){
-			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		}
-        boundaryIdentifierRelBuilder.setBoundaryIdentiferRelationshipInfo((IBoundaryIdentifierRelationshipDefinition)model.getRelationshipDefinitionById(boundaryIdentifierRelationshipId));
-	}
-	
-	private void populateBoundaryObjectRelationshipExternalIdType(IMetadataModel model, Statement statement){
-		String boundaryIdentifierURI = statement.getSubject().stringValue();
-		String boundaryIdentifierType = statement.getObject().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
-		if (boundaryIdentifierRelBuilder == null){
-			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		}
-        boundaryIdentifierRelBuilder.setExternalIdType(boundaryIdentifierType);
-	}
-	
-	private void populateBoundaryObjectRelationshipExternalIdValue(IMetadataModel model, Statement statement){
-		String boundaryIdentifierURI = statement.getSubject().stringValue();
-		String boundaryIdentifierValue = statement.getObject().stringValue();
-		BoundaryIdentifierRelationshipBuilder boundaryIdentifierRelBuilder = boundaryIdentifierRelationships.get(boundaryIdentifierURI);
-		if (boundaryIdentifierRelBuilder == null){
-			boundaryIdentifierRelBuilder = new BoundaryIdentifierRelationshipBuilder();
-            boundaryIdentifierRelationships.put(boundaryIdentifierURI, boundaryIdentifierRelBuilder);
-		}
-        boundaryIdentifierRelBuilder.setExternalIdValue(boundaryIdentifierValue);
-	}
-	
 }

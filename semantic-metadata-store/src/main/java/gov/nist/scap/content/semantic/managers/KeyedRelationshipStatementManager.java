@@ -23,21 +23,21 @@
  ******************************************************************************/
 package gov.nist.scap.content.semantic.managers;
 
-import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.MetaDataOntology;
 import gov.nist.scap.content.semantic.builders.KeyedRelationshipBuilder;
 import gov.nist.scap.content.semantic.entity.EntityBuilder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * Used to process statements to reconstruct a keyed relationship
@@ -48,65 +48,51 @@ public class KeyedRelationshipStatementManager implements
 		RegenerationStatementManager {
 	private MetaDataOntology ontology;
 	
-	//all IDs of directRelationships
-	private Collection<String> directRelationshipIds;
-	
-	// keys of all relatedEntities
-	private Map<URI, IKey> relatedEntityKeys;
-	
-	// key = relatedEntityURI....this map is what this class builds
-	private Map<URI, KeyedRelationshipBuilder> keyedRelationships = new HashMap<URI, KeyedRelationshipBuilder>();
-
 	private IPersistenceContext ipc;
+	
+	private URI owningEntityURI;
 
 	/**
 	 * The default constructor
 	 * @param ipc the persistence context
-	 * @param relatedEntityKeys all of the keys that are related to this entity via a HAS_KEYED_RELATIONSHIP
+	 * @param owningEntityURI the owning entity of the relationship
 	 */
-	public KeyedRelationshipStatementManager(IPersistenceContext ipc, Map<URI, IKey> relatedEntityKeys) {
+	public KeyedRelationshipStatementManager(IPersistenceContext ipc, URI owningEntityURI) {
 		this.ontology = ipc.getOntology();
-		this.relatedEntityKeys = relatedEntityKeys;
-		this.directRelationshipIds = ontology.getKeyedRelationshipIds();
 		this.ipc = ipc;
+		this.owningEntityURI = owningEntityURI;
 	}
 	
 	@Override
-	public boolean scan(Statement statement) {
-		URI predicate = statement.getPredicate();
-		if (directRelationshipIds.contains(predicate.stringValue())){
-			// a triple containing an indirect relationship predicate found
-			populateKeyedRelationshipInfo(ontology, statement);
-			return true;
-		}
-		return false;
+	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+        try {
+            StringBuilder queryBuilder = new StringBuilder();
+            String relType = "_relType";
+            String relatedEntity = "_relatedEntityURI";
+            queryBuilder.append("SELECT ").append(relType).append(", ").append(relatedEntity).append(" FROM ").append("\n");
+            queryBuilder.append("{<").append(owningEntityURI).append(">} ").append(relType).append(" {").append(relatedEntity).append("},").append("\n");
+            queryBuilder.append("{").append(relType).append("} ").append("<").append(RDFS.SUBPROPERTYOF).append(">").append(" {<").append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(">}").append("\n");
+            TupleQuery tupleQuery =
+                ipc.getRepository().getConnection().prepareTupleQuery(
+                    QueryLanguage.SERQL,
+                    queryBuilder.toString());
+            TupleQueryResult result = tupleQuery.evaluate();
+            BindingSet resultSet = null;
+            while (result.hasNext()) {
+                resultSet = result.next();
+                KeyedRelationshipBuilder krb = new KeyedRelationshipBuilder(ipc);
+                // the reasoner treats this as a subproperty of itself
+                if( !ontology.HAS_KEYED_RELATIONSHIP_TO.URI.stringValue().equals(resultSet.getValue(relType).stringValue()) ) {
+                    krb.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)ontology.getRelationshipDefinitionById(resultSet.getValue(relType).stringValue()));
+                    krb.setRelatedEntityKey(new KeyStatementManager(ipc, (URI)resultSet.getValue(relatedEntity)).produceKey());
+                    builder.addRelationship(krb.build(ontology));
+                }
+            }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+
 	}
-	
-	@Override
-	public void populateEntity(EntityBuilder builder) {
-		for (Map.Entry<URI, KeyedRelationshipBuilder> entry : keyedRelationships.entrySet()){
-			URI relatedEntityURI = entry.getKey();
-			KeyedRelationshipBuilder keyedRelBuilder = entry.getValue();
-			keyedRelBuilder.setRelatedEntityKey(relatedEntityKeys.get(relatedEntityURI));
-			IKeyedRelationship keyedRelationship = keyedRelBuilder.build(ontology);
-			builder.addRelationship(keyedRelationship);
-		}
-	}
-
-	private void populateKeyedRelationshipInfo(IMetadataModel model2,
-			Statement statement) {
-		// hit on an keyedRelationship (called directRelationship in ontology) of some type
-		String keyedRelationshipId = statement.getPredicate().stringValue();
-		// this cast is okay because the statement has been vetted before getting here
-		URI relatedEntityURI = (URI)statement.getObject();
-		KeyedRelationshipBuilder keyedRelBuilder = keyedRelationships.get(relatedEntityURI);
-		if (keyedRelBuilder == null){
-			keyedRelBuilder = new KeyedRelationshipBuilder(ipc);
-            keyedRelationships.put(relatedEntityURI, keyedRelBuilder);
-		}
-        keyedRelBuilder.setKeyedRelationshipInfo((IKeyedRelationshipDefinition) ontology.getRelationshipDefinitionById(keyedRelationshipId));
-	}
-
-
-
 }

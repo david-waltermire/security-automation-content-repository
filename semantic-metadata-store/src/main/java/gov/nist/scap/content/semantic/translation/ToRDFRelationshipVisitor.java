@@ -14,8 +14,6 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -73,25 +71,12 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
                 + boundaryObjectValue);
         target.add(valueFactory.createStatement(
             boundaryObjectURI,
-            RDF.TYPE,
-            ontology.BOUNDARY_OBJECT_CLASS.URI));
-        target.add(valueFactory.createStatement(
-            boundaryObjectURI,
-            RDFS.LABEL,
-            valueFactory.createLiteral(boundaryObjectValue)));
-        target.add(valueFactory.createStatement(
-            boundaryObjectURI,
             ontology.HAS_BOUNDARY_OBJECT_TYPE.URI,
             valueFactory.createLiteral(externalIdentifier.getId())));
         target.add(valueFactory.createStatement(
             boundaryObjectURI,
             ontology.HAS_BOUNDARY_OBJECT_VALUE.URI,
             valueFactory.createLiteral(boundaryObjectValue)));
-        // assert this since inference may not be turned on
-        target.add(valueFactory.createStatement(
-            entityResourceId,
-            ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI,
-            boundaryObjectURI));
         target.add(valueFactory.createStatement(
             entityResourceId,
             ontology.findIndirectRelationshipURI(relationshipId),
@@ -108,11 +93,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
     public void visit(ICompositeRelationship relationship) {
         List<Statement> target = new LinkedList<Statement>();
         String relationshipId = relationship.getDefinition().getId();
-        // assert this since inference may not be turned on
-        target.add(valueFactory.createStatement(
-            entityResourceId,
-            ontology.HAS_COMPOSITE_RELATIONSHIP_TO.URI,
-            entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         target.add(valueFactory.createStatement(
             entityResourceId,
             ontology.findCompositeRelationshipURI(relationshipId),
@@ -129,11 +109,6 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
     public void visit(IKeyedRelationship relationship) {
         List<Statement> target = new LinkedList<Statement>();
         String relationshipId = relationship.getDefinition().getId();
-        // assert this since inference may not be turned on
-        target.add(valueFactory.createStatement(
-            entityResourceId,
-            ontology.HAS_KEYED_RELATIONSHIP_TO.URI,
-            entityMetadataMap.getResourceURI(relationship.getReferencedEntity())));
         target.add(valueFactory.createStatement(
             entityResourceId,
             ontology.findKeyedRelationshipURI(relationshipId),
