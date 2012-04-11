@@ -2,8 +2,10 @@ package gov.nist.scap.content.exist;
 
 import gov.nist.scap.content.model.IEntity;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
@@ -15,6 +17,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.exist.xmldb.DatabaseImpl;
 import org.exist.xmldb.DatabaseInstanceManager;
 import org.exist.xmldb.EXistResource;
+import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
@@ -27,8 +30,8 @@ import org.xmldb.api.modules.XMLResource;
 
 /**
  * An eXist-db implementation of ContentStore
+ * 
  * @author Adam Halbardier
- *
  */
 public class ExistDBContentStore implements ContentStore {
 
@@ -39,23 +42,28 @@ public class ExistDBContentStore implements ContentStore {
     public static final String WRAPPER_ELEMENT = "abcdefghijklm";
 
     private final ContentRetrieverFactory contentRetrieverFactory;
-    
+
     private Collection col = null;
+
+    private Map<Object, Set<String>> commitMap =
+        new HashMap<Object, Set<String>>();
 
     /**
      * default constructor
-     * @throws XMLDBException error with the database 
+     * 
+     * @throws XMLDBException error with the database
      */
-    public ExistDBContentStore()
-            throws XMLDBException {
-        Database database = new DatabaseImpl();;
+    public ExistDBContentStore() throws XMLDBException {
+        Database database = new DatabaseImpl();
+        ;
         database.setProperty("create-database", "true");
         DatabaseManager.registerDatabase(database);
 
         col = getOrCreateCollection(COLLECTION);
         col.setProperty(OutputKeys.INDENT, "no");
-        
-        contentRetrieverFactory = ExistDBContentRetrieverFactory.getInstance(this);
+
+        contentRetrieverFactory =
+            ExistDBContentRetrieverFactory.getInstance(this);
 
     }
 
@@ -68,7 +76,15 @@ public class ExistDBContentStore implements ContentStore {
 
     @Override
     public Map<String, IEntity<?>> persist(
-            java.util.Collection<? extends IEntity<?>> entities) {
+            java.util.Collection<? extends IEntity<?>> entities)
+            throws ContentException {
+        return persist(entities, null);
+    }
+
+    @Override
+    public Map<String, IEntity<?>> persist(
+            java.util.Collection<? extends IEntity<?>> entities,
+            Object session) throws ContentException {
         XMLResource res = null;
         String resId = null;
         Map<String, IEntity<?>> resultResult =
@@ -81,7 +97,7 @@ public class ExistDBContentStore implements ContentStore {
                 XmlCursor xc = ie.getContentHandle().getCursor();
                 TokenType tt = xc.toNextToken();
                 StringBuilder sbNS = new StringBuilder();
-                sbNS.append("<"+WRAPPER_ELEMENT);
+                sbNS.append("<" + WRAPPER_ELEMENT);
                 while (tt == TokenType.ATTR || tt == TokenType.NAMESPACE) {
                     if (tt == TokenType.NAMESPACE) {
                         QName q = xc.getName();
@@ -98,16 +114,26 @@ public class ExistDBContentStore implements ContentStore {
                 sbNS.append(">");
                 xc = ie.getContentHandle().getCursor();
                 res.setContent(sbNS.toString() + xc.getObject().xmlText(xo)
-                    + "</"+WRAPPER_ELEMENT+">");
+                    + "</" + WRAPPER_ELEMENT + ">");
                 col.storeResource(res);
                 resId = res.getId();
+                resultResult.put(resId, ie);
                 xc.removeXml();
                 xc.beginElement("xinclude", "gov:nist:scap:content-repo");
                 xc.insertAttributeWithValue("resource-id", resId);
-                resultResult.put(resId, ie);
             } catch (XMLDBException e) {
-            	// TODO: log exception
-                e.printStackTrace();
+                // TODO: log exception
+                // back out all inserted info
+                for (String localResId : resultResult.keySet()) {
+                    try {
+                        col.removeResource(col.getResource(localResId));
+                    } catch (XMLDBException e1) {
+                        throw new ContentException(
+                            "Error rolling back transaction. Database may have stale data!!!",
+                            e);
+                    }
+                }
+                throw new ContentException("error persisting content", e);
             } finally {
                 // dont forget to cleanup
                 if (res != null) {
@@ -120,8 +146,35 @@ public class ExistDBContentStore implements ContentStore {
             }
         }
 
+        if (session != null) {
+            commitMap.put(
+                session,
+                Collections.unmodifiableSet(resultResult.keySet()));
+        }
         return resultResult;
 
+    }
+
+    @Override
+    public boolean commit(Object session) {
+        return commitMap.remove(session) != null;
+    }
+
+    @Override
+    public boolean rollback(Object session) {
+        Set<String> keys = commitMap.remove(session);
+        if (keys != null) {
+            try {
+                for (String key : keys) {
+                    col.removeResource(col.getResource(key));
+                }
+                return true;
+            } catch (XMLDBException e1) {
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -202,7 +255,7 @@ public class ExistDBContentStore implements ContentStore {
         }
         return col;
     }
-    
+
     @Override
     public ContentRetriever newContentRetriever(String contentId) {
         return contentRetrieverFactory.newContentRetriever(contentId);

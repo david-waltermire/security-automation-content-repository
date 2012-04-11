@@ -37,15 +37,12 @@ import gov.nist.scap.content.semantic.translation.EntityMetadataMap;
 import gov.nist.scap.content.semantic.translation.KeyTranslator;
 import gov.nist.scap.content.semantic.translation.ToRDFEntityVisitor;
 import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
-import info.aduna.iteration.Iterations;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,10 +52,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -100,6 +94,8 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     private ContentRetrieverFactory contentRetrieverFactory;
 
+    private Map<Object, RepositoryConnection> sessionMap = new HashMap<Object, RepositoryConnection>();
+    
     private TripleStoreFacadeMetaDataManager(
             ContentRetrieverFactory contentRetrieverFactory) {
         // NOTE: this type is non-inferencing, see
@@ -185,36 +181,35 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     }
 
-    //TODO delete this method
-    public void writeOutAllStatements (OutputStream os) throws RepositoryException, UnsupportedEncodingException, IOException {
-        Set<Statement> result =
-                Iterations.addAll(
-                    repository.getConnection().getStatements(null, null, null, true),
-                    new HashSet<Statement>());
-        for( Statement s : result ) {
-            logStatement(
-                s.getSubject(),
-                s.getPredicate(),
-                s.getObject(),
-                s.getContext(), os);
-        }
-
-    }
-
-    //TODO delete this method
-    private void logStatement(
-            Resource subject,
-            URI predicate,
-            Value object,
-            Resource context, OutputStream os) throws UnsupportedEncodingException, IOException {
-        StringBuilder sb = new StringBuilder();
-        if (context != null) {
-            sb.append("[" + context + "] ");
-        }
-        sb.append(subject.stringValue() + " " + predicate.stringValue() + " "
-            + object.stringValue());
-        os.write((sb.toString() + "\n").getBytes("UTF-8"));
-    }
+    //Used for debuggings
+//    public void writeOutAllStatements (OutputStream os) throws RepositoryException, UnsupportedEncodingException, IOException {
+//        Set<Statement> result =
+//                Iterations.addAll(
+//                    repository.getConnection().getStatements(null, null, null, true),
+//                    new HashSet<Statement>());
+//        for( Statement s : result ) {
+//            logStatement(
+//                s.getSubject(),
+//                s.getPredicate(),
+//                s.getObject(),
+//                s.getContext(), os);
+//        }
+//
+//    }
+//
+//    private void logStatement(
+//            Resource subject,
+//            URI predicate,
+//            Value object,
+//            Resource context, OutputStream os) throws UnsupportedEncodingException, IOException {
+//        StringBuilder sb = new StringBuilder();
+//        if (context != null) {
+//            sb.append("[" + context + "] ");
+//        }
+//        sb.append(subject.stringValue() + " " + predicate.stringValue() + " "
+//            + object.stringValue());
+//        os.write((sb.toString() + "\n").getBytes("UTF-8"));
+//    }
 
     
     /**
@@ -301,6 +296,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         return null;
     }
 
+    @Override
+    public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
+        persist(contentIdToEntityMap, null);
+    }
+    
     /*
      * TODO: NOTE: there is an issue in some cases where an Entity will be sent
      * in containing duplicate relationships. At present only the first of the
@@ -318,9 +318,13 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
      * THIS.
      */
     @Override
-    public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
+    public void persist(Map<String, IEntity<?>> contentIdToEntityMap, Object session) {
         try {
             RepositoryConnection conn = repository.getConnection();
+            if( session != null ) {
+                conn.setAutoCommit(false);
+                sessionMap.put(session, conn);
+            }
             try {
 
                 IEntityVisitor entityVisitor =
@@ -336,13 +340,48 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 }
 
             } finally {
-                conn.close();
+                if( session == null )
+                    conn.close();
             }
         } catch (RepositoryException e) {
             log.error(e);
         }
     }
-
+    
+    @Override
+    public boolean commit(Object session) {
+        RepositoryConnection conn = sessionMap.remove(session);
+        if( conn != null ) {
+            try {
+                conn.commit();
+                conn.close();
+            } catch (RepositoryException e) {
+                log.error(e);
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public boolean rollback(Object session) {
+        RepositoryConnection conn = sessionMap.remove(session);
+        if( conn != null ) {
+            try {
+                conn.rollback();
+                conn.close();
+            } catch (RepositoryException e) {
+                log.error(e);
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     private Map<String, Set<? extends IKey>> findEntityKeys(
             Map<String, List<URI>> entityURIs,
             IPersistenceContext ipc)

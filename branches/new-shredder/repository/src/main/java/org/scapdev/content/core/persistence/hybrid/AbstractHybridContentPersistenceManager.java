@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.ContentException;
+
 //import org.scapdev.content.core.query.EntityStatistic;
 
 public abstract class AbstractHybridContentPersistenceManager implements HybridContentPersistenceManager, ContentRetrieverFactory {
@@ -52,9 +54,25 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return generateKeyedEntity(key);
 	}
 
-	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) {
-		Map<String, IEntity<?>> contentIdToEntityMap = contentStore.persist(entities);
-		metadataStore.persist(contentIdToEntityMap);
+	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException {
+	    Object session = new Object();
+	    
+		Map<String, IEntity<?>> contentIdToEntityMap = null;
+        try {
+            contentIdToEntityMap = contentStore.persist(entities, session);
+        } catch (ContentException e) {
+            contentStore.rollback(session);
+            throw e;
+        }
+
+        try {
+            metadataStore.persist(contentIdToEntityMap);
+        } catch ( ContentException e ) {
+            metadataStore.rollback(session);
+            contentStore.rollback(session);
+        }
+        contentStore.commit(session);
+        metadataStore.commit(session);
 	}
 
 	public ContentRetriever newContentRetriever(String contentId) {

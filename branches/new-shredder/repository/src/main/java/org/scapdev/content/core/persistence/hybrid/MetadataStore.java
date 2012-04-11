@@ -34,6 +34,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.scapdev.content.core.ContentException;
+
 public interface MetadataStore {
 
 	/**
@@ -60,7 +62,11 @@ public interface MetadataStore {
 	 * @return
 	 */
 	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
-	void persist(Map<String, IEntity<?>> contentIdToEntityMap);
+    void persist(Map<String, IEntity<?>> contentIdToEntityMap) throws ContentException;
+	void persist(Map<String, IEntity<?>> contentIdToEntityMap, Object session) throws ContentException;
+    boolean commit(Object session);
+    boolean rollback(Object session);
+
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }
