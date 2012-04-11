@@ -29,11 +29,15 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
+import org.scapdev.content.core.ContentException;
 
 public interface ContentStore extends ContentRetrieverFactory {
 
 	XmlObject getContent(String contentId);
-	Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities);
+	Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities) throws ContentException;
+    Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities, Object session) throws ContentException;
+    boolean commit(Object session);
+    boolean rollback(Object session);
 	ContentRetriever getContentRetriever(String contentId);
 	void shutdown();
 

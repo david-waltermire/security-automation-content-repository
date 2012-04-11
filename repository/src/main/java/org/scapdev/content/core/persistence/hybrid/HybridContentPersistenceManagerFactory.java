@@ -32,6 +32,10 @@ public class HybridContentPersistenceManagerFactory implements ContentPersistenc
     public static final String CONTENT_STORE_FACTORY = "repository.content.hybrid.content-manager-factory";
 
 
+    public static HybridContentPersistenceManagerFactory getInstance() {
+        return new HybridContentPersistenceManagerFactory();
+    }
+    
     public HybridContentPersistenceManager newContentPersistenceManager() {
         ContentStore cs = newContentStore();
         MetadataStore ms = newMetadataStore(cs);
@@ -39,7 +43,7 @@ public class HybridContentPersistenceManagerFactory implements ContentPersistenc
 	}
 
 	@SuppressWarnings("static-method")
-	public HybridContentPersistenceManager newHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
+	public HybridContentPersistenceManager newContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		return new DefaultHybridContentPersistenceManager(metadataStore, contentStore);
 	}
 	

@@ -18,6 +18,7 @@
     <module>model</module>
     <module>exist-db</module>
     <module>exist-db-persistence</module>
+    <module>repository-server</module>
   </modules>
 
   <properties>

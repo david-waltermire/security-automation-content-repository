@@ -68,10 +68,10 @@ public class TestRetrieve {
         tsfdm.persist(resultMap);
         
         //TODO delete this line
-        OutputStream os = new BufferedOutputStream(new FileOutputStream("statements-repo.log"));
-        tsfdm.writeOutAllStatements(os);
-        os.flush();
-        os.close();
+//        OutputStream os = new BufferedOutputStream(new FileOutputStream("statements-repo.log"));
+//        tsfdm.writeOutAllStatements(os);
+//        os.flush();
+//        os.close();
     }
 
     /**

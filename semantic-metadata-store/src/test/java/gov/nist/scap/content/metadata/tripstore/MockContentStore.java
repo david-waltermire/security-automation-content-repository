@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
 
@@ -49,6 +50,24 @@ public class MockContentStore implements ContentStore {
             resultMap.get(contentId).getContentHandle().getCursor());
     }
 
+    @Override
+    public boolean commit(Object session) {
+        // TODO Auto-generated method stub
+        return true;
+    }
+    
+    @Override
+    public Map<String, IEntity<?>> persist(
+            Collection<? extends IEntity<?>> entities,
+            Object session) {
+        return persist(entities);
+    }
+    
+    @Override
+    public boolean rollback(Object session) {
+        return true;
+    }
+    
     @Override
     public void shutdown() {
     };
