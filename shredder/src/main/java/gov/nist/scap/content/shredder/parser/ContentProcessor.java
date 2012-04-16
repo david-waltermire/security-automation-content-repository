@@ -1,5 +1,6 @@
 package gov.nist.scap.content.shredder.parser;
 
+import gov.nist.scap.content.model.AbstractEntity;
 import gov.nist.scap.content.model.DefaultBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.DefaultCompositeRelationship;
 import gov.nist.scap.content.model.DefaultContentNode;
@@ -10,10 +11,6 @@ import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.IMutableContentNode;
-import gov.nist.scap.content.model.IMutableEntity;
-import gov.nist.scap.content.model.IMutableGeneratedDocument;
-import gov.nist.scap.content.model.IMutableKeyedDocument;
 import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
@@ -65,7 +62,7 @@ public class ContentProcessor {
 		definition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, null));
 	}
 
-	private void processEntity(IMutableEntity<?> entity,
+	private void processEntity(AbstractEntity<?> entity,
 			XmlCursor cursor) throws ProcessingException {
 
 		IVersionDefinition versionDef = entity.getDefinition().getVersionDefinition();
@@ -94,7 +91,7 @@ public class ContentProcessor {
 		return new BookmarkContentHandle(bookmark);
 	}
 
-	private void processRelationships(IMutableEntity<?> entity,
+	private void processRelationships(AbstractEntity<?> entity,
 			XmlCursor cursor) throws ProcessingException {
 		Collection<? extends IRelationshipDefinition> relationshipDefinitions = entity.getDefinition().getRelationshipDefinitions();
 
@@ -184,7 +181,7 @@ public class ContentProcessor {
 		return retval;
 	}
 
-	private static void processProperties(IMutableEntity<?> entity, XmlCursor cursor) throws ProcessingException {
+	private static void processProperties(AbstractEntity<?> entity, XmlCursor cursor) throws ProcessingException {
 		for (IPropertyRef propertyRef : entity.getDefinition().getPropertyRefs()) {
 			IPropertyDefinition definition = propertyRef.getPropertyDefinition();
 			List<String> values = propertyRef.getValues(entity.getParent(), cursor);
@@ -195,10 +192,10 @@ public class ContentProcessor {
 	}
 
 	private class ContentProcessingRelationshipDefinitionVisitor implements IRelationshipDefinitionVisitor {
-		private final IMutableEntity<?> entity;
+		private final AbstractEntity<?> entity;
 		private XmlCursor cursor;
 
-		public ContentProcessingRelationshipDefinitionVisitor(IMutableEntity<?> entity) {
+		public ContentProcessingRelationshipDefinitionVisitor(AbstractEntity<?> entity) {
 			this.entity = entity;
 		}
 
@@ -216,7 +213,7 @@ public class ContentProcessor {
 				log.warn("Unrecognized QName '"+qname.toString()+"' at composite boundary: "+definition.getId());
 			} else {
 				// process the child node
-				IMutableEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
+				AbstractEntity<?> childEntity = contentDefinition.accept(new ContentProcessingEntityDefinitionVisitor(cursor, entity));
 
 				ICompositeRelationship relationship = new DefaultCompositeRelationship(definition, childEntity);
 				// Add to the parent entity.  The child has a pointer back to
@@ -250,23 +247,23 @@ public class ContentProcessor {
 		
 	}
 
-	private class ContentProcessingEntityDefinitionVisitor implements IEntityDefinitionVisitor<IMutableEntity<?>> {
+	private class ContentProcessingEntityDefinitionVisitor implements IEntityDefinitionVisitor<AbstractEntity<?>> {
 		private final XmlCursor cursor;
-		private final IMutableEntity<?> parent;
+		private final AbstractEntity<?> parent;
 
 		public ContentProcessingEntityDefinitionVisitor(XmlCursor cursor,
-				IMutableEntity<?> parent) {
+				AbstractEntity<?> parent) {
 			this.cursor = cursor;
 			this.parent = parent;
 		}
 
-		public IMutableEntity<?> visit(IGeneratedDocumentDefinition definition) throws ProcessingException {
-			IMutableGeneratedDocument document = new DefaultGeneratedDocument(definition, getContentHandle(cursor), parent);
+		public AbstractEntity<?> visit(IGeneratedDocumentDefinition definition) throws ProcessingException {
+			DefaultGeneratedDocument document = new DefaultGeneratedDocument(definition, getContentHandle(cursor), parent);
 			processEntity(document, cursor);
 			return document;
 		}
 
-		public IMutableEntity<?> visit(IKeyedDocumentDefinition definition) throws ProcessingException {
+		public AbstractEntity<?> visit(IKeyedDocumentDefinition definition) throws ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
 			IKey key;
 			try {
@@ -275,7 +272,7 @@ public class ContentProcessor {
 				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
 			}
 
-			IMutableKeyedDocument document = new DefaultKeyedDocument(definition, key, getContentHandle(cursor), parent);
+			DefaultKeyedDocument document = new DefaultKeyedDocument(definition, key, getContentHandle(cursor), parent);
 
 			IVersionDefinition versionDef = definition.getVersionDefinition();
 			if (versionDef != null) {
@@ -288,7 +285,7 @@ public class ContentProcessor {
 			return document;
 		}
 
-		public IMutableEntity<?> visit(IContentNodeDefinition definition) throws ProcessingException {
+		public AbstractEntity<?> visit(IContentNodeDefinition definition) throws ProcessingException {
 			IKeyDefinition keyDefinition = definition.getKeyDefinition();
 			IKey key;
 			try {
@@ -297,7 +294,7 @@ public class ContentProcessor {
 				throw new ProcessingException("Unable to extract key for entity: "+cursor.getName().toString(), e);
 			}
 
-			IMutableContentNode node = new DefaultContentNode(definition, key, getContentHandle(cursor), parent);
+			DefaultContentNode node = new DefaultContentNode(definition, key, getContentHandle(cursor), parent);
 			processEntity(node, cursor);
 			return node;
 		}

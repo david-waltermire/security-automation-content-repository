@@ -21,11 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.scapdev.content.core.query;
+package org.scapdev.content.core.resolver;
 
-import org.scapdev.content.core.resolver.Resolver;
+import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IVersion;
+import gov.nist.scap.content.model.definitions.ProcessingException;
 
-public interface Query<RESULT extends QueryResult> {
+import java.util.Collection;
 
-	RESULT resolve(Resolver resolver);
+import org.scapdev.content.core.persistence.IEntityFilter;
+
+public interface IResolver {
+//	IEntityFilter getFilter();
+//	void setFilter(IEntityFilter filter);
+	Collection<? extends IKeyedEntity<?>> resolve(IKey key, IVersion version, IEntityFilter<IKeyedEntity<?>> filter) throws ProcessingException;
 }

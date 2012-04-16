@@ -26,6 +26,7 @@ package org.scapdev.content.core.persistence.hybrid;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
@@ -41,10 +42,11 @@ public interface MetadataStore {
 	/**
 	 * 
 	 * @param key
+	 * @param version 
 	 * @return the entity if the key exists or <code>null</code> if it was not found
 	 * @throws ProcessingException 
 	 */
-	IKeyedEntity<?> getEntity(IKey key) throws ProcessingException;
+	Collection<? extends IKeyedEntity<?>> getEntities(IKey key, IVersion version) throws ProcessingException;
 
 	   /**
      * 

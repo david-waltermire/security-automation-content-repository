@@ -27,6 +27,7 @@ import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
@@ -44,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -225,13 +227,15 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     }
 
     @Override
-    public IKeyedEntity<?> getEntity(IKey key) throws ProcessingException {
+    public Collection<? extends IKeyedEntity<?>> getEntities(IKey key, IVersion version) throws ProcessingException {
+    	// TODO: Adam: add support for version and enable multiple entities to be returned
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
-                return new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                    this,
-                    key);
+            	IKeyedEntity<?> retval = new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
+                        this,
+                        key);
+                return Collections.singleton(retval);
             } finally {
                 conn.close();
             }

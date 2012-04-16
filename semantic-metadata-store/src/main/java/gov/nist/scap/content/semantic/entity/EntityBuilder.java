@@ -1,5 +1,6 @@
 package gov.nist.scap.content.semantic.entity;
 
+import gov.nist.scap.content.model.AbstractEntity;
 import gov.nist.scap.content.model.DefaultContentNode;
 import gov.nist.scap.content.model.DefaultGeneratedDocument;
 import gov.nist.scap.content.model.DefaultKeyedDocument;
@@ -7,7 +8,6 @@ import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IContainer;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
@@ -184,7 +184,7 @@ public class EntityBuilder {
             return retVal;
         }
 
-        private void setCommonInfo(IMutableEntity<?> ime) {
+        private void setCommonInfo(AbstractEntity<?> ime) {
             for (IRelationship<?> relationship : relationships) {
                 ime.addRelationship(relationship);
             }

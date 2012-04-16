@@ -37,6 +37,7 @@ import org.openrdf.repository.RepositoryException;
  *
  */
 public class KeyTranslator {
+	@SuppressWarnings("unused")
 	private MetaDataOntology ontology;
 	
 	/**

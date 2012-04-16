@@ -1,13 +1,12 @@
 package gov.nist.scap.content.shredder.parser;
 
-import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IGeneratedDocument;
-import gov.nist.scap.content.model.IKeyedDocument;
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedDocument;
 import gov.nist.scap.content.model.IKeyedEntity;
-import gov.nist.scap.content.model.IMutableEntity;
 import gov.nist.scap.content.model.definitions.KeyedRelationshipInfo;
 
 import java.util.Collection;
@@ -27,7 +26,7 @@ public class DataExtractingContentHandler implements ContentHandler, IEntityVisi
 
 	private final Collection<KeyedRelationshipInfo> keyedRelationships = new LinkedList<KeyedRelationshipInfo>();
 	private final Map<IKey, IKeyedEntity<?>> keyedEntities = new HashMap<IKey, IKeyedEntity<?>>();
-	private final LinkedList<IMutableEntity<?>> entities = new LinkedList<IMutableEntity<?>>();
+	private final LinkedList<IEntity<?>> entities = new LinkedList<IEntity<?>>();
 
 	public DataExtractingContentHandler() {
 	}
@@ -55,7 +54,7 @@ public class DataExtractingContentHandler implements ContentHandler, IEntityVisi
 		}
 	}
 
-	public void handle(IMutableEntity<?> entity) {
+	public void handle(IEntity<?> entity) {
 		entity.accept(this);
 		entities.add(entity);
 	}

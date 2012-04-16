@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
-import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 import org.scapdev.content.core.persistence.hybrid.ContentStore;
 

@@ -2,7 +2,7 @@ package gov.nist.scap.content.model;
 
 import gov.nist.scap.content.model.definitions.IContentNodeDefinition;
 
-public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IMutableContentNode {
+public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDefinition> implements IContentNode {
 	private final IKey key;
 	private IVersion version;
 
@@ -30,6 +30,7 @@ public abstract class AbstractContentNode extends AbstractEntity<IContentNodeDef
 		return version;
 	}
 
+	@Override
 	public void setVersion(IVersion version) {
 		this.version = version;
 	}
