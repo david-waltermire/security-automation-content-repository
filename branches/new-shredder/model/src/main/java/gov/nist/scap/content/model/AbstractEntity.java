@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> implements IMutableEntity<DEFINITION>, IRelationshipVisitor {
+public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> implements IContainer<DEFINITION>, IRelationshipVisitor {
 	private final DEFINITION contentDefinition;
 	private final List<IRelationship<?>> relationships = new LinkedList<IRelationship<?>>();
 	private final List<IKeyedRelationship> keyedRelationships = new LinkedList<IKeyedRelationship>();
@@ -28,6 +28,8 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		this.contentHandle = contentHandle;
 		this.parent = parent;
 	}
+
+	public abstract void setVersion(IVersion version);
 
 	public DEFINITION getDefinition() {
 		return contentDefinition;

@@ -36,7 +36,8 @@ public class ObjectEqualsHashCodeTest {
 	 * @param y a non-null reference
 	 * @return <code>true</code> if the two parameters are equal or <code>false</code> if not.
 	 */
-	protected static boolean evalEquals(Object x, Object y) {
+	@SuppressWarnings("static-method")
+	protected boolean evalEquals(Object x, Object y) {
 		return x.equals(y);
 	}
 
@@ -60,7 +61,6 @@ public class ObjectEqualsHashCodeTest {
 	 * @param x a non-null reference
 	 * @param y a non-null reference
 	 */
-	@SuppressWarnings("static-method")
 	@Theory(nullsAccepted=false)
 	public void equalsIsSymmetric(Object x, Object y) {
 //
@@ -83,7 +83,6 @@ public class ObjectEqualsHashCodeTest {
 	 * @param y a non-null reference
 	 * @param z a non-null reference
 	 */
-	@SuppressWarnings("static-method")
 	@Theory(nullsAccepted=false)
 	public void equalsIsTransitive(Object x, Object y, Object z) {
 //		// for any non-null reference values x, y, and z

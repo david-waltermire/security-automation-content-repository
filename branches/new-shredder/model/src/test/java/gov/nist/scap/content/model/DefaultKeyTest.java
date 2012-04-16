@@ -34,6 +34,12 @@ public class DefaultKeyTest extends AbstractIKeyTest {
 		return data.toArray(new DefaultKey[data.size()]);
 	}
 
+	// TODO: implement
+	@Override
+	protected boolean evalEquals(Object x, Object y) {
+		return super.evalEquals(x, y);
+	}
+
 	@SuppressWarnings("static-method")
 	@Test
 	public void testNullId() throws KeyException {

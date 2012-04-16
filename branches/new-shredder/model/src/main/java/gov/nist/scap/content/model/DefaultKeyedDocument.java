@@ -4,7 +4,7 @@ import gov.nist.scap.content.model.definitions.IKeyedDocumentDefinition;
 
 
 public class DefaultKeyedDocument extends AbstractEntity<IKeyedDocumentDefinition>
-		implements IMutableKeyedDocument {
+		implements IKeyedDocument {
 
 	private final IKey key;
 	private IVersion version;
@@ -37,6 +37,7 @@ public class DefaultKeyedDocument extends AbstractEntity<IKeyedDocumentDefinitio
 		return version;
 	}
 
+	@Override
 	public void setVersion(IVersion version) {
 		this.version = version;
 	}

@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.scapdev.content.core.persistence.hybrid;
 
+
 public class DefaultHybridContentPersistenceManager extends AbstractHybridContentPersistenceManager {
 	protected DefaultHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		super(metadataStore, contentStore);

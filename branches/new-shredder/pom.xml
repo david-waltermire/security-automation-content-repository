@@ -18,13 +18,13 @@
     <module>model</module>
     <module>exist-db</module>
     <module>exist-db-persistence</module>
-    <module>repository-server</module>
+    <module>secautotrust</module>    <module>repository-server</module>
   </modules>
 
   <properties>
     <java.source>1.6</java.source>
     <java.target>1.6</java.target>
-    <org.openrdf.sesame.version>2.3.2</org.openrdf.sesame.version>
+    <org.openrdf.sesame.version>2.4.2</org.openrdf.sesame.version>
   </properties>
 
   <repositories>

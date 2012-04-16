@@ -13,9 +13,6 @@ import gov.nist.scap.content.shredder.parser.ContentShredder;
 import gov.nist.scap.content.shredder.parser.DataExtractingContentHandler;
 import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -110,8 +107,8 @@ public class TestRetrieve {
             xccdfProfileKey = kb.toKey();
         }
 
-        IKeyedEntity<?> dsEntity = tsfdm.getEntity(dsKey);
-        IKeyedEntity<?> xccdfPEntity = tsfdm.getEntity(xccdfProfileKey);
+        IKeyedEntity<?> dsEntity = tsfdm.getEntities(dsKey, null).iterator().next();
+        IKeyedEntity<?> xccdfPEntity = tsfdm.getEntities(xccdfProfileKey, null).iterator().next();
 
         Assert.assertEquals("v1.2.0.0", xccdfPEntity.getVersion().getValue());
         Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsKey("datastream-collection-id"));

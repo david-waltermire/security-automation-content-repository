@@ -26,6 +26,7 @@ package org.scapdev.content.core.persistence;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
@@ -40,15 +41,33 @@ import org.scapdev.content.core.ContentException;
 
 
 public interface ContentPersistenceManager {
-	IKeyedEntity<?> getEntityByKey(IKey key) throws ProcessingException;
+	/**
+	 * 
+	 * @param key
+	 * @param version the entity version to retrieve if not <code>null</code>
+	 * @param filter 
+	 * @return
+	 * @throws ProcessingException
+	 */
+	Collection<? extends IKeyedEntity<?>> getEntities(IKey key,
+			IVersion version,
+			IEntityFilter<IKeyedEntity<?>> filter) throws ProcessingException;
+	Collection<? extends IEntity<?>> getEntities(
+			IExternalIdentifier externalIdentifier,
+			Set<String> boundaryObjectIds,
+			Set<? extends IEntityDefinition> entityTypes,
+			IEntityFilter<IEntity<?>> filter) throws ProcessingException;
 	/**
 	 * 
 	 * @param externalIdentifier
 	 * @param boundaryObjectIds a collection of non-namespace qualified identifiers
-	 * @param entityTypes filter results to only these entity types or no filtering if empty
-	 * @return
+	 * @param filter filter results to only these entity types or no filtering if empty
+	 * @return a mapping of external identifiers to keys
 	 */
-	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
+	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(
+			IExternalIdentifier externalIdentifier,
+			Collection<String> boundaryObjectIds,
+			Set<? extends IEntityDefinition> entityTypes);
 	void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException;
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
