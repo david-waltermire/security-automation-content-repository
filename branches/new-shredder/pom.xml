@@ -18,7 +18,8 @@
     <module>model</module>
     <module>exist-db</module>
     <module>exist-db-persistence</module>
-    <module>secautotrust</module>    <module>repository-server</module>
+    <module>secautotrust</module>    
+    <module>repository-server</module>
   </modules>
 
   <properties>
@@ -76,6 +77,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>repository</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>semantic-metadata-store</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

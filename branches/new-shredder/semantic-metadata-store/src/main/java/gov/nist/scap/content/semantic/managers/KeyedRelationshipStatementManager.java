@@ -84,8 +84,8 @@ public class KeyedRelationshipStatementManager implements
                 // the reasoner treats this as a subproperty of itself
                 if( !ontology.HAS_KEYED_RELATIONSHIP_TO.URI.stringValue().equals(resultSet.getValue(relType).stringValue()) ) {
                     krb.setKeyedRelationshipInfo((IKeyedRelationshipDefinition)ontology.getRelationshipDefinitionById(resultSet.getValue(relType).stringValue()));
-                    krb.setRelatedEntityKey(new KeyStatementManager(ipc, (URI)resultSet.getValue(relatedEntity)).produceKey());
-                    builder.addRelationship(krb.build(ontology));
+                    krb.setRelatedEntityURI((URI)resultSet.getValue(relatedEntity));
+                    builder.addRelationship(krb.build());
                 }
             }
         } catch (MalformedQueryException e) {

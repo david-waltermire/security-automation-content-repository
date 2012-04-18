@@ -166,7 +166,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
             target.add(valueFactory.createStatement(
                 versionBNode,
                 ontology.HAS_VERSION_TYPE.URI,
-                valueFactory.createLiteral(entity.getVersion().getDefinition().getMethod().getId())));
+                valueFactory.createURI(entity.getVersion().getDefinition().getMethod().getId())));
             target.add(valueFactory.createStatement(
                 versionBNode,
                 ontology.HAS_VERSION_VALUE.URI,

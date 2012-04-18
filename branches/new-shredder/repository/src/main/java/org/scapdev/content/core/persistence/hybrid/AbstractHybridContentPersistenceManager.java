@@ -30,7 +30,6 @@ import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.IEntityFilter;
@@ -97,12 +95,13 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return filter(Collections.unmodifiableCollection(retval), filter);
 	}
 
+	@Deprecated
 	public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
 		// TODO: handle session?
 		return metadataStore.getKeysForBoundaryIdentifier(externalIdentifier, boundaryObjectIds, entityTypes);
 	}
 
-	public void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException {
+	public void storeEntities(List<? extends IEntity<?>> entities) throws ContentException {
 	    Object session = new Object();
 
 		Map<String, IEntity<?>> contentIdToEntityMap = null;

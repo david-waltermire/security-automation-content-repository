@@ -30,7 +30,6 @@ import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
 import java.util.Collection;
 import java.util.List;
@@ -68,7 +67,7 @@ public interface ContentPersistenceManager {
 			IExternalIdentifier externalIdentifier,
 			Collection<String> boundaryObjectIds,
 			Set<? extends IEntityDefinition> entityTypes);
-	void storeEntities(List<? extends IEntity<?>> entities, IMetadataModel model) throws ContentException;
+	void storeEntities(List<? extends IEntity<?>> entities) throws ContentException;
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }
