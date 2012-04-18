@@ -24,16 +24,15 @@
 package gov.nist.scap.content.semantic.builders;
 
 import gov.nist.scap.content.model.DefaultKeyedRelationship;
-import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.definitions.IKeyedEntityDefinition;
 import gov.nist.scap.content.model.definitions.IKeyedRelationshipDefinition;
-import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.semantic.IPersistenceContext;
 import gov.nist.scap.content.semantic.entity.KeyedEntityProxy;
 import gov.nist.scap.content.semantic.exceptions.IncompleteBuildStateException;
 
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -44,7 +43,7 @@ import org.openrdf.repository.RepositoryException;
 public class KeyedRelationshipBuilder {
     private IKeyedRelationshipDefinition keyedRelationshipInfo;
 
-    private IKey relatedEntityKey;
+    private URI relatedEntity;
     private IPersistenceContext ipc;
 
     /**
@@ -67,22 +66,21 @@ public class KeyedRelationshipBuilder {
     }
 
     /**
-     * set the target entity key
+     * set the target entity URI
      * 
-     * @param relatedEntityKey the target entity key
+     * @param relatedEntity the target entity
      */
-    public void setRelatedEntityKey(IKey relatedEntityKey) {
-        this.relatedEntityKey = relatedEntityKey;
+    public void setRelatedEntityURI(URI relatedEntity) {
+        this.relatedEntity = relatedEntity;
     }
 
     /**
      * Will build an instance of an keyed relationship.
      * 
-     * @param model the metadata mode
      * @return the relationship that must be added to the owning entity
      */
-    public IKeyedRelationship build(IMetadataModel model) {
-        if (keyedRelationshipInfo == null || relatedEntityKey == null) {
+    public IKeyedRelationship build() {
+        if (keyedRelationshipInfo == null || relatedEntity == null) {
             throw new IncompleteBuildStateException(
                 "Not all values are populated");
         }
@@ -91,7 +89,7 @@ public class KeyedRelationshipBuilder {
                 keyedRelationshipInfo,
                 new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
                     ipc,
-                    relatedEntityKey));
+                    relatedEntity));
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }

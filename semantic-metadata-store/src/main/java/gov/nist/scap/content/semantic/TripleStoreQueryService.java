@@ -24,6 +24,7 @@
 package gov.nist.scap.content.semantic;
 
 import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.semantic.exceptions.NonUniqueResultException;
@@ -81,40 +82,41 @@ public class TripleStoreQueryService {
     }
 
     /**
-     * method to find an EntityURI from triple store based on given key.
+     * method to find a EntityURIs from triple store based on given key (all versions).
      * 
      * @param key - key to search on
-     * @return URI of entity associated with key, or null if no entity is found
+     * @return Set<URI> of entities associated with key, or null if no entity is found
      * @throws RepositoryException error while executing query
      */
-    public URI findEntityURI(IKey key) throws RepositoryException {
+    public Set<URI> findEntityURIs(IKey key) throws RepositoryException {
+        return findEntityURIs(key, null);
+    }
+    
+    /**
+     * method to find a EntityURIs from triple store based on given key (all versions).
+     * 
+     * @param key - key to search on
+     * @param version version of the entity to return
+     * @return Set<URI> of entities associated with key, or null if no entity is found
+     * @throws RepositoryException error while executing query
+     */
+    public Set<URI> findEntityURIs(IKey key, IVersion version) throws RepositoryException {
         try {
             String entityURIVariableName = "_e";
             TupleQuery tupleQuery =
                 conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
-                    generateEntitySearchQuery(key, entityURIVariableName));
+                    generateEntitySearchQuery(key, version, entityURIVariableName));
             TupleQueryResult result = tupleQuery.evaluate();
             try {
-                String returnVal = null;
-                int resultSize = 0;
+                Set<URI> returnVal = new HashSet<URI>();
                 while (result.hasNext()) {
-                    if (resultSize > 1) {
-                        throw new NonUniqueResultException();
-                    }
-                    String val = result.next().getValue(entityURIVariableName).stringValue();
-                    if( !val.equals(returnVal) ) {
-                        returnVal = result.next().getValue(entityURIVariableName).stringValue();
-                        resultSize++;
-                    }
+                    returnVal.add((URI)result.next().getValue(entityURIVariableName));
                 }
-                if (returnVal != null) {
-                    return factory.createURI(returnVal);
-                }
+                return returnVal;
             } finally {
                 result.close();
             }
-            return null;
         } catch (MalformedQueryException e) {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
@@ -577,6 +579,7 @@ public class TripleStoreQueryService {
 
     private String generateEntitySearchQuery(
             IKey key,
+            IVersion version,
             String entityURIVariableName) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(
@@ -616,6 +619,20 @@ public class TripleStoreQueryService {
                 "\"}");
             fieldNumber++;
         }
+        if( version != null ) {
+            queryBuilder.append(",").append(NEW_LINE);
+            queryBuilder.append("{").append(entityURIVariableName).append("} ");
+            queryBuilder.append("<").append(ontology.HAS_VERSION.URI).append("> ");
+            queryBuilder.append("{versionBNode},").append(NEW_LINE);
+            
+            queryBuilder.append("{versionBNode} ");
+            queryBuilder.append("<").append(ontology.HAS_VERSION_TYPE.URI).append("> ");
+            queryBuilder.append("{<").append(version.getDefinition().getMethod().getId()).append(">};").append(NEW_LINE);
+
+            queryBuilder.append("<").append(ontology.HAS_VERSION_VALUE.URI).append("> ");
+            queryBuilder.append("{\"").append(version.getValue()).append("\"}").append(NEW_LINE);
+        }
+        
         return queryBuilder.toString();
     }
 

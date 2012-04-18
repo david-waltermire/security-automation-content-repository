@@ -1,8 +1,10 @@
 package gov.nist.scap.content.metadata.tripstore;
 
+import gov.nist.scap.content.model.DefaultVersion;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
+import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
@@ -90,25 +92,28 @@ public class TestRetrieve {
             kb.addField(
                 "datastream-id",
                 "scap_gov.nist_datastream_Win7-54-1.2.0.0.zip");
-
+            
             dsKey = kb.toKey();
         }
 
         IKey xccdfProfileKey = null;
+        IVersion xccdfProfileVersion = null;
         if (xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/xccdf/1.2#content-node-profile") instanceof IKeyedEntityDefinition) {
+            IKeyedEntityDefinition iked = (IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/xccdf/1.2#content-node-profile");
             KeyBuilder kb =
                 new KeyBuilder(
-                    ((IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://scap.nist.gov/resource/content/xccdf/1.2#content-node-profile")).getKeyDefinition().getFields());
+                    iked.getKeyDefinition().getFields());
             kb.setId("http://scap.nist.gov/resource/content/xccdf/1.2#key-profile");
             kb.addField(
                 "profile-id",
                 "xccdf_gov.nist_profile_united_states_government_configuration_baseline_version_1.2.0.0");
 
             xccdfProfileKey = kb.toKey();
+            xccdfProfileVersion = new DefaultVersion(iked.getVersionDefinition(), "v1.2.0.0");
         }
 
         IKeyedEntity<?> dsEntity = tsfdm.getEntities(dsKey, null).iterator().next();
-        IKeyedEntity<?> xccdfPEntity = tsfdm.getEntities(xccdfProfileKey, null).iterator().next();
+        IKeyedEntity<?> xccdfPEntity = tsfdm.getEntities(xccdfProfileKey, xccdfProfileVersion).iterator().next();
 
         Assert.assertEquals("v1.2.0.0", xccdfPEntity.getVersion().getValue());
         Assert.assertTrue(dsEntity.getKey().getFieldNameToValueMap().containsKey("datastream-collection-id"));

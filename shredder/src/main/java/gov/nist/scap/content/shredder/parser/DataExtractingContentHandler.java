@@ -34,6 +34,7 @@ public class DataExtractingContentHandler implements ContentHandler, IEntityVisi
 	/**
 	 * @return a depth first ordered list of processed entities
 	 */
+	@Override
 	public List<? extends IEntity<?>> getEntities() {
 		process();
 		return Collections.unmodifiableList(entities);

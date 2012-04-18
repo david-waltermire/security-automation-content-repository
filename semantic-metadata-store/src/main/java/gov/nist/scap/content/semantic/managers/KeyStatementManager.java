@@ -89,6 +89,7 @@ public class KeyStatementManager implements RegenerationStatementManager {
      * Call to produce the key without populating any entity
      * 
      * @return the produced key
+     * @exception RepositoryException error with repository
      */
     public IKey produceKey() throws RepositoryException {
 

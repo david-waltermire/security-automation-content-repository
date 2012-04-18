@@ -97,14 +97,24 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     private ContentRetrieverFactory contentRetrieverFactory;
 
     private Map<Object, RepositoryConnection> sessionMap = new HashMap<Object, RepositoryConnection>();
-    
+
     private TripleStoreFacadeMetaDataManager(
             ContentRetrieverFactory contentRetrieverFactory) {
+        this( contentRetrieverFactory, System.getProperty(TRIPLE_STORE_DIR), System.getProperty(RULES_FILE) );
+    }
+    
+    /**
+     * The default constructor
+     * @param contentRetrieverFactory the content retriever factory for the content store
+     * @param tripleStoreDir the path to the triple store (can be null)
+     * @param rulesPath the path to the rules file
+     */
+    public TripleStoreFacadeMetaDataManager(
+            ContentRetrieverFactory contentRetrieverFactory, String tripleStoreDir, String rulesPath) {
         // NOTE: this type is non-inferencing, see
         // http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more
         // detail
         try {
-            String tripleStoreDir = System.getProperty(TRIPLE_STORE_DIR);
             boolean loadRules = false;
             if (tripleStoreDir != null) {
                 File f = new File(tripleStoreDir);
@@ -145,7 +155,6 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             queryService = new TripleStoreQueryService(this);
             this.contentRetrieverFactory = contentRetrieverFactory;
 
-            String rulesPath = System.getProperty(RULES_FILE);
             InputStream is;
             if (rulesPath == null) {
                 throw new RuntimeException("System property must be set: "
@@ -232,10 +241,14 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
-            	IKeyedEntity<?> retval = new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                        this,
-                        key);
-                return Collections.singleton(retval);
+                Set<URI> uris = queryService.findEntityURIs(key, version);
+                Set<IKeyedEntity<?>> returnSet = new HashSet<IKeyedEntity<?>>();
+                for( URI u : uris ) {
+                    returnSet.add(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
+                            this,
+                            u));
+                }
+                return Collections.unmodifiableCollection(returnSet);
             } finally {
                 conn.close();
             }
@@ -269,6 +282,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     }
 
     @Override
+    @Deprecated
     public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(
             IExternalIdentifier externalIdentifier,
             Collection<String> boundaryObjectIds,

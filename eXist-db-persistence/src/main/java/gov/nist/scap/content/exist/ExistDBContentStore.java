@@ -36,9 +36,9 @@ import org.xmldb.api.modules.XMLResource;
 public class ExistDBContentStore implements ContentStore {
 
     private static final String URI = "xmldb:exist:///db/";
-    private static final String COLLECTION = "dsig";
-    private static final String USERNAME = "content-repo";
-    private static final String PASSWORD = "test123";
+    private final String COLLECTION;
+    private final String USERNAME;
+    private final String PASSWORD;
     public static final String WRAPPER_ELEMENT = "abcdefghijklm";
 
     private final ContentRetrieverFactory contentRetrieverFactory;
@@ -54,8 +54,41 @@ public class ExistDBContentStore implements ContentStore {
      * @throws XMLDBException error with the database
      */
     public ExistDBContentStore() throws XMLDBException {
+        this("dsig", "content-repo", "test123");
+    }
+
+    /**
+     * constructor where the collection name can be specified
+     * @param collection the collection name to use
+     * @throws XMLDBException error with the repo
+     */
+    public ExistDBContentStore(String collection) throws XMLDBException {
+        this(collection, "content-repo", "test123");
+    }
+
+    /**
+     * constructor where the username/password can be specified
+     * @param username the username to access the repo
+     * @param password the password for the username
+     * @throws XMLDBException error with the repo
+     */
+    public ExistDBContentStore(String username, String password) throws XMLDBException {
+        this("dsig", username, password);
+    }
+
+    /**
+     * constructor where the username/password and collection can be specified
+     * @param collection the collection to use
+     * @param username the username
+     * @param password the password
+     * @throws XMLDBException error with the repo
+     */
+    public ExistDBContentStore(String collection, String username, String password) throws XMLDBException {
+        COLLECTION = collection;
+        USERNAME = username;
+        PASSWORD = password;
+
         Database database = new DatabaseImpl();
-        ;
         database.setProperty("create-database", "true");
         DatabaseManager.registerDatabase(database);
 
@@ -64,7 +97,6 @@ public class ExistDBContentStore implements ContentStore {
 
         contentRetrieverFactory =
             ExistDBContentRetrieverFactory.getInstance(this);
-
     }
 
     @Override
@@ -199,12 +231,12 @@ public class ExistDBContentStore implements ContentStore {
         }
     }
 
-    private static Collection getOrCreateCollection(String collectionUri)
+    private Collection getOrCreateCollection(String collectionUri)
             throws XMLDBException {
         return getOrCreateCollection(collectionUri, 0);
     }
 
-    private static Collection getOrCreateCollection(
+    private Collection getOrCreateCollection(
             String collectionUri,
             int pathSegmentOffset) throws XMLDBException {
 

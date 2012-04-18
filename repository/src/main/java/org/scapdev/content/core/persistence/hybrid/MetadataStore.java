@@ -63,6 +63,7 @@ public interface MetadataStore {
 	 * @param entityTypes filter results to only these entity types or no filtering if empty
 	 * @return
 	 */
+    @Deprecated
 	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
     void persist(Map<String, IEntity<?>> contentIdToEntityMap) throws ContentException;
 	void persist(Map<String, IEntity<?>> contentIdToEntityMap, Object session) throws ContentException;
