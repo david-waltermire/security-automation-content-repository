@@ -25,8 +25,8 @@ package org.scapdev.content.core.persistence.hybrid;
 
 import gov.nist.scap.content.model.IEntity;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
 import org.scapdev.content.core.ContentException;
@@ -34,8 +34,21 @@ import org.scapdev.content.core.ContentException;
 public interface ContentStore extends ContentRetrieverFactory {
 
 	XmlObject getContent(String contentId);
-	Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities) throws ContentException;
-    Map<String, IEntity<?>> persist(Collection<? extends IEntity<?>> entities, Object session) throws ContentException;
+	/**
+	 * Persist a list of entities. 
+	 * @param entities The list MUST be ordered such that each entity either contains no other entities, or only contains entities that appear before it in the list
+	 * @return A map of content IDs to entities. The insertion of the entities MUST be in the same order as the passed in list
+	 * @throws ContentException error with the repo
+	 */
+	LinkedHashMap<String, IEntity<?>> persist(List<? extends IEntity<?>> entities) throws ContentException;
+    /**
+     * Persist a list of entities. 
+     * @param entities The list MUST be ordered such that each entity either contains no other entities, or only contains entities that appear before it in the list
+     * @session A session for tracking purposes
+     * @return A map of content IDs to entities. The insertion of the entities MUST be in the same order as the passed in list
+     * @throws ContentException error with the repo
+     */
+	LinkedHashMap<String, IEntity<?>> persist(List<? extends IEntity<?>> entities, Object session) throws ContentException;
     boolean commit(Object session);
     boolean rollback(Object session);
 	ContentRetriever getContentRetriever(String contentId);

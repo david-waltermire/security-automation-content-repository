@@ -26,7 +26,7 @@
       </bean>
     </constructor-arg>
     <constructor-arg><null/></constructor-arg>
-    <constructor-arg value="/test-rules.xml"/>
+    <constructor-arg value="/rules.xml"/>
   </bean>
   
   <bean id="defaultContentShredder" class="gov.nist.scap.content.shredder.parser.ContentShredder">
@@ -39,7 +39,7 @@
   </bean>
 
   <bean id="defaultRuleDefinitions" class="gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules">
-    <constructor-arg value="classpath:/test-rules.xml" type="java.io.InputStream" />
+    <constructor-arg value="classpath:/rules.xml" type="java.io.InputStream" />
   </bean>
 
 </beans>

@@ -4,6 +4,8 @@ import gov.nist.scap.content.model.IEntity;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -107,20 +109,20 @@ public class ExistDBContentStore implements ContentStore {
     }
 
     @Override
-    public Map<String, IEntity<?>> persist(
-            java.util.Collection<? extends IEntity<?>> entities)
+    public LinkedHashMap<String, IEntity<?>> persist(
+            List<? extends IEntity<?>> entities)
             throws ContentException {
         return persist(entities, null);
     }
 
     @Override
-    public Map<String, IEntity<?>> persist(
-            java.util.Collection<? extends IEntity<?>> entities,
+    public LinkedHashMap<String, IEntity<?>> persist(
+            List<? extends IEntity<?>> entities,
             Object session) throws ContentException {
         XMLResource res = null;
         String resId = null;
-        Map<String, IEntity<?>> resultResult =
-            new HashMap<String, IEntity<?>>();
+        LinkedHashMap<String, IEntity<?>> resultResult =
+            new LinkedHashMap<String, IEntity<?>>();
         for (IEntity<?> ie : entities) {
             try {
                 res = (XMLResource)col.createResource(null, "XMLResource");

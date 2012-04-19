@@ -48,16 +48,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -96,21 +104,29 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     private ContentRetrieverFactory contentRetrieverFactory;
 
-    private Map<Object, RepositoryConnection> sessionMap = new HashMap<Object, RepositoryConnection>();
+    private Map<Object, RepositoryConnection> sessionMap =
+        new HashMap<Object, RepositoryConnection>();
 
     private TripleStoreFacadeMetaDataManager(
             ContentRetrieverFactory contentRetrieverFactory) {
-        this( contentRetrieverFactory, System.getProperty(TRIPLE_STORE_DIR), System.getProperty(RULES_FILE) );
+        this(
+            contentRetrieverFactory,
+            System.getProperty(TRIPLE_STORE_DIR),
+            System.getProperty(RULES_FILE));
     }
-    
+
     /**
      * The default constructor
-     * @param contentRetrieverFactory the content retriever factory for the content store
+     * 
+     * @param contentRetrieverFactory the content retriever factory for the
+     *            content store
      * @param tripleStoreDir the path to the triple store (can be null)
      * @param rulesPath the path to the rules file
      */
     public TripleStoreFacadeMetaDataManager(
-            ContentRetrieverFactory contentRetrieverFactory, String tripleStoreDir, String rulesPath) {
+            ContentRetrieverFactory contentRetrieverFactory,
+            String tripleStoreDir,
+            String rulesPath) {
         // NOTE: this type is non-inferencing, see
         // http://www.openrdf.org/doc/sesame2/2.3.2/users/ch08.html for more
         // detail
@@ -192,37 +208,38 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     }
 
-    //Used for debuggings
-//    public void writeOutAllStatements (OutputStream os) throws RepositoryException, UnsupportedEncodingException, IOException {
-//        Set<Statement> result =
-//                Iterations.addAll(
-//                    repository.getConnection().getStatements(null, null, null, true),
-//                    new HashSet<Statement>());
-//        for( Statement s : result ) {
-//            logStatement(
-//                s.getSubject(),
-//                s.getPredicate(),
-//                s.getObject(),
-//                s.getContext(), os);
-//        }
-//
-//    }
-//
-//    private void logStatement(
-//            Resource subject,
-//            URI predicate,
-//            Value object,
-//            Resource context, OutputStream os) throws UnsupportedEncodingException, IOException {
-//        StringBuilder sb = new StringBuilder();
-//        if (context != null) {
-//            sb.append("[" + context + "] ");
-//        }
-//        sb.append(subject.stringValue() + " " + predicate.stringValue() + " "
-//            + object.stringValue());
-//        os.write((sb.toString() + "\n").getBytes("UTF-8"));
-//    }
+    // Used for debuggings
+    // public void writeOutAllStatements (OutputStream os) throws
+    // RepositoryException, UnsupportedEncodingException, IOException {
+    // Set<Statement> result =
+    // Iterations.addAll(
+    // repository.getConnection().getStatements(null, null, null, true),
+    // new HashSet<Statement>());
+    // for( Statement s : result ) {
+    // logStatement(
+    // s.getSubject(),
+    // s.getPredicate(),
+    // s.getObject(),
+    // s.getContext(), os);
+    // }
+    //
+    // }
+    //
+    // private void logStatement(
+    // Resource subject,
+    // URI predicate,
+    // Value object,
+    // Resource context, OutputStream os) throws UnsupportedEncodingException,
+    // IOException {
+    // StringBuilder sb = new StringBuilder();
+    // if (context != null) {
+    // sb.append("[" + context + "] ");
+    // }
+    // sb.append(subject.stringValue() + " " + predicate.stringValue() + " "
+    // + object.stringValue());
+    // os.write((sb.toString() + "\n").getBytes("UTF-8"));
+    // }
 
-    
     /**
      * get an instance of this manager
      * 
@@ -235,18 +252,60 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         return new TripleStoreFacadeMetaDataManager(contentRetrieverFactory);
     }
 
+    /**
+     * TODO delete this method later...it's only for testing
+     * 
+     * @param sparql
+     * @return
+     */
+    public List<SortedMap<String, String>> runSPARQL(String sparql) throws RepositoryException {
+        try {
+            TupleQuery tupleQuery =
+                repository.getConnection().prepareTupleQuery(
+                    QueryLanguage.SPARQL,
+                    sparql);
+            TupleQueryResult result = tupleQuery.evaluate();
+            try {
+                List<SortedMap<String, String>> returnVal =
+                    new LinkedList<SortedMap<String, String>>();
+                BindingSet bs;
+                while (result.hasNext()) {
+                    SortedMap<String, String> sm = new TreeMap<String, String>();
+                    bs = result.next();
+                    for( String key : bs.getBindingNames() ) {
+                        sm.put(key, bs.getValue(key).stringValue());
+                    }
+                    returnVal.add(sm);
+                }
+                return returnVal;
+            } finally {
+                result.close();
+            }
+        } catch (MalformedQueryException e) {
+            throw new RepositoryException(e);
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        } catch (RepositoryException e) {
+            throw new RepositoryException(e);
+        }
+
+    }
+
     @Override
-    public Collection<? extends IKeyedEntity<?>> getEntities(IKey key, IVersion version) throws ProcessingException {
-    	// TODO: Adam: add support for version and enable multiple entities to be returned
+    public Collection<? extends IKeyedEntity<?>> getEntities(
+            IKey key,
+            IVersion version) throws ProcessingException {
+        // TODO: Adam: add support for version and enable multiple entities to
+        // be returned
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
                 Set<URI> uris = queryService.findEntityURIs(key, version);
                 Set<IKeyedEntity<?>> returnSet = new HashSet<IKeyedEntity<?>>();
-                for( URI u : uris ) {
+                for (URI u : uris) {
                     returnSet.add(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                            this,
-                            u));
+                        this,
+                        u));
                 }
                 return Collections.unmodifiableCollection(returnSet);
             } finally {
@@ -315,10 +374,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     }
 
     @Override
-    public void persist(Map<String, IEntity<?>> contentIdToEntityMap) {
-        persist(contentIdToEntityMap, null);
+    public List<String> persist(
+            LinkedHashMap<String, IEntity<?>> contentIdToEntityMap) {
+        return persist(contentIdToEntityMap, null);
     }
-    
+
     /*
      * TODO: NOTE: there is an issue in some cases where an Entity will be sent
      * in containing duplicate relationships. At present only the first of the
@@ -336,40 +396,43 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
      * THIS.
      */
     @Override
-    public void persist(Map<String, IEntity<?>> contentIdToEntityMap, Object session) {
+    public List<String> persist(
+            LinkedHashMap<String, IEntity<?>> contentIdToEntityMap,
+            Object session) {
+        List<String> returnVal = new LinkedList<String>();
         try {
             RepositoryConnection conn = repository.getConnection();
-            if( session != null ) {
+            if (session != null) {
                 conn.setAutoCommit(false);
                 sessionMap.put(session, conn);
             }
             try {
-
-                IEntityVisitor entityVisitor =
-                    new ToRDFEntityVisitor(
+                EntityMetadataMap emm =
+                    new DefaultURIToEntityMap(
                         factory,
-                        ontology,
-                        new DefaultURIToEntityMap(
-                            factory,
-                            BASE_URI,
-                            contentIdToEntityMap), conn);
+                        BASE_URI,
+                        contentIdToEntityMap);
+                IEntityVisitor entityVisitor =
+                    new ToRDFEntityVisitor(factory, ontology, emm, conn);
                 for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap.entrySet()) {
                     entry.getValue().accept(entityVisitor);
+                    returnVal.add(emm.getContentId(entry.getValue()));
                 }
 
             } finally {
-                if( session == null )
+                if (session == null)
                     conn.close();
             }
         } catch (RepositoryException e) {
             log.error(e);
         }
+        return returnVal;
     }
-    
+
     @Override
     public boolean commit(Object session) {
         RepositoryConnection conn = sessionMap.remove(session);
-        if( conn != null ) {
+        if (conn != null) {
             try {
                 conn.commit();
                 conn.close();
@@ -382,11 +445,11 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             return false;
         }
     }
-    
+
     @Override
     public boolean rollback(Object session) {
         RepositoryConnection conn = sessionMap.remove(session);
-        if( conn != null ) {
+        if (conn != null) {
             try {
                 conn.rollback();
                 conn.close();
@@ -399,7 +462,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             return false;
         }
     }
-    
+
     private Map<String, Set<? extends IKey>> findEntityKeys(
             Map<String, List<URI>> entityURIs,
             IPersistenceContext ipc)
@@ -412,8 +475,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             Set<IKey> map = new HashSet<IKey>();
             boundaryIdToKeyMap.put(entry.getKey(), map);
             for (URI entityURI : entry.getValue()) {
-                IKey entityKey =
-                    keyTranslator.translateToJava(ipc, entityURI);
+                IKey entityKey = keyTranslator.translateToJava(ipc, entityURI);
                 map.add(entityKey);
             }
         }

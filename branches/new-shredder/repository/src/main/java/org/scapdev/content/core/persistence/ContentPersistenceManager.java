@@ -56,6 +56,7 @@ public interface ContentPersistenceManager {
 			Set<String> boundaryObjectIds,
 			Set<? extends IEntityDefinition> entityTypes,
 			IEntityFilter<IEntity<?>> filter) throws ProcessingException;
+    IEntity<?> getEntity(String contentId) throws ProcessingException;
 	/**
 	 * 
 	 * @param externalIdentifier
@@ -67,7 +68,7 @@ public interface ContentPersistenceManager {
 			IExternalIdentifier externalIdentifier,
 			Collection<String> boundaryObjectIds,
 			Set<? extends IEntityDefinition> entityTypes);
-	void storeEntities(List<? extends IEntity<?>> entities) throws ContentException;
+	List<String> storeEntities(List<? extends IEntity<?>> entities) throws ContentException;
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }

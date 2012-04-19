@@ -2,9 +2,8 @@ package gov.nist.scap.content.metadata.tripstore;
 
 import gov.nist.scap.content.model.IEntity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -19,7 +18,7 @@ import org.scapdev.content.core.persistence.hybrid.ContentStore;
  */
 public class MockContentStore implements ContentStore {
 
-    Map<String, IEntity<?>> resultMap = new HashMap<String, IEntity<?>>();
+    LinkedHashMap<String, IEntity<?>> resultMap = new LinkedHashMap<String, IEntity<?>>();
 
     @Override
     public XmlObject getContent(String contentId) {
@@ -33,8 +32,8 @@ public class MockContentStore implements ContentStore {
     }
 
     @Override
-    public Map<String, IEntity<?>> persist(
-            Collection<? extends IEntity<?>> entities) {
+    public LinkedHashMap<String, IEntity<?>> persist(
+            List<? extends IEntity<?>> entities) {
         for (IEntity<?> e : entities) {
             resultMap.put(
                 Long.toString(Math.round(Math.random() * 1000000000)),
@@ -56,8 +55,8 @@ public class MockContentStore implements ContentStore {
     }
     
     @Override
-    public Map<String, IEntity<?>> persist(
-            Collection<? extends IEntity<?>> entities,
+    public LinkedHashMap<String, IEntity<?>> persist(
+            List<? extends IEntity<?>> entities,
             Object session) {
         return persist(entities);
     }

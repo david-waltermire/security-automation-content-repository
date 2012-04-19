@@ -17,6 +17,8 @@ import gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +37,7 @@ public class TestRetrieve {
 
     private static XmlbeansRules xmlbeansRules;
     private static TripleStoreFacadeMetaDataManager tsfdm;
-    private static Map<String, IEntity<?>> resultMap;
+    private static LinkedHashMap<String, IEntity<?>> resultMap;
 
     /**
      * Set up the tests by persisting an SCAP data stream
@@ -59,7 +61,7 @@ public class TestRetrieve {
         shredder.shred(
             TestRetrieve.class.getResourceAsStream("/" + testFile),
             handler);
-        Collection<? extends IEntity<?>> entities = handler.getEntities();
+        List<? extends IEntity<?>> entities = handler.getEntities();
         ContentStore cs = new MockContentStore();
         resultMap = cs.persist(entities);
 
