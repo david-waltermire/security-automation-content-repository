@@ -65,7 +65,7 @@ public class ContentStoreTest {
         shredder.shred(
             this.getClass().getResourceAsStream("/" + testFile),
             handler);
-        Collection<? extends IEntity<?>> entities = handler.getEntities();
+        List<? extends IEntity<?>> entities = handler.getEntities();
 
         ContentStore cs = new ExistDBContentStore();
         Map<String, IEntity<?>> result = cs.persist(entities);

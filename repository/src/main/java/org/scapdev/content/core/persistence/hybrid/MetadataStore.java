@@ -32,6 +32,8 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,8 +67,21 @@ public interface MetadataStore {
 	 */
     @Deprecated
 	Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes);
-    void persist(Map<String, IEntity<?>> contentIdToEntityMap) throws ContentException;
-	void persist(Map<String, IEntity<?>> contentIdToEntityMap, Object session) throws ContentException;
+    /**
+     * Persist the entities to the triple store
+     * @param contentIdToEntityMap a map of content IDs to entities. The map must be in order such that each entity either contains no other entities, or only contains entities that appear before it in the list 
+     * @return a list of persisted entity contentIds, in the same order as the passed in parameter
+     * @throws ContentException error with the repo
+     */
+    List<String> persist(LinkedHashMap<String, IEntity<?>> contentIdToEntityMap) throws ContentException;
+    /**
+     * Persist the entities to the triple store
+     * @param contentIdToEntityMap a map of content IDs to entities. The map must be in order such that each entity either contains no other entities, or only contains entities that appear before it in the list
+     * @session a session object 
+     * @return a list of persisted entity contentIds, in the same order as the passed in parameter
+     * @throws ContentException error with the repo
+     */
+    List<String> persist(LinkedHashMap<String, IEntity<?>> contentIdToEntityMap, Object session) throws ContentException;
     boolean commit(Object session);
     boolean rollback(Object session);
 

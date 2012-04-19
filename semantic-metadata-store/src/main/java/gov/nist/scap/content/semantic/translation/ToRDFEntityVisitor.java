@@ -56,7 +56,6 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
     @Override
     public void visit(IContentNode entity) {
         URI resourceId = entityMetadataMap.getResourceURI(entity);
-
         BNode context = valueFactory.createBNode();
         try {
             conn.add(

@@ -34,6 +34,7 @@ import gov.nist.scap.content.model.definitions.ProcessingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return retval;
 	}
 
+	@Override
 	public Collection<? extends IKeyedEntity<?>> getEntities(IKey key,
 			IVersion version, IEntityFilter<IKeyedEntity<?>> filter) throws ProcessingException {
 		// TODO: handle session?
@@ -95,16 +97,23 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 		return filter(Collections.unmodifiableCollection(retval), filter);
 	}
 
+    @Override
+    public IEntity<?> getEntity(String contentId) throws ProcessingException {
+       return metadataStore.getEntity(contentId);
+    }
+
+
 	@Deprecated
 	public Map<String, Set<? extends IKey>> getKeysForBoundaryIdentifier(IExternalIdentifier externalIdentifier, Collection<String> boundaryObjectIds, Set<? extends IEntityDefinition> entityTypes) {
 		// TODO: handle session?
 		return metadataStore.getKeysForBoundaryIdentifier(externalIdentifier, boundaryObjectIds, entityTypes);
 	}
 
-	public void storeEntities(List<? extends IEntity<?>> entities) throws ContentException {
+	@Override
+	public List<String> storeEntities(List<? extends IEntity<?>> entities) throws ContentException {
 	    Object session = new Object();
 
-		Map<String, IEntity<?>> contentIdToEntityMap = null;
+		LinkedHashMap<String, IEntity<?>> contentIdToEntityMap = null;
         try {
             contentIdToEntityMap = contentStore.persist(entities, session);
         } catch (ContentException e) {
@@ -112,14 +121,16 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
             throw e;
         }
 
+        List<String> returnVal = null;
         try {
-            metadataStore.persist(contentIdToEntityMap);
+            returnVal = metadataStore.persist(contentIdToEntityMap);
         } catch ( ContentException e ) {
             metadataStore.rollback(session);
             contentStore.rollback(session);
         }
         contentStore.commit(session);
         metadataStore.commit(session);
+        return returnVal;
 	}
 
 	public ContentRetriever newContentRetriever(String contentId) {
