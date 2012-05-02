@@ -15,6 +15,7 @@
     <constructor-arg value="dsig" />
     <constructor-arg value="content-repo" />
     <constructor-arg value="test123" />
+    <!-- <constructor-arg value="xmldb:exist://localhost:8080/exist/xmlrpc/db/"/> -->
   </bean>
 
   <bean id="defaultContentHandler" class="gov.nist.scap.content.shredder.parser.DataExtractingContentHandler" scope="prototype"/>
@@ -25,7 +26,8 @@
         <constructor-arg ref="defaultLocalContentStore" />
       </bean>
     </constructor-arg>
-    <constructor-arg><null/></constructor-arg>
+    <!-- <constructor-arg><null/></constructor-arg> -->
+    <constructor-arg value="target"/>
     <constructor-arg value="/rules.xml"/>
   </bean>
   

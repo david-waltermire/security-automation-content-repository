@@ -47,6 +47,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 
@@ -84,6 +85,7 @@ public class EntityTranslator {
         managers.add(new VersionStatementManager(persistContext, entityURI));
 
         EntityBuilder builder = new EntityBuilder();
+        RepositoryConnection conn = null;
         try {
 
             StringBuilder queryBuilder = new StringBuilder();
@@ -92,8 +94,9 @@ public class EntityTranslator {
             queryBuilder.append("SELECT DISTINCT ").append(entityType).append(", ").append(contentId).append(" FROM ").append("\n");
             queryBuilder.append("{<").append(entityURI).append(">} <").append(ontology.HAS_ENTITY_TYPE.URI).append("> {").append(entityType).append("};").append("\n");
             queryBuilder.append("<").append(ontology.HAS_CONTENT_ID.URI).append("> {").append(contentId).append("}").append("\n");
+            conn = persistContext.getRepository().getConnection();
             TupleQuery tupleQuery =
-                persistContext.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -110,6 +113,10 @@ public class EntityTranslator {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null ) {
+                conn.close();
+            }
         }
 
         for (RegenerationStatementManager statementManager : managers) {

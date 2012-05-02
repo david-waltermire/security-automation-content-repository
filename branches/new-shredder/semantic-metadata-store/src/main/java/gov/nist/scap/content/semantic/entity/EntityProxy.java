@@ -166,7 +166,7 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
     protected void loadEntity() {
         if (entity == null) {
 
-            RepositoryConnection conn;
+            RepositoryConnection conn = null;
             try {
                 conn = persistContext.getRepository().getConnection();
                 if (resourceId == null && contentId != null) {
@@ -226,6 +226,13 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
 
             } catch (RepositoryException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if( conn != null )
+                    try {
+                        conn.close();
+                    } catch (RepositoryException e) {
+                        e.printStackTrace();
+                    }
             }
         }
     }

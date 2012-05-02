@@ -37,7 +37,7 @@ import org.xmldb.api.modules.XMLResource;
  */
 public class ExistDBContentStore implements ContentStore {
 
-    private static final String URI = "xmldb:exist:///db/";
+    private final String URI;
     private final String COLLECTION;
     private final String USERNAME;
     private final String PASSWORD;
@@ -89,6 +89,32 @@ public class ExistDBContentStore implements ContentStore {
         COLLECTION = collection;
         USERNAME = username;
         PASSWORD = password;
+        URI = "xmldb:exist:///db/";
+
+        Database database = new DatabaseImpl();
+        database.setProperty("create-database", "true");
+        DatabaseManager.registerDatabase(database);
+
+        col = getOrCreateCollection(COLLECTION);
+        col.setProperty(OutputKeys.INDENT, "no");
+
+        contentRetrieverFactory =
+            ExistDBContentRetrieverFactory.getInstance(this);
+    }
+
+    /**
+     * constructor where the username/password and collection can be specified
+     * @param collection the collection to use
+     * @param username the username
+     * @param password the password
+     * @param uri the connection URI (must end in "db/")
+     * @throws XMLDBException error with the repo
+     */
+    public ExistDBContentStore(String collection, String username, String password, String uri) throws XMLDBException {
+        COLLECTION = collection;
+        USERNAME = username;
+        PASSWORD = password;
+        URI = uri;
 
         Database database = new DatabaseImpl();
         database.setProperty("create-database", "true");

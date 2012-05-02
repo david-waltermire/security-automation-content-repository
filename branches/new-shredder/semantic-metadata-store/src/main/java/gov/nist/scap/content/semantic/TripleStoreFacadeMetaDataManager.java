@@ -149,6 +149,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                     loadRules = true;
                 }
                 MemoryStore ms = new MemoryStore(new File(tripleStoreDir));
+                ms.setPersist(true);
                 // prevent file lock issues
                 ms.setSyncDelay(1000L);
                 repository =
@@ -260,8 +261,9 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
      */
     public List<SortedMap<String, String>> runSPARQL(String sparql) throws RepositoryException {
         try {
+            RepositoryConnection conn = repository.getConnection();
             TupleQuery tupleQuery =
-                repository.getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SPARQL,
                     sparql);
             TupleQueryResult result = tupleQuery.evaluate();
@@ -280,6 +282,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 return returnVal;
             } finally {
                 result.close();
+                conn.close();
             }
         } catch (MalformedQueryException e) {
             throw new RepositoryException(e);
@@ -402,10 +405,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         List<String> returnVal = new LinkedList<String>();
         try {
             RepositoryConnection conn = repository.getConnection();
+            conn.setAutoCommit(false);
             if (session != null) {
-                conn.setAutoCommit(false);
                 sessionMap.put(session, conn);
-            }
+            } 
             try {
                 EntityMetadataMap emm =
                     new DefaultURIToEntityMap(
@@ -420,8 +423,10 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 }
 
             } finally {
-                if (session == null)
+                if (session == null) {
+                    conn.commit();
                     conn.close();
+                }
             }
         } catch (RepositoryException e) {
             log.error(e);
@@ -485,7 +490,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
     @Override
     public void shutdown() {
         try {
-            repository.getConnection().close();
+            repository.shutDown();
         } catch (RepositoryException e) {
             log.error(e);
         }

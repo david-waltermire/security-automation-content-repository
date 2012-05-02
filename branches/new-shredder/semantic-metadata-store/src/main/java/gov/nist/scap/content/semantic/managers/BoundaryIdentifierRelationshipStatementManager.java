@@ -37,6 +37,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -67,6 +68,7 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
 	
 	@Override
 	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+	    RepositoryConnection conn = null;
         try {
             StringBuilder queryBuilder = new StringBuilder();
             String relType = "_relType";
@@ -77,8 +79,9 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
             queryBuilder.append("{").append(relType).append("} ").append("<").append(RDFS.SUBPROPERTYOF).append(">").append(" {<").append(ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append(">},").append("\n");
             queryBuilder.append("{_boundaryIdURI} ").append("<").append(ontology.HAS_BOUNDARY_OBJECT_TYPE.URI).append(">").append(" {").append(bType).append("};").append("\n");
             queryBuilder.append("<").append(ontology.HAS_BOUNDARY_OBJECT_VALUE.URI).append(">").append(" {").append(bValue).append("}").append("\n");
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -98,6 +101,9 @@ public class BoundaryIdentifierRelationshipStatementManager implements Regenerat
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null ) 
+                conn.close();
         }
 	}
 }

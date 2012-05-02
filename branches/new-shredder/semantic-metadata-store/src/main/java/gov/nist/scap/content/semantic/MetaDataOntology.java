@@ -258,6 +258,8 @@ public class MetaDataOntology implements IMetadataModel {
                 throw new RuntimeException("misconfigured ontology...",e);
             }
             conn.add(statements, context);
+            conn.commit();
+            conn.close();
         }
     }
 

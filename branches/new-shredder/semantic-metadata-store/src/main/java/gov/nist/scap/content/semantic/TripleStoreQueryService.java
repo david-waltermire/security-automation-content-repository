@@ -38,16 +38,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -68,7 +62,7 @@ public class TripleStoreQueryService {
 
     private MetaDataOntology ontology;
 
-    private RepositoryConnection conn;
+    private IPersistenceContext ipc;
 
     /**
      * @param persistContext the context for the triple store
@@ -78,7 +72,7 @@ public class TripleStoreQueryService {
             throws RepositoryException {
         this.factory = persistContext.getRepository().getValueFactory();
         this.ontology = persistContext.getOntology();
-        this.conn = persistContext.getRepository().getConnection();
+        this.ipc = persistContext;
     }
 
     /**
@@ -101,8 +95,10 @@ public class TripleStoreQueryService {
      * @throws RepositoryException error while executing query
      */
     public Set<URI> findEntityURIs(IKey key, IVersion version) throws RepositoryException {
+        RepositoryConnection conn = null;
         try {
             String entityURIVariableName = "_e";
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
                 conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
@@ -121,6 +117,9 @@ public class TripleStoreQueryService {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null )
+                conn.close();
         }
 
     }
@@ -133,8 +132,10 @@ public class TripleStoreQueryService {
      * @throws RepositoryException error while running query
      */
     URI findEntityURIbyContentId(String contentId) throws RepositoryException {
+        RepositoryConnection conn = null;
         try {
             String entityURIVariableName = "_e";
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
                 conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
@@ -162,49 +163,11 @@ public class TripleStoreQueryService {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
-        }
-    }
-
-    /**
-     * <p>
-     * method that will generate list of all entityURIs of entities related to
-     * owningEntityURI through a HAS_KEYED_RELATIONSHIP predicate.
-     * </p>
-     * 
-     * @param owningEntityURI the base entity URI
-     * @return the list of related URIs
-     * @throws RepositoryException error while running query
-     */
-    public List<URI> findAllRelatedEntityURIs(URI owningEntityURI)
-            throws RepositoryException {
-        try {
-            String relatedEntityVariableName = "_e";
-            TupleQuery tupleQuery =
-                conn.prepareTupleQuery(
-                    QueryLanguage.SERQL,
-                    generateRelatedEntitySearchQuery(
-                        owningEntityURI,
-                        relatedEntityVariableName));
-            TupleQueryResult result = tupleQuery.evaluate();
-            List<URI> relatedEntityURIs = new LinkedList<URI>();
-            try {
-                BindingSet resultSet = null;
-                while (result.hasNext()) {
-                    resultSet = result.next();
-                    Value entityURI =
-                        resultSet.getValue(relatedEntityVariableName);
-                    relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
-                }
-            } finally {
-                result.close();
+        } finally {
+            if( conn != null ) {
+                conn.close();
             }
-            return relatedEntityURIs;
-        } catch (MalformedQueryException e) {
-            throw new RepositoryException(e);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException(e);
         }
-
     }
 
     /**
@@ -266,114 +229,6 @@ public class TripleStoreQueryService {
 
     }
 
-    /**
-     * Find all entities of a given type
-     * 
-     * @param entityTypeId the entity type ID
-     * @return list of URI of the entities of the given type
-     * @throws RepositoryException error while executing query
-     */
-    List<URI> findEntityURIsByEntityType(String entityTypeId)
-            throws RepositoryException {
-        try {
-            String entityURIVariableName = "_e";
-            TupleQuery tupleQuery =
-                conn.prepareTupleQuery(
-                    QueryLanguage.SERQL,
-                    generateEntitiesFromEntityTypeSearchString(
-                        entityTypeId,
-                        entityURIVariableName));
-            TupleQueryResult result = tupleQuery.evaluate();
-            List<URI> relatedEntityURIs = new LinkedList<URI>();
-            try {
-                BindingSet resultSet = null;
-                while (result.hasNext()) {
-                    resultSet = result.next();
-                    Value entityURI = resultSet.getValue(entityURIVariableName);
-                    relatedEntityURIs.add(factory.createURI(entityURI.stringValue()));
-                }
-            } finally {
-                result.close();
-            }
-            return relatedEntityURIs;
-        } catch (MalformedQueryException e) {
-            throw new RepositoryException(e);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException(e);
-        }
-
-    }
-
-    /**
-     * Find all relationships associated with the specific entity
-     * 
-     * @param entityUri the target entity
-     * @return the relationships
-     * @throws RepositoryException error while running query
-     */
-    List<String> findAllRelationshipsFromEntity(URI entityUri)
-            throws RepositoryException {
-        try {
-            String relationshipPredicateVariableName = "_p";
-            TupleQuery tupleQuery =
-                conn.prepareTupleQuery(
-                    QueryLanguage.SERQL,
-                    generateRelationshipsFromEntitySearchString(
-                        relationshipPredicateVariableName,
-                        entityUri));
-            TupleQueryResult result = tupleQuery.evaluate();
-            List<String> relationshipIds = new LinkedList<String>();
-            try {
-                BindingSet resultSet = null;
-                while (result.hasNext()) {
-                    resultSet = result.next();
-                    Value relationshipPredicate =
-                        resultSet.getValue(relationshipPredicateVariableName);
-                    relationshipIds.add(relationshipPredicate.stringValue());
-                }
-            } finally {
-                result.close();
-            }
-            return relationshipIds;
-        } catch (MalformedQueryException e) {
-            throw new RepositoryException(e);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException(e);
-        }
-    }
-
-    private String generateRelationshipsFromEntitySearchString(
-            String relationshipPredicateVariable,
-            URI entityURI) {
-        String unusedObject = "_o";
-        String topLevelPredicateVariableName = "_topLevelPredicate";
-
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(relationshipPredicateVariable).append(
-            " ").append(NEW_LINE);
-        // _e relationshipPredicateVariable _o
-        queryBuilder.append("FROM {<").append(entityURI).append(">} ");
-        queryBuilder.append(relationshipPredicateVariable).append(" ");
-        queryBuilder.append("{").append(unusedObject).append("}").append(",").append(
-            NEW_LINE);
-        // relationshipPredicateVariable rdfs:subPropertyOf _topLevelPredicate
-        queryBuilder.append("{").append(relationshipPredicateVariable).append(
-            "}").append(" ");
-        queryBuilder.append(" <").append(RDFS.SUBPROPERTYOF).append("> ");
-        queryBuilder.append("{").append(topLevelPredicateVariableName).append(
-            "}").append(NEW_LINE);
-        // WHERE _topLevelPredicate = HAS_INDIRECT_REL OR HAS_DIRECT_REL
-        queryBuilder.append("WHERE").append(NEW_LINE);
-        queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(
-            ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(">").append(NEW_LINE);
-        queryBuilder.append("OR").append(NEW_LINE);
-        queryBuilder.append(topLevelPredicateVariableName).append(" = <").append(
-            ontology.HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO.URI).append(">").append(
-            NEW_LINE);
-
-        return queryBuilder.toString();
-    }
-
     private String generateRelatedBoundaryObjectSearchString(
             String boudaryObjectType,
             Collection<String> boundaryIdentifierValues,
@@ -427,20 +282,6 @@ public class TripleStoreQueryService {
         return queryBuilder.toString();
     }
 
-    private String generateEntitiesFromEntityTypeSearchString(
-            String entityType,
-            String entityURIVariableName) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(entityURIVariableName).append(" ").append(
-            NEW_LINE);
-        // _e hasEntityType {entityType};
-        queryBuilder.append("FROM {").append(entityURIVariableName).append("} ");
-        queryBuilder.append("<").append(ontology.HAS_ENTITY_TYPE.URI).append(
-            "> ");
-        queryBuilder.append("{\"").append(entityType).append("\"}");
-        return queryBuilder.toString();
-    }
-
     private static String convertStringSetForInClause(Collection<String> target) {
         StringBuilder inClauseBuilder = new StringBuilder();
         inClauseBuilder.append("(");
@@ -457,61 +298,6 @@ public class TripleStoreQueryService {
         return inClauseBuilder.toString();
     }
 
-    private String generateRelatedEntitySearchQuery(
-            URI owningEntityURI,
-            String relatedEntityVariableName) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(relatedEntityVariableName).append(
-            " ").append(NEW_LINE);
-        // _e hasDirectRelationshipTo relatedEntityURI
-        queryBuilder.append("FROM {<").append(owningEntityURI).append(">} ");
-        queryBuilder.append("<").append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(
-            ">");
-        queryBuilder.append(" {").append(relatedEntityVariableName).append("}").append(
-            NEW_LINE);
-        return queryBuilder.toString();
-    }
-
-    /**
-     * <p>
-     * Produces the list of all triples required to rebuild all entity keys
-     * related to owningEntityURI through a HAS_KEYED_RELATIONSHIP predicate.
-     * </p>
-     * 
-     * @param owningEntityURI the target entity URI
-     * @return the resulting triples
-     * @throws RepositoryException error while running the query
-     */
-    List<Statement> findRelatedEntityKeyStatements(URI owningEntityURI)
-            throws RepositoryException {
-        try {
-            GraphQuery graphQuery =
-                conn.prepareGraphQuery(
-                    QueryLanguage.SERQL,
-                    generateRelatedEntityKeyConstructQuery(owningEntityURI));
-            GraphQueryResult result = graphQuery.evaluate();
-            List<Statement> statements = new LinkedList<Statement>();
-            try {
-                while (result.hasNext()) {
-                    Statement statement = result.next();
-                    log.info(statement.getSubject() + " "
-                        + statement.getPredicate() + " "
-                        + statement.getObject());
-                    statements.add(statement);
-
-                }
-            } finally {
-                result.close();
-            }
-            return statements;
-        } catch (MalformedQueryException e) {
-            throw new RepositoryException(e);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException(e);
-        }
-
-    }
-
     private String generateEntitySearchQuery(
             String contentId,
             String entityURIVariableName) {
@@ -523,57 +309,6 @@ public class TripleStoreQueryService {
         queryBuilder.append("<").append(ontology.HAS_CONTENT_ID.URI).append(">");
         queryBuilder.append(" {\"").append(contentId).append("\"}").append(
             NEW_LINE);
-        return queryBuilder.toString();
-    }
-
-    private String generateRelatedEntityKeyConstructQuery(URI owningEntityURI) {
-        StringBuilder queryBuilder = new StringBuilder();
-        String relatedEntityVariable = "{relEntity}";
-        String relatedKeyVariable = "{relKey}";
-        String relatedKeyTypeVariable = "{relKeyType}";
-        String relatedKeyFieldVariable = "{keyField}";
-        String relatedKeyFieldIdVariable = "{fieldId}";
-        String relatedKeyFieldValueVariable = "{fieldValue}";
-        // CONSTRUCT {relEntity} hasKey {relKey}
-        queryBuilder.append("CONSTRUCT ").append(relatedEntityVariable).append(
-            " <").append(ontology.HAS_KEY.URI).append("> ").append(
-            relatedKeyVariable).append(",").append(NEW_LINE);
-        // {relKey} hasKeyType {keyType};
-        queryBuilder.append(relatedKeyVariable).append(" <").append(
-            ontology.HAS_KEY_TYPE.URI).append("> ").append(
-            relatedKeyTypeVariable).append(";").append(NEW_LINE);
-        // hasKeyField {keyField},
-        queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append(
-            "> ").append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
-        // {keyField} hasFieldId {fieldId};
-        queryBuilder.append(relatedKeyFieldVariable).append(" <").append(
-            ontology.HAS_FIELD_NAME.URI).append("> ").append(
-            relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
-        // hasFieldValue {fieldVAlue}
-        queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append(
-            "> ").append(relatedKeyFieldValueVariable).append(NEW_LINE);
-        // FROM {owningEntity hasDirectRelationshipTo {relEntity},
-        queryBuilder.append("FROM {<").append(owningEntityURI).append(">} <").append(
-            ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append("> ").append(
-            relatedEntityVariable).append(",").append(NEW_LINE);
-        // {relEntity} hasKey {relKey}
-        queryBuilder.append(relatedEntityVariable).append(" <").append(
-            ontology.HAS_KEY.URI).append("> ").append(relatedKeyVariable).append(
-            ",").append(NEW_LINE);
-        // {relKey} hasKeyType {keyType};
-        queryBuilder.append(relatedKeyVariable).append(" <").append(
-            ontology.HAS_KEY_TYPE.URI).append("> ").append(
-            relatedKeyTypeVariable).append(";").append(NEW_LINE);
-        // hasKeyField {keyField},
-        queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append(
-            "> ").append(relatedKeyFieldVariable).append(",").append(NEW_LINE);
-        // {keyField} hasFieldId {fieldId};
-        queryBuilder.append(relatedKeyFieldVariable).append(" <").append(
-            ontology.HAS_FIELD_NAME.URI).append("> ").append(
-            relatedKeyFieldIdVariable).append(";").append(NEW_LINE);
-        // hasFieldValue {fieldVAlue}
-        queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append(
-            "> ").append(relatedKeyFieldValueVariable);
         return queryBuilder.toString();
     }
 
@@ -634,52 +369,6 @@ public class TripleStoreQueryService {
         }
         
         return queryBuilder.toString();
-    }
-
-    /**
-     * Helper method to find the context associated with the triples necessary
-     * to re-constitute an entity
-     * 
-     * @param entityURI the target entity
-     * @return the context associated with the target entity
-     * @throws RepositoryException error while executing query
-     */
-    public Resource findEntityContext(URI entityURI)
-            throws RepositoryException {
-        try {
-            StringBuilder queryBuilder = new StringBuilder();
-            String sourceVariableName = "source";
-            queryBuilder.append("SELECT source FROM CONTEXT ").append(
-                sourceVariableName).append(" {<");
-            queryBuilder.append(entityURI).append(">} ");
-            queryBuilder.append("<").append(RDF.TYPE).append("> ");
-            queryBuilder.append("{<").append(ontology.ENTITY_CLASS.URI).append(
-                ">} ");
-            TupleQuery tupleQuery =
-                conn.prepareTupleQuery(
-                    QueryLanguage.SERQL,
-                    queryBuilder.toString());
-            TupleQueryResult result = tupleQuery.evaluate();
-            BindingSet resultSet = null;
-            int resultSize = 0;
-            while (result.hasNext()) {
-                if (resultSize > 1) {
-                    throw new NonUniqueResultException();
-                }
-                resultSet = result.next();
-                resultSize++;
-            }
-            if (resultSet != null) {
-                Value entityContextURI = resultSet.getValue(sourceVariableName);
-                return factory.createBNode(entityContextURI.stringValue());
-            }
-            return null;
-        } catch (MalformedQueryException e) {
-            throw new RepositoryException(e);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException(e);
-        }
-
     }
 
 }
