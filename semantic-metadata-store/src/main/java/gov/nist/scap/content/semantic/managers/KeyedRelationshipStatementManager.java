@@ -37,6 +37,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -65,6 +66,7 @@ public class KeyedRelationshipStatementManager implements
 	
 	@Override
 	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+	    RepositoryConnection conn = null;
         try {
             StringBuilder queryBuilder = new StringBuilder();
             String relType = "_relType";
@@ -72,8 +74,9 @@ public class KeyedRelationshipStatementManager implements
             queryBuilder.append("SELECT ").append(relType).append(", ").append(relatedEntity).append(" FROM ").append("\n");
             queryBuilder.append("{<").append(owningEntityURI).append(">} ").append(relType).append(" {").append(relatedEntity).append("},").append("\n");
             queryBuilder.append("{").append(relType).append("} ").append("<").append(RDFS.SUBPROPERTYOF).append(">").append(" {<").append(ontology.HAS_KEYED_RELATIONSHIP_TO.URI).append(">}").append("\n");
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -92,6 +95,9 @@ public class KeyedRelationshipStatementManager implements
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null )
+                conn.close();
         }
 
 	}

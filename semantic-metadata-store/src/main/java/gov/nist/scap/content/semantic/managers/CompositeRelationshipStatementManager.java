@@ -43,6 +43,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -70,6 +71,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
 	
 	@Override
 	public void populateEntity(EntityBuilder builder) throws RepositoryException {
+	    RepositoryConnection conn = null;
         try {
             StringBuilder queryBuilder = new StringBuilder();
             String relType = "_relType";
@@ -77,8 +79,9 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
             queryBuilder.append("SELECT DISTINCT ").append(relType).append(", ").append(relatedEntity).append(" FROM ").append("\n");
             queryBuilder.append("{<").append(owningEntityURI).append(">} ").append(relType).append(" {").append(relatedEntity).append("},").append("\n");
             queryBuilder.append("{").append(relType).append("} ").append("<").append(RDFS.SUBPROPERTYOF).append(">").append(" {<").append(ontology.HAS_COMPOSITE_RELATIONSHIP_TO.URI).append(">}").append("\n");
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -98,7 +101,7 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
             queryBuilder.append("SELECT DISTINCT ").append(relatedEntity).append(" FROM ").append("\n");
             queryBuilder.append("{<").append(owningEntityURI).append(">} ").append("<").append(ontology.HAS_PARENT_RELATIONSHIP_TO.URI).append(">").append(" {").append(relatedEntity).append("}").append("\n");
             tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             result = tupleQuery.evaluate();
@@ -115,6 +118,10 @@ public class CompositeRelationshipStatementManager implements RegenerationStatem
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null ) {
+                conn.close();
+            }
         }
 	}
 	

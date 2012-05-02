@@ -46,6 +46,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -93,6 +94,7 @@ public class KeyStatementManager implements RegenerationStatementManager {
      */
     public IKey produceKey() throws RepositoryException {
 
+        RepositoryConnection conn = null;
         try {
             StringBuilder queryBuilder = new StringBuilder();
             String entityTypeVar = "_entityType";
@@ -106,8 +108,9 @@ public class KeyStatementManager implements RegenerationStatementManager {
             queryBuilder.append("<").append(ontology.HAS_FIELD_DATA.URI).append(">").append(" {_fieldBNode},").append("\n");
             queryBuilder.append("{_fieldBNode}").append("<").append(ontology.HAS_FIELD_NAME.URI).append(">").append(" {").append(fieldName).append("};").append("\n");
             queryBuilder.append("<").append(ontology.HAS_FIELD_VALUE.URI).append(">").append(" {").append(fieldValue).append("}").append("\n");
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -131,6 +134,9 @@ public class KeyStatementManager implements RegenerationStatementManager {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null )
+                conn.close();
         }
 
         if( entityType != null ) {

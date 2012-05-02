@@ -34,6 +34,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -60,6 +61,7 @@ public class VersionStatementManager implements RegenerationStatementManager {
 	public void populateEntity(EntityBuilder builder) throws RepositoryException {
         //TODO does version type need to be read from the triple store?
 
+	    RepositoryConnection conn = null;
 	    try {
     	    StringBuilder queryBuilder = new StringBuilder();
             String versionType = "_versionType";
@@ -68,8 +70,9 @@ public class VersionStatementManager implements RegenerationStatementManager {
             queryBuilder.append("{<").append(owningEntityURI).append(">} ").append("<").append(ontology.HAS_VERSION.URI).append(">").append(" {_versionBNode},").append("\n");
             queryBuilder.append("{_versionBNode}").append("<").append(ontology.HAS_VERSION_TYPE.URI).append(">").append(" {").append(versionType).append("};").append("\n");
             queryBuilder.append("<").append(ontology.HAS_VERSION_VALUE.URI).append(">").append(" {").append(versionValue).append("}").append("\n");
+            conn = ipc.getRepository().getConnection();
             TupleQuery tupleQuery =
-                ipc.getRepository().getConnection().prepareTupleQuery(
+                conn.prepareTupleQuery(
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
@@ -85,6 +88,9 @@ public class VersionStatementManager implements RegenerationStatementManager {
             throw new RepositoryException(e);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
+        } finally {
+            if( conn != null )
+                conn.close();
         }
 
 
