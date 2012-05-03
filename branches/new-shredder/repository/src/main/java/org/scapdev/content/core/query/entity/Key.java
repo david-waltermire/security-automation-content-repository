@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.scapdev.content.core.query.IQueryVisitor;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class Key implements IEntityConstruct {
-	private final String type;
-	private final List<Field> fields;
-	
 
 	public static Key key(String type, Field...fields) {
 		return new Key(type, fields);
@@ -18,9 +20,17 @@ public class Key implements IEntityConstruct {
 		return new Field(name, value);
 	}
 
+	private final String type;
+	private final List<Field> fields;
+
 	public Key(String type, Field...fields) {
+		this(type, Arrays.asList(fields));
+	}
+
+	@JsonCreator
+	public Key(@JsonProperty("type") String type, @JsonProperty("fields") List<Field> fields) {
 		this.type = type;
-		this.fields = Arrays.asList(fields);
+		this.fields = fields;
 	}
 
 	public String getType() {
@@ -31,11 +41,16 @@ public class Key implements IEntityConstruct {
 		return Collections.unmodifiableList(fields);
 	}
 
+	public <RESULT> RESULT visit(IQueryVisitor<RESULT, EntityContext> visitor) {
+		return visitor.visit(this);
+	}
+
 	public static class Field {
 		private final String name;
 		private final String value;
 
-		public Field(String name, String value) {
+		@JsonCreator
+		public Field(@JsonProperty("name") String name, @JsonProperty("value") String value) {
 			this.name = name;
 			this.value = value;
 		}

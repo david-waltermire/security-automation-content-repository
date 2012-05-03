@@ -149,7 +149,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         target.add(valueFactory.createStatement(
             resourceId,
             ontology.HAS_ENTITY_TYPE.URI,
-            valueFactory.createLiteral(entity.getDefinition().getId())));
+            valueFactory.createURI(entity.getDefinition().getId())));
         if (entity.getParent() != null) {
             target.add(valueFactory.createStatement(
                 resourceId,
@@ -192,7 +192,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         target.add(valueFactory.createStatement(
             key,
             ontology.HAS_KEY_TYPE.URI,
-            valueFactory.createLiteral(entityKeyId)));
+            valueFactory.createURI(entityKeyId)));
         for (Map.Entry<String, String> keyFieldEntry : fieldNameToValueMap.entrySet()) {
             BNode keyField = valueFactory.createBNode();
             target.add(valueFactory.createStatement(

@@ -72,7 +72,7 @@ public class ToRDFRelationshipVisitor implements IRelationshipVisitor {
         target.add(valueFactory.createStatement(
             boundaryObjectURI,
             ontology.HAS_BOUNDARY_OBJECT_TYPE.URI,
-            valueFactory.createLiteral(externalIdentifier.getId())));
+            valueFactory.createURI(externalIdentifier.getId())));
         target.add(valueFactory.createStatement(
             boundaryObjectURI,
             ontology.HAS_BOUNDARY_OBJECT_VALUE.URI,

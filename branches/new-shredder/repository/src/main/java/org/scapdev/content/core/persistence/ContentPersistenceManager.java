@@ -37,9 +37,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
+import org.scapdev.content.core.query.entity.EntityQuery;
 
 
 public interface ContentPersistenceManager {
+	Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException;
 	/**
 	 * 
 	 * @param key

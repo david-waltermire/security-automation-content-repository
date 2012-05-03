@@ -1,14 +1,24 @@
 package org.scapdev.content.core.query;
 
-import org.scapdev.content.core.query.entity.IEntityConstruct;
-import org.scapdev.content.core.query.relationship.IRelationshipConstruct;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Type implements IEntityConstruct, IRelationshipConstruct {
-	public static Type type(String type) {
-		return new Type(type);
+
+
+public class Type<CONTEXT extends IContext<CONTEXT>> implements IConstruct<CONTEXT> {
+	private final String type;
+
+	@JsonCreator
+	public Type(@JsonProperty("type") String type) {
+		this.type = type;
 	}
 
-	public Type(String type) {
-		// TODO Auto-generated constructor stub
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public <RESULT> RESULT visit(IQueryVisitor<RESULT, CONTEXT> visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -59,6 +59,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
@@ -74,6 +75,8 @@ import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
+import org.scapdev.content.core.query.entity.EntityQuery;
+import org.scapdev.content.core.query.sparql.EntityQueryParser;
 
 /**
  * At this point this is just going to be a facade into the triple store REST
@@ -293,6 +296,40 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         }
 
     }
+
+	@Override
+	public Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException {
+        try {
+            RepositoryConnection conn = repository.getConnection();
+            try {
+            	TupleQuery tupleQuery = EntityQueryParser.parse(query, conn);
+
+            	TupleQueryResult result = tupleQuery.evaluate();
+            	Set<URI> uris = new HashSet<URI>();
+                while (result.hasNext()) {
+                	Value value = result.next().getValue(EntityQueryParser.ENTITY_URI_VARIABLE_NAME);
+                	uris.add((URI)value);
+                }
+                Set<IEntity<?>> returnSet = new HashSet<IEntity<?>>();
+                for (URI u : uris) {
+                    returnSet.add(new EntityProxy<IEntityDefinition, IEntity<IEntityDefinition>>(
+                        this,
+                        u));
+                }
+                return Collections.unmodifiableCollection(returnSet);
+            } catch (QueryEvaluationException e) {
+            	throw new ProcessingException(e);
+			} catch (MalformedQueryException e) {
+            	throw new ProcessingException(e);
+			} finally {
+                conn.close();
+            }
+
+        } catch (RepositoryException e) {
+            log.error(e);
+        	throw new ProcessingException(e);
+        }
+	}
 
     @Override
     public Collection<? extends IKeyedEntity<?>> getEntities(
