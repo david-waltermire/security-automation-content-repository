@@ -42,6 +42,7 @@ import java.util.Set;
 
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.IEntityFilter;
+import org.scapdev.content.core.query.entity.EntityQuery;
 
 //import org.scapdev.content.core.query.EntityStatistic;
 
@@ -65,6 +66,11 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 			retval = entities;
 		}
 		return retval;
+	}
+
+	@Override
+	public Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException {
+		return metadataStore.getEntities(query);
 	}
 
 	@Override

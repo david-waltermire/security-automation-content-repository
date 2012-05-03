@@ -1,21 +1,24 @@
 package org.scapdev.content.core.query.relationship;
 
-import org.scapdev.content.core.query.Conditional;
-import org.scapdev.content.core.query.IConditional;
+import org.scapdev.content.core.query.IConstruct;
+import org.scapdev.content.core.query.IQueryVisitor;
 import org.scapdev.content.core.query.entity.EntityContext;
-import org.scapdev.content.core.query.entity.IEntityConstruct;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class To extends EntityContext implements IRelationshipConstruct {
 
-	public To(IConditional<? extends IEntityConstruct> conditional) {
-		super(conditional);
+	public static To to(IConstruct<EntityContext> construct) {
+		return new To(construct);
 	}
 
-	public static To to(IEntityConstruct construct) {
-		return new To(new Conditional<IEntityConstruct>(Conditional.Form.CONJUNCTIVE, construct));
+	@JsonCreator
+	public To(@JsonProperty("construct") IConstruct<EntityContext> construct) {
+		super(construct);
 	}
 
-	public static To to(IConditional<? extends IEntityConstruct> conditional) {
-		return new To(conditional);
+	public <RESULT> RESULT visit(IQueryVisitor<RESULT, RelationshipContext> visitor) {
+		return visitor.visit(this);
 	}
 }

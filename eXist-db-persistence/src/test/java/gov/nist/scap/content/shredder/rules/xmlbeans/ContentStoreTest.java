@@ -23,7 +23,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

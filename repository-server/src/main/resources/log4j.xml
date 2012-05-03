@@ -33,15 +33,11 @@
 
 
   <logger name="gov.nist.scap.content.semantic.aspectj" additivity="false">
-    <level value="INFO"/>
+    <!-- Use TRACE for logging of statements -->
+    <level value="TRACE"/>
     <appender-ref ref="statements"/>
   </logger>
 
-  <logger name="org.openrdf.sail" additivity="false">
-    <level value="DEBUG"/>
-    <appender-ref ref="console"/>
-  </logger>
-  
   <!-- ========[ROOT logger]======== -->
   <root>
     <priority value="info"/>
