@@ -39,8 +39,9 @@
   </logger>
  -->
 
-  <logger name="org.apache.cxf" additivity="false">
-    <level value="TRACE"/>
+<!-- Setting package to WARN because it has a background thread that logs to INFO periodically -->
+  <logger name="org.exist.statistics" additivity="false">
+    <level value="WARN"/>
     <appender-ref ref="console"/>
   </logger>
  
