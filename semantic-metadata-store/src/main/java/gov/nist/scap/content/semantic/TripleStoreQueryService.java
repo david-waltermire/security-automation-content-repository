@@ -48,16 +48,12 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A service class to provide any triple store searching related services
  */
 public class TripleStoreQueryService {
     private static final String NEW_LINE = System.getProperty("line.separator");
-    private static final Logger log =
-        LoggerFactory.getLogger(TripleStoreQueryService.class);
 
     private ValueFactory factory;
 

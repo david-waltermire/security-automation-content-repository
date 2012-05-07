@@ -16,9 +16,12 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -41,6 +44,9 @@ public class ContentRepoRest {
 
 	private ContentPersistenceManager contentRepo;
 	private ContentShredder shredder;
+	
+	private static final Pattern httpCharsetPattern = Pattern.compile("charset=(\\S+)");
+	private static final Pattern xmlCharsetPattern = Pattern.compile("^\\s*\\<\\?xml[\\s\\S]+encoding\\s*=[\"'](\\S+)[\"'][\\s\\S]*\\?\\>");
 
 	private static ConfigurableApplicationContext context;
 
@@ -60,12 +66,34 @@ public class ContentRepoRest {
 	@Path("submit")
 	@Consumes("text/xml")
 	@Produces("text/xml")
-	public Object submit(InputStream is) {
+	public Object submit(@HeaderParam("Content-Type") String contentType, InputStream is) {
 
 		try {
+			String encoding = null;
+			if( contentType != null ) {
+				Matcher m = httpCharsetPattern.matcher(contentType);
+				if( m.find() ) {
+					 encoding = m.group(1);
+				}
+			}
+			
+			if( encoding == null ) {
+				
+				byte[] bArray = new byte[1024]; //the XML header should complete within the first kilobyte
+				int readLength = is.read(bArray);
+				Matcher m = xmlCharsetPattern.matcher(new String(bArray));
+				if( m.find() ) {
+					 encoding = m.group(1);
+				}
+				is = new PassThroughInputStream(is, bArray, readLength);
+			}
+			
+			if( encoding == null ) {
+				encoding = "UTF-8"; //the default encoding for XML
+			}
 			ContentHandler handler = (ContentHandler) context
 					.getBean("defaultContentHandler");
-			shredder.shred(is, handler);
+			shredder.shred(is, encoding, handler);
 			List<String> storedEntities = contentRepo.storeEntities(handler
 					.getEntities());
 

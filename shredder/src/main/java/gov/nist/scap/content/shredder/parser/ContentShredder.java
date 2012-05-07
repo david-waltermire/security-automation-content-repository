@@ -4,9 +4,11 @@ import gov.nist.scap.content.model.definitions.IDocumentDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.model.definitions.RuleDefinitions;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.xml.namespace.QName;
 
@@ -29,7 +31,12 @@ public class ContentShredder {
 	}
 
     public void shred(InputStream is, ContentHandler contentHandler) throws XmlException, IOException, ProcessingException {
-        shred(XmlObject.Factory.parse(is), contentHandler);
+    	this.shred(is, "UTF-8", contentHandler);
+    }
+    
+    public void shred(InputStream is, String encoding, ContentHandler contentHandler) throws XmlException, IOException, ProcessingException {
+    	BufferedReader lnr = new BufferedReader(new InputStreamReader(is, encoding));
+        shred(XmlObject.Factory.parse(lnr), contentHandler);
     }
 	
 	public void shred(XmlObject obj, ContentHandler contentHandler) throws ProcessingException {
