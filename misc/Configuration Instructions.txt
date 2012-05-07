@@ -1,0 +1,6 @@
+1) After building repository-server, copy the JARs from repository-server/target/endorsed into the endorsed folder on the target application server.
+2) Ensure that the target folder from step 1 is configured as an endorsed folder for the JVM when lanuching the application server (e.g. set -Djava.endorsed.dirs="<target folder>" as a JVM argument when launching the application server).
+3) Extract the ZIP file misc/exist-db-data.zip to c:\temp\exist-db-data.
+4) In c:\temp, create an empty folder called "triple-store".
+5) Start up the application server and deploy repository-server/target/repository-server-<version>.war to the server.
+6) Go to http://<host>:<port>/<context>/ws?_wadl to get a listing of services and endpoints.
