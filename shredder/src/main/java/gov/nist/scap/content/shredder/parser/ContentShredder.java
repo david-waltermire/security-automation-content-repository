@@ -10,13 +10,14 @@ import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContentShredder {
-	private static final Logger log = Logger.getLogger(ContentShredder.class);
+	private static final Logger log = LoggerFactory.getLogger(ContentShredder.class);
 	private final RuleDefinitions ruleDefinitions;
 
 	public ContentShredder(RuleDefinitions ruleDefinitions) {

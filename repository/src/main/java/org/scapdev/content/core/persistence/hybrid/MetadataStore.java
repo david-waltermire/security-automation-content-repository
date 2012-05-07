@@ -42,7 +42,7 @@ import org.scapdev.content.core.query.entity.EntityQuery;
 
 public interface MetadataStore {
 
-	Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException;
+	<T  extends IEntity<?>> Collection<? extends T> getEntities(EntityQuery query, Class<T> clazz) throws ProcessingException;
 
 	/**
 	 * 

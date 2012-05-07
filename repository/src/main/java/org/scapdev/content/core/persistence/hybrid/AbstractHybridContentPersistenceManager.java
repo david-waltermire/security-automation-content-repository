@@ -43,6 +43,8 @@ import java.util.Set;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.IEntityFilter;
 import org.scapdev.content.core.query.entity.EntityQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import org.scapdev.content.core.query.EntityStatistic;
 
@@ -50,6 +52,8 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 
 	private final MetadataStore metadataStore;
 	private final ContentStore contentStore;
+	
+	private static final Logger log = LoggerFactory.getLogger(AbstractHybridContentPersistenceManager.class);
 
 	public AbstractHybridContentPersistenceManager(MetadataStore metadataStore, ContentStore contentStore) {
 		this.metadataStore = metadataStore;
@@ -70,7 +74,8 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
 
 	@Override
 	public Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException {
-		return metadataStore.getEntities(query);
+	    throw new UnsupportedOperationException();
+		//return metadataStore.getEntities(query);
 	}
 
 	@Override

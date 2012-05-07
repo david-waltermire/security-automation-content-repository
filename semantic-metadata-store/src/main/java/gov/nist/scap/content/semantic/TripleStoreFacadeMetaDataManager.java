@@ -23,6 +23,7 @@
  ******************************************************************************/
 package gov.nist.scap.content.semantic;
 
+import static org.scapdev.content.core.query.entity.EntityQuery.selectEntitiesWith;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IKey;
@@ -44,6 +45,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,7 +59,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -76,7 +78,10 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
 import org.scapdev.content.core.persistence.hybrid.MetadataStore;
 import org.scapdev.content.core.query.entity.EntityQuery;
+import org.scapdev.content.core.query.entity.Key;
 import org.scapdev.content.core.query.sparql.EntityQueryParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * At this point this is just going to be a facade into the triple store REST
@@ -93,7 +98,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             + ".RulesFile";
 
     private static final Logger log =
-        Logger.getLogger(TripleStoreFacadeMetaDataManager.class);
+        LoggerFactory.getLogger(TripleStoreFacadeMetaDataManager.class);
     private static final String BASE_URI =
         "http://scap.nist.gov/resource/content/individuals#";
 
@@ -262,22 +267,22 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
      * @param sparql
      * @return
      */
-    public List<SortedMap<String, String>> runSPARQL(String sparql) throws RepositoryException {
+    public List<SortedMap<String, String>> runSPARQL(String sparql)
+            throws RepositoryException {
         try {
             RepositoryConnection conn = repository.getConnection();
             TupleQuery tupleQuery =
-                conn.prepareTupleQuery(
-                    QueryLanguage.SPARQL,
-                    sparql);
+                conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql);
             TupleQueryResult result = tupleQuery.evaluate();
             try {
                 List<SortedMap<String, String>> returnVal =
                     new LinkedList<SortedMap<String, String>>();
                 BindingSet bs;
                 while (result.hasNext()) {
-                    SortedMap<String, String> sm = new TreeMap<String, String>();
+                    SortedMap<String, String> sm =
+                        new TreeMap<String, String>();
                     bs = result.next();
-                    for( String key : bs.getBindingNames() ) {
+                    for (String key : bs.getBindingNames()) {
                         sm.put(key, bs.getValue(key).stringValue());
                     }
                     returnVal.add(sm);
@@ -297,65 +302,99 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
     }
 
-	@Override
-	public Collection<? extends IEntity<?>> getEntities(EntityQuery query) throws ProcessingException {
+    @Override
+    public <T extends IEntity<?>> Collection<? extends T> getEntities(
+            EntityQuery query,
+            Class<T> clazz) throws ProcessingException {
         try {
             RepositoryConnection conn = repository.getConnection();
             try {
-            	TupleQuery tupleQuery = EntityQueryParser.parse(query, conn);
+                Constructor<T> c =
+                    clazz.getConstructor(IPersistenceContext.class, URI.class);
 
-            	TupleQueryResult result = tupleQuery.evaluate();
-            	Set<URI> uris = new HashSet<URI>();
+                TupleQuery tupleQuery = EntityQueryParser.parse(query, conn);
+
+                TupleQueryResult result = tupleQuery.evaluate();
+                Set<URI> uris = new HashSet<URI>();
                 while (result.hasNext()) {
-                	Value value = result.next().getValue(EntityQueryParser.ENTITY_URI_VARIABLE_NAME);
-                	uris.add((URI)value);
+                    Value value =
+                        result.next().getValue(
+                            EntityQueryParser.ENTITY_URI_VARIABLE_NAME);
+                    uris.add((URI)value);
                 }
-                Set<IEntity<?>> returnSet = new HashSet<IEntity<?>>();
+                Set<T> returnSet = new HashSet<T>();
                 for (URI u : uris) {
-                    returnSet.add(new EntityProxy<IEntityDefinition, IEntity<IEntityDefinition>>(
-                        this,
-                        u));
+                    returnSet.add(c.newInstance(this, u));
                 }
                 return Collections.unmodifiableCollection(returnSet);
             } catch (QueryEvaluationException e) {
-            	throw new ProcessingException(e);
-			} catch (MalformedQueryException e) {
-            	throw new ProcessingException(e);
-			} finally {
-                conn.close();
-            }
-
-        } catch (RepositoryException e) {
-            log.error(e);
-        	throw new ProcessingException(e);
-        }
-	}
-
-    @Override
-    public Collection<? extends IKeyedEntity<?>> getEntities(
-            IKey key,
-            IVersion version) throws ProcessingException {
-        // TODO: Adam: add support for version and enable multiple entities to
-        // be returned
-        try {
-            RepositoryConnection conn = repository.getConnection();
-            try {
-                Set<URI> uris = queryService.findEntityURIs(key, version);
-                Set<IKeyedEntity<?>> returnSet = new HashSet<IKeyedEntity<?>>();
-                for (URI u : uris) {
-                    returnSet.add(new KeyedEntityProxy<IKeyedEntityDefinition, IKeyedEntity<IKeyedEntityDefinition>>(
-                        this,
-                        u));
-                }
-                return Collections.unmodifiableCollection(returnSet);
+                throw new ProcessingException(e);
+            } catch (MalformedQueryException e) {
+                throw new ProcessingException(e);
+            } catch (SecurityException e) {
+                throw new ProcessingException(e);
+            } catch (NoSuchMethodException e) {
+                throw new ProcessingException(
+                    "Class "
+                        + clazz.getCanonicalName()
+                        + " must have a constructor that takes (gov.nist.scap.content.semantic.IPersistenceContext ipc, org.openrdf.model.URI entityURI)",
+                    e);
+            } catch (IllegalArgumentException e) {
+                throw new ProcessingException(e);
+            } catch (InstantiationException e) {
+                throw new ProcessingException(e);
+            } catch (IllegalAccessException e) {
+                throw new ProcessingException(e);
+            } catch (InvocationTargetException e) {
+                throw new ProcessingException(e);
             } finally {
                 conn.close();
             }
 
         } catch (RepositoryException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
+            throw new ProcessingException(e);
         }
-        return null;
+    }
+
+    @Override
+    public Collection<? extends IKeyedEntity<?>> getEntities(
+            IKey key,
+            IVersion version) throws ProcessingException {
+        // try {
+        // RepositoryConnection conn = repository.getConnection();
+        // try {
+        // Set<URI> uris = queryService.findEntityURIs(key, version);
+        // Set<IKeyedEntity<?>> returnSet = new HashSet<IKeyedEntity<?>>();
+        // for (URI u : uris) {
+        // returnSet.add(new KeyedEntityProxy<IKeyedEntityDefinition,
+        // IKeyedEntity<IKeyedEntityDefinition>>(
+        // this,
+        // u));
+        // }
+        // return Collections.unmodifiableCollection(returnSet);
+        // } finally {
+        // conn.close();
+        // }
+        //
+        // } catch (RepositoryException e) {
+        // log.error(e);
+        // }
+        // return null;
+
+        List<Key.Field> fields = new LinkedList<Key.Field>();
+        for (String fieldName : key.getFieldNames()) {
+            fields.add(Key.field(fieldName, key.getValue(fieldName)));
+        }
+        Key qKey = Key.key(key.getId(), fields.toArray(new Key.Field[0]));
+
+        if (version != null) {
+            //TODO add version
+        }
+        EntityQuery query = selectEntitiesWith(qKey);
+        @SuppressWarnings("unchecked")
+        Collection<? extends KeyedEntityProxy<?,?>> coll = (Collection<? extends KeyedEntityProxy<?,?>>)getEntities(query, KeyedEntityProxy.class);
+        return coll;
     }
 
     @Override
@@ -375,7 +414,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             }
 
         } catch (RepositoryException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
         return null;
     }
@@ -398,17 +437,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 return findEntityKeys(entityURIs, this);
 
             } catch (MalformedQueryException e) {
-                log.error(e);
+                log.error(e.getMessage(), e);
                 throw new RuntimeException(e);
             } catch (QueryEvaluationException e2) {
-                log.error(e2);
+                log.error(e2.getMessage(), e2);
                 throw new RuntimeException(e2);
             } finally {
                 conn.close();
             }
 
         } catch (RepositoryException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
         return null;
     }
@@ -445,7 +484,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
             conn.setAutoCommit(false);
             if (session != null) {
                 sessionMap.put(session, conn);
-            } 
+            }
             try {
                 EntityMetadataMap emm =
                     new DefaultURIToEntityMap(
@@ -466,7 +505,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 }
             }
         } catch (RepositoryException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
         return returnVal;
     }
@@ -479,7 +518,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 conn.commit();
                 conn.close();
             } catch (RepositoryException e) {
-                log.error(e);
+                log.error(e.getMessage(), e);
                 return false;
             }
             return true;
@@ -496,7 +535,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
                 conn.rollback();
                 conn.close();
             } catch (RepositoryException e) {
-                log.error(e);
+                log.error(e.getMessage(), e);
                 return false;
             }
             return true;
@@ -529,7 +568,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
         try {
             repository.shutDown();
         } catch (RepositoryException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
     }
 
