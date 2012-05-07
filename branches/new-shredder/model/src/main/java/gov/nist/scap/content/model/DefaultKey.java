@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A key is a collection of identification fields that form a compound index. In
@@ -20,7 +21,7 @@ import org.apache.log4j.Logger;
  * @see IElement
  */
 class DefaultKey implements IKey {
-	private static final Logger log = Logger.getLogger(DefaultKey.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultKey.class);
 	private final String id;
 	private final LinkedHashMap<String, String> idToValueMap;
 

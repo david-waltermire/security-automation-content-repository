@@ -25,10 +25,11 @@ package org.scapdev.content.util;
 
 import java.util.ServiceLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceLoaderUtil {
-	private static final Logger log = Logger.getLogger(ServiceLoaderUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(ServiceLoaderUtil.class);
 
 	/**
 	 * Loads a service instance using the Java SPI. The service class instance

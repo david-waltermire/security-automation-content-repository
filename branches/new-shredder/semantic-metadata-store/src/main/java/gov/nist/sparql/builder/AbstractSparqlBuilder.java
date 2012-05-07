@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.Logger;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.MalformedQueryException;
@@ -17,9 +16,11 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSparqlBuilder {
-	private static final Logger log = Logger.getLogger(AbstractSparqlBuilder.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractSparqlBuilder.class);
 
 	private static final String PN_CHARS_BASE = "[A-Z]|[a-z]|[\u00C0-\u00D6]|[\u00D8-\u00F6]|[\u00F8-\u02FF]|[\u0370-\u037D]|[\u037F-\u1FFF]|[\u200C-\u200D]|[\u2070-\u218F]|[\u2C00-\u2FEF]|[\u3001-\uD7FF]|[\uF900-\uFDCF]|[\uFDF0-\uFFFD]|[\u10000-\uEFFFF]";
 	private static final String PN_CHARS_U = PN_CHARS_BASE+"|_";
@@ -68,6 +69,8 @@ public abstract class AbstractSparqlBuilder {
 		Integer currentValue = varMap.get(nameBase);
 		if (currentValue == null) {
 			currentValue = Integer.valueOf(1);
+		} else {
+		    currentValue++;
 		}
 
 		String name = nameBase+currentValue.toString();

@@ -6,7 +6,7 @@
 
 
 
-  <bean id="defaultLocalRepository" class="org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager">
+  <bean id="defaultLocalRepository" class="org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager" destroy-method="shutdown">
     <constructor-arg ref="defaultLocalMetadataStore" />
     <constructor-arg ref="defaultLocalContentStore" />
   </bean>
@@ -27,7 +27,7 @@
       </bean>
     </constructor-arg>
     <!-- <constructor-arg><null/></constructor-arg> -->
-    <constructor-arg value="target"/>
+    <constructor-arg value="${metadata.store.home}"/>
     <constructor-arg value="/rules.xml"/>
   </bean>
   

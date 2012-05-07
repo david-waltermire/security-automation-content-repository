@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -49,6 +48,8 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service class to provide any triple store searching related services
@@ -56,7 +57,7 @@ import org.openrdf.repository.RepositoryException;
 public class TripleStoreQueryService {
     private static final String NEW_LINE = System.getProperty("line.separator");
     private static final Logger log =
-        Logger.getLogger(TripleStoreQueryService.class);
+        LoggerFactory.getLogger(TripleStoreQueryService.class);
 
     private ValueFactory factory;
 

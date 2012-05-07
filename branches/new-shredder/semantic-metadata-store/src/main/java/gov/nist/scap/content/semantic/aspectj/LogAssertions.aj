@@ -1,15 +1,16 @@
 package gov.nist.scap.content.semantic.aspectj;
 
-import org.apache.log4j.Logger;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public aspect LogAssertions {
 
-    private static final Logger log = Logger.getLogger(LogAssertions.class);
+    private static final Logger log = LoggerFactory.getLogger(LogAssertions.class);
 
     before(Iterable<? extends Statement> statements, Resource[] contexts): call(void org.openrdf.repository.RepositoryConnection.add(Iterable<? extends Statement>, Resource...)) && args(statements, contexts) {
         if (log.isTraceEnabled()) {

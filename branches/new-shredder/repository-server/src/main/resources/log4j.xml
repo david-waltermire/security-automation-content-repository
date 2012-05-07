@@ -31,13 +31,19 @@
     </layout>
   </appender>
 
-
-  <logger name="gov.nist.scap.content.semantic.aspectj" additivity="false">
     <!-- Use TRACE for logging of statements -->
+<!-- 
+  <logger name="gov.nist.scap.content.semantic.aspectj" additivity="false">
     <level value="TRACE"/>
     <appender-ref ref="statements"/>
   </logger>
+ -->
 
+  <logger name="org.apache.cxf" additivity="false">
+    <level value="TRACE"/>
+    <appender-ref ref="console"/>
+  </logger>
+ 
   <!-- ========[ROOT logger]======== -->
   <root>
     <priority value="info"/>

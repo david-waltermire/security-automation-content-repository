@@ -45,12 +45,13 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContentProcessor {
-	private static final Logger log = Logger.getLogger(ContentProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(ContentProcessor.class);
 
 	private final ContentHandler contentHandler;
 

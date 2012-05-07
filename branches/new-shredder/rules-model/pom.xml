@@ -36,10 +36,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>gov.nist.scap</groupId>
 			<artifactId>scap-signature</artifactId>
 			<scope>test</scope>

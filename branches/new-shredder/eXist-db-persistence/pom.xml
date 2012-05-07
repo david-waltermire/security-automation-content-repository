@@ -13,7 +13,7 @@
   <name>eXist-db Persistance Store</name>
 
   <properties>
-    <exist.data.dir>exist-data</exist.data.dir>
+    <exist.data.dir>c:\temp\exist-db-data</exist.data.dir>
   </properties>
   
   <dependencies>
@@ -33,6 +33,12 @@
       <artifactId>exist-db</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+      	<exclusion>
+      		<groupId>log4j</groupId>
+      		<artifactId>log4j</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -78,6 +84,18 @@
     	<groupId>gov.nist.scap</groupId>
     	<artifactId>scap-signature</artifactId>
     </dependency>
+    
+    <dependency>
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>slf4j-log4j12</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+      	<groupId>log4j</groupId>
+      	<artifactId>log4j</artifactId>
+	   	<scope>test</scope>
+    </dependency>
+    
   </dependencies>
   <build>
     <resources>
@@ -85,8 +103,70 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
+      <resource>
+      	<directory>src/main/exist-home</directory>
+      	<targetPath>target/test-classes</targetPath>
+      	<filtering>true</filtering>
+      </resource>
+      
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-exist-home</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/exist-home</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/exist-home</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-exist-home-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/exist-home</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-2</version>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/exist-home.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -147,7 +227,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed" -Dexist.home="${project.build.directory}/classes"</argLine>
+          <argLine>-Djava.endorsed.dirs="${project.build.directory}/endorsed"</argLine>
         </configuration>
       </plugin>
     </plugins>

@@ -625,7 +625,7 @@
           guidance is also appropriate for other Windows 7 editions. This guide draws on a large body of vendor
           knowledge and government and security community experience gained over many years of securing computer
             systems.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>This section of the guide is based largely on
-          the steps proposed in NIST’s FISMA Implementation Project for achieving more secure information systems.
+          the steps proposed in NIST's FISMA Implementation Project for achieving more secure information systems.
           Sections 2.1 and 2.2 address the need to categorize information and information systems. Each Windows 7 system
           can be classified as having one of three roles; each system can also be classified according to the potential
           impact caused by security breaches. Section 2.3 describes threats and provides examples of security controls
@@ -673,7 +673,7 @@
             resources with additional information are provided as needed.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>The classic model for information security defines three
             objectives of security: maintaining confidentiality, integrity, and availability. Confidentiality refers to
             protecting information from being accessed by unauthorized parties. Integrity refers to ensuring the
-            authenticity of information—that information is not altered, and that the source of the information is
+            authenticity of information-that information is not altered, and that the source of the information is
             genuine. Availability means that information is accessible by authorized users. Each objective addresses a
             different aspect of providing protection for information.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Determining how strongly a system needs to be protected is based largely on the type of information that
             the system processes and stores. For example, a system containing medical records probably needs much
@@ -714,7 +714,7 @@
             Limiting functionality and resolving security weaknesses have a common goal: give attackers as few
             opportunities as possible to breach a system.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Although
             each system should ideally be made as secure as possible, this is generally not feasible because the system
-            needs to meet the functional requirements of the system’s users. Another common problem with security
+            needs to meet the functional requirements of the system's users. Another common problem with security
             controls is that they often make systems less convenient or more difficult to use. When usability is an
             issue, many users will attempt to circumvent security controls; for example, if passwords must be long and
             complex, users may write them down. Balancing security, functionality, and usability is often a challenge.
@@ -734,7 +734,7 @@
           <xccdf:title>Baseline Security Controls and Threat Analysis Refinement</xccdf:title>
           <xccdf:description>To secure a system, it is essential first to define the threats that need to be mitigated.
             This knowledge of threats is also key to understanding the reasons the various configuration options have
-            been chosen in this guide. Most threats against data and resources are possible because of mistakes—either
+            been chosen in this guide. Most threats against data and resources are possible because of mistakes-either
             bugs in operating system and application software that create exploitable vulnerabilities, or errors made by
             users and administrators. Threats may involve intentional actors (e.g., an attacker who wants to access
             credit cards on a system) or unintentional actors (e.g., an administrator who forgets to disable user
@@ -855,12 +855,12 @@
                 <xhtml:ul xmlns:xhtml="http://www.w3.org/1999/xhtml">
                   <xhtml:li>
                     <xhtml:strong>Threat:</xhtml:strong> An authorized user with normal user-level rights escalates the
-                    account’s privileges to gain administrator-level access.</xhtml:li>
+                    account's privileges to gain administrator-level access.</xhtml:li>
                   <xhtml:li>
                     <xhtml:strong>Examples:</xhtml:strong>
                     <xhtml:ul>
                       <xhtml:li>A user takes advantage of a vulnerability in a service to gain administrator-level
-                        privileges and access another user’s files.</xhtml:li>
+                        privileges and access another user's files.</xhtml:li>
                       <xhtml:li>A user guesses the password for an administrator-level account, gains full access to the
                         system, and disables several security controls.</xhtml:li>
                     </xhtml:ul>
@@ -994,7 +994,7 @@
                         the user installs the game on her computer, the Trojan horse is also installed, which
                         compromises the system.</xhtml:li>
                       <xhtml:li>A user with administrative-level privileges surfs the Web and accidentally visits a
-                        malicious Web site, which successfully infects the user’s system.</xhtml:li>
+                        malicious Web site, which successfully infects the user's system.</xhtml:li>
                       <xhtml:li>A user installs and operates peer-to-peer (P2P) file sharing software to download music
                         files, and the P2P software installs spyware programs onto the system.</xhtml:li>
                       <xhtml:li>A user opens and executes a payload that was attached to a spam or spoofed
@@ -1014,7 +1014,7 @@
                         should be less likely to infect their systems.</xhtml:li>
                       <xhtml:li>Use antivirus software and spyware detection and removal utilities as an automated way
                         of preventing most infections and detecting the infections that were not prevented.</xhtml:li>
-                      <xhtml:li>Use e-mail clients that support spam filtering—automatically detecting and quarantining
+                      <xhtml:li>Use e-mail clients that support spam filtering-automatically detecting and quarantining
                         messages that are known to be spam or have the same characteristics as typical spam.</xhtml:li>
                       <xhtml:li>Do not install or use non-approved applications (e.g., P2P, IM) to connect to unknown
                         servers. Educate users regarding the potential impact caused by the use of P2P, IM, and other
@@ -1062,7 +1062,7 @@
               generally on functionality and ease of use. A SOHO system might not use any security software (e.g.,
               antivirus software, personal firewall). In some instances, there are no network-based controls such as
               firewalls, so SOHO systems may be directly exposed to external attacks. Therefore, SOHO environments are
-              frequently targeted for exploitation—not necessarily to acquire information, but more commonly to be used
+              frequently targeted for exploitation-not necessarily to acquire information, but more commonly to be used
               for attacking other computers, or incidentally as collateral damage from the propagation of a
                 worm.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" class="figure" src="2.2.jpg" title="Figure 2-2. Typical SOHO Network Architecture"/><xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Because the primary threats in SOHO environments are
               external, and SOHO computers generally have less restrictive security policies than enterprise or
@@ -1094,7 +1094,7 @@
               security posture across an organization.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>The
               enterprise environment is more restrictive and provides less functionality than the SOHO environment.
               Managed environments typically have better control on the flow of various types of traffic, such as
-              filtering traffic based on protocols and ports at the enterprise’s connections with external networks.
+              filtering traffic based on protocols and ports at the enterprise's connections with external networks.
               Because of the supported and largely homogeneous nature of the enterprise environment, it is typically
               easier to use more functionally restrictive settings than it is in SOHO environments. Enterprise
               environments also tend to implement several layers of defense (e.g., firewalls, antivirus servers,
@@ -1106,10 +1106,10 @@
               moderate risk environment.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>In the enterprise
               environment, systems are typically susceptible to local and remote threats. In fact, threats often
               encompass all the categories of threats defined in Section 2.3. Local attacks, such as unauthorized usage
-              of another user’s workstation, most often lead to a loss of confidentiality (e.g., unauthorized access to
+              of another user's workstation, most often lead to a loss of confidentiality (e.g., unauthorized access to
               data) but may also lead to a loss of integrity (e.g., data modification) or availability (e.g., theft of a
               system). Remote threats may be posed not only by attackers outside the organization, but also by internal
-              users who are attacking other internal systems across the organization’s network. Most security breaches
+              users who are attacking other internal systems across the organization's network. Most security breaches
               caused by remote threats involve malicious payloads sent by external parties, such as viruses and worms
               acquired via e-mail or infected Web sites. Threats against network services tend to payloads and network
               service attacks are most likely to affect availability (e.g., crashing the system, consuming all network
@@ -1138,7 +1138,7 @@
               functionality environment within an enterprise environment. In addition, a laptop used by a mobile worker
               might be a specialized security-limited functionality environment within a SOHO environment. A specialized
               security-limited functionality environment might also be a self-contained environment outside any other
-              environment—for instance, a government security installation dealing in sensitive data.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Systems in specialized security-limited functionality
+              environment-for instance, a government security installation dealing in sensitive data.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Systems in specialized security-limited functionality
               environments face the same threats as systems in enterprise environments. Threats from both insiders and
               external parties are a concern. Because of the risks and possible consequences of a compromise in a
               specialized security-limited functionality environment, it usually has the most functionally restrictive
@@ -1191,7 +1191,7 @@
             proposed in this guide and the NIST Windows 7 security templates are consistent with the FISMA controls, as
             discussed in Section 2.2. The NIST template for Specialized Security-Limited Functionality environments
             represents the consensus settings from CIS, DISA, Microsoft, NIST, NSA, and USAF; the other NIST templates
-            are based on Microsoft’s templates and recommendations.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Although the guidance presented in this document has undergone considerable testing, every system is
+            are based on Microsoft's templates and recommendations.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Although the guidance presented in this document has undergone considerable testing, every system is
             unique, so it is certainly possible for certain settings to cause unexpected problems. System administrators
             should perform their own testing, especially for the applications used by their organizations, to identify
             any functionality or usability problems before the guidance is deployed throughout organizations. It is also
@@ -1354,7 +1354,7 @@
             <xccdf:title>Bitlocker Drive Encryption</xccdf:title>
             <xccdf:description>BitLocker helps keep everything from documents to passwords safer by encrypting the
               entire drive that Windows and your data reside on. Once BitLocker is turned on, any file you save on that
-              drive is encrypted automatically. BitLocker To Go—a new feature of Windows 7—gives the lockdown treatment
+              drive is encrypted automatically. BitLocker To Go-a new feature of Windows 7-gives the lockdown treatment
               to easily-misplaced portable storage devices like USB flash drives and external hard
               drives.</xccdf:description>
           </xccdf:Group>
@@ -1425,7 +1425,7 @@
             patching be done with the computer disconnected from any network. If a computer must be connected to a
             network, then it is recommended that the network be isolated and strongly protected (e.g., shielded by a
             firewall on a trusted network segment) to minimize exposure to any network attacks during installation. If
-            possible, the latest service pack and security patches should be downloaded from Microsoft’s Web site,
+            possible, the latest service pack and security patches should be downloaded from Microsoft's Web site,
             archived to read-only media, such as CD-ROMs, and kept physically secure.</xccdf:description>
           <xccdf:Group id="xccdf_gov.nist_group_PartitioningAdvice" selected="true">
             <xccdf:title>Partitioning Advice</xccdf:title>
@@ -1460,7 +1460,7 @@
                 such as using a Microsoft CD. This is effective only for installing a small number of computers at a
                 time because it requires user attention throughout the installation. When installing Windows 7 from a
                 CD, follow the default steps, except for the following:<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/><xhtml:ul xmlns:xhtml="http://www.w3.org/1999/xhtml"><xhtml:li>For the Network Setting configuration, select Custom and disable all network clients,
-                    services, and protocols that are not required. Although this will help to limit the computer’s
+                    services, and protocols that are not required. Although this will help to limit the computer's
                     exposure to network-based attacks, consider the implications of disabling each service because this
                     may inadvertently break required functionality (e.g., connecting to remote servers and printers).
                     See Section 7.5 for more information on network clients, services, and protocols. Consider disabling
@@ -1495,7 +1495,7 @@
                 addition, the Windows 7 installation occurs more quickly with Sysprep. This is beneficial not only for
                 building new systems, but also for reinstalling and reconfiguring the operating system and applications
                 much more quickly when needed - for example, as a result of hardware failure or a virus infection. In
-                preparing the “gold” image for Sysprep, the same guidelines used for a local installation should be
+                preparing the "gold" image for Sysprep, the same guidelines used for a local installation should be
                 used, with the addition of enabling any needed services and patching the system. It is also important to
                 physically secure image media so that it is not inadvertently or purposely altered.</xccdf:description>
             </xccdf:Group>
@@ -1521,10 +1521,10 @@
           <xccdf:description>To increase the availability of data in case of a system failure or data corruption caused
             by a power failure or other event, Windows 7 has built-in capabilities to back up and restore data and
             systems. Users run the Backup and Restore Center, which automates most of the processes. For example, during
-            a backup the user is presented with several options, including backing up the current user’s files and
-            settings, backing up all users’ files and settings, and backing up the whole system. This allows the user to
+            a backup the user is presented with several options, including backing up the current user's files and
+            settings, backing up all users' files and settings, and backing up the whole system. This allows the user to
             back up data and systems without having to manually indicate which files and directories should be backed
-            up, if the user’s files are where the backup program expects them to be. To open the Backup and Restore
+            up, if the user's files are where the backup program expects them to be. To open the Backup and Restore
             center, perform the following steps:<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/><xhtml:ol xmlns:xhtml="http://www.w3.org/1999/xhtml"><xhtml:li>Open the Control Panel and select 'Backup or restore
                 your files'</xhtml:li><xhtml:li>If this is your first time using the center select 'Set up
                 backup'</xhtml:li></xhtml:ol><xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>the Backup and Restore
@@ -1655,7 +1655,7 @@
               prioritize the patch appropriately. It is not uncommon for several patches to be released in a relatively
               short time, and typically one or two of the patches are much more important to the organization than the
               others. Each patch should be tested with system configurations that are representative of the
-              organization’s systems. Once the team determines that the patch is suitable for deployment, the patch
+              organization's systems. Once the team determines that the patch is suitable for deployment, the patch
               needs to be distributed through automated or manual means for installation on all appropriate systems.
               (There are several third-party applications available for patch management and distribution, which support
               many types of platforms and offer functionality that supports enterprise requirements.) Finally, the team
@@ -1681,7 +1681,7 @@
             ability to change settings or download and install updates onto systems. The methods discussed in Section
             4.3 should be used to download and apply patches.<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml"/>Individual systems can also monitor their own security state and alert users of potential problems.
             Windows 7 offers the Windows Security Action Center, which is a service that can be configured to monitor
-            the state of the system’s firewall (either Windows Firewall or a third-party firewall) and antivirus
+            the state of the system's firewall (either Windows Firewall or a third-party firewall) and antivirus
             software, as well as the settings for Automatic Updates. Windows Security Center can generate alerts if the
             firewall, antivirus software, or Automatic Updates feature is not enabled, and also if certain major
             configuration settings are insecure, such as not setting antivirus software to perform real-time scanning,
@@ -2658,7 +2658,7 @@
                   of blank passwords</xhtml:li><xhtml:li>Renaming the default Administrator and Guest
                   accounts</xhtml:li><xhtml:li>Restricting remote access to floppy and CD-ROM
                   drives</xhtml:li><xhtml:li>Encrypting secure channel data in a domain</xhtml:li><xhtml:li>Securing the
-                  interactive logon screen (e.g., not showing the previous user’s account name, displaying a warning
+                  interactive logon screen (e.g., not showing the previous user's account name, displaying a warning
                   banner, prompting users to change passwords before they expire)</xhtml:li><xhtml:li>Restricting which
                   types of network access may be performed</xhtml:li><xhtml:li>Specifying which types of authentication
                   may be used (e.g., NTLM v2).</xhtml:li></xhtml:ul>The Security Options settings can also be accessed
@@ -3245,7 +3245,7 @@
             <xccdf:Rule id="xccdf_gov.nist_rule_accounts_limit_local_account_use_of_blank_passwords_to_console_logon_only" selected="false" weight="10.0">
               <xccdf:title>Accounts: Limit local account use to blank passwords to console logon only</xccdf:title>
               <xccdf:description>In Windows 7, accounts with null or blank passwords can only be used to log on at the
-                physical system’s logon screen. This means that accounts with blank or null passwords cannot be used
+                physical system's logon screen. This means that accounts with blank or null passwords cannot be used
                 over networks or with the secondary logon service (RunAs). This feature prevents attackers and malware
                 from gaining remote access through blank passwords. Section 6 contains information on other recommended
                 password settings.</xccdf:description>
@@ -3954,7 +3954,7 @@
                 authentication, set LAN Manager Authentication Level to Send NTLMv2 response only\refuse LM and NTLM.
                 Enabling this setting may have adverse effects on your ability to communicate with other Windows
                 machines unless the change is made network-wide. If you find that you are unable to require a certain
-                level of LM Authentication, back down to “Send LM and NTLM – Use NTLMv2 session security if negotiated”
+                level of LM Authentication, back down to "Send LM and NTLM - Use NTLMv2 session security if negotiated"
                 and try your network authentication again. Communication with Windows 9x/Me machines requires the
                 DSCLIENT.EXE utility from the Windows 2000 installation CD. </xccdf:description>
               <xccdf:reference>
@@ -3970,8 +3970,8 @@
             </xccdf:Rule>
             <xccdf:Rule id="xccdf_gov.nist_rule_network_security_ldap_client_signing_requirements" selected="false" weight="10.0">
               <xccdf:title>Network security: LDAP client signing requirements</xccdf:title>
-              <xccdf:description>Similar to the SMB protocol, the LDAP protocol supports signing. LDAP, “Lightweight
-                Directory Access Protocol,” provides one means for the client to talk to active directory. LDAP protocol
+              <xccdf:description>Similar to the SMB protocol, the LDAP protocol supports signing. LDAP, "Lightweight
+                Directory Access Protocol," provides one means for the client to talk to active directory. LDAP protocol
                 is text-based, but supports authentication to gain access to sensitive sections of the directory.
                 Require signing to provide the assurance of mutual authentication for this communications
                 channel.</xccdf:description>
@@ -4027,7 +4027,7 @@
                 access to an otherwise unbootable operating system. The console allows access to the NTFS file system,
                 which does not natively allow access when the operating system becomes unbootable. Other third-party
                 applications have been developed to perform this action as well, but the Recovery Console is part of the
-                operating system. It can be installed from the Windows 2000 CD with the “d:\i386\winnt32.exe /cmdcons”
+                operating system. It can be installed from the Windows 2000 CD with the "d:\i386\winnt32.exe /cmdcons"
                 command. It can also be run directly from the Windows 2000 installation CD. The Recovery Console does
                 not grant full and unrestricted access to the operating system by default. It does require that you log
                 on using the password of the default Administrator account. Keep in mind that this must be the local
@@ -4085,7 +4085,7 @@
               <xccdf:title>Shutdown: Clear Virtual Memory Pagefile</xccdf:title>
               <xccdf:description>Virtual memory extends the physical memory available to the CPU. As data and
                 applications fill the available physical memory, the operating system writes less-frequently used pages
-                of memory out to disk, into the virtual memory pagefile. This greatly extends the amount of “virtual”
+                of memory out to disk, into the virtual memory pagefile. This greatly extends the amount of "virtual"
                 memory available to the computer. Since the pagefile contains information that was in memory, it
                 potentially holds a great deal of information useful for an attacker. Digging through the pagefile can
                 reveal SSL web pages, queries set from the client to databases, sometimes even user ids and passwords
@@ -4125,7 +4125,7 @@
             <xccdf:Rule id="xccdf_gov.nist_rule_system_objects_require_case_insensitivity_for_non_windows_subsystems" selected="false" weight="10.0">
               <xccdf:title>System objects: Require case insensitivity for non-Windows subsystems</xccdf:title>
               <xccdf:description>The Windows operating systems ignore case when accessing resources; for example,
-                “C:\Windows”, “C:\WINDOWS” and “c:\windows” all refer to the same directory. However, the Windows kernel
+                "C:\Windows", "C:\WINDOWS" and "c:\windows" all refer to the same directory. However, the Windows kernel
                 allows interfaces with other case-sensitive operating systems (e.g., Unix). Enabling this setting causes
                 the interoperability features to be case-insensitive as well. This setting has no effect when the
                 workstation communicates only with other Windows systems. </xccdf:description>
@@ -4143,7 +4143,7 @@
             <xccdf:Rule id="xccdf_gov.nist_rule_system_objects_strengthen_default_permissions_on_internal_system_objects" selected="false" weight="10.0">
               <xccdf:title>System objects: Strengthen default permissions of internal system objects</xccdf:title>
               <xccdf:description>This setting actually digs deep into the operating system behavior and should be left
-                at the default setting (Enabled) unless explicitly required. “Internal system objects” are shared
+                at the default setting (Enabled) unless explicitly required. "Internal system objects" are shared
                 physical and logical resources such as semaphores and DOS device name; the objects all are created with
                 access control lists (ACLs). When enabled, the ACL allows other non-administrative system processes to
                 query internal system objects, but will not allow them to modify them.</xccdf:description>
@@ -4339,7 +4339,7 @@
               <xccdf:title>MSS: (EnableICMPRedirect) Allow ICMP redirects to override OSPF generated
                 routes</xccdf:title>
               <xccdf:description>Internet Control Message Protocol (ICMP) redirects cause the stack to plumb host
-                routes. These routes override the Open Shortest Path First (OSPF)–generated routes, attackers can use
+                routes. These routes override the Open Shortest Path First (OSPF)-generated routes, attackers can use
                 source routed packets to conceal the address of their computer.
                 HKLM\System\CurrentControlSet\Services\Tcpip\Parameters\EnableICMPRedirect</xccdf:description>
               <xccdf:value>0</xccdf:value>
@@ -4409,7 +4409,7 @@
               <xccdf:title>MSS: (ScreenSaverGracePeriod) The time in seconds before the screen saver grace period
                 expires (0 recommended)</xccdf:title>
               <xccdf:description>Setting Added to Registry to Make Screensaver Password Protection Immediate The default
-                grace period allowed for user movement before the screen – saver lock takes effect is five seconds.
+                grace period allowed for user movement before the screen - saver lock takes effect is five seconds.
                 Leaving the grace period in the default setting makes your computer vulnerable to a potential attack
                 from someone walking up to the console to attempt to log onto the system before the lock takes effect.
                 An entry to the registry can be made to adjust the length of the grace period.</xccdf:description>
@@ -4685,7 +4685,7 @@
               <xccdf:title>MSS: (ScreenSaverGracePeriod) The time in seconds before the screen saver grace period
                 expires (0 recommended)</xccdf:title>
               <xccdf:description>Setting Added to Registry to Make Screensaver Password Protection Immediate The default
-                grace period allowed for user movement before the screen – saver lock takes effect is five seconds.
+                grace period allowed for user movement before the screen - saver lock takes effect is five seconds.
                 Leaving the grace period in the default setting makes your computer vulnerable to a potential attack
                 from someone walking up to the console to attempt to log onto the system before the lock takes effect.
                 An entry to the registry can be made to adjust the length of the grace period.</xccdf:description>
@@ -5272,8 +5272,8 @@
           <xccdf:Group id="xccdf_gov.nist_group_object_access_audit_settings">
             <xccdf:title>Object Access Settings</xccdf:title>
             <xccdf:description>By itself, this policy setting will not cause auditing of any events. It determines
-              whether to audit the event of a user who accesses an object—for example, a file, folder, registry key, or
-              printer—that has a specified system access control list (SACL), effectively enabling auditing to take
+              whether to audit the event of a user who accesses an object-for example, a file, folder, registry key, or
+              printer-that has a specified system access control list (SACL), effectively enabling auditing to take
               place.</xccdf:description>
             <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
             <!--                Values                              -->
@@ -8541,7 +8541,7 @@
                 <xccdf:Rule id="xccdf_gov.nist_rule_hide_mechanisms_to_remove_zone" selected="false" weight="10.0">
                   <xccdf:title>Hide mechanisms to remove zone information</xccdf:title>
                   <xccdf:description>This policy setting allows you to manage whether users can manually remove the zone
-                    information from saved file attachments by clicking the Unblock button in the file’s property sheet
+                    information from saved file attachments by clicking the Unblock button in the file's property sheet
                     or by using a check box in the security warning dialog.</xccdf:description>
                   <xccdf:reference>
                     <dc:type xmlns:dc="http://purl.org/dc/elements/1.1/">GPO</dc:type>

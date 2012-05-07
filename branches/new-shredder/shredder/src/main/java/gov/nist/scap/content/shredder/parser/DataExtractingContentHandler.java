@@ -17,12 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 // TODO: deal with synchronization issues 'synchronized'
 public class DataExtractingContentHandler implements ContentHandler, IEntityVisitor {
-	private static final Logger log = Logger.getLogger(DataExtractingContentHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(DataExtractingContentHandler.class);
 
 	private final Collection<KeyedRelationshipInfo> keyedRelationships = new LinkedList<KeyedRelationshipInfo>();
 	private final Map<IKey, IKeyedEntity<?>> keyedEntities = new HashMap<IKey, IKeyedEntity<?>>();
