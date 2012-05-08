@@ -9,6 +9,7 @@ import gov.nist.scap.content.model.definitions.ProcessingException;
 import gov.nist.scap.content.semantic.TripleStoreFacadeMetaDataManager;
 import gov.nist.scap.content.semantic.entity.EntityProxy;
 import gov.nist.scap.content.shredder.parser.ContentHandler;
+import gov.nist.scap.content.shredder.parser.ContentHandlerFactory;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
 
 import java.io.IOException;
@@ -33,8 +34,7 @@ import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.entity.EntityQuery;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Path("/")
 public class ContentRepoRest {
@@ -42,25 +42,20 @@ public class ContentRepoRest {
 	public static String CONTENT_STORE_CLASS = "";
 	public static String METADATA_STORE_CLASS = "";
 
+	@Autowired
 	private ContentPersistenceManager contentRepo;
-	private ContentShredder shredder;
 	
+	@Autowired
+	private ContentShredder shredder;
+
+	@Autowired
+	private TripleStoreFacadeMetaDataManager tsfmdm;
+	
+	@Autowired
+	private ContentHandlerFactory contentHandlerFactory;
+
 	private static final Pattern httpCharsetPattern = Pattern.compile("charset=(\\S+)");
 	private static final Pattern xmlCharsetPattern = Pattern.compile("^\\s*\\<\\?xml[\\s\\S]+encoding\\s*=[\"'](\\S+)[\"'][\\s\\S]*\\?\\>");
-
-	private static ConfigurableApplicationContext context;
-
-	static {
-		context = new ClassPathXmlApplicationContext(
-				new String[] { "spring-beans.xml" });
-		context.registerShutdownHook();
-	}
-
-	public ContentRepoRest() {
-		contentRepo = (ContentPersistenceManager) context
-				.getBean("defaultLocalRepository");
-		shredder = (ContentShredder) context.getBean("defaultContentShredder");
-	}
 
 	@POST
 	@Path("submit")
@@ -91,8 +86,7 @@ public class ContentRepoRest {
 			if( encoding == null ) {
 				encoding = "UTF-8"; //the default encoding for XML
 			}
-			ContentHandler handler = (ContentHandler) context
-					.getBean("defaultContentHandler");
+			ContentHandler handler = contentHandlerFactory.newContentHandler();
 			shredder.shred(is, encoding, handler);
 			List<String> storedEntities = contentRepo.storeEntities(handler
 					.getEntities());
@@ -121,8 +115,6 @@ public class ContentRepoRest {
 	public Object sparqlQuery(String sparqlQuery) {
 		// TODO delete this once testing is complete
 		try {
-			TripleStoreFacadeMetaDataManager tsfmdm = (TripleStoreFacadeMetaDataManager) context
-					.getBean("defaultLocalMetadataStore");
 			List<SortedMap<String, String>> r;
 			r = tsfmdm.runSPARQL(sparqlQuery);
 
@@ -152,9 +144,6 @@ public class ContentRepoRest {
 	@Produces("text/xml")
 	public String test() {
 		// TODO delete this once testing is complete
-		TripleStoreFacadeMetaDataManager tsfmdm = (TripleStoreFacadeMetaDataManager) context
-				.getBean("defaultLocalMetadataStore");
-
 		EntityQuery query = selectEntitiesWith(allOf(
 		// anyOf(
 		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-test"),
