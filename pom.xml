@@ -401,4 +401,25 @@
       </plugin>
     </plugins>
   </reporting>
+  
+  <profiles>
+		<profile>
+			<id>env-dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<exist.data.dir>c:\temp\exist-db-data</exist.data.dir>
+				<metadata.store.home>c:\temp\triple-store</metadata.store.home>
+			</properties>
+    </profile>
+		<profile>
+			<id>env-prod</id>
+			<properties>
+				<exist.data.dir>blah</exist.data.dir>
+				<metadata.store.home>blah</metadata.store.home>
+			</properties>
+    </profile>
+  </profiles>
+  
 </project>
