@@ -8,9 +8,65 @@
                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
                         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
                         http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<context:annotation-config/>
+	
     <jaxrs:server id="mainService" address="/ws">
     	<jaxrs:serviceBeans>
     		<bean class="gov.nist.scap.content.server.ContentRepoRest"/>
     	</jaxrs:serviceBeans>
     </jaxrs:server>
+    
+  <bean id="defaultLocalRepository" class="org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager" destroy-method="shutdown">
+    <constructor-arg ref="defaultLocalMetadataStore" />
+    <constructor-arg ref="defaultLocalContentStore" />
+  </bean>
+
+  <bean id="defaultLocalContentStore" class="gov.nist.scap.content.exist.ExistDBContentStore">
+    <constructor-arg value="dsig" />
+    <constructor-arg value="content-repo" />
+    <constructor-arg value="test123" />
+    <!-- <constructor-arg value="xmldb:exist://localhost:8080/exist/xmlrpc/db/"/> -->
+  </bean>
+
+
+  <bean id="defaultContentHandlerFactory" class="gov.nist.scap.content.shredder.parser.ContentHandlerFactory">
+	  <constructor-arg>
+	     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	      <property name="staticMethod">
+	      	<value>java.lang.Class.forName</value>
+	      </property>
+	      <property name="arguments">
+	       <list>
+	        <value>gov.nist.scap.content.shredder.parser.DataExtractingContentHandler</value>
+	       </list>
+	    </property>
+	   </bean>
+	  </constructor-arg>
+  </bean>
+  
+  <bean id="defaultLocalMetadataStore" class="gov.nist.scap.content.semantic.TripleStoreFacadeMetaDataManager">
+    <constructor-arg>
+      <bean class="gov.nist.scap.content.exist.ExistDBContentRetrieverFactory">
+        <constructor-arg ref="defaultLocalContentStore" />
+      </bean>
+    </constructor-arg>
+    <!-- <constructor-arg><null/></constructor-arg> -->
+    <constructor-arg value="${metadata.store.home}"/>
+    <constructor-arg value="/rules.xml"/>
+  </bean>
+  
+  <bean id="defaultContentShredder" class="gov.nist.scap.content.shredder.parser.ContentShredder">
+    <constructor-arg>
+      <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="defaultRuleDefinitions"/>
+        <property name="propertyPath" value="ruleDefinitions"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+  <bean id="defaultRuleDefinitions" class="gov.nist.scap.content.shredder.rules.xmlbeans.XmlbeansRules">
+    <constructor-arg value="classpath:/rules.xml" type="java.io.InputStream" />
+  </bean>
+    
 </beans>
