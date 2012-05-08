@@ -99,11 +99,6 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
-      <resource>
-      	<directory>src/main/exist-home</directory>
-      	<targetPath>target/test-classes</targetPath>
-      	<filtering>true</filtering>
-      </resource>
       
     </resources>
     <plugins>
