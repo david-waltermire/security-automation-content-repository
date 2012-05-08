@@ -37,11 +37,6 @@
   <name>repository-server</name>
   <url>http://maven.apache.org</url>
   
-  <properties>
-  	<exist.data.dir>c:\temp\exist-db-data</exist.data.dir>
-  	<metadata.store.home>c:\temp\triple-store</metadata.store.home>
-  </properties>
-
 	<repositories>
 		<repository>
 			<id>atlassian</id>
@@ -344,4 +339,5 @@
       </plugin>
     </plugins>
   </reporting>
+  
  </project>

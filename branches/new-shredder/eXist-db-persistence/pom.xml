@@ -12,10 +12,6 @@
 
   <name>eXist-db Persistance Store</name>
 
-  <properties>
-    <exist.data.dir>c:\temp\exist-db-data</exist.data.dir>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
