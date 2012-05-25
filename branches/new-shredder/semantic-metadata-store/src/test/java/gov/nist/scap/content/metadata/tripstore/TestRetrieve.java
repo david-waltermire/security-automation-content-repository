@@ -163,4 +163,49 @@ public class TestRetrieve {
                 entity.getDefinition().getId()));
         }
     }
+    
+    /**
+     * Test that properties are created and retrieved
+     * @throws Exception general exception
+     */
+    @Test
+    public void testProperties() throws Exception {
+
+        IKey key = null;
+        IVersion version = null;
+        if (xmlbeansRules.getEntityDefinitionById("http://oval.mitre.org/resource/content/definition/5#content-node-definition") instanceof IKeyedEntityDefinition) {
+            IKeyedEntityDefinition iked = (IKeyedEntityDefinition)xmlbeansRules.getEntityDefinitionById("http://oval.mitre.org/resource/content/definition/5#content-node-definition");
+            KeyBuilder kb =
+                new KeyBuilder(
+                    iked.getKeyDefinition().getFields());
+            kb.setId("http://oval.mitre.org/resource/content/definition/5#key-definition");
+            kb.addField(
+                "definition-id",
+                "oval:gov.nist.usgcb.windowsseven:def:1");
+
+            key = kb.toKey();
+            version = new DefaultVersion(iked.getVersionDefinition(), "1");
+        }
+
+        IKeyedEntity<?> entity = tsfdm.getEntities(key, version).iterator().next();
+
+        Assert.assertNotNull(entity);
+        Map<String,? extends Set<String>> properties = entity.getProperties();
+        Assert.assertTrue(properties.containsKey("http://oval.mitre.org/resource/content/definition/5#property-definition-class"));
+        Assert.assertTrue(properties.containsKey("http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version"));
+        
+        Set<String> value = properties.get("http://oval.mitre.org/resource/content/definition/5#property-definition-class");
+        Assert.assertEquals(1, value.size());
+        for( String v : value ) {
+        	v.equals("compliance");
+        }
+
+        value = properties.get("http://oval.mitre.org/resource/content/definition/5#property-definition-schema-version");
+        Assert.assertEquals(1, value.size());
+        for( String v : value ) {
+        	v.equals("5.4");
+        }
+
+    }
+
 };
