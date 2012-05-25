@@ -34,6 +34,7 @@ import gov.nist.scap.content.semantic.managers.BoundaryIdentifierRelationshipSta
 import gov.nist.scap.content.semantic.managers.CompositeRelationshipStatementManager;
 import gov.nist.scap.content.semantic.managers.KeyStatementManager;
 import gov.nist.scap.content.semantic.managers.KeyedRelationshipStatementManager;
+import gov.nist.scap.content.semantic.managers.PropertyStatementManager;
 import gov.nist.scap.content.semantic.managers.RegenerationStatementManager;
 import gov.nist.scap.content.semantic.managers.VersionStatementManager;
 
@@ -83,6 +84,7 @@ public class EntityTranslator {
         managers.add(new CompositeRelationshipStatementManager(persistContext, entityURI));
         managers.add(new KeyStatementManager(persistContext, entityURI));
         managers.add(new VersionStatementManager(persistContext, entityURI));
+        managers.add(new PropertyStatementManager(persistContext, entityURI));
 
         EntityBuilder builder = new EntityBuilder();
         RepositoryConnection conn = null;

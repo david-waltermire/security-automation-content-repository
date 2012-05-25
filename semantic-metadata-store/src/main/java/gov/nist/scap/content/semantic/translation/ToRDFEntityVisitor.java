@@ -12,6 +12,7 @@ import gov.nist.scap.content.semantic.MetaDataOntology;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Resource;
@@ -170,6 +171,25 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
                 versionBNode,
                 ontology.HAS_VERSION_VALUE.URI,
                 valueFactory.createLiteral(entity.getVersion().getValue())));
+        }
+        if( entity.getProperties() != null ) {
+        	for( Map.Entry<String, ? extends Set<String>> entry : entity.getProperties().entrySet() ) {
+                BNode propertyBNode = valueFactory.createBNode();
+                target.add(valueFactory.createStatement(
+                    resourceId,
+                    ontology.HAS_PROPERTY.URI,
+                    propertyBNode));
+                target.add(valueFactory.createStatement(
+                    propertyBNode,
+                    ontology.HAS_PROPERTY_NAME.URI,
+                    valueFactory.createURI(entry.getKey())));
+                for( String value : entry.getValue() ) {
+	                target.add(valueFactory.createStatement(
+	                	propertyBNode,
+	                    ontology.HAS_PROPERTY_VALUE.URI,
+	                    valueFactory.createLiteral(value)));
+                }
+        	}
         }
         return target;
     }

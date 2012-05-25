@@ -66,6 +66,7 @@ public class MetaDataOntology implements IMetadataModel {
     public final Construct KEY_CLASS;
     /** field of a key (to include both field id and value) */
     public final Construct FIELD_CLASS;
+    public final Construct PROPERTY_CLASS;
     /** same as 'externalId' from java model */
     public final Construct BOUNDARY_OBJECT_CLASS;
     public final Construct VERSION_CLASS;
@@ -85,6 +86,9 @@ public class MetaDataOntology implements IMetadataModel {
     public final Predicate HAS_FIELD_NAME;
     /** value of a field (for a specific field type). */
     public final Predicate HAS_FIELD_VALUE;
+    public final Predicate HAS_PROPERTY;
+    public final Predicate HAS_PROPERTY_NAME;
+    public final Predicate HAS_PROPERTY_VALUE;
     /** range should always be a boundary object */
     public final Predicate HAS_BOUNDARY_OBJECT_RELATIONSHIP_TO;
     /** entity to entity relationship */
@@ -134,6 +138,7 @@ public class MetaDataOntology implements IMetadataModel {
         ENTITY_CLASS = new Construct(genModelURI("entity"), "entity");
         KEY_CLASS = new Construct(genModelURI("Key"), "Key");
         FIELD_CLASS = new Construct(genModelURI("Field"), "Field");
+        PROPERTY_CLASS = new Construct(genModelURI("Property"), "Property");
         BOUNDARY_OBJECT_CLASS =
             new Construct(genModelURI("BoundaryObject"), "Boundary Object");
         VERSION_CLASS = new Construct(genModelURI("Version"), "Version");
@@ -180,6 +185,14 @@ public class MetaDataOntology implements IMetadataModel {
             new Predicate(genModelURI("hasFieldName"), "hasFieldName").addDomain(FIELD_CLASS);
         HAS_FIELD_VALUE =
             new Predicate(genModelURI("hasFieldValue"), "hasFieldValue").addDomain(FIELD_CLASS);
+
+        // property
+        HAS_PROPERTY =
+                new Predicate(genModelURI("hasProperty"), "hasProperty").addDomain(ENTITY_CLASS).addRange(PROPERTY_CLASS);
+        HAS_PROPERTY_NAME =
+                new Predicate(genModelURI("hasPropertyName"), "hasPropertyName").addDomain(PROPERTY_CLASS);
+        HAS_PROPERTY_VALUE =
+                new Predicate(genModelURI("hasPropertyValue"), "hasPropertyValue").addDomain(PROPERTY_CLASS);
 
         // boundary object
         HAS_BOUNDARY_OBJECT_TYPE =
