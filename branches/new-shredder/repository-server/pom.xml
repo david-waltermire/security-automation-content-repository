@@ -91,6 +91,10 @@
     </dependency>
 	<dependency>
 		<groupId>org.springframework</groupId>
+		<artifactId>spring-oxm</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
 		<artifactId>spring-web</artifactId>
 	</dependency>
     <dependency>
@@ -117,6 +121,10 @@
 	<dependency>
 		<groupId>org.apache.cxf</groupId>
 		<artifactId>cxf-rt-frontend-jaxws</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.cxf</groupId>
+		<artifactId>cxf-rt-databinding-xmlbeans</artifactId>
 	</dependency>
 	
 	<dependency>
@@ -325,7 +333,38 @@
             </configuration>            
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xmlbeans-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xmlbeans</goal>
+						</goals>
+					</execution>
+				</executions>
+				<inherited>true</inherited>
+				<configuration>
+					<quiet>false</quiet>
+					<verbose>false</verbose>
+					<download>false</download>
+					<javaSource>1.5</javaSource>
+					<schemaDirectory>src/main/xsd</schemaDirectory>
+					<catalogLocation>src/main/xsd/resolver-catalog.xml</catalogLocation>
+					<staleFile>${project.build.directory}/generated-sources/xmlbeans/.staleFlag</staleFile>
+					<noJavac>true</noJavac>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>xml-resolver</groupId>
+						<artifactId>xml-resolver</artifactId>
+						<version>1.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
     </plugins>
 
   </build>

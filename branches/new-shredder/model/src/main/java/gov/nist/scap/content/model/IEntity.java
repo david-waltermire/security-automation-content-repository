@@ -16,6 +16,7 @@ import java.util.Set;
  * 		entity may contain
  */
 public interface IEntity<DEFINITION extends IEntityDefinition> extends IContentConstruct<DEFINITION> {
+	String getId();
 	/**
 	 * Retrieves the parent entity, the entity containing the this entity in the
 	 * XML infoset, if one exists.

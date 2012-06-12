@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://scap.nist.gov/schema/content/entity/0.1"
+    targetNamespace="http://scap.nist.gov/schema/content/entity/0.1" elementFormDefault="qualified">
+    <xs:element name="entity-collection" type="EntityCollectionType"/>
+    <xs:complexType name="EntityCollectionType">
+        <xs:sequence>
+            <xs:element ref="entity" maxOccurs="unbounded"/>
+        </xs:sequence>        
+    </xs:complexType>
+
+    <xs:element name="entity" type="EntityType"/>
+    <xs:complexType name="EntityType">
+        <xs:sequence>
+            <xs:element name="version" type="EntityVersionType" minOccurs="0"/>
+            <xs:element name="property" type="EntityPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="content" type="EntityContentType"/>
+        </xs:sequence>
+        <xs:attribute name="identifier" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>The globally unique identifier for the entity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>The identified class of the entity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="EntityVersionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:normalizedString"/>
+        </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:complexType name="EntityPropertyType">
+        <xs:sequence>
+            <xs:element name="value" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+    
+    <xs:complexType name="EntityContentType">
+        <xs:sequence>
+            <xs:any namespace="##other" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

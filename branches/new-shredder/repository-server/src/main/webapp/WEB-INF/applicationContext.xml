@@ -12,7 +12,12 @@
 	<context:annotation-config/>
 	
     <jaxrs:server id="mainService" address="/ws">
-    	<jaxrs:serviceBeans>
+      <!--
+      <jaxrs:dataBinding>
+        <bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding" />
+      </jaxrs:dataBinding>
+      -->
+      <jaxrs:serviceBeans>
     		<bean class="gov.nist.scap.content.server.ContentRepoRest"/>
     	</jaxrs:serviceBeans>
     </jaxrs:server>
