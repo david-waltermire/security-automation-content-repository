@@ -29,6 +29,12 @@ public abstract class AbstractEntity<DEFINITION extends IEntityDefinition> imple
 		this.parent = parent;
 	}
 
+	@Override
+	public String getId() {
+		// TODO: add a setter?
+		return null;
+	}
+
 	public abstract void setVersion(IVersion version);
 
 	public DEFINITION getDefinition() {

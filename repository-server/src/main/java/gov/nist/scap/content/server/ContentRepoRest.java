@@ -14,6 +14,7 @@ import gov.nist.scap.content.shredder.parser.ContentShredder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
@@ -28,13 +29,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.io.output.XmlStreamWriter;
 import org.apache.xmlbeans.XmlException;
 import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.entity.EntityQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.scapdev.content.core.query.entity.EntityContext.entityType;
 
 @Path("/")
 public class ContentRepoRest {
@@ -142,39 +149,49 @@ public class ContentRepoRest {
 	@GET
 	@Path("test")
 	@Produces("text/xml")
-	public String test() {
+	public StreamingOutput test() {
 		// TODO delete this once testing is complete
-		EntityQuery query = selectEntitiesWith(allOf(
-		// anyOf(
-		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-test"),
-		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-definition")
-		// ),
-		relationship(
-		// anyOf(
-		// relationshipType("http://scap.nist.gov/resource/content/model#hasParentRelationshipTo"),
-		toBoundaryIdentifier(
-				"http://cce.mitre.org/resource/content/cce#external-identifier-cce-5",
-				"CCE-13091-4")
-		// )
-		)));
+
+//		// Generic query
+//		EntityQuery query = selectEntitiesWith(allOf(
+//		// anyOf(
+//		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-test"),
+//		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-definition")
+//		// ),
+//		relationship(
+//		// anyOf(
+//		// relationshipType("http://scap.nist.gov/resource/content/model#hasParentRelationshipTo"),
+//		toBoundaryIdentifier(
+//				"http://cce.mitre.org/resource/content/cce#external-identifier-cce-5",
+//				"CCE-13091-4")
+//		// )
+//		)));
+
+
+		EntityQuery query = selectEntitiesWith(
+//				entityType("http://oval.mitre.org/resource/content/definition/5#content-node-definition")
+				entityType("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection")
+				);
+		
 		try {
 			@SuppressWarnings("unchecked")
 			Collection<? extends IEntity<?>> results = (Collection<? extends IEntity<?>>) tsfmdm
 					.getEntities(query, EntityProxy.class);
-			StringBuilder returnString = new StringBuilder();
-			returnString.append("<results>\n");
+//			StringBuilder returnString = new StringBuilder();
+//			returnString.append("<results>\n");
+//
+//			for (IEntity<?> entityObj : results) {
+//				returnString.append("  <class>");
+//				returnString.append(entityObj.getDefinition().getId());
+//				returnString.append("</class>\n");
+//				// returnString.append("  <uri>");
+//				// returnString.append(entityObj.getUri());
+//				// returnString.append("</uri>\n");
+//			}
+//
+//			returnString.append("</result>\n");
 
-			for (IEntity<?> entityObj : results) {
-				returnString.append("  <class>");
-				returnString.append(entityObj.getDefinition().getId());
-				returnString.append("</class>\n");
-				// returnString.append("  <uri>");
-				// returnString.append(entityObj.getUri());
-				// returnString.append("</uri>\n");
-			}
-
-			returnString.append("</result>\n");
-			return returnString.toString();
+			return new EntityCollectionStreamingOutput(results);
 		} catch (ProcessingException e) {
 			e.printStackTrace();
 			throw new WebApplicationException(e);

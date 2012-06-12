@@ -257,4 +257,9 @@ public class EntityProxy<T extends IEntityDefinition, ENTITY extends IEntity<T>>
 
     }
 
+	@Override
+	public String getId() {
+		return resourceId.stringValue();
+	}
+
 }
