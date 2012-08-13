@@ -25,6 +25,7 @@ package gov.nist.scap.content.semantic;
 
 import gov.nist.scap.content.model.definitions.IEntityDefinition;
 import gov.nist.scap.content.model.definitions.IExternalIdentifier;
+import gov.nist.scap.content.model.definitions.IKeyDefinition;
 import gov.nist.scap.content.model.definitions.IRelationshipDefinition;
 import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 
@@ -358,6 +359,14 @@ public class MetaDataOntology implements IMetadataModel {
         }
         return null;
     }
+    
+    @Override
+    public <T extends IKeyDefinition> T getKeyById(String keyId) {
+        if (javaModel != null) {
+            return javaModel.getKeyById(keyId);
+        }
+        return null;
+	}
 
     private List<Statement> loadBoundaryObjectRelationships(
             Collection<String> boundaryObjectRelationshipIds) {

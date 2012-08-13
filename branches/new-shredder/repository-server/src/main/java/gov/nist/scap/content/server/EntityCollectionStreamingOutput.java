@@ -2,10 +2,14 @@ package gov.nist.scap.content.server;
 
 import gov.nist.scap.content.model.IContentHandle;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IKey;
+import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.IRelationship;
 import gov.nist.scap.content.model.IVersion;
 import gov.nist.scap.schema.content.entity.x01.EntityContentType;
 import gov.nist.scap.schema.content.entity.x01.EntityDocument;
+import gov.nist.scap.schema.content.entity.x01.EntityKeyFieldType;
+import gov.nist.scap.schema.content.entity.x01.EntityKeyType;
 import gov.nist.scap.schema.content.entity.x01.EntityPropertyType;
 import gov.nist.scap.schema.content.entity.x01.EntityType;
 import gov.nist.scap.schema.content.entity.x01.EntityVersionType;
@@ -71,6 +75,18 @@ public class EntityCollectionStreamingOutput implements StreamingOutput {
 		data.setIdentifier(entity.getId());
 		data.setType(entity.getDefinition().getId());
 
+		// if it's a keyed type, then populate the key info
+		if( entity instanceof IKeyedEntity ) {
+			IKey key = ((IKeyedEntity<?>)entity).getKey();
+			EntityKeyType ekt = data.addNewKey();
+			ekt.setId(key.getId());
+			for( Map.Entry<String, String> field : key.getFieldNameToValueMap().entrySet() ) {
+				EntityKeyFieldType ekft = ekt.addNewField();
+				ekft.setId(field.getKey());
+				ekft.setValue(field.getValue());
+			}
+		}
+		
 		IVersion version = entity.getVersion();
 		// if the entity is versioned, set the version info
 		if (version != null) {
@@ -98,7 +114,7 @@ public class EntityCollectionStreamingOutput implements StreamingOutput {
 
 		IContentHandle handle = entity.getContentHandle();
 		XmlCursor srcCursor = handle.getCursor();
-		srcCursor.toFirstChild();
+		//srcCursor.toFirstChild();
 
 		XmlCursor destCursor = contentData.newCursor();
 		destCursor.toEndToken();

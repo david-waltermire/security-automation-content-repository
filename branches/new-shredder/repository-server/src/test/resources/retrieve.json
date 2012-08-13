@@ -1,0 +1,11 @@
+{
+  "identifier": {
+    "host": "usgcb.nist.gov",
+    "port": 8080,
+    "version": "1.0.0",
+    "key-uri": "http://scap.nist.gov/resource/content/xccdf/1.2#key-benchmark",
+    "key-values": ["xccdf_gov.nist_benchmark_USGCB-Windows-7"]
+  },
+  "metadata": false,
+  "depth": -1
+}

@@ -416,6 +416,14 @@ public class XmlbeansRules implements IMetadataModel {
 			String id) {
 		return externalIdentifiers.get(id);
 	}
+	
+	public <T extends IKeyDefinition> T getKeyById(String id) {
+		IKeyDefinition result = keys.get(id);
+		@SuppressWarnings("unchecked")
+		T retval = (T)result;
+		return retval;
+	}
+
 
 	private IVersioningMethodDefinition getVersioningMethodById(
 			ISchemaDefinition schemaDef, String id) {
@@ -425,4 +433,7 @@ public class XmlbeansRules implements IMetadataModel {
 		}
 		return retval;
 	}
+
+	
+	
 }
