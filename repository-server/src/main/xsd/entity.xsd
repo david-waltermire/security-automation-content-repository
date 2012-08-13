@@ -6,14 +6,17 @@
     <xs:complexType name="EntityCollectionType">
         <xs:sequence>
             <xs:element ref="entity" maxOccurs="unbounded"/>
-        </xs:sequence>        
+        </xs:sequence>
     </xs:complexType>
 
     <xs:element name="entity" type="EntityType"/>
     <xs:complexType name="EntityType">
         <xs:sequence>
+            <xs:element minOccurs="0" name="key" type="EntityKeyType"/>
             <xs:element name="version" type="EntityVersionType" minOccurs="0"/>
-            <xs:element name="property" type="EntityPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="property" type="EntityPropertyType" minOccurs="0"
+                maxOccurs="unbounded"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="relationship"/>
             <xs:element name="content" type="EntityContentType"/>
         </xs:sequence>
         <xs:attribute name="identifier" type="xs:anyURI" use="required">
@@ -33,17 +36,38 @@
             <xs:extension base="xs:normalizedString"/>
         </xs:simpleContent>
     </xs:complexType>
-    
+
     <xs:complexType name="EntityPropertyType">
         <xs:sequence>
             <xs:element name="value" type="xs:string" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:anyURI" use="required"/>
     </xs:complexType>
-    
+
     <xs:complexType name="EntityContentType">
         <xs:sequence>
             <xs:any namespace="##other" processContents="lax"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:complexType name="EntityKeyType">
+        <xs:sequence>
+            <xs:element name="field" type="EntityKeyFieldType"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:anyURI"/>
+    </xs:complexType>
+    <xs:complexType name="EntityKeyFieldType">
+        <xs:attribute name="id" type="xs:anyURI"/>
+        <xs:attribute name="value" type="xs:normalizedString"/>
+    </xs:complexType>
+    <xs:complexType name="EntityRelationshipType">
+        <xs:attribute name="predicate" type="xs:anyURI"/>
+        <xs:attribute name="object" type="xs:string"/>
+    </xs:complexType>
+    <xs:element abstract="true" name="relationship" type="EntityRelationshipType"/>
+    <xs:element name="keyed-relationship" substitutionGroup="relationship"
+        type="EntityRelationshipType"/>
+    <xs:element name="composite-relationship" substitutionGroup="relationship"
+        type="EntityRelationshipType"/>
+    <xs:element name="boundary-identifier-relationship" substitutionGroup="relationship"
+        type="EntityRelationshipType"/>
 </xs:schema>

@@ -20,7 +20,11 @@
       <jaxrs:serviceBeans>
     		<bean class="gov.nist.scap.content.server.ContentRepoRest"/>
     	</jaxrs:serviceBeans>
+		<jaxrs:providers>
+		   <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+		</jaxrs:providers>
     </jaxrs:server>
+    
     
   <bean id="defaultLocalRepository" class="org.scapdev.content.core.persistence.hybrid.DefaultHybridContentPersistenceManager" destroy-method="shutdown">
     <constructor-arg ref="defaultLocalMetadataStore" />
@@ -31,7 +35,7 @@
     <constructor-arg value="dsig" />
     <constructor-arg value="content-repo" />
     <constructor-arg value="test123" />
-    <!-- <constructor-arg value="xmldb:exist://localhost:8080/exist/xmlrpc/db/"/> -->
+    <!-- <constructor-arg value="xmldb:exist://localhost:8088/exist/xmlrpc/db/"/>  -->
   </bean>
 
 
@@ -56,7 +60,9 @@
         <constructor-arg ref="defaultLocalContentStore" />
       </bean>
     </constructor-arg>
+    <!-- set to null to have the triple-store in memory only -->
     <!-- <constructor-arg><null/></constructor-arg> -->
+    <!-- set to the folder that contains the triple-store -->
     <constructor-arg value="${metadata.store.home}"/>
     <constructor-arg value="/rules.xml"/>
   </bean>

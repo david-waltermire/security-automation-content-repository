@@ -1,6 +1,14 @@
+Set environment variable JBOSS_HOME to the JBoss installation directory.
+
+Triple Store
+The triple store must be configured to persist to a writeable directory. In applicationContext.xml, defaultLocalMetadataStore contains the configuration for the folder that holds the triple store. If null is set, then the triple store will reside in memory only. The folder is set via a Maven property defined in the root POM. The profiles dictate the folder location. The folder must exist.
+
+eXist-db
+The XML database is configured in the applicationContext.xml, bean = defaultLocalContentStore. If the 4th constructor argument is specified, then the content repository will interact with the XML database over HTTP. If the 4th argument is not specified, eXist-db will run as embedded. The location of the folder that holds the eXist-db data is set via a Maven property defined in the root POM. The profiles dictate the folder location. Extract the ZIP file misc/exist-db-data.zip to to eXist-db data folder specified in the Maven property.
+
+
+Configure Application Server
 1) After building repository-server, copy the JARs from repository-server/target/endorsed into the endorsed folder on the target application server.
 2) Ensure that the target folder from step 1 is configured as an endorsed folder for the JVM when lanuching the application server (e.g. set -Djava.endorsed.dirs="<target folder>" as a JVM argument when launching the application server).
-3) Extract the ZIP file misc/exist-db-data.zip to c:\temp\exist-db-data.
-4) In c:\temp, create an empty folder called "triple-store".
 5) Start up the application server and deploy repository-server/target/repository-server-<version>.war to the server.
 6) Go to http://<host>:<port>/<context>/ws?_wadl to get a listing of services and endpoints.

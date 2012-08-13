@@ -86,6 +86,10 @@ public class PropertyStatementManager implements RegenerationStatementManager {
                     QueryLanguage.SERQL,
                     queryBuilder.toString());
             TupleQueryResult result = tupleQuery.evaluate();
+            //short circuit if there's no properties to report
+            if( !result.hasNext() )
+            	return;
+            
             BindingSet resultSet = null;
             Map<String,Set<String>> results = new HashMap<String, Set<String>>();
             
