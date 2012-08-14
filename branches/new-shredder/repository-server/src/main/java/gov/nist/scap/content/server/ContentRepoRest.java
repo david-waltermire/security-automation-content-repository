@@ -77,27 +77,6 @@ public class ContentRepoRest {
 	private static final String HOSTNAME = "usgcb.nist.gov";
 	private static final Integer PORT = 8080;
 
-	@GET
-	@Path("retrieve")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Object retrieve1() {
-		RetrieveRequestDto dto = new RetrieveRequestDto();
-		dto.setDepth(-1);
-		dto.setMetadata(true);
-		ContentIdentiferDto cid = new ContentIdentiferDto();
-		dto.setIdentifier(cid);
-		cid.setHost("losthost");
-		cid.setPort(8080);
-		cid.setKeyUri("http://scap.nist.gov/resource/content/xccdf/1.2#key-benchmark");
-		cid.setKeyValues(new ArrayList<String>() {
-			private static final long serialVersionUID = 1L;
-			{add("xccdf_gov.nist_benchmark_USGCB-Windows-7");}
-		});
-		cid.setVersion("1.0.0");
-		return dto;
-	}
-	
-	
 	@POST
 	@Path("retrieve")
 	@Consumes(MediaType.APPLICATION_JSON)
