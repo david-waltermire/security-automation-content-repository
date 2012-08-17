@@ -12,6 +12,7 @@ import org.scapdev.content.core.query.Type;
 import org.scapdev.content.core.query.entity.ContentId;
 import org.scapdev.content.core.query.entity.EntityContext;
 import org.scapdev.content.core.query.entity.Key;
+import org.scapdev.content.core.query.entity.Version;
 import org.scapdev.content.core.query.entity.Key.Field;
 import org.scapdev.content.core.query.relationship.Relationship;
 import org.scapdev.content.core.query.relationship.To;
@@ -49,6 +50,31 @@ public class EntityConstructProcessor extends AbstractConstructProcessor<EntityC
 		return this;
 	}
 
+	/*
+	[_:node174j1hg4cx3619] http://scap.nist.gov/resource/content/individuals#5f902c18.xml http://scap.nist.gov/resource/content/model#hasVersion node174j1hg4cx3620
+	[_:node174j1hg4cx3619] node174j1hg4cx3620 http://scap.nist.gov/resource/content/model#hasVersionType http://scap.nist.gov/resource/content/cms#versioning-method-serial
+	[_:node174j1hg4cx3619] node174j1hg4cx3620 http://scap.nist.gov/resource/content/model#hasVersionValue 2
+	*/
+
+	@Override
+	public IConstructProcessor<EntityContext> visit(Version version) {
+		IPrefix modelPrefix = getQueryInfo().getModelPrefix();
+		AbstractSparqlBuilder builder = getQueryInfo().getSparqlBuilder();
+		IVar entityVar = getEntityUriVar();
+		IVar versionVar = builder.newVarUsingBaseName("version");
+
+		// Map entity to key
+		Tripple entityTripple = new Tripple(entityVar, new Property(modelPrefix.resource("hasVersion"), versionVar));
+
+		// Find the version
+		Tripple versionTripple = new Tripple(versionVar, new Property(modelPrefix.resource("hasVersionValue"), builder.createLiteral(version.getVersion())));
+
+		TripplesBlock block = new TripplesBlock(entityTripple, versionTripple);
+
+		getGroupGraph().addStatement(block);
+		return this;
+	}
+	
 	@Override
 	public EntityConstructProcessor visit(ContentId contentId) {
 		IPrefix modelPrefix = getQueryInfo().getModelPrefix();

@@ -11,6 +11,7 @@ import gov.nist.sparql.builder.TripplesBlock;
 import org.scapdev.content.core.query.Type;
 import org.scapdev.content.core.query.entity.ContentId;
 import org.scapdev.content.core.query.entity.Key;
+import org.scapdev.content.core.query.entity.Version;
 import org.scapdev.content.core.query.relationship.Relationship;
 import org.scapdev.content.core.query.relationship.RelationshipContext;
 import org.scapdev.content.core.query.relationship.To;
@@ -54,6 +55,11 @@ public class RelationshipConstructProcessor extends
 		TripplesBlock block = new TripplesBlock(tripple);
 		getGroupGraph().addStatement(block);
 		return this;
+	}
+
+	@Override
+	public IConstructProcessor<RelationshipContext> visit(Version version) {
+		throw new UnsupportedOperationException("EntityContext is required.");
 	}
 
 	@Override
