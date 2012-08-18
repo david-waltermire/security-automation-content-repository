@@ -151,7 +151,7 @@
             <artifactId>tools</artifactId>
             <version>1.7.0</version>
             <scope>system</scope>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            <systemPath>${java.tools}</systemPath>
           </dependency>
         </dependencies>
       </plugin>
@@ -263,29 +263,80 @@
 
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <id>apply-indexer-patch</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>svn</executable>
-              <workingDirectory>.</workingDirectory>
-              <arguments>
-                <argument>patch</argument>
-                <argument>Indexer.java.patch</argument>
-                <argument>eXist</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	</plugins>	
+	</build>
+    <profiles>
+    	<profile>
+    	  <id>env-dev-windows</id>
+    	  <activation>
+        	<os>
+          		<family>Windows</family>
+        	</os>
+    	  </activation>
+    	  <build>
+    	    <plugins>
+    		  <plugin>
+        	    <groupId>org.codehaus.mojo</groupId>
+        		<artifactId>exec-maven-plugin</artifactId>
+        		<version>1.2.1</version>
+        		<executions>
+          		  <execution>
+            	    <id>apply-indexer-patch</id>
+            		<phase>process-sources</phase>
+            		<goals>
+              		  <goal>exec</goal>
+            		</goals>
+            		<configuration>
+              		  <executable>svn</executable>
+              		  <workingDirectory>.</workingDirectory>
+              		  <arguments>
+                		<argument>patch</argument>
+                		<argument>Indexer.java.patch</argument>
+                		<argument>eXist</argument>
+              		  </arguments>
+            		</configuration>
+          		  </execution>
+        		</executions>
+      		  </plugin>
+    		</plugins>
+    	  </build>
+    	</profile>  	
+    	<profile>
+    		<id>env-dev-mac</id>
+    	    <activation>
+        	  <os>
+          		<family>mac</family>
+        	  </os>
+    	    </activation>    		
+    		<build>
+    			<plugins>   
+			      <plugin>
+			        <groupId>org.codehaus.mojo</groupId>
+			        <artifactId>exec-maven-plugin</artifactId>
+			        <version>1.2.1</version>
+			        <executions>
+			          <execution>
+			            <id>apply-indexer-patch</id>
+			            <phase>process-sources</phase>
+			            <goals>
+			              <goal>exec</goal>
+			            </goals>
+			            <configuration>
+			              <executable>patch</executable>
+			              <workingDirectory>.</workingDirectory>
+			              <arguments>
+			                <argument>-p0</argument>
+			                <argument>--directory=eXist/</argument>
+			                <argument>conf.xml.tmpl</argument>
+			                <argument>../Indexer.java.patch</argument>
+			              </arguments>
+			            </configuration>
+			          </execution>
+			        </executions>
+			      </plugin>
+			    </plugins>
+ 			 </build>
+    	</profile>
+      </profiles>
+
 </project>

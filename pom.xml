@@ -425,13 +425,29 @@
   </reporting>
   <profiles>
   <profile>
-    <id>env-dev</id>
-    <activation>
-    	<activeByDefault>true</activeByDefault>
+    <id>env-dev-windows</id>
+	<activation>
+        <os>
+          <family>Windows</family>
+        </os>
     </activation>
 	<properties>
 		<metadata.store.home>${env.JBOSS_HOME}/data/triple-store</metadata.store.home>
 		<exist.data.dir>${env.JBOSS_HOME}/data/exist-db-data</exist.data.dir>
+		<java.tools>${java.home}/../lib/tools.jar</java.tools>
+	</properties>
+  </profile>  
+    <profile>
+    <id>env-dev-mac</id>
+    <activation>
+        <os>
+          <family>mac</family>
+        </os>
+    </activation>
+	<properties>
+		<metadata.store.home>${env.JBOSS_HOME}/data/triple-store</metadata.store.home>
+		<exist.data.dir>${env.JBOSS_HOME}/data/exist-db-data</exist.data.dir>
+		<java.tools>${java.home}/../Classes/classes.jar</java.tools>
 	</properties>
   </profile>  
   </profiles>
