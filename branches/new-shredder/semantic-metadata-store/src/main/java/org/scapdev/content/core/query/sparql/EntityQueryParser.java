@@ -26,6 +26,7 @@ public class EntityQueryParser {
 		
 		// Define prefixes
 		IPrefix model = builder.addPrefix(URI.create("http://scap.nist.gov/resource/content/model#"), "model");
+		IPrefix rdf = builder.addPrefix(URI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#"), "rdf");
 
 		// Define variables
 		IVar entityURI = builder.newVar(ENTITY_URI_VARIABLE_NAME);
@@ -33,7 +34,7 @@ public class EntityQueryParser {
 		// Assign the select statement
 		builder.setSelectVars(entityURI);
 
-		QueryInfo info = new QueryInfo(builder, model);
+		QueryInfo info = new QueryInfo(builder, model, rdf);
 
 		EntityConstructProcessor processor = new EntityConstructProcessor(info, builder.where(), entityURI);
 		query.getConstruct().visit(processor);

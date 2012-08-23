@@ -11,10 +11,12 @@ public class QueryInfo {
 //	}
 	private final AbstractSparqlBuilder sparqlBuilder;
 	private final IPrefix modelPrefix;
+	private final IPrefix rdfPrefix;
 
-	public QueryInfo(AbstractSparqlBuilder sparqlBuilder, IPrefix modelPrefix) {
+	public QueryInfo(AbstractSparqlBuilder sparqlBuilder, IPrefix modelPrefix, IPrefix rdfPrefix) {
 		this.sparqlBuilder = sparqlBuilder;
 		this.modelPrefix = modelPrefix;
+		this.rdfPrefix = rdfPrefix;
 	}
 
 	public AbstractSparqlBuilder getSparqlBuilder() {
@@ -24,4 +26,9 @@ public class QueryInfo {
 	public IPrefix getModelPrefix() {
 		return modelPrefix;
 	}
+
+	public IPrefix getRdfPrefix() {
+		return rdfPrefix;
+	}
+	
 }

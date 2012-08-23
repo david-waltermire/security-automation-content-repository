@@ -1,6 +1,7 @@
 package org.scapdev.content.core.query.sparql;
 
 import gov.nist.sparql.builder.AbstractSparqlBuilder;
+import gov.nist.sparql.builder.Filter;
 import gov.nist.sparql.builder.GroupGraph;
 import gov.nist.sparql.builder.IPrefix;
 import gov.nist.sparql.builder.IVar;
@@ -63,7 +64,7 @@ public class EntityConstructProcessor extends AbstractConstructProcessor<EntityC
 		AbstractSparqlBuilder builder = getQueryInfo().getSparqlBuilder();
 		IVar entityVar = getEntityUriVar();
 		IVar versionVar = builder.newVarUsingBaseName("version");
-
+		
 		// Map entity to key
 		Tripple entityTripple = new Tripple(entityVar, new Property(modelPrefix.resource("hasVersion"), versionVar));
 
@@ -79,12 +80,13 @@ public class EntityConstructProcessor extends AbstractConstructProcessor<EntityC
 	@Override
 	public EntityConstructProcessor visit(EntityId entityId) {
 		IPrefix modelPrefix = getQueryInfo().getModelPrefix();
+		IPrefix rdfPrefix = getQueryInfo().getRdfPrefix();
 		AbstractSparqlBuilder builder = getQueryInfo().getSparqlBuilder();
 
-		Property property = new Property(modelPrefix.resource("hasEntityId"), builder.createLiteral(entityId.getEntityId()));
-		Tripple tripple = new Tripple(getEntityUriVar(), property);
-		TripplesBlock block = new TripplesBlock(tripple);
+		Tripple entityTripple = new Tripple(getEntityUriVar(), new Property(rdfPrefix.resource("type"),builder.createURI(modelPrefix.getUri().toString() + "entity")));
+		TripplesBlock block = new TripplesBlock(entityTripple);
 		getGroupGraph().addStatement(block);
+		getGroupGraph().addStatement(Filter.filter(getEntityUriVar(), entityId.getEntityId()));
 		return this;
 	}
 
