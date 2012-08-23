@@ -419,7 +419,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 			RepositoryResult<Statement> result = conn.getStatements(null,
 					ontology.IS_TOP_ELEMENT_ENTITY.URI,
 					factory.createLiteral(true), false);
-			return new ContentIdListDelegateImpl(conn, result);
+			return new EntityIdListDelegateImpl(conn, result);
 
 		} catch (RepositoryException e) {
 			log.error(e.getMessage(), e);
@@ -499,7 +499,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 				for (Map.Entry<String, IEntity<?>> entry : contentIdToEntityMap
 						.entrySet()) {
 					entry.getValue().accept(entityVisitor);
-					returnVal.add(emm.getContentId(entry.getValue()));
+					returnVal.add(emm.getResourceURI(entry.getValue()).stringValue());
 				}
 
 			} finally {
@@ -619,12 +619,12 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 		return repository;
 	}
 
-	private class ContentIdListDelegateImpl implements Iterator<String> {
+	private class EntityIdListDelegateImpl implements Iterator<String> {
 
 		private RepositoryConnection conn;
 		private RepositoryResult<Statement> result;
 
-		private ContentIdListDelegateImpl(RepositoryConnection conn,
+		private EntityIdListDelegateImpl(RepositoryConnection conn,
 				RepositoryResult<Statement> result) {
 			this.conn = conn;
 			this.result = result;
@@ -645,13 +645,7 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 		public String next() {
 			try {
 				if (!result.isClosed() && result.hasNext()) {
-					Statement s = result.next();
-					RepositoryResult<Statement> r = conn.getStatements(
-							s.getSubject(), ontology.HAS_CONTENT_ID.URI, null,
-							false);
-					Statement s1 = r.next();
-					String retVal = s1.getObject().stringValue();
-					r.close();
+					String retVal = result.next().getSubject().stringValue();
 
 					if (!result.hasNext()) {
 						result.close();

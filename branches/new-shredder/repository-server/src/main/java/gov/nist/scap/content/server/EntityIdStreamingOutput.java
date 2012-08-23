@@ -12,14 +12,14 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.log4j.Logger;
 
-public class ContentIdStreamingOutput implements StreamingOutput {
+public class EntityIdStreamingOutput implements StreamingOutput {
 	private static final Logger log = Logger
-			.getLogger(ContentIdStreamingOutput.class);
-	private final Iterator<String> contentIds;
-	private String ns = "http://scap.nist.gov/schema/content/content-id-list/0.1";
+			.getLogger(EntityIdStreamingOutput.class);
+	private final Iterator<String> entityIds;
+	private String ns = "http://scap.nist.gov/schema/content/entity-id-list/0.1";
 
-	public ContentIdStreamingOutput(Iterator<String> iter) {
-		this.contentIds = iter;
+	public EntityIdStreamingOutput(Iterator<String> iter) {
+		this.entityIds = iter;
 	}
 
 	@Override
@@ -31,12 +31,12 @@ public class ContentIdStreamingOutput implements StreamingOutput {
 			writer.setDefaultNamespace(ns);
 
 			writer.writeStartDocument();
-			writer.writeStartElement(ns, "content-ids");
+			writer.writeStartElement(ns, "entity-ids");
 			writer.writeDefaultNamespace(ns);
 
-			while (contentIds.hasNext()) {
-				writer.writeStartElement(ns, "content-id");
-				writer.writeCharacters(contentIds.next());
+			while (entityIds.hasNext()) {
+				writer.writeStartElement(ns, "entity-id");
+				writer.writeCharacters(entityIds.next());
 				writer.writeEndElement();
 			}
 			writer.writeEndElement();

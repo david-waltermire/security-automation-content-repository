@@ -10,6 +10,7 @@ import gov.nist.sparql.builder.TripplesBlock;
 
 import org.scapdev.content.core.query.Type;
 import org.scapdev.content.core.query.entity.ContentId;
+import org.scapdev.content.core.query.entity.EntityId;
 import org.scapdev.content.core.query.entity.Key;
 import org.scapdev.content.core.query.entity.Version;
 import org.scapdev.content.core.query.relationship.Relationship;
@@ -64,6 +65,11 @@ public class RelationshipConstructProcessor extends
 
 	@Override
 	public RelationshipConstructProcessor visit(ContentId contentId) {
+		throw new UnsupportedOperationException("EntityContext is required.");
+	}
+	
+	@Override
+	public IConstructProcessor<RelationshipContext> visit(EntityId entityId) {
 		throw new UnsupportedOperationException("EntityContext is required.");
 	}
 

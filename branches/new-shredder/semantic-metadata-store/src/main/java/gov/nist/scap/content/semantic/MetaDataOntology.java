@@ -73,6 +73,8 @@ public class MetaDataOntology implements IMetadataModel {
     public final Construct VERSION_CLASS;
 
     // ** relationships in model **
+    /** triple store ID of an entity */
+    public final Predicate HAS_ENTITY_ID;
     /** persistence ID of an entity */
     public final Predicate HAS_CONTENT_ID;
     /** type of entity. TODO: this should be refactored into type hiearchy */
@@ -147,6 +149,8 @@ public class MetaDataOntology implements IMetadataModel {
         VERSION_CLASS = new Construct(genModelURI("Version"), "Version");
 
         // base entity info
+        HAS_ENTITY_ID =
+                new Predicate(genModelURI("hasEntityId"), "hasEntityId").addDomain(ENTITY_CLASS);
         HAS_CONTENT_ID =
             new Predicate(genModelURI("hasContentId"), "hasContentId").addDomain(ENTITY_CLASS);
         HAS_ENTITY_TYPE =

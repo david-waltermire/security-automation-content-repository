@@ -47,6 +47,7 @@ import org.apache.xmlbeans.XmlException;
 import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
+import org.scapdev.content.core.query.entity.EntityId;
 import org.scapdev.content.core.query.entity.EntityQuery;
 import org.scapdev.content.core.query.entity.Key.Field;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,7 @@ public class ContentRepoRest {
 
 		EntityQuery query = selectEntitiesWith(allOf(key(key.getId(), f)));
 
+		
 		@SuppressWarnings("rawtypes")
 		Collection<? extends IKeyedEntity> retVal = tsfmdm.getEntities(query,
 				KeyedEntityProxy.class);
@@ -175,6 +177,7 @@ public class ContentRepoRest {
 			// resources...see HTTP spec
 			throw new WebApplicationException(300);
 		}
+		
 
 		return retVal.iterator().next().getContentHandle().getCursor()
 				.getObject().newInputStream();
@@ -218,9 +221,9 @@ public class ContentRepoRest {
 			List<String> storedEntities = contentRepo.storeEntities(handler
 					.getEntities());
 
-			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<content-id>"
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<entity-id>"
 					+ storedEntities.get(storedEntities.size() - 1)
-					+ "</content-id>";
+					+ "</entity-id>";
 		} catch (XmlException e) {
 			e.printStackTrace();
 			throw new WebApplicationException(e);
@@ -270,7 +273,7 @@ public class ContentRepoRest {
 	@Path("get-top-entities")
 	@Produces(MediaType.APPLICATION_XML)
 	public StreamingOutput getTopLevelEntities() {
-		return new ContentIdStreamingOutput(tsfmdm.getAllTopLevelEntities());
+		return new EntityIdStreamingOutput(tsfmdm.getAllTopLevelEntities());
 	
 	}
 
