@@ -113,6 +113,8 @@ public class MetaDataOntology implements IMetadataModel {
     public final Predicate HAS_VERSION;
     public final Predicate HAS_VERSION_TYPE;
     public final Predicate HAS_VERSION_VALUE;
+    
+    public final Predicate IS_TOP_ELEMENT_ENTITY;
 
     // dynamic predicates
     private Map<String, Construct> boundaryObjectRelationships =
@@ -213,6 +215,10 @@ public class MetaDataOntology implements IMetadataModel {
             new Predicate(genModelURI("hasVersionType"), "hasVersionType").addDomain(VERSION_CLASS);
         HAS_VERSION_VALUE =
             new Predicate(genModelURI("hasVersionValue"), "hasVersionValue").addDomain(VERSION_CLASS);
+        
+        IS_TOP_ELEMENT_ENTITY =
+                new Predicate(genModelURI("isTopLevelEntity"), "isTopLevelEntity").addDomain(ENTITY_CLASS);
+            
     }
 
     /**
