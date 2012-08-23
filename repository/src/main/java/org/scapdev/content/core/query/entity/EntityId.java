@@ -1,23 +1,25 @@
 package org.scapdev.content.core.query.entity;
 
+import java.net.URI;
+
 import org.scapdev.content.core.query.IQueryVisitor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EntityId implements IEntityConstruct {
-	public static EntityId entityId(String entityId) {
+	public static EntityId entityId(URI entityId) {
 		return new EntityId(entityId);
 	}
 
-	private final String entityId;
+	private final URI entityId;
 
 	@JsonCreator
-	public EntityId(@JsonProperty("entityId") String entityId) {
+	public EntityId(@JsonProperty("entityId") URI entityId) {
 		this.entityId = entityId;
 	}
 
-	public String getEntityId() {
+	public URI getEntityId() {
 		return entityId;
 	}
 

@@ -27,7 +27,7 @@ public abstract class AbstractSparqlBuilder {
 	private static final String PN_CHARS = PN_CHARS_U+"|-|[0-9]|\u00B7|[\u0300-\u036F]|[\u203F-\u2040]";
 
 	public static final Pattern PN_PREFIX = Pattern.compile("("+PN_CHARS_BASE+")(("+PN_CHARS+"|\\.)*("+PN_CHARS+"))?");
-	public static final Pattern IRI_REF = Pattern.compile("[^<>\"{}|^`\\]\\-\\[\\x00-\\x20]*");
+	public static final Pattern IRI_REF = Pattern.compile("[^<>\"{}|^`\\]\\[\\x00-\\x20]*");
 	public static final Pattern VARNAME = Pattern.compile("("+PN_CHARS_U+"|[0-9])("+PN_CHARS_U+"|[0-9]|\u00B7|[\u0300-\u036F]|[\u203F-\u2040])*");
 
 	private final Map<URI, String> prefixMap = new LinkedHashMap<URI, String>();
