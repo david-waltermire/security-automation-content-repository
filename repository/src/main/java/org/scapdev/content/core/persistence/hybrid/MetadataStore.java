@@ -32,6 +32,7 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,9 +86,17 @@ public interface MetadataStore {
      * @throws ContentException error with the repo
      */
     List<String> persist(LinkedHashMap<String, IEntity<?>> contentIdToEntityMap, Object session) throws ContentException;
+    
+    /**
+     * Used to implement interface 4. This method should lazy load the content IDs.
+     * @return
+     */
+    Iterator<String> getAllTopLevelEntities();
+    
     boolean commit(Object session);
     boolean rollback(Object session);
 
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
+	
 }

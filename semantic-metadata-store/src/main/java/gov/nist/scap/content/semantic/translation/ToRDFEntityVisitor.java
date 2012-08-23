@@ -156,6 +156,11 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
                 resourceId,
                 ontology.HAS_PARENT_RELATIONSHIP_TO.URI,
                 entityMetadataMap.getResourceURI(entity.getParent())));
+        } else {
+            target.add(valueFactory.createStatement(
+                    resourceId,
+                    ontology.IS_TOP_ELEMENT_ENTITY.URI,
+                    valueFactory.createLiteral(true)));
         }
         if (entity.getVersion() != null) {
             BNode versionBNode = valueFactory.createBNode();

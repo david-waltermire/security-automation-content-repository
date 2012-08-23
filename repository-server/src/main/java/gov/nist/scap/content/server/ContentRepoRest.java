@@ -267,6 +267,14 @@ public class ContentRepoRest {
 	}
 
 	@GET
+	@Path("get-top-entities")
+	@Produces(MediaType.APPLICATION_XML)
+	public StreamingOutput getTopLevelEntities() {
+		return new ContentIdStreamingOutput(tsfmdm.getAllTopLevelEntities());
+	
+	}
+
+	@GET
 	@Path("test")
 	@Produces("text/xml")
 	public StreamingOutput test() {
