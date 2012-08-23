@@ -143,6 +143,10 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
             String contentId) {
         List<Statement> target = new LinkedList<Statement>();
         target.add(valueFactory.createStatement(
+                resourceId,
+                ontology.HAS_ENTITY_ID.URI,
+                valueFactory.createLiteral(resourceId.stringValue())));
+        target.add(valueFactory.createStatement(
             resourceId,
             ontology.HAS_CONTENT_ID.URI,
             valueFactory.createLiteral(contentId)));

@@ -11,9 +11,10 @@ import gov.nist.sparql.builder.TripplesBlock;
 import org.scapdev.content.core.query.Type;
 import org.scapdev.content.core.query.entity.ContentId;
 import org.scapdev.content.core.query.entity.EntityContext;
+import org.scapdev.content.core.query.entity.EntityId;
 import org.scapdev.content.core.query.entity.Key;
-import org.scapdev.content.core.query.entity.Version;
 import org.scapdev.content.core.query.entity.Key.Field;
+import org.scapdev.content.core.query.entity.Version;
 import org.scapdev.content.core.query.relationship.Relationship;
 import org.scapdev.content.core.query.relationship.To;
 import org.scapdev.content.core.query.relationship.ToBoundaryIdentifier;
@@ -74,7 +75,19 @@ public class EntityConstructProcessor extends AbstractConstructProcessor<EntityC
 		getGroupGraph().addStatement(block);
 		return this;
 	}
-	
+
+	@Override
+	public EntityConstructProcessor visit(EntityId entityId) {
+		IPrefix modelPrefix = getQueryInfo().getModelPrefix();
+		AbstractSparqlBuilder builder = getQueryInfo().getSparqlBuilder();
+
+		Property property = new Property(modelPrefix.resource("hasEntityId"), builder.createLiteral(entityId.getEntityId()));
+		Tripple tripple = new Tripple(getEntityUriVar(), property);
+		TripplesBlock block = new TripplesBlock(tripple);
+		getGroupGraph().addStatement(block);
+		return this;
+	}
+
 	@Override
 	public EntityConstructProcessor visit(ContentId contentId) {
 		IPrefix modelPrefix = getQueryInfo().getModelPrefix();
