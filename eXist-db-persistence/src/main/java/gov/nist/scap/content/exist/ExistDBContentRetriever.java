@@ -39,7 +39,7 @@ public class ExistDBContentRetriever implements ContentRetriever {
             XMLResource res = null;
             try {
                 ExistDBContentHandler handler =
-                    new ExistDBContentHandler(col, contentId, sb);
+                    new ExistDBContentHandler(col, sb, true);
 
                 res = (XMLResource)col.getResource(contentId);
                 if (res instanceof RemoteXMLResource)
@@ -48,7 +48,6 @@ public class ExistDBContentRetriever implements ContentRetriever {
                 else if (res instanceof LocalXMLResource)
                     ((LocalXMLResource)res).setLexicalHandler(new ExistDBContentLexicalHandler(
                         sb));
-
                 res.getContentAsSAX(handler);
                 xmlObj = XmlObject.Factory.parse(sb.toString());
                 return xmlObj.newCursor();
