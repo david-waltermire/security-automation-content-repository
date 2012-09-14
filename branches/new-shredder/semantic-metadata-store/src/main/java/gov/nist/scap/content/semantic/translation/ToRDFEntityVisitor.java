@@ -119,7 +119,7 @@ public class ToRDFEntityVisitor implements IEntityVisitor {
         }
         iterateThroughRelationship(resourceId, entity, context);
     }
-
+    
     private void iterateThroughRelationship(
             URI resourceId,
             IEntity<?> e,

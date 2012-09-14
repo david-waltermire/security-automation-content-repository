@@ -12,3 +12,6 @@ Configure Application Server
 2) Ensure that the target folder from step 1 is configured as an endorsed folder for the JVM when lanuching the application server (e.g. set -Djava.endorsed.dirs="<target folder>" as a JVM argument when launching the application server).
 5) Start up the application server and deploy repository-server/target/repository-server-<version>.war to the server.
 6) Go to http://<host>:<port>/<context>/ws?_wadl to get a listing of services and endpoints.
+
+
+For JBoss AS 7.1.1, the endorsed variable should be set in standalone.conf.bat. Also for JBoss AS 7.1.1, the following 2 JARs must be in the endorsed folder (search Maven Central Repo to retrieve the JARs): stax2-api-3.1.1.jar, woodstox-core-asl-4.1.3.jar

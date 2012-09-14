@@ -34,6 +34,7 @@ import gov.nist.scap.content.model.definitions.ProcessingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,6 +109,19 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
     public IEntity<?> getEntity(String contentId) throws ProcessingException {
        return metadataStore.getEntity(contentId);
     }
+    
+    @Override
+    public <T extends IEntity<?>> Collection<? extends T> getEntities(
+    		EntityQuery query, Class<T> clazz) throws ProcessingException {
+    	return metadataStore.getEntities(query, clazz);
+    }
+    
+    @Override
+    public <T extends IEntity<?>> Collection<? extends T> getEntities(
+    		EntityQuery query, boolean areKeyedEntities)
+    		throws ProcessingException {
+    	return metadataStore.getEntities(query, areKeyedEntities);
+    }
 
 
 	@Deprecated
@@ -138,6 +152,11 @@ public abstract class AbstractHybridContentPersistenceManager implements HybridC
         contentStore.commit(session);
         metadataStore.commit(session);
         return returnVal;
+	}
+	
+	@Override
+	public Iterator<String> getAllTopLevelEntities() {
+		return metadataStore.getAllTopLevelEntities();
 	}
 
 	public ContentRetriever newContentRetriever(String contentId) {

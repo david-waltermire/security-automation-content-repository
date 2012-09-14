@@ -1,5 +1,6 @@
 package gov.nist.scap.content.server.dto;
 
+import java.net.URI;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -17,6 +18,16 @@ public class ContentIdentiferDto {
 	private List<String> keyValues;
 	@JsonProperty("version")
 	private String version;
+	@JsonProperty("entity-id")
+	private URI entityId;
+	
+
+	public URI getEntityId() {
+		return entityId;
+	}
+	public void setEntityId(URI entityId) {
+		this.entityId = entityId;
+	}
 	public String getHost() {
 		return host;
 	}

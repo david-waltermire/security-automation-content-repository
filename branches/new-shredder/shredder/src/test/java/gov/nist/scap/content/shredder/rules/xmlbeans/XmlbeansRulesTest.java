@@ -1,11 +1,11 @@
 package gov.nist.scap.content.shredder.rules.xmlbeans;
 
+import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.ICompositeRelationship;
 import gov.nist.scap.content.model.IContentNode;
 import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IGeneratedDocument;
-import gov.nist.scap.content.model.IBoundaryIdentifierRelationship;
 import gov.nist.scap.content.model.IKeyedDocument;
 import gov.nist.scap.content.model.IKeyedRelationship;
 import gov.nist.scap.content.model.IRelationship;
@@ -84,6 +84,7 @@ public class XmlbeansRulesTest {
 
 			System.out.println(qname.toString()+": "+entity.getDefinition().getId()+": "+entity.getKey().toString()+": "+ver);
 		}
+		
 	}
 
 	private static class RelationshipVisitor implements IRelationshipVisitor {

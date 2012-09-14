@@ -146,7 +146,7 @@ public abstract class AbstractSparqlBuilder {
 	public TupleQuery build(RepositoryConnection conn) throws RepositoryException, MalformedQueryException {
 		String queryString = buildQueryString(conn);
 
-		log.info("SPARQL:\n"+queryString);
+		log.trace("SPARQL:\n"+queryString);
 
 		TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
 		if (!bindingMap.isEmpty()) {

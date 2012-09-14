@@ -2,6 +2,7 @@ package gov.nist.scap.content.model.definitions;
 
 import gov.nist.scap.content.model.AbstractEntity;
 import gov.nist.scap.content.model.DefaultKeyedRelationship;
+import gov.nist.scap.content.model.IEntity;
 import gov.nist.scap.content.model.IKey;
 import gov.nist.scap.content.model.IKeyedEntity;
 
@@ -20,6 +21,10 @@ public class KeyedRelationshipInfo {
 		return key;
 	}
 	
+	public IEntity<?> getContainingEntity() {
+		return containingEntity;
+	}
+
 	public void applyRelationship(IKeyedEntity<?> referencedEntity) {
 		containingEntity.addRelationship(new DefaultKeyedRelationship(definition, referencedEntity));
 	}

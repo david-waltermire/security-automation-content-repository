@@ -63,14 +63,16 @@
     <dependency>
       <groupId>gov.nist.scap.content</groupId>
       <artifactId>eXist-db-persistence</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>gov.nist.scap.content</groupId>
-      <artifactId>repository</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>gov.nist.scap.content</groupId>
       <artifactId>semantic-metadata-store</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>gov.nist.scap.content</groupId>
+      <artifactId>repository</artifactId>
     </dependency>
   	<dependency>
   		<groupId>junit</groupId>

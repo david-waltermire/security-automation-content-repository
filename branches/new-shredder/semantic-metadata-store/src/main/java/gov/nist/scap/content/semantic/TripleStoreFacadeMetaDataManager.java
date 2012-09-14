@@ -298,6 +298,17 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends IEntity<?>> Collection<? extends T> getEntities(
+			EntityQuery query, boolean areKeyedEntities) throws ProcessingException {
+		if( areKeyedEntities ) {
+			return (Collection<? extends T>) getEntities(query, KeyedEntityProxy.class);
+		} else {
+			return (Collection<? extends T>) getEntities(query, EntityProxy.class);
+		}
+	}
+	
 	@Override
 	public <T extends IEntity<?>> Collection<? extends T> getEntities(
 			EntityQuery query, Class<T> clazz) throws ProcessingException {
@@ -618,8 +629,8 @@ public class TripleStoreFacadeMetaDataManager implements MetadataStore,
 	public Repository getRepository() {
 		return repository;
 	}
-
-	private class EntityIdListDelegateImpl implements Iterator<String> {
+	
+		private class EntityIdListDelegateImpl implements Iterator<String> {
 
 		private RepositoryConnection conn;
 		private RepositoryResult<Statement> result;
