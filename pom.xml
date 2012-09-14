@@ -28,8 +28,8 @@
 		<jaxb-impl.version>2.2.5</jaxb-impl.version>
 		<cxf.version>2.6.0</cxf.version>
 		<spring.version>3.1.1.RELEASE</spring.version>
-    <java.source>1.6</java.source>
-    <java.target>1.6</java.target>
+    <java.source>1.7</java.source>
+    <java.target>1.7</java.target>
     <org.openrdf.sesame.version>2.4.2</org.openrdf.sesame.version>
   </properties>
   

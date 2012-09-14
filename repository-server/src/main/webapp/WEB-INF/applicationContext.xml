@@ -38,20 +38,18 @@
     <!-- <constructor-arg value="xmldb:exist://localhost:8088/exist/xmlrpc/db/"/>  -->
   </bean>
 
-
-  <bean id="defaultContentHandlerFactory" class="gov.nist.scap.content.shredder.parser.ContentHandlerFactory">
-	  <constructor-arg>
-	     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-	      <property name="staticMethod">
-	      	<value>java.lang.Class.forName</value>
-	      </property>
-	      <property name="arguments">
-	       <list>
-	        <value>gov.nist.scap.content.shredder.parser.DataExtractingContentHandler</value>
-	       </list>
-	    </property>
-	   </bean>
-	  </constructor-arg>
+  <bean id="entityComparator" class="org.scapdev.content.util.EntityComparator"/>
+  
+  <bean id="dataExtractingContentHandler" class="gov.nist.scap.content.shredder.parser.DataExtractingContentHandler"
+    scope="prototype">
+    <property name="entityComparator" ref="entityComparator"/>
+    
+  </bean>
+  
+  <bean id="defaultContentHandlerFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+    <property name="targetBeanName">
+      <idref local="dataExtractingContentHandler" />
+    </property>
   </bean>
   
   <bean id="defaultLocalMetadataStore" class="gov.nist.scap.content.semantic.TripleStoreFacadeMetaDataManager">

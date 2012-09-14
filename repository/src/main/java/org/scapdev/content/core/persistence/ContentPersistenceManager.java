@@ -32,6 +32,7 @@ import gov.nist.scap.content.model.definitions.IExternalIdentifier;
 import gov.nist.scap.content.model.definitions.ProcessingException;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,15 @@ public interface ContentPersistenceManager {
 			Collection<String> boundaryObjectIds,
 			Set<? extends IEntityDefinition> entityTypes);
 	List<String> storeEntities(List<? extends IEntity<?>> entities) throws ContentException;
+	
+	public <T extends IEntity<?>> Collection<? extends T> getEntities(
+			EntityQuery query, Class<T> clazz) throws ProcessingException;
+	
+	public <T extends IEntity<?>> Collection<? extends T> getEntities(
+			EntityQuery query, boolean areKeyedEntities) throws ProcessingException;
+	public Iterator<String> getAllTopLevelEntities();
+
+			
 //	Map<String, ? extends EntityStatistic> getEntityStatistics(Set<String> entityInfoIds, IMetadataModel model);
 	void shutdown();
 }

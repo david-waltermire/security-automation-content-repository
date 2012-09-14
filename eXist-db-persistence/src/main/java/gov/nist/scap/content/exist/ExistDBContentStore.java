@@ -9,16 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
 
-import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlCursor.TokenType;
 import org.apache.xmlbeans.XmlObject;
-import org.apache.xmlbeans.XmlOptions;
 import org.exist.xmldb.DatabaseImpl;
 import org.exist.xmldb.DatabaseInstanceManager;
-import org.exist.xmldb.EXistResource;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.hybrid.ContentRetriever;
 import org.scapdev.content.core.persistence.hybrid.ContentRetrieverFactory;
@@ -28,7 +23,6 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.CollectionManagementService;
-import org.xmldb.api.modules.XMLResource;
 
 /**
  * An eXist-db implementation of ContentStore
@@ -41,7 +35,6 @@ public class ExistDBContentStore implements ContentStore {
     private final String COLLECTION;
     private final String USERNAME;
     private final String PASSWORD;
-    public static final String WRAPPER_ELEMENT = "abcdefghijklm";
 
     private final ContentRetrieverFactory contentRetrieverFactory;
 
@@ -145,65 +138,11 @@ public class ExistDBContentStore implements ContentStore {
     public LinkedHashMap<String, IEntity<?>> persist(
             List<? extends IEntity<?>> entities,
             Object session) throws ContentException {
-        XMLResource res = null;
-        String resId = null;
         LinkedHashMap<String, IEntity<?>> resultResult =
             new LinkedHashMap<String, IEntity<?>>();
+        ExistDBPersistEntityVisitor visitor = new ExistDBPersistEntityVisitor(col, resultResult);
         for (IEntity<?> ie : entities) {
-            try {
-                res = (XMLResource)col.createResource(null, "XMLResource");
-                XmlOptions xo = new XmlOptions();
-                xo.setSaveOuter();
-                XmlCursor xc = ie.getContentHandle().getCursor();
-                TokenType tt = xc.toNextToken();
-                StringBuilder sbNS = new StringBuilder();
-                sbNS.append("<" + WRAPPER_ELEMENT);
-                while (tt == TokenType.ATTR || tt == TokenType.NAMESPACE) {
-                    if (tt == TokenType.NAMESPACE) {
-                        QName q = xc.getName();
-                        String spacer = "";
-                        if (q.getLocalPart() != null
-                            && !q.getLocalPart().equals("")) {
-                            spacer = ":" + q.getLocalPart();
-                        }
-                        sbNS.append(" xmlns" + spacer + "=\""
-                            + q.getNamespaceURI() + "\"");
-                    }
-                    tt = xc.toNextToken();
-                }
-                sbNS.append(">");
-                xc = ie.getContentHandle().getCursor();
-                res.setContent(sbNS.toString() + xc.getObject().xmlText(xo)
-                    + "</" + WRAPPER_ELEMENT + ">");
-                col.storeResource(res);
-                resId = res.getId();
-                resultResult.put(resId, ie);
-                xc.removeXml();
-                xc.beginElement("xinclude", "gov:nist:scap:content-repo");
-                xc.insertAttributeWithValue("resource-id", resId);
-            } catch (XMLDBException e) {
-                // TODO: log exception
-                // back out all inserted info
-                for (String localResId : resultResult.keySet()) {
-                    try {
-                        col.removeResource(col.getResource(localResId));
-                    } catch (XMLDBException e1) {
-                        throw new ContentException(
-                            "Error rolling back transaction. Database may have stale data!!!",
-                            e);
-                    }
-                }
-                throw new ContentException("error persisting content", e);
-            } finally {
-                // dont forget to cleanup
-                if (res != null) {
-                    try {
-                        ((EXistResource)res).freeResources();
-                    } catch (XMLDBException xe) {
-                        xe.printStackTrace();
-                    }
-                }
-            }
+        	ie.accept(visitor);
         }
 
         if (session != null) {

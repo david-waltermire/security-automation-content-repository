@@ -23,7 +23,7 @@ public class SendContentMain {
 		connection.setDoInput(true);
 		connection.setRequestProperty("Content-Type", "application/xml");
 		
-		InputStream is = SendContentMain.class.getResourceAsStream("/scap-data-stream-multi-signatures.xml");
+		InputStream is = SendContentMain.class.getResourceAsStream("/scap_gov.nist_USGCB-Windows-7.xml");
 		OutputStream os = connection.getOutputStream();
 		byte[] b = new byte[1024 * 10];
 		int length;

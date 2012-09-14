@@ -1,35 +1,35 @@
 package gov.nist.scap.content.server;
 
 import static org.scapdev.content.core.query.Conditional.allOf;
-import static org.scapdev.content.core.query.entity.EntityContext.entityType;
 import static org.scapdev.content.core.query.entity.EntityQuery.selectEntitiesWith;
 import static org.scapdev.content.core.query.entity.Key.field;
 import static org.scapdev.content.core.query.entity.Key.key;
 import gov.nist.scap.content.model.IEntity;
+import gov.nist.scap.content.model.IEntityVisitor;
 import gov.nist.scap.content.model.IKey;
-import gov.nist.scap.content.model.IKeyedEntity;
 import gov.nist.scap.content.model.KeyBuilder;
 import gov.nist.scap.content.model.KeyException;
 import gov.nist.scap.content.model.definitions.IKeyDefinition;
 import gov.nist.scap.content.model.definitions.ProcessingException;
-import gov.nist.scap.content.semantic.TripleStoreFacadeMetaDataManager;
-import gov.nist.scap.content.semantic.entity.EntityProxy;
-import gov.nist.scap.content.semantic.entity.KeyedEntityProxy;
+import gov.nist.scap.content.model.definitions.collection.IMetadataModel;
 import gov.nist.scap.content.server.dto.ContentIdentiferDto;
 import gov.nist.scap.content.server.dto.RetrieveRequestDto;
+import gov.nist.scap.content.server.dto.SubmitResponseDto;
+import gov.nist.scap.content.server.dto.SubmitResponseDto.SubmitEntityResponseDto;
 import gov.nist.scap.content.shredder.parser.ContentHandler;
-import gov.nist.scap.content.shredder.parser.ContentHandlerFactory;
 import gov.nist.scap.content.shredder.parser.ContentShredder;
+import gov.nist.scap.content.shredder.parser.IEntityComparator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,15 +41,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.xmlbeans.XmlException;
-import org.openrdf.repository.RepositoryException;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
 import org.scapdev.content.core.query.entity.EntityId;
 import org.scapdev.content.core.query.entity.EntityQuery;
 import org.scapdev.content.core.query.entity.Key.Field;
+import org.scapdev.content.core.query.entity.Version;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Path("/")
@@ -65,10 +67,13 @@ public class ContentRepoRest {
 	private ContentShredder shredder;
 
 	@Autowired
-	private TripleStoreFacadeMetaDataManager tsfmdm;
+	private IMetadataModel metadataModel;
 
 	@Autowired
-	private ContentHandlerFactory contentHandlerFactory;
+	private ObjectFactory<ContentHandler> contentHandlerFactory;
+
+	@Autowired
+	private IEntityComparator entityComparator;
 
 	private static final Pattern httpCharsetPattern = Pattern
 			.compile("charset=(\\S+)");
@@ -82,28 +87,17 @@ public class ContentRepoRest {
 	@Path("retrieve")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_XML)
-	public Object retrieve(RetrieveRequestDto dto) throws KeyException,
+	public Response retrieve(RetrieveRequestDto dto) throws KeyException,
 			MalformedURLException, UnsupportedEncodingException,
 			ProcessingException {
 
-		if( dto.getIdentifier() == null ) {
-			throw new IllegalArgumentException(
-					"An identifier is required");
+		// Start parameter checking
+		if (dto.getIdentifier() == null) {
+			throw new IllegalArgumentException("An identifier is required");
 		}
 
-		if( dto.getIdentifier().getHost() == null ) {
-			throw new IllegalArgumentException(
-					"Host is required");
-		}
-
-		if( dto.getIdentifier().getKeyUri() == null ) {
-			throw new IllegalArgumentException(
-					"Key URI is required");
-		}
-
-		if( dto.getIdentifier().getKeyValues() == null || dto.getIdentifier().getKeyValues().size() == 0) {
-			throw new IllegalArgumentException(
-					"1 or more key values is required");
+		if (dto.getIdentifier().getHost() == null) {
+			throw new IllegalArgumentException("Host is required");
 		}
 
 		Boolean metadata = dto.getMetadata();
@@ -127,67 +121,99 @@ public class ContentRepoRest {
 					"Remote content is not yet implemented...");
 		}
 
-		if (PORT.intValue() != cid.getPort().intValue() ) {
+		if (PORT.intValue() != cid.getPort().intValue()) {
 			throw new UnsupportedOperationException(
 					"Remote content is not yet implemented...");
 		}
 
-		IKeyDefinition keyDef = tsfmdm.getOntology()
-				.getKeyById(cid.getKeyUri());
+		if (dto.getIdentifier().getKeyUri() != null) {
+			if (dto.getIdentifier().getEntityId() != null) {
+				throw new IllegalArgumentException(
+						"Only one of key-uri OR content-id may be specified");
+			}
+			if (dto.getIdentifier().getKeyValues() == null
+					|| dto.getIdentifier().getKeyValues().size() == 0) {
+				throw new IllegalArgumentException(
+						"1 or more key values is required");
+			}
 
-		if (keyDef == null) {
-			throw new IllegalArgumentException("Could not find key: "
-					+ cid.getKeyUri());
-		}
+		} else if (dto.getIdentifier().getEntityId() != null) {
+			if (dto.getIdentifier().getKeyUri() != null) {
+				throw new IllegalArgumentException(
+						"Only one of key-uri OR content-id may be specified");
+			}
+			if (dto.getIdentifier().getKeyValues() != null) {
+				throw new IllegalArgumentException(
+						"key-values may not be specified when content-id is specified");
+			}
+		} else {
 
-		KeyBuilder builder = new KeyBuilder(keyDef.getFields());
-		builder.setId(keyDef.getId());
-		if (keyDef.getFields().size() != cid.getKeyValues().size()) {
 			throw new IllegalArgumentException(
-					"Number of field values does not match key fields. Expecting "
-							+ keyDef.getFields().size() + " fields.");
+					"key-values or content Id must be specified");
 		}
+		// End parameter checking
 		
-		for (int i=0,size = keyDef.getFields().size(); i<size; i++) {
-			builder.addField(keyDef.getFields().get(i).getName(), cid.getKeyValues().get(i));
+		EntityQuery query = null;
+
+		// if this is a request by key, then recreate the key query
+		if (cid.getKeyUri() != null) {
+			IKeyDefinition keyDef = metadataModel.getKeyById(cid.getKeyUri());
+
+			if (keyDef == null) {
+				throw new IllegalArgumentException("Could not find key: "
+						+ cid.getKeyUri());
+			}
+
+			KeyBuilder builder = new KeyBuilder(keyDef.getFields());
+			builder.setId(keyDef.getId());
+			if (keyDef.getFields().size() != cid.getKeyValues().size()) {
+				throw new IllegalArgumentException(
+						"Number of field values does not match key fields. Expecting "
+								+ keyDef.getFields().size() + " fields.");
+			}
+
+			for (int i = 0, size = keyDef.getFields().size(); i < size; i++) {
+				builder.addField(keyDef.getFields().get(i).getName(), cid
+						.getKeyValues().get(i));
+			}
+			IKey key = builder.toKey();
+
+			Field[] f = new Field[key.getFieldNames().size()];
+			Iterator<String> iter = key.getFieldNames().iterator();
+			String fieldName;
+			for (int j = 0, size = key.getFieldNames().size(); j < size; j++) {
+				fieldName = iter.next();
+				f[j] = field(fieldName, key.getValue(fieldName));
+			}
+
+			// if version user version query otherwise user previous query
+			query = selectEntitiesWith(allOf(key(key.getId(), f),
+					Version.version(dto.getIdentifier().getVersion())));
+
+		} else if (cid.getEntityId() != null) {
+			// if this is a request by entity id, then create the entity id query
+			query = selectEntitiesWith(allOf(EntityId.entityId(dto
+					.getIdentifier().getEntityId())));
+
 		}
-		IKey key = builder.toKey();
 
-		Field[] f = new Field[key.getFieldNames().size()];
-		Iterator<String> iter = key.getFieldNames().iterator();
-		String fieldName;
-		for (int j = 0, size = key.getFieldNames().size(); j < size; j++) {
-			fieldName = iter.next();
-			f[j] = field(fieldName, key.getValue(fieldName));
-		}
-
-		EntityQuery query = selectEntitiesWith(allOf(key(key.getId(), f)));
-
-		
+		// We can't guarantee that all entities are keyed if they are retrieved by entity id
 		@SuppressWarnings("rawtypes")
-		Collection<? extends IKeyedEntity> retVal = tsfmdm.getEntities(query,
-				KeyedEntityProxy.class);
+		Collection<? extends IEntity> retVal = contentRepo.getEntities(query,
+				false);
 
-		if (retVal.size() == 0) {
-			throw new WebApplicationException(404);
-		}
-
-		if (retVal.size() > 1) {
-			// TODO the body should include all of the specific
-			// resources...see HTTP spec
-			throw new WebApplicationException(300);
+		RetrieveEntityVisitor visitor = new RetrieveEntityVisitor();
+		for( IEntity<?> entity : retVal ) {
+			entity.accept(visitor);
 		}
 		
-
-		return retVal.iterator().next().getContentHandle().getCursor()
-				.getObject().newInputStream();
-
+		return visitor.getResponse();
 	}
 
 	@POST
 	@Path("submit")
-	@Consumes("application/xml")
-	@Produces("text/xml")
+	@Consumes(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Object submit(@HeaderParam("Content-Type") String contentType,
 			InputStream is) {
 
@@ -216,14 +242,35 @@ public class ContentRepoRest {
 			if (encoding == null) {
 				encoding = "UTF-8"; // the default encoding for XML
 			}
-			ContentHandler handler = contentHandlerFactory.newContentHandler();
-			shredder.shred(is, encoding, handler);
-			List<String> storedEntities = contentRepo.storeEntities(handler
-					.getEntities());
 
-			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<entity-id>"
-					+ storedEntities.get(storedEntities.size() - 1)
-					+ "</entity-id>";
+			ContentHandler handler = contentHandlerFactory.getObject();
+
+			shredder.shred(is, encoding, handler);
+
+			List<SubmitEntityResponseDto> responseList = new LinkedList<SubmitEntityResponseDto>();
+			IEntityVisitor visitor = new SubmitEntityVisitor(contentRepo, entityComparator, responseList);
+			for (IEntity<?> i : handler.getEntities()) {
+				i.accept(visitor);
+			}
+
+			
+			if( responseList.size() == 0 ) {
+				List<String> storedEntities = contentRepo.storeEntities(handler
+						.getEntities());
+				SubmitResponseDto responseDto = new SubmitResponseDto();
+				responseDto.setStatus(SubmitResponseDto.STATUS.SUCCESS);
+				responseDto.setNewEntity(new URI(storedEntities.get(storedEntities.size() - 1)));
+				
+				return responseDto;
+			} else {
+				SubmitResponseDto responseDto = new SubmitResponseDto();
+				responseDto.setStatus(SubmitResponseDto.STATUS.FAILED);
+				responseDto.setEntityList(responseList);
+				return responseDto;
+			}
+			
+			
+
 		} catch (XmlException e) {
 			e.printStackTrace();
 			throw new WebApplicationException(e);
@@ -236,98 +283,18 @@ public class ContentRepoRest {
 		} catch (ContentException e) {
 			e.printStackTrace();
 			throw new WebApplicationException(e);
-		}
-	}
-
-	@POST
-	@Path("sparql-query")
-	@Produces("text/xml")
-	public Object sparqlQuery(String sparqlQuery) {
-		// TODO delete this once testing is complete
-		try {
-			List<SortedMap<String, String>> r;
-			r = tsfmdm.runSPARQL(sparqlQuery);
-
-			StringBuilder returnString = new StringBuilder();
-			returnString.append("<results>\n");
-
-			for (SortedMap<String, String> m : r) {
-				returnString.append("  <result>\n");
-				for (String key : m.keySet()) {
-					returnString.append("    <key>" + key + "</key><value>"
-							+ m.get(key) + "</value>\n");
-				}
-				returnString.append("  </result>\n");
-			}
-
-			returnString.append("</result>\n");
-			return returnString.toString();
-		} catch (RepositoryException e) {
-			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// should never happen
 			throw new WebApplicationException(e);
 		}
-
+		
 	}
 
 	@GET
 	@Path("get-top-entities")
 	@Produces(MediaType.APPLICATION_XML)
 	public StreamingOutput getTopLevelEntities() {
-		return new EntityIdStreamingOutput(tsfmdm.getAllTopLevelEntities());
-	
-	}
-
-	@GET
-	@Path("test")
-	@Produces("text/xml")
-	public StreamingOutput test() {
-		// TODO delete this once testing is complete
-
-		// // Generic query
-		// EntityQuery query = selectEntitiesWith(allOf(
-		// // anyOf(
-		// //
-		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-test"),
-		// //
-		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-definition")
-		// // ),
-		// relationship(
-		// // anyOf(
-		// //
-		// relationshipType("http://scap.nist.gov/resource/content/model#hasParentRelationshipTo"),
-		// toBoundaryIdentifier(
-		// "http://cce.mitre.org/resource/content/cce#external-identifier-cce-5",
-		// "CCE-13091-4")
-		// // )
-		// )));
-
-		EntityQuery query = selectEntitiesWith(
-		// entityType("http://oval.mitre.org/resource/content/definition/5#content-node-definition")
-		entityType("http://scap.nist.gov/resource/content/source/1.2#document-datastream-collection"));
-
-		try {
-			@SuppressWarnings("unchecked")
-			Collection<? extends IEntity<?>> results = (Collection<? extends IEntity<?>>) tsfmdm
-					.getEntities(query, EntityProxy.class);
-			// StringBuilder returnString = new StringBuilder();
-			// returnString.append("<results>\n");
-			//
-			// for (IEntity<?> entityObj : results) {
-			// returnString.append("  <class>");
-			// returnString.append(entityObj.getDefinition().getId());
-			// returnString.append("</class>\n");
-			// // returnString.append("  <uri>");
-			// // returnString.append(entityObj.getUri());
-			// // returnString.append("</uri>\n");
-			// }
-			//
-			// returnString.append("</result>\n");
-
-			return new EntityCollectionStreamingOutput(results);
-		} catch (ProcessingException e) {
-			e.printStackTrace();
-			throw new WebApplicationException(e);
-		}
+		return new EntityIdStreamingOutput(contentRepo.getAllTopLevelEntities());
 
 	}
 

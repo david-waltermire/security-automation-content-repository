@@ -22,7 +22,7 @@ public class ExistDBContentHandler implements ContentHandler {
 
     private Collection col;
     private Map<String, String> namespaceMap = new HashMap<String, String>();
-    private int isFirstElement = 1;
+    private boolean isFirstElement = true;
     private boolean moveDownNs;
 
     private StringBuilder sb;
@@ -59,7 +59,7 @@ public class ExistDBContentHandler implements ContentHandler {
             && "xinclude".equals(arg1)) {
             return;
         }
-        if (ExistDBContentStore.WRAPPER_ELEMENT.equals(arg1)) {
+        if (ExistDBPersistEntityVisitor.WRAPPER_ELEMENT.equals(arg1)) {
             return;
         }
 
@@ -102,8 +102,7 @@ public class ExistDBContentHandler implements ContentHandler {
             String arg2,
             Attributes arg3) throws SAXException {
         try {
-            if (isFirstElement != 1) {
-                isFirstElement = -1;
+            if (!isFirstElement) {
                 if ("gov:nist:scap:content-repo".equals(arg0)
                     && "xinclude".equals(arg1)) {
                     String resId = arg3.getValue("resource-id");
@@ -133,7 +132,7 @@ public class ExistDBContentHandler implements ContentHandler {
                     sb.append(">");
                 }
             } else {
-                isFirstElement = 0;
+                isFirstElement = false;
             }
         } catch (XMLDBException e) {
             throw new SAXException(e);
@@ -144,16 +143,13 @@ public class ExistDBContentHandler implements ContentHandler {
     @Override
     public void startPrefixMapping(String arg0, String arg1)
             throws SAXException {
-        if (!moveDownNs && isFirstElement == 0) {
+        if (!moveDownNs && isFirstElement) {
         	return;
         }
-        
-        if (isFirstElement == 0) {
-            namespaceMap.put(arg0, arg1);
-        }
+        namespaceMap.put(arg0, arg1);
     }
     
-    private void writeNS(StringBuilder sb, String prefix, String ns) {
+    private static void writeNS(StringBuilder sb, String prefix, String ns) {
         String separator = "";
         if (prefix.length() > 0)
             separator = ":";

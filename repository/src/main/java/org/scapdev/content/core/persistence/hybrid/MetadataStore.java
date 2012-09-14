@@ -45,6 +45,9 @@ public interface MetadataStore {
 
 	<T  extends IEntity<?>> Collection<? extends T> getEntities(EntityQuery query, Class<T> clazz) throws ProcessingException;
 
+	<T extends IEntity<?>> Collection<? extends T> getEntities(
+			EntityQuery query, boolean areKeyedEntities) throws ProcessingException;
+
 	/**
 	 * 
 	 * @param key
@@ -53,7 +56,7 @@ public interface MetadataStore {
 	 * @throws ProcessingException 
 	 */
 	Collection<? extends IKeyedEntity<?>> getEntities(IKey key, IVersion version) throws ProcessingException;
-
+	
 	   /**
      * 
      * @param contentId

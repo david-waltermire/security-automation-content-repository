@@ -1,0 +1,76 @@
+/*******************************************************************************
+ * The MIT License
+ * 
+ * Copyright (c) 2012 540951
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ ******************************************************************************/
+package org.scapdev.content.util;
+
+import gov.nist.scap.content.shredder.parser.IEntityComparator;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.xmlbeans.XmlOptions;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+public class EntityComparator implements IEntityComparator {
+
+	private Logger log = LoggerFactory.getLogger(EntityComparator.class);
+	
+	
+	public gov.nist.scap.content.shredder.parser.IEntityComparator.STATUS compareEntities(
+			gov.nist.scap.content.model.IEntity<?> control,
+			gov.nist.scap.content.model.IEntity<?> test) {
+		XmlOptions xo = new XmlOptions();
+		xo.setSaveOuter();
+		try {
+			Diff d = new Diff(control.getContentHandle().getCursor().getObject()
+					.xmlText(xo), test.getContentHandle()
+					.getCursor().getObject().xmlText(xo));
+			
+			if( d.identical() ) {
+				return STATUS.IDENTICAL;
+			} else if( d.similar() ) {
+				return STATUS.SIMILAR;
+			} else {
+				DetailedDiff dd = new DetailedDiff(d);
+				List<?> l = dd.getAllDifferences();
+				log.warn("Difference found:");
+				for( Object o : l ) {
+					log.warn(((Difference)o).getDescription());
+				}
+				return STATUS.DIFFERENT;
+			}
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+
+		
+	};
+}
