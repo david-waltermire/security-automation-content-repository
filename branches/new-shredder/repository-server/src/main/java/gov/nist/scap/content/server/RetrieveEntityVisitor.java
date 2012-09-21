@@ -18,16 +18,29 @@ import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
 public class RetrieveEntityVisitor implements IEntityVisitor {
 
 	private List<IEntity<?>> list = new LinkedList<IEntity<?>>();
-	
+
+	private final boolean includeMetadata;
+
+	public RetrieveEntityVisitor(boolean includeMetadata) {
+		this.includeMetadata = includeMetadata;
+	}
+
 	public Response getResponse() {
 		ResponseBuilder builder = new ResponseBuilderImpl();
-		if( list.size() == 0 ) {
+		if (list.size() == 0) {
 			builder.status(404);
 			return builder.build();
-		} else if( list.size() == 1 ) {
+		} else if (list.size() == 1) {
 			builder.status(200);
-			builder.entity(list.get(0).getContentHandle().getCursor()
-					.getObject().newInputStream());
+			if (!includeMetadata) {
+				builder.entity(list.get(0).getContentHandle().getCursor()
+						.getObject().newInputStream());
+			} else {
+				MetadataEntityVisitor visitor = new MetadataEntityVisitor();
+				list.get(0).accept(visitor);
+				builder.entity(visitor.getDoc());
+			}
+
 			builder.type(MediaType.APPLICATION_XML);
 			return builder.build();
 		} else {
@@ -41,23 +54,23 @@ public class RetrieveEntityVisitor implements IEntityVisitor {
 			return builder.build();
 		}
 	}
-	
+
 	private void visit(IEntity<?> entity) {
 		list.add(entity);
 	}
-	
+
 	@Override
 	public void visit(IContentNode entity) {
-		visit((IEntity<?>)entity);
+		visit((IEntity<?>) entity);
 	}
-	
+
 	@Override
 	public void visit(IGeneratedDocument entity) {
-		visit((IEntity<?>)entity);
+		visit((IEntity<?>) entity);
 	}
-	
+
 	@Override
 	public void visit(IKeyedDocument entity) {
-		visit((IEntity<?>)entity);
+		visit((IEntity<?>) entity);
 	}
 }

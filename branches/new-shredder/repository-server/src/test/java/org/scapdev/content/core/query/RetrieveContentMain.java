@@ -36,18 +36,28 @@ public class RetrieveContentMain {
 		os.flush();
 		os.close();
 
+//		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("out.xml")));
+
 		for( Map.Entry<String, List<String>> e : connection.getHeaderFields().entrySet() ) {
-			System.out.println("Header: " + e.getKey());
+			bw.write("Header: " + e.getKey());
+			bw.newLine();
 			for( String s : e.getValue() ) {
-				System.out.println("  " + s);
+				bw.write("  " + s);
+				bw.newLine();
 			}
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String line;
-		System.out.println("\n");
+		
+		bw.newLine();
 		while( (line = br.readLine()) != null ) {
-			System.out.println(line);
+			bw.write(line);
+			bw.newLine();
 		}
+		bw.flush();
+		bw.close();
+		
 
 	}
 

@@ -40,10 +40,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.xmlbeans.XmlException;
 import org.scapdev.content.core.ContentException;
 import org.scapdev.content.core.persistence.ContentPersistenceManager;
@@ -80,32 +82,23 @@ public class ContentRepoRest {
 	private static final Pattern xmlCharsetPattern = Pattern
 			.compile("^\\s*\\<\\?xml[\\s\\S]+encoding\\s*=[\"'](\\S+)[\"'][\\s\\S]*\\?\\>");
 
-	private static final String HOSTNAME = "usgcb.nist.gov";
-	private static final Integer PORT = 8080;
-
 	@POST
 	@Path("retrieve")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_XML)
-	public Response retrieve(RetrieveRequestDto dto) throws KeyException,
-			MalformedURLException, UnsupportedEncodingException,
-			ProcessingException {
+	public Response retrieve(@Context MessageContext context,
+			RetrieveRequestDto dto) throws KeyException, MalformedURLException,
+			UnsupportedEncodingException, ProcessingException {
 
+		String incomingHost = context.getHttpServletRequest().getServerName();
+		int incomingPort = context.getHttpServletRequest().getServerPort();
+		
 		// Start parameter checking
 		if (dto.getIdentifier() == null) {
 			throw new IllegalArgumentException("An identifier is required");
 		}
 
-		if (dto.getIdentifier().getHost() == null) {
-			throw new IllegalArgumentException("Host is required");
-		}
-
 		Boolean metadata = dto.getMetadata();
-
-		if (metadata != null && metadata.equals(true)) {
-			throw new IllegalArgumentException(
-					"The metadata parameter is not yet supported");
-		}
 
 		Integer depth = dto.getDepth();
 
@@ -116,12 +109,12 @@ public class ContentRepoRest {
 
 		ContentIdentiferDto cid = dto.getIdentifier();
 
-		if (!HOSTNAME.equals(cid.getHost())) {
+		if (cid.getHost() != null && !incomingHost.equals(cid.getHost())) {
 			throw new UnsupportedOperationException(
 					"Remote content is not yet implemented...");
 		}
 
-		if (PORT.intValue() != cid.getPort().intValue()) {
+		if (cid.getPort() != null && incomingPort != cid.getPort().intValue()) {
 			throw new UnsupportedOperationException(
 					"Remote content is not yet implemented...");
 		}
@@ -152,7 +145,7 @@ public class ContentRepoRest {
 					"key-values or content Id must be specified");
 		}
 		// End parameter checking
-		
+
 		EntityQuery query = null;
 
 		// if this is a request by key, then recreate the key query
@@ -186,27 +179,31 @@ public class ContentRepoRest {
 				f[j] = field(fieldName, key.getValue(fieldName));
 			}
 
-			// if version user version query otherwise user previous query
-			query = selectEntitiesWith(allOf(key(key.getId(), f),
-					Version.version(dto.getIdentifier().getVersion())));
+			if (dto.getIdentifier().getVersion() != null)
+				query = selectEntitiesWith(allOf(key(key.getId(), f),
+						Version.version(dto.getIdentifier().getVersion())));
+			else
+				query = selectEntitiesWith(allOf(key(key.getId(), f)));
 
 		} else if (cid.getEntityId() != null) {
-			// if this is a request by entity id, then create the entity id query
+			// if this is a request by entity id, then create the entity id
+			// query
 			query = selectEntitiesWith(allOf(EntityId.entityId(dto
 					.getIdentifier().getEntityId())));
 
 		}
 
-		// We can't guarantee that all entities are keyed if they are retrieved by entity id
+		// We can't guarantee that all entities are keyed if they are retrieved
+		// by entity id
 		@SuppressWarnings("rawtypes")
 		Collection<? extends IEntity> retVal = contentRepo.getEntities(query,
 				false);
 
-		RetrieveEntityVisitor visitor = new RetrieveEntityVisitor();
-		for( IEntity<?> entity : retVal ) {
+		RetrieveEntityVisitor visitor = new RetrieveEntityVisitor(metadata != null ? metadata : false);
+		for (IEntity<?> entity : retVal) {
 			entity.accept(visitor);
 		}
-		
+
 		return visitor.getResponse();
 	}
 
@@ -248,19 +245,20 @@ public class ContentRepoRest {
 			shredder.shred(is, encoding, handler);
 
 			List<SubmitEntityResponseDto> responseList = new LinkedList<SubmitEntityResponseDto>();
-			IEntityVisitor visitor = new SubmitEntityVisitor(contentRepo, entityComparator, responseList);
+			IEntityVisitor visitor = new SubmitEntityVisitor(contentRepo,
+					entityComparator, responseList);
 			for (IEntity<?> i : handler.getEntities()) {
 				i.accept(visitor);
 			}
 
-			
-			if( responseList.size() == 0 ) {
+			if (responseList.size() == 0) {
 				List<String> storedEntities = contentRepo.storeEntities(handler
 						.getEntities());
 				SubmitResponseDto responseDto = new SubmitResponseDto();
 				responseDto.setStatus(SubmitResponseDto.STATUS.SUCCESS);
-				responseDto.setNewEntity(new URI(storedEntities.get(storedEntities.size() - 1)));
-				
+				responseDto.setNewEntity(new URI(storedEntities
+						.get(storedEntities.size() - 1)));
+
 				return responseDto;
 			} else {
 				SubmitResponseDto responseDto = new SubmitResponseDto();
@@ -268,8 +266,6 @@ public class ContentRepoRest {
 				responseDto.setEntityList(responseList);
 				return responseDto;
 			}
-			
-			
 
 		} catch (XmlException e) {
 			e.printStackTrace();
@@ -287,7 +283,7 @@ public class ContentRepoRest {
 			// should never happen
 			throw new WebApplicationException(e);
 		}
-		
+
 	}
 
 	@GET
