@@ -265,6 +265,7 @@
 				<version>${spring.version}</version>
 				<scope>runtime</scope>
 			</dependency>
+			
     </dependencies>
   </dependencyManagement>
 
@@ -432,8 +433,8 @@
         </os>
     </activation>
 	<properties>
-		<metadata.store.home>${env.JBOSS_HOME}/data/triple-store</metadata.store.home>
-		<exist.data.dir>${env.JBOSS_HOME}/data/exist-db-data</exist.data.dir>
+		<metadata.store.home>C:/Tools/jboss-as-7.1.1.Final-content-repo/data/triple-store</metadata.store.home>
+		<exist.data.dir>C:/Tools/jboss-as-7.1.1.Final-content-repo/data/exist-db-data</exist.data.dir>
 		<java.tools>${java.home}/../lib/tools.jar</java.tools>
 	</properties>
   </profile>  

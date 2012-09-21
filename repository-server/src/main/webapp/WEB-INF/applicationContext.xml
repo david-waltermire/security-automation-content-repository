@@ -22,6 +22,7 @@
     	</jaxrs:serviceBeans>
 		<jaxrs:providers>
 		   <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+		   <bean class="org.apache.cxf.jaxrs.provider.xmlbeans.XMLBeansElementProvider"/>
 		</jaxrs:providers>
     </jaxrs:server>
     

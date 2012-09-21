@@ -67,7 +67,9 @@ import gov.nist.scap.schema.contentRules.x01.VersionType;
 import gov.nist.scap.schema.contentRules.x01.VersioningMethodType;
 import gov.nist.scap.schema.contentRules.x01.VersioningMethodsType;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -101,11 +103,12 @@ public class XmlbeansRules implements IMetadataModel {
 	private final Map<String, ICompositeRelationshipDefinition> compositeRelationships = new HashMap<String, ICompositeRelationshipDefinition>();
 
 	public XmlbeansRules(File file) throws XmlException, IOException {
-		this(RulesDocument.Factory.parse(file));
+		this(new BufferedInputStream(new FileInputStream(file)));
 	}
 
     public XmlbeansRules(InputStream is) throws XmlException, IOException {
         this(RulesDocument.Factory.parse(is));
+        is.close();
     }
 	
 	public XmlbeansRules(RulesDocument data) throws XmlException {
